@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": "../ts/",
+    "lib": ["DOM", "ES6"],
+    "module": "System",
+    "noImplicitAny": true,
+    "outFile": "railroad.studio/studio.js",
+    "removeComments": true,
+    "rootDir": "ts",
+    "sourceMap": true,
+    "sourceRoot": "../ts/",
+    "strict": true,
+    "target": "ES6"
+  }
+}

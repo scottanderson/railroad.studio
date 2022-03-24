@@ -1,0 +1,17 @@
+.pad {
+  padding: 1rem;
+}
+
+.light thead.sticky-top {
+  background-color: var(--bs-body-bg);
+}
+
+.dark thead.sticky-top {
+  background-color: var(--bs-body-bg-alt);
+}
+
+#drop_zone {
+  border: 5px solid blue;
+  width:  200px;
+  height: 100px;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Railroad Studio</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-nightshade.min.css" integrity="sha384-CvItGYrXmque42UjYhp+bjRR8tgQz78Nlwk42gYsNzBc6y0DuXNtdUaRzr1cl2uK" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css" integrity="sha384-ZZRF0DVUJx2AMk/on/MvIwSN1tvQ3OE8CcxiKTqAlkypC5g+bb6pVOIWAAIANf5Y" crossorigin="anonymous">
+</head>
+<body class="pad">
+  <div id="content">
+    <div id="drop-area">
+      <form class="drop-form">
+        <p>Drag and drop a file here.</p>
+        <input type="file" id="fileElem" accept=".sav">
+        <label class="button" for="fileElem">Select a file</label>
+      </form>
+    </div>
+  </div>
+  <script src="https://unpkg.com/systemjs@6.11.0/dist/s.js"></script>
+  <script src="https://unpkg.com/systemjs@6.11.0/dist/extras/named-register.js"></script>
+  <script src="studio.js"></script>
+  <script type="module">System.import('index');</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/js/darkmode.min.js" integrity="sha384-A4SLs39X/aUfwRclRaXvNeXNBTLZdnZdHhhteqbYFS2jZTRD79tKeFeBn7SGXNpi" crossorigin="anonymous"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-H9CEK18JXC"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-H9CEK18JXC', { send_page_view: false }); gtag('consent', 'default', { 'analytics_storage': 'denied' });</script>
+</body>
+
+</html>
