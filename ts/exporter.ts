@@ -1,23 +1,12 @@
-import {
-    CustomData,
-    EngineVersion,
-    Gvas,
-    GvasHeader,
-    GvasMap,
-    GvasString,
-    GvasText,
-    RichTextFormat,
-    Rotator,
-    Vector,
-} from 'Gvas';
-import {Railroad} from 'Railroad';
+/* exported railroadToGvas, gvasToBlob */
+/* global CustomData EngineVersion Gvas GvasHeader GvasMap GvasString GvasText Railroad RichTextFormat Rotator Vector */
 
 /**
  * Converts a Railroad to a Gvas for export.
  * @param {Railroad} railroad
  * @return {Gvas}
  */
-export function railroadToGvas(railroad: Railroad): Gvas {
+function railroadToGvas(railroad: Railroad): Gvas {
     // Flatten control points and segment arrays
     let splineControlPoints: Vector[] = [];
     const splineControlPointsIndexStart: number[] = [];
@@ -120,7 +109,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'switchtypearray': intArrays[propertyName] = switches.map((s) => s.type); break;
             case 'tenderfuelamountarray': floatArrays[propertyName] = frames.map((f) => f.state.tenderFuelAmount); break;
             case 'tenderwateramountarray': floatArrays[propertyName] = frames.map((f) => f.state.tenderWaterAmount); break;
-            case 'turntabledeckrotationarray': rotatorArrays[propertyName] = turntables.map((t) => t.deckRotation!); break;
+            case 'turntabledeckrotationarray': rotatorArrays[propertyName] = removeUndefinedTail(turntables.map((t) => t.deckRotation)); break;
             case 'turntablelocationarray': vectorArrays[propertyName] = turntables.map((t) => t.location); break;
             case 'turntablerotatorarray': rotatorArrays[propertyName] = turntables.map((t) => t.rotator); break;
             case 'turntabletypearray': intArrays[propertyName] = turntables.map((t) => t.type); break;
@@ -153,7 +142,7 @@ function requireArgument<T>(obj?: T | null): T {
     return obj;
 }
 
-export function gvasToBlob(gvas: Gvas): Blob {
+function gvasToBlob(gvas: Gvas): Blob {
     // seq:
     //   - id: gvas
     //     contents: 'GVAS'

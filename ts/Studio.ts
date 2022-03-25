@@ -1,15 +1,10 @@
-import {Railroad} from 'Railroad';
-import {
-    gvasToBlob,
-    railroadToGvas,
-} from 'exporter';
-import {simplifySplines} from 'splines';
-import {GvasString, GvasText} from './Gvas';
+/* exported Studio */
+/* global GvasString GvasText Railroad gvasToBlob railroadToGvas simplifySplines */
 
 /**
  * Web UI for editing a Railroad object.
  */
-export class Studio {
+class Studio {
     filename: string;
     railroad: Railroad;
 

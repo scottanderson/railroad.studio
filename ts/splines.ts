@@ -1,5 +1,5 @@
-import {Vector} from 'Gvas';
-import {Railroad, Spline} from 'Railroad';
+/* exported simplifySplines */
+/* global Railroad Spline Vector */
 
 /**
  * @callback loggingCallback
@@ -16,7 +16,7 @@ import {Railroad, Spline} from 'Railroad';
  * @param {loggingCallback} log - Handler for logging output
  * @return {Spline[]}
  */
-export function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spline[] {
+function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spline[] {
     const splines = railroad.splines;
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
     if (log) log(`Starting with ${splines.length} splines, ${numControlPoints} control points.`);

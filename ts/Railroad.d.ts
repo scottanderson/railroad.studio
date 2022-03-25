@@ -1,19 +1,11 @@
-import {
-    GvasHeader,
-    GvasMap,
-    GvasString,
-    GvasText,
-    GvasTypes,
-    Rotator,
-    Vector,
-} from 'Gvas';
+/* global GvasHeader GvasMap GvasString GvasText GvasTypes Rotator Vector */
 
 /**
  * A simplified save state that can be modified in Railroad Studio.
  *
  * Can be created from or converted to a {@link Gvas} for serializaiton.
  */
-export interface Railroad {
+interface Railroad {
     _header: GvasHeader;
     _order: GvasString[];
     _types: GvasMap<GvasTypes>;
@@ -34,7 +26,7 @@ export interface Railroad {
     splines: Spline[];
 }
 
-export interface Frame {
+interface Frame {
     location: Vector;
     name: GvasText;
     number: GvasText;
@@ -71,7 +63,7 @@ export interface Frame {
     };
 }
 
-export interface Industry {
+interface Industry {
     location: Vector;
     rotation: Rotator;
     inputs: [number, number, number, number];
@@ -79,7 +71,7 @@ export interface Industry {
     type: IndustryType;
 }
 
-export enum IndustryType {
+declare enum IndustryType {
     logging_camp = 1,
     sawmill = 2,
     smelter = 3,

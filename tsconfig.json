@@ -2,7 +2,6 @@
   "compilerOptions": {
     "baseUrl": "../ts/",
     "lib": ["DOM", "ES6"],
-    "module": "System",
     "noImplicitAny": true,
     "outFile": "railroad.studio/studio.js",
     "removeComments": true,

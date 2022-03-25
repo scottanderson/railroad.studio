@@ -1,7 +1,7 @@
 /**
  * Stores the data from a GVAS '.sav' file.
  */
-export interface Gvas {
+interface Gvas {
     _order: GvasString[];
     _types: GvasMap<GvasTypes>;
     _header: GvasHeader;
@@ -16,7 +16,7 @@ export interface Gvas {
     textArrays: GvasMap<GvasText[]>;
 }
 
-export type GvasTypes = (
+type GvasTypes = (
     [] |
     ['FloatProperty'] |
     ['StrProperty'] |
@@ -28,13 +28,13 @@ export type GvasTypes = (
     ['ArrayProperty', 'StructProperty', 'Vector'] |
     ['ArrayProperty', 'TextProperty']);
 
-export type GvasMap<V> = {
+type GvasMap<V> = {
     [key: string]: V;
 };
 
-export type GvasString = string | null;
+type GvasString = string | null;
 
-export interface GvasHeader {
+interface GvasHeader {
     saveVersion: number;
     structureVersion: number;
     engineVersion: EngineVersion
@@ -43,7 +43,7 @@ export interface GvasHeader {
     saveType: GvasString;
 }
 
-export interface EngineVersion {
+interface EngineVersion {
     major: number;
     minor: number;
     patch: number;
@@ -51,32 +51,32 @@ export interface EngineVersion {
     buildID: GvasString;
 }
 
-export interface CustomData {
+interface CustomData {
     guid: number[];
     value: number;
 }
 
-export interface Vector {
+interface Vector {
     x: number;
     y: number;
     z: number;
 }
 
-export interface Rotator {
+interface Rotator {
     pitch: number;
     yaw: number;
     roll: number;
 }
 
-export type GvasText = null | RichText | GvasString[];
+type GvasText = null | RichText | GvasString[];
 
-export interface RichText {
+interface RichText {
     guid: GvasString;
     pattern: GvasString,
     textFormat: RichTextFormat[],
 }
 
-export interface RichTextFormat {
+interface RichTextFormat {
     formatKey: GvasString;
     contentType: number;
     values: GvasString[];

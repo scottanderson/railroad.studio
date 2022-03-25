@@ -1,13 +1,4 @@
-import {Gvas} from 'Gvas';
-import {Studio} from 'Studio';
-import {gvasToRailroad} from 'importer';
-import {parseGvas} from 'parser';
-
-declare global {
-    interface Window {
-        studio: Studio;
-    }
-}
+/* global Gvas Studio gvasToRailroad parseGvas */
 
 window.onload = () => {
     // Configure the drop area
@@ -92,7 +83,7 @@ function handleFile(file?: File): void {
         const railroad = gvasToRailroad(gvas);
         const content = document.getElementById('content');
         if (!content) throw new Error('Missing content');
-        window.studio = new Studio(file.name, railroad, content);
+        new Studio(file.name, railroad, content);
     };
     file.arrayBuffer()
         .then(parseGvas)
