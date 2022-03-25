@@ -11,8 +11,6 @@ import {
     Vector,
 } from 'Gvas';
 import {Railroad} from 'Railroad';
-type BlobPart = BufferSource | Blob | string;
-type BufferSource = ArrayBufferView | ArrayBuffer;
 
 /**
  * Converts a Railroad to a Gvas for export.

@@ -8,21 +8,22 @@
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
+        "project": "tsconfig.json",
         "ecmaVersion": "latest",
         "sourceType": "script"
     },
     "plugins": ["@typescript-eslint"],
     "rules": {
         "@typescript-eslint/indent": ["error"],
+        "@typescript-eslint/no-inferrable-types": ["error"],
         "@typescript-eslint/no-require-imports": ["error"],
         "@typescript-eslint/no-type-alias": ["error", {
             "allowAliases": "in-unions",
             "allowLiterals": "always",
             "allowTupleTypes": "in-unions"
         }],
-        "@typescript-eslint/no-unused-vars": ["error", {
-
-        }],
+        "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
+        "@typescript-eslint/no-unused-vars": ["error"],
         "@typescript-eslint/semi": ["error"],
         "eqeqeq": "error",
         "indent": "off", // @typescript-eslint/indent

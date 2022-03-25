@@ -17,19 +17,19 @@ export interface Railroad {
     _header: GvasHeader;
     _order: GvasString[];
     _types: GvasMap<GvasTypes>;
-    frames?: Frame[];
+    frames: Frame[];
     industries: Industry[];
     players: Player[];
-    sandhouses?: Sandhouse[],
-    switches?: Switch[];
-    turntables?: Turntable[],
-    watertowers?: Watertower[];
+    sandhouses: Sandhouse[],
+    switches: Switch[];
+    turntables: Turntable[],
+    watertowers: Watertower[];
     removedVegetationAssets: Vector[];
     saveGame: {
-        date: string;
-        uniqueId: string;
-        uniqueWorldId: string;
-        version: string;
+        date: GvasString;
+        uniqueId: GvasString;
+        uniqueWorldId: GvasString;
+        version: GvasString;
     };
     splines: Spline[];
 }
@@ -72,7 +72,6 @@ export interface Frame {
 }
 
 export interface Industry {
-    id: number;
     location: Vector;
     rotation: Rotator;
     inputs: [number, number, number, number];
@@ -98,8 +97,8 @@ export enum IndustryType {
 }
 
 interface Player {
-    id?: string;
-    name: string;
+    id?: GvasString;
+    name: GvasString;
     location: Vector;
     rotation?: number;
     money: number;

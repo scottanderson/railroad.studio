@@ -3,6 +3,7 @@ import {
     GvasMap,
 } from 'Gvas';
 import {
+    Frame,
     Industry,
     Player,
     Railroad,
@@ -20,10 +21,15 @@ import {
  */
 export function gvasToRailroad(gvas: Gvas): Railroad {
     if (gvas._header.saveType !== '/Script/arr.arrSaveGame') throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
+    // Read save game data
     const saveGameVersion = optionalMap(gvas.strings, 'SaveGameVersion');
     if (Number(saveGameVersion || 0) !== 220127) {
         console.log(`Warning: Save game version ${saveGameVersion} has not been tested. Proceed with caution.`);
     }
+    const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
+    const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
+    const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
+    // Read frames
     const boilerFireTemp = optionalMap(gvas.floatArrays, 'BoilerFireTempArray');
     const boilerFuelAmount = optionalMap(gvas.floatArrays, 'BoilerFuelAmountArray');
     const boilerPressure = optionalMap(gvas.floatArrays, 'BoilerPressureArray');
@@ -45,77 +51,18 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const headlightFrontState = optionalMap(gvas.boolArrays, 'HeadlightFrontStateArray');
     const headlightRearState = optionalMap(gvas.boolArrays, 'HeadlightRearStateArray');
     const headlightType = optionalMap(gvas.intArrays, 'HeadlightTypeArray');
-    const industryLocation = requireMap(gvas.vectorArrays, 'IndustryLocationArray');
-    const industryRotation = requireMap(gvas.rotatorArrays, 'IndustryRotationArray');
-    const industryStorageEduct1 = requireMap(gvas.intArrays, 'IndustryStorageEduct1Array');
-    const industryStorageEduct2 = requireMap(gvas.intArrays, 'IndustryStorageEduct2Array');
-    const industryStorageEduct3 = requireMap(gvas.intArrays, 'IndustryStorageEduct3Array');
-    const industryStorageEduct4 = requireMap(gvas.intArrays, 'IndustryStorageEduct4Array');
-    const industryStorageProduct1 = requireMap(gvas.intArrays, 'IndustryStorageProduct1Array');
-    const industryStorageProduct2 = requireMap(gvas.intArrays, 'IndustryStorageProduct2Array');
-    const industryStorageProduct3 = requireMap(gvas.intArrays, 'IndustryStorageProduct3Array');
-    const industryStorageProduct4 = requireMap(gvas.intArrays, 'IndustryStorageProduct4Array');
-    const industryType = requireMap(gvas.intArrays, 'IndustryTypeArray');
     const markerLightsCenterState = optionalMap(gvas.intArrays, 'MarkerLightsCenterStateArray');
     const markerLightsFrontLeftState = optionalMap(gvas.intArrays, 'MarkerLightsFrontLeftStateArray');
     const markerLightsFrontRightState = optionalMap(gvas.intArrays, 'MarkerLightsFrontRightStateArray');
     const markerLightsRearLeftState = optionalMap(gvas.intArrays, 'MarkerLightsRearLeftStateArray');
     const markerLightsRearRightState = optionalMap(gvas.intArrays, 'MarkerLightsRearRightStateArray');
-    const playerId = optionalMap(gvas.stringArrays, 'playeridarray');
-    const playerLocation = requireMap(gvas.vectorArrays, 'PlayerLocationArray');
-    const playerMoney = requireMap(gvas.floatArrays, 'PlayerMoneyArray');
-    const playerName = requireMap(gvas.stringArrays, 'PlayerNameArray');
-    const playerXp = requireMap(gvas.intArrays, 'PlayerXPArray');
     const regulatorValue = optionalMap(gvas.floatArrays, 'RegulatorValueArray');
-    const removedVegetationAssets = requireMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray');
     const reverserValue = optionalMap(gvas.floatArrays, 'ReverserValueArray');
     const sanderAmount = optionalMap(gvas.floatArrays, 'SanderAmountArray');
-    const sandhouseLocation = optionalMap(gvas.vectorArrays, 'SandhouseLocationArray');
-    const sandhouseRotation = optionalMap(gvas.rotatorArrays, 'SandhouseRotationArray');
-    const sandhouseType = optionalMap(gvas.intArrays, 'SandhouseTypeArray');
-    const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
-    const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
-    const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
     const smokestackType = optionalMap(gvas.intArrays, 'SmokestackTypeArray');
-    const splineControlPoints = optionalMap(gvas.vectorArrays, 'SplineControlPointsArray');
-    const splineControlPointsIndexEnd = optionalMap(gvas.intArrays, 'SplineControlPointsIndexEndArray');
-    const splineControlPointsIndexStart = optionalMap(gvas.intArrays, 'SplineControlPointsIndexStartArray');
-    const splineLocation = optionalMap(gvas.vectorArrays, 'SplineLocationArray');
-    const splineSegmentsVisibility = optionalMap(gvas.boolArrays, 'SplineSegmentsVisibilityArray');
-    const splineType = optionalMap(gvas.intArrays, 'SplineTypeArray');
-    const splineVisibilityEnd = optionalMap(gvas.intArrays, 'SplineVisibilityEndArray');
-    const splineVisibilityStart = optionalMap(gvas.intArrays, 'SplineVisibilityStartArray');
-    const switchLocation = optionalMap(gvas.vectorArrays, 'SwitchLocationArray');
-    const switchRotation = optionalMap(gvas.rotatorArrays, 'SwitchRotationArray');
-    const switchState = optionalMap(gvas.intArrays, 'SwitchStateArray');
-    const switchType = optionalMap(gvas.intArrays, 'SwitchTypeArray');
     const tenderFuelAmount = optionalMap(gvas.floatArrays, 'TenderFuelAmountArray');
     const tenderWaterAmount = optionalMap(gvas.floatArrays, 'TenderWaterAmountArray');
-    const turntableDeckRotationArray = optionalMap(gvas.rotatorArrays, 'TurntableDeckRotationArray');
-    const turntableLocation = optionalMap(gvas.vectorArrays, 'TurntableLocationArray');
-    const turntableRotator = optionalMap(gvas.rotatorArrays, 'TurntableRotatorArray');
-    const turntableType = optionalMap(gvas.intArrays, 'TurntableTypeArray');
-    const watertowerLocation = optionalMap(gvas.vectorArrays, 'WatertowerLocationArray');
-    const watertowerRotation = optionalMap(gvas.rotatorArrays, 'WatertowerRotationArray');
-    const watertowerType = optionalMap(gvas.intArrays, 'WatertowerTypeArray');
-    const watertowerWaterlevel = optionalMap(gvas.floatArrays, 'WatertowerWaterlevelArray');
-    // Parse the data
-    const railroad = <Railroad>{
-        _header: gvas._header,
-        _order: gvas._order,
-        _types: gvas._types,
-        industries: [],
-        players: [],
-        removedVegetationAssets: removedVegetationAssets,
-        saveGame: {
-            date: saveGameDate,
-            uniqueId: saveGameUniqueID,
-            uniqueWorldId: saveGameUniqueWorldID,
-            version: saveGameVersion,
-        },
-        splines: [],
-    };
-    // Read frames
+    const frames: Frame[] = [];
     if (boilerFireTemp || boilerFuelAmount || boilerPressure || boilerWaterLevel || boilerWaterTemp ||
         brakeValue || compressorAirPressure || compressorValveValue || couplerFrontState || couplerRearState ||
         frameLocation || frameName || frameNumber || frameRotation || frameType || freightAmount || freightType ||
@@ -144,9 +91,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             smokestackType,
             tenderFuelAmount, tenderWaterAmount,
         ]);
-        railroad.frames = [];
         for (let i = 0; i < frameLocation.length; i++) {
-            railroad.frames.push({
+            const frame: Frame = {
                 location: frameLocation[i],
                 name: frameName[i],
                 number: frameNumber[i],
@@ -181,76 +127,110 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                     tenderFuelAmount: tenderFuelAmount[i],
                     tenderWaterAmount: tenderWaterAmount[i],
                 },
-            });
+            };
+            frames.push(frame);
         }
     }
     // Read industries
+    const industries: Industry[] = [];
+    const industryLocation = requireMap(gvas.vectorArrays, 'IndustryLocationArray');
+    const industryRotation = requireMap(gvas.rotatorArrays, 'IndustryRotationArray');
+    const industryStorageEduct1 = requireMap(gvas.intArrays, 'IndustryStorageEduct1Array');
+    const industryStorageEduct2 = requireMap(gvas.intArrays, 'IndustryStorageEduct2Array');
+    const industryStorageEduct3 = requireMap(gvas.intArrays, 'IndustryStorageEduct3Array');
+    const industryStorageEduct4 = requireMap(gvas.intArrays, 'IndustryStorageEduct4Array');
+    const industryStorageProduct1 = requireMap(gvas.intArrays, 'IndustryStorageProduct1Array');
+    const industryStorageProduct2 = requireMap(gvas.intArrays, 'IndustryStorageProduct2Array');
+    const industryStorageProduct3 = requireMap(gvas.intArrays, 'IndustryStorageProduct3Array');
+    const industryStorageProduct4 = requireMap(gvas.intArrays, 'IndustryStorageProduct4Array');
+    const industryType = requireMap(gvas.intArrays, 'IndustryTypeArray');
     enforceEqualLengths([industryLocation, industryRotation,
         industryStorageEduct1, industryStorageEduct2, industryStorageEduct3, industryStorageEduct4,
         industryStorageProduct1, industryStorageProduct2, industryStorageProduct3, industryStorageProduct4,
         industryType]);
     for (let i = 0; i < industryLocation.length; i++) {
-        railroad.industries.push(<Industry>{
+        const industry: Industry = {
             location: industryLocation[i],
             rotation: industryRotation[i],
             inputs: [industryStorageEduct1[i], industryStorageEduct2[i], industryStorageEduct3[i], industryStorageEduct4[i]],
             outputs: [industryStorageProduct1[i], industryStorageProduct2[i], industryStorageProduct3[i], industryStorageProduct4[i]],
             type: industryType[i],
-        });
+        };
+        industries.push(industry);
     }
     // Read players
+    const players: Player[] = [];
+    const playerId = optionalMap(gvas.stringArrays, 'playeridarray');
+    const playerLocation = requireMap(gvas.vectorArrays, 'PlayerLocationArray');
+    const playerMoney = requireMap(gvas.floatArrays, 'PlayerMoneyArray');
+    const playerName = requireMap(gvas.stringArrays, 'PlayerNameArray');
+    const playerXp = requireMap(gvas.intArrays, 'PlayerXPArray');
     enforceEqualLengths([playerName, playerLocation, playerMoney, playerXp]);
     if (playerId && playerId.length !== playerName.length) {
         console.log('Warning: playerId array does not match other player arrays', playerId, playerName);
     }
     for (let i = 0; i < playerName.length; i++) {
-        railroad.players.push(<Player>{
+        const player: Player = {
             id: optionalIndex(playerId, i),
             name: playerName[i],
             location: playerLocation[i],
             money: playerMoney[i],
             xp: playerXp[i],
-        });
+        };
+        players.push(player);
     }
     // Read sandhouses
+    const sandhouses: Sandhouse[] = [];
+    const sandhouseLocation = optionalMap(gvas.vectorArrays, 'SandhouseLocationArray');
+    const sandhouseRotation = optionalMap(gvas.rotatorArrays, 'SandhouseRotationArray');
+    const sandhouseType = optionalMap(gvas.intArrays, 'SandhouseTypeArray');
     if (sandhouseLocation || sandhouseRotation || sandhouseType) {
         if (!sandhouseLocation || !sandhouseRotation || !sandhouseType) {
             throw new Error('Some sandhouse values are missing');
         }
         enforceEqualLengths([sandhouseLocation, sandhouseRotation, sandhouseType]);
-        railroad.sandhouses = [];
         for (let i = 0; i < sandhouseLocation.length; i++) {
-            railroad.sandhouses.push(<Sandhouse>{
+            const sandhouse: Sandhouse = {
                 location: sandhouseLocation[i],
                 rotation: sandhouseRotation[i],
                 type: sandhouseType[i],
-            });
+            };
+            sandhouses.push(sandhouse);
         }
     }
     // Read switches
+    const switches: Switch[] = [];
+    const switchLocation = optionalMap(gvas.vectorArrays, 'SwitchLocationArray');
+    const switchRotation = optionalMap(gvas.rotatorArrays, 'SwitchRotationArray');
+    const switchState = optionalMap(gvas.intArrays, 'SwitchStateArray');
+    const switchType = optionalMap(gvas.intArrays, 'SwitchTypeArray');
     if (switchLocation || switchRotation || switchState || switchType) {
         if (!switchLocation || !switchRotation || !switchState || !switchType) {
             throw new Error('Some switch values are missing');
         }
         enforceEqualLengths([switchLocation, switchRotation, switchState, switchType]);
-        railroad.switches = [];
         for (let i = 0; i < switchLocation.length; i++) {
-            railroad.switches.push(<Switch>{
+            const sw: Switch = {
                 location: switchLocation[i],
                 rotation: switchRotation[i],
                 state: switchState[i],
                 type: switchType[i],
-            });
+            };
+            switches.push(sw);
         }
     }
     // Read turntables
+    const turntables: Turntable[] = [];
+    const turntableDeckRotationArray = optionalMap(gvas.rotatorArrays, 'TurntableDeckRotationArray');
+    const turntableLocation = optionalMap(gvas.vectorArrays, 'TurntableLocationArray');
+    const turntableRotator = optionalMap(gvas.rotatorArrays, 'TurntableRotatorArray');
+    const turntableType = optionalMap(gvas.intArrays, 'TurntableTypeArray');
     if (turntableDeckRotationArray || turntableLocation || turntableRotator || turntableType) {
         if (!turntableLocation || !turntableRotator || !turntableType) {
             throw new Error('Some turntable values are missing');
         }
         enforceEqualLengths([turntableLocation, turntableRotator, turntableType]);
         if (turntableDeckRotationArray) enforceEqualLengths([turntableDeckRotationArray, turntableLocation]);
-        railroad.turntables = [];
         for (let i = 0; i < turntableLocation.length; i++) {
             const t: Turntable = {
                 location: turntableLocation[i],
@@ -260,26 +240,40 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             if (turntableDeckRotationArray) {
                 t.deckRotation = turntableDeckRotationArray[i];
             }
-            railroad.turntables.push(t);
+            turntables.push(t);
         }
     }
     // Read watertowers
+    const watertowers: Watertower[] = [];
+    const watertowerLocation = optionalMap(gvas.vectorArrays, 'WatertowerLocationArray');
+    const watertowerRotation = optionalMap(gvas.rotatorArrays, 'WatertowerRotationArray');
+    const watertowerType = optionalMap(gvas.intArrays, 'WatertowerTypeArray');
+    const watertowerWaterlevel = optionalMap(gvas.floatArrays, 'WatertowerWaterlevelArray');
     if (watertowerLocation || watertowerRotation || watertowerType || watertowerWaterlevel) {
         if (!watertowerLocation || !watertowerRotation || !watertowerType || !watertowerWaterlevel) {
             throw new Error('Some watertower values are missing');
         }
         enforceEqualLengths([watertowerLocation, watertowerRotation, watertowerType, watertowerWaterlevel]);
-        railroad.watertowers = [];
         for (let i = 0; i < watertowerLocation.length; i++) {
-            railroad.watertowers.push(<Watertower>{
+            const w: Watertower = {
                 location: watertowerLocation[i],
                 rotation: watertowerRotation[i],
                 type: watertowerType[i],
                 waterlevel: watertowerWaterlevel[i],
-            });
+            };
+            watertowers.push(w);
         }
     }
     // Read splines
+    const splines: Spline[] = [];
+    const splineControlPoints = optionalMap(gvas.vectorArrays, 'SplineControlPointsArray');
+    const splineControlPointsIndexEnd = optionalMap(gvas.intArrays, 'SplineControlPointsIndexEndArray');
+    const splineControlPointsIndexStart = optionalMap(gvas.intArrays, 'SplineControlPointsIndexStartArray');
+    const splineLocation = optionalMap(gvas.vectorArrays, 'SplineLocationArray');
+    const splineSegmentsVisibility = optionalMap(gvas.boolArrays, 'SplineSegmentsVisibilityArray');
+    const splineType = optionalMap(gvas.intArrays, 'SplineTypeArray');
+    const splineVisibilityEnd = optionalMap(gvas.intArrays, 'SplineVisibilityEndArray');
+    const splineVisibilityStart = optionalMap(gvas.intArrays, 'SplineVisibilityStartArray');
     if (splineControlPoints ||
         splineControlPointsIndexEnd ||
         splineControlPointsIndexStart ||
@@ -317,14 +311,38 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             if (controlPoints.length - segmentsVisible.length !== 1) {
                 throw new Error(`Segment length does not match control point length, ${controlPoints.length}, ${segmentsVisible.length}`);
             }
-            railroad.splines.push(<Spline>{
+            const spline: Spline = {
                 controlPoints: controlPoints,
                 location: splineLocation[i],
                 segmentsVisible: segmentsVisible,
                 type: splineType[i],
-            });
+            };
+            splines.push(spline);
         }
     }
+    // Read cut trees
+    const removedVegetationAssets = requireMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray');
+    // Import complete, build the railroad
+    const railroad: Railroad = {
+        _header: gvas._header,
+        _order: gvas._order,
+        _types: gvas._types,
+        frames: frames,
+        industries: industries,
+        players: players,
+        removedVegetationAssets: removedVegetationAssets,
+        sandhouses: sandhouses,
+        saveGame: {
+            date: saveGameDate,
+            uniqueId: saveGameUniqueID,
+            uniqueWorldId: saveGameUniqueWorldID,
+            version: saveGameVersion,
+        },
+        splines: splines,
+        switches: switches,
+        turntables: turntables,
+        watertowers: watertowers,
+    };
     return railroad;
 }
 
