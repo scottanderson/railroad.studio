@@ -1,3 +1,16 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#content {
+  flex: 1 0 auto;
+}
+
 .pad {
   padding: 1rem;
 }
@@ -14,4 +27,9 @@
   border: 5px solid blue;
   width:  200px;
   height: 100px;
+}
+
+#footer {
+  flex-shrink: 0;
+  padding-top: 1rem;
 }
