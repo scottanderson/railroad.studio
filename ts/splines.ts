@@ -30,7 +30,7 @@ function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spli
     const simplified = splitSplines(visible);
     if (log && visible.length !== simplified.length) {
         const simplifiedPoints = simplified.reduce((a, e) => a + e.controlPoints.length, 0);
-        log(`After simplification, ${simplified.length} splines, ${simplifiedPoints} control points.`);
+        log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
     }
     // Step 3, combine
     const merged = mergeSplines(simplified);
@@ -132,20 +132,27 @@ function splitSpline(spline: Spline): Spline[] {
  * @return {Spline[]}
  */
 function mergeSplines(splines: Spline[]): Spline[] {
-    const nowhere: Vector = {x: NaN, y: NaN, z: NaN};
-    const placeholder: Spline = {controlPoints: [nowhere], location: nowhere, segmentsVisible: [], type: NaN};
     const result: Spline[] = splines.slice();
-    for (let i = 0; i < splines.length - 1; i++) {
-        for (let j = i + 1; j < splines.length; j++) {
-            const merged = mergeAdjacentSplines(result[i]!, result[j]!);
-            if (merged) {
-                // console.log(`Merged splines ${i} and ${j}`);
-                result[i] = merged;
-                result[j] = placeholder;
+    let replaced;
+    // Repeat this loop until no more splines can be merged
+    do {
+        replaced = false;
+        for (let i = 0; i < result.length - 1; i++) {
+            for (let j = result.length - 1; j > i; j--) {
+                if (typeof result[j] === 'undefined') {
+                    throw new Error(`unexpected undef at idx i=${i}, j=${j}`);
+                }
+                const merged = mergeAdjacentSplines(result[i]!, result[j]!);
+                if (merged) {
+                    // console.log(`Merged splines ${i} and ${j}`);
+                    result[i] = merged;
+                    result.splice(j, 1);
+                    replaced = true;
+                }
             }
         }
-    }
-    return result.filter((s) => s !== placeholder);
+    } while (replaced);
+    return result;
 }
 
 /**
@@ -155,15 +162,18 @@ function mergeSplines(splines: Spline[]): Spline[] {
  * @return {Spline | null} a merged spline, or null if merging failed
  */
 function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
-    const limit = 0.01; // Max distance between control points (1cm, in meters)
+    const limit = 0.100; // Max distance between control points (10cm, in meters)
     const limit2 = limit * limit; // Limit squared
+    const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg, in radians)
     if (spline1.type !== spline2.type) return null;
     [spline1, spline2].forEach(enforceSimpleSpline);
     // Iterate through each permutation of spline ordering (forward, reverse).
     for (const a of [spline1, reverseSpline(spline1)]) {
+        // The tail CP is the last visible segment index plus one
         const taila = tailControlPoint(a);
         const cpa = a.controlPoints[taila]!;
         for (const b of [spline2, reverseSpline(spline2)]) {
+            // The head CP is the first visible segment index
             const headb = headControlPoint(b);
             const cpb = b.controlPoints[headb]!;
             // Compare the tail control point of A to the head control point of B
@@ -172,10 +182,10 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
                 // Control points are too far apart to be merged
                 continue;
             }
-            const ha = splineHeading(a, taila - 1);
+            const ha = splineHeading(a, taila);
             const hb = splineHeading(b, headb);
-            const dh = Math.abs(normalizeAngle(ha - hb));
-            if (dh > 10) {
+            const bearing = Math.abs(normalizeAngle(ha - hb));
+            if (bearing > bearingLimit) {
                 // Spline headings are too far apart to be merged
                 continue;
             }
@@ -238,6 +248,8 @@ function mergeSubSplines(spline1: Spline, starta: number, enda: number, spline2:
     const headControlPoints = spline1.controlPoints.slice(starta, enda); // Remove one of the shared control points
     const tailControlPoints = spline2.controlPoints.slice(startb, endb + 1);
     const controlPoints = headControlPoints.concat(tailControlPoints);
+    // Replace the joined point with the midpoint of the two merged points
+    controlPoints[enda] = midpoint(tailControlPoints[0], spline1.controlPoints[enda]);
     const headVisible = spline1.segmentsVisible.slice(starta, enda);
     const tailVisible = spline2.segmentsVisible.slice(startb, endb);
     const segmentsVisible = headVisible.concat(tailVisible);
@@ -268,6 +280,56 @@ function findLastIndex<T>(array: T[], predicate: (value: T, index: number, obj: 
     return (index >= 0) ? (array.length - 1 - index) : index;
 }
 
+/**
+ * Returns the heading (in degrees) at the provided control point index.
+ * @param {Spline} spline - the spline providing control points
+ * @param {number} i - the control point index
+ * @return {number}
+ */
+function splineHeading(spline: Spline, i: number): number {
+    const max = spline.segmentsVisible.length;
+    if (i === 0) {
+        // Head segment heading
+        const va = spline.controlPoints[1]!;
+        const vb = spline.controlPoints[0]!;
+        return vectorHeading(va, vb);
+    } else if (i === max) {
+        // Tail segment heading
+        const va = spline.controlPoints[i]!;
+        const vb = spline.controlPoints[i - 1]!;
+        return vectorHeading(va, vb);
+    } else if (i > 0 && i < max) {
+        // Average two adjacent segments
+        const va = spline.controlPoints[i + 1]!;
+        const vb = spline.controlPoints[i]!;
+        const vc = spline.controlPoints[i - 1]!;
+        const ha = vectorHeading(va, vb);
+        const hb = vectorHeading(vb, vc);
+        return circularMean(ha, hb);
+    } else {
+        throw new Error(`Illeval control point index ${i}`);
+    }
+}
+
+/**
+ * Calculates the circular mean of any number of angles.
+ * @param {number[]} args - an array of angles to average (in degrees)
+ * @return {number} the circular mean of angles (in degrees)
+ */
+function circularMean(...args: number[]): number {
+    // https://en.wikipedia.org/wiki/Circular_mean
+    const rads = args.map((d) => d * Math.PI / 180);
+    const x = rads.map(Math.sin).reduce((a, e) => a + e, 0);
+    const y = rads.map(Math.cos).reduce((a, e) => a + e, 0);
+    return Math.atan2(x, y) * 180 / Math.PI;
+}
+
+function vectorHeading(va: Vector, vb: Vector) {
+    const x = (vb.x - va.y); // positive is east
+    const y = (vb.y - va.y); // positive is north
+    return Math.atan2(x, y) * 180 / Math.PI;
+}
+
 function normalizeAngle(angle: number): number {
     angle %= 360.0;
     if (angle > 180) return angle - 360.0;
@@ -275,23 +337,10 @@ function normalizeAngle(angle: number): number {
     return angle;
 }
 
-function difference(a: Vector, b: Vector): Vector {
+function midpoint(arg0: Vector, arg1: Vector): Vector {
     return {
-        x: b.x - a.x,
-        y: b.y - a.y,
-        z: b.z - a.z,
+        x: (arg0.x + arg1.x) / 2,
+        y: (arg0.y + arg1.y) / 2,
+        z: (arg0.z + arg1.z) / 2,
     };
-}
-
-function splineHeading(spline: Spline, i: number): number {
-    const len = spline.segmentsVisible.length;
-    if (i < 0 || i > len) throw new Error(`Illeval i ${i}`);
-    if (i === 0) {
-        i = 1;
-    }
-    const va = spline.controlPoints[i]!;
-    const vb = spline.controlPoints[i - 1]!;
-    const dv = difference(va, vb);
-    const hdg = Math.atan2(dv.y, dv.x);
-    return hdg * 180 / Math.PI;
 }
