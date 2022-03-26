@@ -93,7 +93,7 @@ function splitSpline(spline: Spline): Spline[] {
                 vectors.push(spline.controlPoints[i + 1]);
                 visible.push(false);
                 if (!visible.some(Boolean)) throw new Error('Spline is not visible');
-                splines.push(<Spline>{
+                splines.push({
                     controlPoints: vectors,
                     location: vectors[0],
                     segmentsVisible: visible,
@@ -113,7 +113,7 @@ function splitSpline(spline: Spline): Spline[] {
     if (spline.segmentsVisible[spline.segmentsVisible.length - 1]) {
         // Spline does not have any hidden sections at its tail
         if (!visible.some(Boolean)) throw new Error('Spline is not visible');
-        splines.push(<Spline>{
+        splines.push({
             controlPoints: vectors,
             location: vectors[0],
             segmentsVisible: visible,
@@ -226,7 +226,7 @@ function enforceSimpleSpline(spline: Spline): void {
 function reverseSpline(spline: Spline): Spline {
     const controlPoints = spline.controlPoints.slice().reverse();
     const segmentsVisible = spline.segmentsVisible.slice().reverse();
-    return <Spline>{
+    return {
         controlPoints: controlPoints,
         segmentsVisible: segmentsVisible,
         location: controlPoints[0],
@@ -245,7 +245,7 @@ function mergeSubSplines(spline1: Spline, starta: number, enda: number, spline2:
     if (controlPoints.length - segmentsVisible.length !== 1) {
         throw new Error(`Segment length does not match control point length, ${controlPoints.length}, ${segmentsVisible.length}`);
     }
-    const newSpline = <Spline>{
+    const newSpline = {
         controlPoints: controlPoints,
         location: controlPoints[0],
         segmentsVisible: segmentsVisible,
@@ -276,7 +276,7 @@ function normalizeAngle(angle: number): number {
 }
 
 function difference(a: Vector, b: Vector): Vector {
-    return <Vector>{
+    return {
         x: b.x - a.x,
         y: b.y - a.y,
         z: b.z - a.z,

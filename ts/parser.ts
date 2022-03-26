@@ -1,5 +1,5 @@
 /* exported parseGvas */
-/* global CustomData EngineVersion Gvas GvasHeader GvasString GvasText GvasTypes RichText RichTextFormat Rotator Vector */
+/* global CustomData EngineVersion Gvas GvasHeader GvasString GvasText GvasTypes RichTextFormat Rotator Vector */
 
 /**
  * Parse a GVAS file from an ArrayBuffer.
@@ -275,13 +275,13 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
         const values = new Float32Array(buffer.slice(pos, pos + 12));
         pos += 12;
         if (fieldName === 'Rotator') {
-            value.push(<Rotator>{
+            value.push({
                 pitch: values[0], // y (need to confirm)
                 yaw: values[1], // Rotation around the Z axis
                 roll: values[2], // x (need to confirm)
             });
         } else if (fieldName === 'Vector') {
-            value.push(<Vector>{
+            value.push({
                 x: values[0], // East (need to confirm)
                 y: values[1], // North (need to confirm)
                 z: values[2], // Altitude
@@ -302,7 +302,7 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
 /**
  * Parse a struct array from a buffer.
  * @param {ArrayBuffer} buffer
- * @return {RichText[]}
+ * @return {GvasText[]}
  */
 function parseTextArray(buffer: ArrayBuffer): GvasText[] {
     // text_array:
@@ -409,13 +409,13 @@ function parseTextArray(buffer: ArrayBuffer): GvasText[] {
                     [pos, value] = parseString(buffer, pos);
                     values.push(value);
                 }
-                textFormat.push(<RichTextFormat>{
+                textFormat.push({
                     formatKey: formatKey,
                     contentType: contentType,
                     values: values,
                 });
             }
-            array.push(<RichText>{
+            array.push({
                 guid: componentGuid,
                 pattern: textFormatPattern,
                 textFormat: textFormat,
