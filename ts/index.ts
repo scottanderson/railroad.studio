@@ -77,13 +77,18 @@ function handleDrop(e: DragEvent) {
     handleFile(file);
 }
 
+// eslint-disable-next-line no-redeclare
+interface Window {
+    studio: Studio;
+}
+
 function handleFile(file?: File): void {
     if (!file) return;
     const handleGvas = (gvas: Gvas) => {
         const railroad = gvasToRailroad(gvas);
         const content = document.getElementById('content');
         if (!content) throw new Error('Missing content');
-        new Studio(file.name, railroad, content);
+        window.studio = new Studio(file.name, railroad, content);
     };
     file.arrayBuffer()
         .then(parseGvas)

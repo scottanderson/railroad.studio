@@ -7,10 +7,12 @@
 class Studio {
     filename: string;
     railroad: Railroad;
+    modified: boolean;
 
     constructor(filename: string, railroad: Railroad, element: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
+        this.modified = false;
         const header = document.createElement('h2');
         header.innerText = 'Loaded ' + this.filename;
         const buttons = document.createElement('div');
@@ -23,7 +25,7 @@ class Studio {
             this.railroad.splines = simplifySplines(this.railroad, (data: string) => {
                 pre.textContent = pre.textContent ? pre.textContent + '\n' + data : data;
             });
-            this.filename = 'modified-' + this.filename;
+            this.modified = true;
         });
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
@@ -64,13 +66,22 @@ class Studio {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = this.filename;
+            a.download = this.modified ? 'modified-' + this.filename : this.filename;
             document.body.append(a);
             a.click();
             window.URL.revokeObjectURL(url);
             a.remove();
         });
-        buttons.replaceChildren(btnReplaceSplines, btnFrames, btnIndustries, btnPlayers, btnExport);
+        const btnDark = document.createElement('button');
+        const i = document.createElement('i');
+        i.classList.add('bi', 'bi-lightbulb');
+        i.setAttribute('role', 'img');
+        i.ariaLabel = 'Toggle dark mode';
+        btnDark.appendChild(i);
+        btnDark.addEventListener('click', function() {
+            eval('darkmode.toggleDarkMode();');
+        });
+        buttons.replaceChildren(btnReplaceSplines, btnFrames, btnIndustries, btnPlayers, btnExport, btnDark);
         element.replaceChildren(header, buttons);
         document.title = this.filename + ' - Railroad Studio';
         console.log(railroad);
@@ -194,7 +205,9 @@ class Studio {
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
-            td.innerText = JSON.stringify(player.location);
+            const pre = document.createElement('pre');
+            pre.innerText = JSON.stringify(player.location);
+            td.appendChild(pre);
             tr.appendChild(td);
         }
     }
