@@ -2,7 +2,7 @@
  * Stores the data from a GVAS '.sav' file.
  */
 interface Gvas {
-    _order: GvasString[];
+    _order: string[];
     _types: GvasMap<GvasTypes>;
     _header: GvasHeader;
     boolArrays: GvasMap<boolean[]>;

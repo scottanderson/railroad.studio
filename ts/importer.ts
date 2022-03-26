@@ -120,51 +120,67 @@ function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read industries
     const industries: Industry[] = [];
-    const industryLocation = requireMap(gvas.vectorArrays, 'IndustryLocationArray');
-    const industryRotation = requireMap(gvas.rotatorArrays, 'IndustryRotationArray');
-    const industryStorageEduct1 = requireMap(gvas.intArrays, 'IndustryStorageEduct1Array');
-    const industryStorageEduct2 = requireMap(gvas.intArrays, 'IndustryStorageEduct2Array');
-    const industryStorageEduct3 = requireMap(gvas.intArrays, 'IndustryStorageEduct3Array');
-    const industryStorageEduct4 = requireMap(gvas.intArrays, 'IndustryStorageEduct4Array');
-    const industryStorageProduct1 = requireMap(gvas.intArrays, 'IndustryStorageProduct1Array');
-    const industryStorageProduct2 = requireMap(gvas.intArrays, 'IndustryStorageProduct2Array');
-    const industryStorageProduct3 = requireMap(gvas.intArrays, 'IndustryStorageProduct3Array');
-    const industryStorageProduct4 = requireMap(gvas.intArrays, 'IndustryStorageProduct4Array');
-    const industryType = requireMap(gvas.intArrays, 'IndustryTypeArray');
-    enforceEqualLengths([industryLocation, industryRotation,
-        industryStorageEduct1, industryStorageEduct2, industryStorageEduct3, industryStorageEduct4,
-        industryStorageProduct1, industryStorageProduct2, industryStorageProduct3, industryStorageProduct4,
-        industryType]);
-    for (let i = 0; i < industryLocation.length; i++) {
-        const industry: Industry = {
-            location: industryLocation[i],
-            rotation: industryRotation[i],
-            inputs: [industryStorageEduct1[i], industryStorageEduct2[i], industryStorageEduct3[i], industryStorageEduct4[i]],
-            outputs: [industryStorageProduct1[i], industryStorageProduct2[i], industryStorageProduct3[i], industryStorageProduct4[i]],
-            type: industryType[i],
-        };
-        industries.push(industry);
+    const industryLocation = optionalMap(gvas.vectorArrays, 'IndustryLocationArray');
+    const industryRotation = optionalMap(gvas.rotatorArrays, 'IndustryRotationArray');
+    const industryStorageEduct1 = optionalMap(gvas.intArrays, 'IndustryStorageEduct1Array');
+    const industryStorageEduct2 = optionalMap(gvas.intArrays, 'IndustryStorageEduct2Array');
+    const industryStorageEduct3 = optionalMap(gvas.intArrays, 'IndustryStorageEduct3Array');
+    const industryStorageEduct4 = optionalMap(gvas.intArrays, 'IndustryStorageEduct4Array');
+    const industryStorageProduct1 = optionalMap(gvas.intArrays, 'IndustryStorageProduct1Array');
+    const industryStorageProduct2 = optionalMap(gvas.intArrays, 'IndustryStorageProduct2Array');
+    const industryStorageProduct3 = optionalMap(gvas.intArrays, 'IndustryStorageProduct3Array');
+    const industryStorageProduct4 = optionalMap(gvas.intArrays, 'IndustryStorageProduct4Array');
+    const industryType = optionalMap(gvas.intArrays, 'IndustryTypeArray');
+    if (industryLocation || industryRotation ||
+        industryStorageEduct1 || industryStorageEduct2 || industryStorageEduct3 || industryStorageEduct4 ||
+        industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4 ||
+        industryType) {
+        if (!industryLocation || !industryRotation ||
+            !industryStorageEduct1 || !industryStorageEduct2 || !industryStorageEduct3 || !industryStorageEduct4 ||
+            !industryStorageProduct1 || !industryStorageProduct2 || !industryStorageProduct3 || !industryStorageProduct4 ||
+            !industryType) {
+            throw new Error('Some industry values are missing');
+        }
+        enforceEqualLengths([industryLocation, industryRotation,
+            industryStorageEduct1, industryStorageEduct2, industryStorageEduct3, industryStorageEduct4,
+            industryStorageProduct1, industryStorageProduct2, industryStorageProduct3, industryStorageProduct4,
+            industryType]);
+        for (let i = 0; i < industryLocation.length; i++) {
+            const industry: Industry = {
+                location: industryLocation[i],
+                rotation: industryRotation[i],
+                inputs: [industryStorageEduct1[i], industryStorageEduct2[i], industryStorageEduct3[i], industryStorageEduct4[i]],
+                outputs: [industryStorageProduct1[i], industryStorageProduct2[i], industryStorageProduct3[i], industryStorageProduct4[i]],
+                type: industryType[i],
+            };
+            industries.push(industry);
+        }
     }
     // Read players
     const players: Player[] = [];
     const playerId = optionalMap(gvas.stringArrays, 'playeridarray');
-    const playerLocation = requireMap(gvas.vectorArrays, 'PlayerLocationArray');
-    const playerMoney = requireMap(gvas.floatArrays, 'PlayerMoneyArray');
-    const playerName = requireMap(gvas.stringArrays, 'PlayerNameArray');
-    const playerXp = requireMap(gvas.intArrays, 'PlayerXPArray');
-    enforceEqualLengths([playerName, playerLocation, playerMoney, playerXp]);
-    if (playerId && playerId.length !== playerName.length) {
-        console.log('Warning: playerId array does not match other player arrays', playerId, playerName);
-    }
-    for (let i = 0; i < playerName.length; i++) {
-        const player: Player = {
-            id: optionalIndex(playerId, i),
-            name: playerName[i],
-            location: playerLocation[i],
-            money: playerMoney[i],
-            xp: playerXp[i],
-        };
-        players.push(player);
+    const playerLocation = optionalMap(gvas.vectorArrays, 'PlayerLocationArray');
+    const playerMoney = optionalMap(gvas.floatArrays, 'PlayerMoneyArray');
+    const playerName = optionalMap(gvas.stringArrays, 'PlayerNameArray');
+    const playerXp = optionalMap(gvas.intArrays, 'PlayerXPArray');
+    if (playerId || playerLocation || playerMoney || playerName || playerXp) {
+        if (!playerLocation || !playerMoney || !playerName || !playerXp) {
+            throw new Error('Some player values are missing');
+        }
+        enforceEqualLengths([playerName, playerLocation, playerMoney, playerXp]);
+        if (playerId && playerId.length !== playerName.length) {
+            console.log('Warning: playerId array does not match other player arrays', playerId, playerName);
+        }
+        for (let i = 0; i < playerName.length; i++) {
+            const player: Player = {
+                id: optionalIndex(playerId, i),
+                name: playerName[i],
+                location: playerLocation[i],
+                money: playerMoney[i],
+                xp: playerXp[i],
+            };
+            players.push(player);
+        }
     }
     // Read sandhouses
     const sandhouses: Sandhouse[] = [];
@@ -308,7 +324,7 @@ function gvasToRailroad(gvas: Gvas): Railroad {
         }
     }
     // Read cut trees
-    const removedVegetationAssets = requireMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray');
+    const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') || [];
     // Import complete, build the railroad
     const railroad: Railroad = {
         _header: gvas._header,
@@ -335,21 +351,6 @@ function gvasToRailroad(gvas: Gvas): Railroad {
 
 function optionalIndex<T>(arr: T[] | null, i: number): (T | undefined) {
     return arr && arr.length > i ? arr[i] : undefined;
-}
-
-/**
- * Read a case-insensitive key from a GvasMap
- * @param {GvasMap<T>} map
- * @param {string} key
- * @return {T} Returns the map entry.
- * @throws {Error} If key is not found in the map.
- */
-function requireMap<T>(map: GvasMap<T>, key: string): T {
-    if (key in map) return map[key];
-    const lowerKey = key.toLowerCase();
-    const matchingKeys = Object.keys(map).filter((k) => k.toLowerCase() === lowerKey);
-    if (matchingKeys.length === 0) throw new Error(`Key not found: ${key}`);
-    return map[matchingKeys[0]];
 }
 
 /**

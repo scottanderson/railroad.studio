@@ -1,5 +1,85 @@
 /* exported railroadToGvas, gvasToBlob */
-/* global CustomData EngineVersion Gvas GvasHeader GvasMap GvasString GvasText Railroad RichTextFormat Rotator Vector */
+/* global CustomData EngineVersion Gvas GvasHeader GvasMap GvasString GvasText GvasTypes Railroad RichTextFormat Rotator Vector */
+
+const exportKeys = [
+    'BoilerFireTempArray',
+    'BoilerFuelAmountArray',
+    'BoilerPressureArray',
+    'BoilerWaterLevelArray',
+    'BoilerWaterTempArray',
+    'BrakeValueArray',
+    'CompressorValveValueArray',
+    'CompressorairPressureArray',
+    'CouplerFrontStateArray',
+    'CouplerrearStateArray',
+    'FrameLocationArray',
+    'FrameNameArray',
+    'FrameNumberArray',
+    'FrameRotationArray',
+    'FrameTypeArray',
+    'FreightAmountArray',
+    'FreightTypeArray',
+    'GeneratorValveValueArray',
+    'HeadlightFrontStateArray',
+    'HeadlightTypeArray',
+    'HeadlightrearStateArray',
+    'IndustryLocationArray',
+    'IndustryRotationArray',
+    'IndustryStorageEduct1Array',
+    'IndustryStorageEduct2Array',
+    'IndustryStorageEduct3Array',
+    'IndustryStorageEduct4Array',
+    'IndustryStorageProduct1Array',
+    'IndustryStorageProduct2Array',
+    'IndustryStorageProduct3Array',
+    'IndustryStorageProduct4Array',
+    'IndustryTypeArray',
+    'MarkerLightsCenterStateArray',
+    'MarkerLightsFrontLeftStateArray',
+    'MarkerLightsFrontRightStateArray',
+    'MarkerLightsRearLeftStateArray',
+    'MarkerLightsRearRightStateArray',
+    'PlayerIDArray',
+    'PlayerLocationArray',
+    'PlayerMoneyArray',
+    'PlayerNameArray',
+    'PlayerRotationArray',
+    'PlayerXPArray',
+    'RegulatorValueArray',
+    'RemovedVegetationAssetsArray',
+    'ReverserValueArray',
+    'SanderAmountArray',
+    'SandhouseLocationArray',
+    'SandhouseRotationArray',
+    'SandhouseTypeArray',
+    'SaveGameDate',
+    'SaveGameUniqueID',
+    'SaveGameUniqueWorldID',
+    'SaveGameVersion',
+    'SmokestackTypeArray',
+    'SplineControlPointsArray',
+    'SplineControlPointsindexendArray',
+    'SplineControlPointsindexstartArray',
+    'SplineLocationArray',
+    'SplineSegmentsVisibilityArray',
+    'SplineTypeArray',
+    'SplineVisibilityendArray',
+    'SplineVisibilitystartArray',
+    'SwitchLocationArray',
+    'SwitchRotationArray',
+    'SwitchStateArray',
+    'SwitchTypeArray',
+    'TenderFuelAmountArray',
+    'TenderWaterAmountArray',
+    'TurntableDeckRotationArray',
+    'TurntableLocationArray',
+    'TurntableRotatorArray',
+    'TurntableTypeArray',
+    'WatertowerLocationArray',
+    'WatertowerRotationArray',
+    'WatertowerTypeArray',
+    'WatertowerWaterLevelArray',
+];
 
 /**
  * Converts a Railroad to a Gvas for export.
@@ -23,7 +103,6 @@ function railroadToGvas(railroad: Railroad): Gvas {
         splineSegmentVisibility = splineSegmentVisibility.concat(spline.segmentsVisible);
         splineVisibilityEnd[idx] = splineSegmentVisibility.length - 1;
     }
-    // Fill in the GvasMaps
     const boolArrays: GvasMap<boolean[]> = {};
     const floatArrays: GvasMap<number[]> = {};
     const floats: GvasMap<number> = {};
@@ -33,34 +112,39 @@ function railroadToGvas(railroad: Railroad): Gvas {
     const rotatorArrays: GvasMap<Rotator[]> = {};
     const vectorArrays: GvasMap<Vector[]> = {};
     const textArrays: GvasMap<GvasText[]> = {};
-    const frames = railroad.frames || [];
-    const sandhouses = railroad.sandhouses || [];
-    const switches = railroad.switches || [];
-    const turntables = railroad.turntables || [];
-    const watertowers = railroad.watertowers || [];
+    const orderLowerCase = railroad._order.map((s) => s.toLowerCase());
+    // Add missing keys to railroad._order
+    for (const propertyName of exportKeys) {
+        const lowerCase = propertyName.toLowerCase();
+        if (!orderLowerCase.includes(lowerCase)) {
+            railroad._order.push(propertyName);
+            railroad._types[propertyName] = propertyType(lowerCase);
+        }
+    }
+    // Fill in the GvasMaps, preserving property name capitalization
     for (const propertyName of railroad._order) {
-        switch (propertyName?.toLocaleLowerCase()) {
-            case 'boilerfiretemparray': floatArrays[propertyName] = frames.map((f) => f.state.boilerFireTemp); break;
-            case 'boilerfuelamountarray': floatArrays[propertyName] = frames.map((f) => f.state.boilerFuelAmount); break;
-            case 'boilerpressurearray': floatArrays[propertyName] = frames.map((f) => f.state.boilerPressure); break;
-            case 'boilerwaterlevelarray': floatArrays[propertyName] = frames.map((f) => f.state.boilerWaterLevel); break;
-            case 'boilerwatertemparray': floatArrays[propertyName] = frames.map((f) => f.state.boilerWaterTemp); break;
-            case 'brakevaluearray': floatArrays[propertyName] = frames.map((f) => f.state.brakeValue); break;
-            case 'compressorairpressurearray': floatArrays[propertyName] = frames.map((f) => f.state.compressorAirPressure); break;
-            case 'compressorvalvevaluearray': floatArrays[propertyName] = frames.map((f) => f.state.compressorValveValue); break;
-            case 'couplerfrontstatearray': boolArrays[propertyName] = frames.map((f) => f.state.couplerFrontState); break;
-            case 'couplerrearstatearray': boolArrays[propertyName] = frames.map((f) => f.state.couplerRearState); break;
-            case 'framelocationarray': vectorArrays[propertyName] = frames.map((f) => f.location); break;
-            case 'framenamearray': textArrays[propertyName] = frames.map((f) => f.name); break;
-            case 'framenumberarray': textArrays[propertyName] = frames.map((f) => f.number); break;
-            case 'framerotationarray': rotatorArrays[propertyName] = frames.map((f) => f.rotation); break;
-            case 'frametypearray': stringArrays[propertyName] = frames.map((f) => f.type); break;
-            case 'freightamountarray': intArrays[propertyName] = frames.map((f) => f.state.freightAmount); break;
-            case 'freighttypearray': stringArrays[propertyName] = frames.map((f) => f.state.freightType); break;
-            case 'generatorvalvevaluearray': floatArrays[propertyName] = frames.map((f) => f.state.generatorValveValue); break;
-            case 'headlightfrontstatearray': boolArrays[propertyName] = frames.map((f) => f.state.headlightFrontState); break;
-            case 'headlightrearstatearray': boolArrays[propertyName] = frames.map((f) => f.state.headlightRearState); break;
-            case 'headlighttypearray': intArrays[propertyName] = frames.map((f) => f.state.headlightType); break;
+        switch (propertyName.toLowerCase()) {
+            case 'boilerfiretemparray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerFireTemp); break;
+            case 'boilerfuelamountarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerFuelAmount); break;
+            case 'boilerpressurearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerPressure); break;
+            case 'boilerwaterlevelarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerWaterLevel); break;
+            case 'boilerwatertemparray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerWaterTemp); break;
+            case 'brakevaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.brakeValue); break;
+            case 'compressorairpressurearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.compressorAirPressure); break;
+            case 'compressorvalvevaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.compressorValveValue); break;
+            case 'couplerfrontstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerFrontState); break;
+            case 'couplerrearstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerRearState); break;
+            case 'framelocationarray': vectorArrays[propertyName] = railroad.frames.map((f) => f.location); break;
+            case 'framenamearray': textArrays[propertyName] = railroad.frames.map((f) => f.name); break;
+            case 'framenumberarray': textArrays[propertyName] = railroad.frames.map((f) => f.number); break;
+            case 'framerotationarray': rotatorArrays[propertyName] = railroad.frames.map((f) => f.rotation); break;
+            case 'frametypearray': stringArrays[propertyName] = railroad.frames.map((f) => f.type); break;
+            case 'freightamountarray': intArrays[propertyName] = railroad.frames.map((f) => f.state.freightAmount); break;
+            case 'freighttypearray': stringArrays[propertyName] = railroad.frames.map((f) => f.state.freightType); break;
+            case 'generatorvalvevaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.generatorValveValue); break;
+            case 'headlightfrontstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.headlightFrontState); break;
+            case 'headlightrearstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.headlightRearState); break;
+            case 'headlighttypearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.headlightType); break;
             case 'industrylocationarray': vectorArrays[propertyName] = railroad.industries.map((i) => i.location); break;
             case 'industryrotationarray': rotatorArrays[propertyName] = railroad.industries.map((i) => i.rotation); break;
             case 'industrystorageeduct1array': intArrays[propertyName] = railroad.industries.map((i) => i.inputs[0]); break;
@@ -72,29 +156,29 @@ function railroadToGvas(railroad: Railroad): Gvas {
             case 'industrystorageproduct3array': intArrays[propertyName] = railroad.industries.map((i) => i.outputs[2]); break;
             case 'industrystorageproduct4array': intArrays[propertyName] = railroad.industries.map((i) => i.outputs[3]); break;
             case 'industrytypearray': intArrays[propertyName] = railroad.industries.map((i) => i.type); break;
-            case 'markerlightscenterstatearray': intArrays[propertyName] = frames.map((f) => requireArgument(f.state.markerLightsCenterState)); break;
-            case 'markerlightsfrontleftstatearray': intArrays[propertyName] = frames.map((f) => f.state.markerLightsFrontLeftState); break;
-            case 'markerlightsfrontrightstatearray': intArrays[propertyName] = frames.map((f) => f.state.markerLightsFrontRightState); break;
-            case 'markerlightsrearleftstatearray': intArrays[propertyName] = frames.map((f) => f.state.markerLightsRearLeftState); break;
-            case 'markerlightsrearrightstatearray': intArrays[propertyName] = frames.map((f) => f.state.markerLightsRearRightState); break;
+            case 'markerlightscenterstatearray': intArrays[propertyName] = removeUndefinedTail(railroad.frames.map((f) => f.state.markerLightsCenterState)); break;
+            case 'markerlightsfrontleftstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsFrontLeftState); break;
+            case 'markerlightsfrontrightstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsFrontRightState); break;
+            case 'markerlightsrearleftstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearLeftState); break;
+            case 'markerlightsrearrightstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearRightState); break;
             case 'playeridarray': stringArrays[propertyName] = removeUndefinedTail(railroad.players.map((p) => p.id)); break;
             case 'playerlocationarray': vectorArrays[propertyName] = railroad.players.map((p) => p.location); break;
             case 'playermoneyarray': floatArrays[propertyName] = railroad.players.map((p) => p.money); break;
             case 'playernamearray': stringArrays[propertyName] = railroad.players.map((p) => p.name); break;
             case 'playerrotationarray': floatArrays[propertyName] = removeUndefinedTail(railroad.players.map((p) => p.rotation)); break;
             case 'playerxparray': intArrays[propertyName] = railroad.players.map((p) => p.xp); break;
-            case 'regulatorvaluearray': floatArrays[propertyName] = frames.map((f) => f.state.regulatorValue); break;
+            case 'regulatorvaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.regulatorValue); break;
             case 'removedvegetationassetsarray': vectorArrays[propertyName] = railroad.removedVegetationAssets; break;
-            case 'reverservaluearray': floatArrays[propertyName] = frames.map((f) => f.state.reverserValue); break;
-            case 'sanderamountarray': floatArrays[propertyName] = frames.map((f) => f.state.sanderAmount); break;
-            case 'sandhouselocationarray': vectorArrays[propertyName] = sandhouses.map((s) => s.location); break;
-            case 'sandhouserotationarray': rotatorArrays[propertyName] = sandhouses.map((s) => s.rotation); break;
-            case 'sandhousetypearray': intArrays[propertyName] = sandhouses.map((s) => s.type); break;
+            case 'reverservaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.reverserValue); break;
+            case 'sanderamountarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.sanderAmount); break;
+            case 'sandhouselocationarray': vectorArrays[propertyName] = railroad.sandhouses.map((s) => s.location); break;
+            case 'sandhouserotationarray': rotatorArrays[propertyName] = railroad.sandhouses.map((s) => s.rotation); break;
+            case 'sandhousetypearray': intArrays[propertyName] = railroad.sandhouses.map((s) => s.type); break;
             case 'savegamedate': strings[propertyName] = railroad.saveGame.date; break;
             case 'savegameuniqueid': strings[propertyName] = railroad.saveGame.uniqueId; break;
             case 'savegameuniqueworldid': strings[propertyName] = railroad.saveGame.uniqueWorldId; break;
             case 'savegameversion': strings[propertyName] = railroad.saveGame.version; break;
-            case 'smokestacktypearray': intArrays[propertyName] = frames.map((f) => f.state.smokestackType); break;
+            case 'smokestacktypearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.smokestackType); break;
             case 'splinecontrolpointsarray': vectorArrays[propertyName] = splineControlPoints; break;
             case 'splinecontrolpointsindexendarray': intArrays[propertyName] = splineControlPointsIndexEnd; break;
             case 'splinecontrolpointsindexstartarray': intArrays[propertyName] = splineControlPointsIndexStart; break;
@@ -103,20 +187,20 @@ function railroadToGvas(railroad: Railroad): Gvas {
             case 'splinetypearray': intArrays[propertyName] = railroad.splines.map((s) => s.type); break;
             case 'splinevisibilityendarray': intArrays[propertyName] = splineVisibilityEnd; break;
             case 'splinevisibilitystartarray': intArrays[propertyName] = splineVisibilityStart; break;
-            case 'switchlocationarray': vectorArrays[propertyName] = switches.map((s) => s.location); break;
-            case 'switchrotationarray': rotatorArrays[propertyName] = switches.map((s) => s.rotation); break;
-            case 'switchstatearray': intArrays[propertyName] = switches.map((s) => s.state); break;
-            case 'switchtypearray': intArrays[propertyName] = switches.map((s) => s.type); break;
-            case 'tenderfuelamountarray': floatArrays[propertyName] = frames.map((f) => f.state.tenderFuelAmount); break;
-            case 'tenderwateramountarray': floatArrays[propertyName] = frames.map((f) => f.state.tenderWaterAmount); break;
-            case 'turntabledeckrotationarray': rotatorArrays[propertyName] = removeUndefinedTail(turntables.map((t) => t.deckRotation)); break;
-            case 'turntablelocationarray': vectorArrays[propertyName] = turntables.map((t) => t.location); break;
-            case 'turntablerotatorarray': rotatorArrays[propertyName] = turntables.map((t) => t.rotator); break;
-            case 'turntabletypearray': intArrays[propertyName] = turntables.map((t) => t.type); break;
-            case 'watertowerlocationarray': vectorArrays[propertyName] = watertowers.map((w) => w.location); break;
-            case 'watertowerrotationarray': rotatorArrays[propertyName] = watertowers.map((w) => w.rotation); break;
-            case 'watertowertypearray': intArrays[propertyName] = watertowers.map((w) => w.type); break;
-            case 'watertowerwaterlevelarray': floatArrays[propertyName] = watertowers.map((w) => w.waterlevel); break;
+            case 'switchlocationarray': vectorArrays[propertyName] = railroad.switches.map((s) => s.location); break;
+            case 'switchrotationarray': rotatorArrays[propertyName] = railroad.switches.map((s) => s.rotation); break;
+            case 'switchstatearray': intArrays[propertyName] = railroad.switches.map((s) => s.state); break;
+            case 'switchtypearray': intArrays[propertyName] = railroad.switches.map((s) => s.type); break;
+            case 'tenderfuelamountarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.tenderFuelAmount); break;
+            case 'tenderwateramountarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.tenderWaterAmount); break;
+            case 'turntabledeckrotationarray': rotatorArrays[propertyName] = removeUndefinedTail(railroad.turntables.map((t) => t.deckRotation)); break;
+            case 'turntablelocationarray': vectorArrays[propertyName] = railroad.turntables.map((t) => t.location); break;
+            case 'turntablerotatorarray': rotatorArrays[propertyName] = railroad.turntables.map((t) => t.rotator); break;
+            case 'turntabletypearray': intArrays[propertyName] = railroad.turntables.map((t) => t.type); break;
+            case 'watertowerlocationarray': vectorArrays[propertyName] = railroad.watertowers.map((w) => w.location); break;
+            case 'watertowerrotationarray': rotatorArrays[propertyName] = railroad.watertowers.map((w) => w.rotation); break;
+            case 'watertowertypearray': intArrays[propertyName] = railroad.watertowers.map((w) => w.type); break;
+            case 'watertowerwaterlevelarray': floatArrays[propertyName] = railroad.watertowers.map((w) => w.waterlevel); break;
             default: throw new Error(`Unrecognized property: ${propertyName}`);
         }
     }
@@ -136,10 +220,89 @@ function railroadToGvas(railroad: Railroad): Gvas {
     };
 }
 
-function requireArgument<T>(obj?: T | null): T {
-    if (obj === null) throw new Error('argument is null');
-    if (typeof obj === 'undefined') throw new Error('argument is undefined');
-    return obj;
+function propertyType(propertyName: string): GvasTypes {
+    switch (propertyName) {
+        case 'boilerfiretemparray': return ['ArrayProperty', 'FloatProperty'];
+        case 'boilerfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'boilerpressurearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'boilerwaterlevelarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'boilerwatertemparray': return ['ArrayProperty', 'FloatProperty'];
+        case 'brakevaluearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'compressorairpressurearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'compressorvalvevaluearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'couplerfrontstatearray': return ['ArrayProperty', 'BoolProperty'];
+        case 'couplerrearstatearray': return ['ArrayProperty', 'BoolProperty'];
+        case 'framelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'framenamearray': return ['ArrayProperty', 'TextProperty'];
+        case 'framenumberarray': return ['ArrayProperty', 'TextProperty'];
+        case 'framerotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'frametypearray': return ['ArrayProperty', 'StrProperty'];
+        case 'freightamountarray': return ['ArrayProperty', 'IntProperty'];
+        case 'freighttypearray': return ['ArrayProperty', 'StrProperty'];
+        case 'generatorvalvevaluearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'headlightfrontstatearray': return ['ArrayProperty', 'BoolProperty'];
+        case 'headlightrearstatearray': return ['ArrayProperty', 'BoolProperty'];
+        case 'headlighttypearray': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrylocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        // case 'industryrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        // case 'industrystorageeduct1array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageeduct2array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageeduct3array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageeduct4array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageproduct1array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageproduct2array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageproduct3array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrystorageproduct4array': return ['ArrayProperty', 'IntProperty'];
+        // case 'industrytypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'markerlightscenterstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'markerlightsfrontleftstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'markerlightsfrontrightstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'markerlightsrearleftstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'markerlightsrearrightstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
+        // case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        // case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
+        // case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
+        // case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
+        case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
+        // case 'removedvegetationassetsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'reverservaluearray': return ['ArrayProperty', 'FloatProperty'];
+        case 'sanderamountarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'sandhouselocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'sandhouserotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'sandhousetypearray': return ['ArrayProperty', 'IntProperty'];
+        // case 'savegamedate': return ['StrProperty'];
+        // case 'savegameuniqueid': return ['StrProperty'];
+        case 'savegameuniqueid': return ['StrProperty'];
+        // case 'savegameuniqueworldid': return ['StrProperty'];
+        case 'savegameuniqueworldid': return ['StrProperty'];
+        // case 'savegameversion': return ['StrProperty'];
+        case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinecontrolpointsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinecontrolpointsindexendarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinecontrolpointsindexstartarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinesegmentsvisibilityarray': return ['ArrayProperty', 'BoolProperty'];
+        case 'splinetypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinevisibilityendarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinevisibilitystartarray': return ['ArrayProperty', 'IntProperty'];
+        case 'switchlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'switchrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'switchstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'switchtypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'tenderfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'tenderwateramountarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'turntabledeckrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'turntablelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'turntablerotatorarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'turntabletypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'watertowerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'watertowerrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'watertowertypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'watertowerwaterlevelarray': return ['ArrayProperty', 'FloatProperty'];
+        default: throw new Error(`Unknown property name ${propertyName}`);
+    }
 }
 
 function gvasToBlob(gvas: Gvas): Blob {
@@ -530,7 +693,7 @@ function rtfToBlob(rtf: RichTextFormat): BlobPart {
 function removeUndefinedTail<T>(arr: (T | undefined)[]): T[] {
     const filtered = arr.filter((x): x is T => x !== undefined);
     if (filtered.length === arr.length) return filtered;
-    if (filtered === arr.slice(0, filtered.length)) return filtered;
+    if (filtered.every((v, i) => v === arr[i])) return filtered;
     throw new Error('Found undefined elements before tail');
 }
 

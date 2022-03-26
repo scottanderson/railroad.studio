@@ -7,7 +7,7 @@
  */
 interface Railroad {
     _header: GvasHeader;
-    _order: GvasString[];
+    _order: string[];
     _types: GvasMap<GvasTypes>;
     frames: Frame[];
     industries: Industry[];
