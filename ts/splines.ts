@@ -103,7 +103,7 @@ function splitSpline(spline: Spline): Spline[] {
         } else {
             if (tv) {
                 // Create a two segment spline with invisible start
-                vectors = spline.controlPoints.slice(i - 2, i + 1);
+                vectors = spline.controlPoints.slice(i - 1, i + 2);
                 visible = [pv, tv];
             } else {
                 // Consecutive invisible segments
