@@ -27,7 +27,7 @@ function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spli
         log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points.`);
     }
     // Step 2, split and trim
-    const simplified = splitSplines(visible);
+    const simplified = splines.flatMap(splitSpline);
     if (log && visible.length !== simplified.length) {
         const simplifiedPoints = simplified.reduce((a, e) => a + e.controlPoints.length, 0);
         log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
@@ -40,19 +40,6 @@ function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spli
         log(`Spline count reduced by ${(100 * (1 - (merged.length / splines.length))).toFixed(2)}%.\nControl point count reduced by ${(100 * (1 - (mergedPoints / numControlPoints))).toFixed(2)}%.`);
     }
     return merged;
-}
-
-/**
- * Split splines with alternating visibility into multiple splines.
- * @param {Spline[]} splines
- * @return {Spline[]}
- */
-function splitSplines(splines: Spline[]): Spline[] {
-    let result: Spline[] = [];
-    for (const spline of splines) {
-        result = result.concat(splitSpline(spline));
-    }
-    return result;
 }
 
 /**
@@ -162,9 +149,9 @@ function mergeSplines(splines: Spline[]): Spline[] {
  * @return {Spline | null} a merged spline, or null if merging failed
  */
 function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
-    const limit = 0.100; // Max distance between control points (10cm, in meters)
+    const limit = 10; // Max distance between control points (10cm)
     const limit2 = limit * limit; // Limit squared
-    const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg, in radians)
+    const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg)
     if (spline1.type !== spline2.type) return null;
     [spline1, spline2].forEach(enforceSimpleSpline);
     // Iterate through each permutation of spline ordering (forward, reverse).
