@@ -1,11 +1,5 @@
-/* exported simplifySplines */
-/* global Railroad Spline Vector */
-
-/**
- * @callback loggingCallback
- * @param {string} log - The message to log
- * @returns {void}
- */
+import {Vector} from './Gvas';
+import {Railroad, Spline} from './Railroad';
 
 /**
  * Create new splines through existing control points. There are three steps:
@@ -16,28 +10,28 @@
  * @param {loggingCallback} log - Handler for logging output
  * @return {Spline[]}
  */
-function simplifySplines(railroad: Railroad, log?: (data: string) => void): Spline[] {
+export function simplifySplines(railroad: Railroad): Spline[] {
     const splines = railroad.splines;
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
-    if (log) log(`Starting with ${splines.length} splines, ${numControlPoints} control points.`);
+    console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points.`);
     // Step 1, discard invisible
     const visible = splines.filter((spline) => spline.segmentsVisible.some(Boolean));
-    if (log && splines.length !== visible.length) {
+    if (splines.length !== visible.length) {
         const visiblePoints = visible.reduce((a, e) => a + e.controlPoints.length, 0);
-        log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points.`);
+        console.log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points.`);
     }
     // Step 2, split and trim
     const simplified = splines.flatMap(splitSpline);
-    if (log && visible.length !== simplified.length) {
+    if (visible.length !== simplified.length) {
         const simplifiedPoints = simplified.reduce((a, e) => a + e.controlPoints.length, 0);
-        log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
+        console.log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
     }
     // Step 3, combine
     const merged = mergeSplines(simplified);
-    if (log && merged.length !== simplified.length) {
+    if (merged.length !== simplified.length) {
         const mergedPoints = merged.reduce((a, e) => a + e.controlPoints.length, 0);
-        log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
-        log(`Spline count reduced by ${(100 * (1 - (merged.length / splines.length))).toFixed(2)}%.\nControl point count reduced by ${(100 * (1 - (mergedPoints / numControlPoints))).toFixed(2)}%.`);
+        console.log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
+        console.log(`Spline count reduced by ${(100 * (1 - (merged.length / splines.length))).toFixed(2)}%.\nControl point count reduced by ${(100 * (1 - (mergedPoints / numControlPoints))).toFixed(2)}%.`);
     }
     return merged;
 }
@@ -57,28 +51,30 @@ function splitSpline(spline: Spline): Spline[] {
         throw new Error('No segments are visible');
     } else if (firstVisibleSegment === 0) {
         // Spline does not have any hidden sections at its head
-        vectors.push(spline.controlPoints[0]);
-        vectors.push(spline.controlPoints[1]);
-        visible = [true];
+        // vectors.push(spline.controlPoints[0]);
+        // vectors.push(spline.controlPoints[1]);
+        // visible = [true];
+        vectors = spline.controlPoints.slice(0, 2);
+        visible = spline.segmentsVisible.slice(0, 1);
     } else {
         // Spline has a hidden section at its head
-        vectors.push(spline.controlPoints[firstVisibleSegment - 1]);
-        vectors.push(spline.controlPoints[firstVisibleSegment]);
-        vectors.push(spline.controlPoints[firstVisibleSegment + 1]);
-        visible = [false, true];
+        // vectors.push(spline.controlPoints[firstVisibleSegment - 1]);
+        // vectors.push(spline.controlPoints[firstVisibleSegment]);
+        // vectors.push(spline.controlPoints[firstVisibleSegment + 1]);
+        // visible = [false, true];
+        vectors = spline.controlPoints.slice(firstVisibleSegment - 1, firstVisibleSegment + 2);
+        visible = spline.segmentsVisible.slice(firstVisibleSegment - 1, firstVisibleSegment + 1);
     }
     for (let i = firstVisibleSegment + 1; i < spline.segmentsVisible.length; i++) {
         const tv = spline.segmentsVisible[i];
         const pv = spline.segmentsVisible[i - 1];
         if (pv) {
+            vectors.push(spline.controlPoints[i + 1]);
+            visible.push(tv);
             if (tv) {
-                // Consecutive visible segments, extend the spline
-                vectors.push(spline.controlPoints[i + 1]);
-                visible.push(true);
+                // Consecutive visible segments, continue the spline
             } else {
                 // Previous segment was visible, end the spline
-                vectors.push(spline.controlPoints[i + 1]);
-                visible.push(false);
                 if (!visible.some(Boolean)) throw new Error('Spline is not visible');
                 splines.push({
                     controlPoints: vectors,
@@ -195,7 +191,7 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
  * @param {Vector} b
  * @return {number}
  */
-function delta2(a: Vector, b: Vector): number {
+export function delta2(a: Vector, b: Vector): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     const dz = b.z - a.z;
@@ -273,7 +269,7 @@ function findLastIndex<T>(array: T[], predicate: (value: T, index: number, obj: 
  * @param {number} i - the control point index
  * @return {number}
  */
-function splineHeading(spline: Spline, i: number): number {
+export function splineHeading(spline: Spline, i: number): number {
     const max = spline.segmentsVisible.length;
     if (i === 0) {
         // Head segment heading
@@ -311,13 +307,19 @@ function circularMean(...args: number[]): number {
     return Math.atan2(x, y) * 180 / Math.PI;
 }
 
+/**
+ * Calculates the heading between the origin and target vectors.
+ * @param {vector} va - origin vector
+ * @param {vector} vb - target vector
+ * @return {number} the heading from a to b (in degrees)
+ */
 function vectorHeading(va: Vector, vb: Vector) {
-    const x = (vb.x - va.y); // positive is east
-    const y = (vb.y - va.y); // positive is north
-    return Math.atan2(x, y) * 180 / Math.PI;
+    const dx = (vb.x - va.x); // positive is west
+    const dy = (vb.y - va.y); // positive is south
+    return Math.atan2(-dy, -dx) * 180 / Math.PI;
 }
 
-function normalizeAngle(angle: number): number {
+export function normalizeAngle(angle: number): number {
     angle %= 360.0;
     if (angle > 180) return angle - 360.0;
     if (angle <= -180) return angle + 360.0;

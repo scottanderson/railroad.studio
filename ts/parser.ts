@@ -1,12 +1,11 @@
-/* exported parseGvas */
-/* global CustomData EngineVersion Gvas GvasHeader GvasString GvasText GvasTypes RichTextFormat Rotator Vector */
+import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
 
 /**
  * Parse a GVAS file from an ArrayBuffer.
  * @param {ArrayBuffer} buffer
  * @return {Gvas}
  */
-function parseGvas(buffer: ArrayBuffer): Gvas {
+export function parseGvas(buffer: ArrayBuffer): Gvas {
     // Parse the header
     const uint8View = new Uint8Array(buffer, 0, 4);
     const magic = String.fromCharCode.apply(null, [...uint8View]);

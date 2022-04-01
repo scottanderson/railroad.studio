@@ -1,11 +1,11 @@
-/* global GvasHeader GvasMap GvasString GvasText GvasTypes Rotator Vector */
+import {GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, Rotator, Vector} from './Gvas';
 
 /**
  * A simplified save state that can be modified in Railroad Studio.
  *
  * Can be created from or converted to a {@link Gvas} for serializaiton.
  */
-interface Railroad {
+export interface Railroad {
     _header: GvasHeader;
     _order: string[];
     _types: GvasMap<GvasTypes>;
@@ -26,7 +26,7 @@ interface Railroad {
     splines: Spline[];
 }
 
-interface Frame {
+export interface Frame {
     location: Vector;
     name: GvasText;
     number: GvasText;
@@ -63,7 +63,7 @@ interface Frame {
     };
 }
 
-interface Industry {
+export interface Industry {
     location: Vector;
     rotation: Rotator;
     inputs: [number, number, number, number];
@@ -71,7 +71,7 @@ interface Industry {
     type: IndustryType;
 }
 
-declare enum IndustryType {
+export enum IndustryType {
     logging_camp = 1,
     sawmill = 2,
     smelter = 3,
@@ -88,7 +88,7 @@ declare enum IndustryType {
     engine_house_brown = 14,
 }
 
-interface Player {
+export interface Player {
     id?: GvasString;
     name: GvasString;
     location: Vector;
@@ -97,24 +97,42 @@ interface Player {
     xp: number;
 }
 
-interface Sandhouse {
+export interface Sandhouse {
     location: Vector;
     rotation: Rotator;
     type: SandhouseType;
 }
 
-declare enum SandhouseType {
+export enum SandhouseType {
     sandhouse = 0,
 }
 
-interface Switch {
+export interface Spline {
+    controlPoints: Vector[];
+    location: Vector;
+    segmentsVisible: boolean[];
+    type: SplineType;
+}
+
+export enum SplineType {
+    rail = 0,
+    variable_grade = 1,
+    constant_grade = 2,
+    wooden_bridge = 3,
+    rail_deck = 4,
+    variable_stone_wall = 5,
+    constant_stone_wall = 6,
+    steel_bridge = 7,
+}
+
+export interface Switch {
     location: Vector;
     rotation: Rotator;
     state: number;
     type: SwitchType;
 }
 
-declare enum SwitchType {
+export enum SwitchType {
     leftSwitchLeft = 0,
     rightSwitchRight = 1,
     leftSwitchRight = 4,
@@ -122,28 +140,21 @@ declare enum SwitchType {
     diamond = 6,
 }
 
-interface Turntable {
+export interface Turntable {
     deckRotation?: Rotator;
     location: Vector;
     rotator: Rotator;
     type: TurntableType;
 }
 
-declare enum TurntableType {
+export enum TurntableType {
     dark = 0,
     light = 1,
 }
 
-interface Watertower {
+export interface Watertower {
     location: Vector;
     rotation: Rotator;
     waterlevel: number;
-    type: number;
-}
-
-interface Spline {
-    controlPoints: Vector[];
-    location: Vector;
-    segmentsVisible: boolean[];
     type: number;
 }

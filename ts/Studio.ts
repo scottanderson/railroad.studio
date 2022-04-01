@@ -1,35 +1,84 @@
-/* exported Studio */
-/* global GvasString GvasText Railroad Vector gvasToBlob railroadToGvas simplifySplines */
+import {GvasString, GvasText, Vector} from './Gvas';
+import {Railroad} from './Railroad';
+import {RailroadMap} from './RailroadMap';
+import {simplifySplines} from './splines';
+import {gvasToBlob, railroadToGvas} from './exporter';
 
 /**
  * Web UI for editing a Railroad object.
  */
-class Studio {
+export class Studio {
     filename: string;
     railroad: Railroad;
     modified: boolean;
+    map: RailroadMap;
 
     constructor(filename: string, railroad: Railroad, element: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
         this.modified = false;
         const header = document.createElement('h2');
-        header.innerText = 'Loaded ' + this.filename;
+        header.textContent = 'Loaded ' + this.filename;
         const buttons = document.createElement('div');
+        // Map
+        const btnMap = document.createElement('button');
+        btnMap.innerText = 'Map';
+        btnMap.classList.add('btn', 'btn-secondary');
+        const mapDiv = document.createElement('div');
+        btnMap.addEventListener('click', () => {
+            element.replaceChildren(header, buttons, mapButtons, mapDiv);
+        });
+        const btnTogglePoints = document.createElement('button');
+        btnTogglePoints.textContent = 'Show control points';
+        btnTogglePoints.classList.add('btn', 'btn-secondary');
+        btnTogglePoints.addEventListener('click', () => {
+            const showing = this.map.toggleShowControlPoints();
+            btnTogglePoints.textContent = showing ?
+                'Hide control points' :
+                'Show control points';
+        });
+        const btnToggleSegments = document.createElement('button');
+        btnToggleSegments.textContent = 'Show hidden segments';
+        btnToggleSegments.classList.add('btn', 'btn-secondary');
+        btnToggleSegments.addEventListener('click', () => {
+            const showing = this.map.toggleShowHiddenSegments();
+            btnToggleSegments.textContent = showing ?
+                'Hide hidden segments' :
+                'Show hidden segments';
+        });
         const btnReplaceSplines = document.createElement('button');
         btnReplaceSplines.textContent = 'Replace splines';
-        btnReplaceSplines.classList.add('button');
+        btnReplaceSplines.classList.add('btn', 'btn-secondary');
         btnReplaceSplines.addEventListener('click', () => {
-            const pre = document.createElement('pre');
-            element.replaceChildren(header, buttons, pre);
-            this.railroad.splines = simplifySplines(this.railroad, (data: string) => {
-                pre.textContent = pre.textContent ? pre.textContent + '\n' + data : data;
-            });
+            this.railroad.splines = simplifySplines(this.railroad);
             this.modified = true;
+            this.map.refresh();
         });
+        const btnDeleteSpline = document.createElement('button');
+        const imgDeleteSpline = document.createElement('i');
+        imgDeleteSpline.classList.add('bi', 'bi-eraser-fill');
+        imgDeleteSpline.setAttribute('role', 'img');
+        imgDeleteSpline.ariaLabel = 'Delete Splines';
+        btnDeleteSpline.appendChild(imgDeleteSpline);
+        btnDeleteSpline.classList.add('btn', 'btn-secondary');
+        btnDeleteSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleDeleteTool();
+            if (toolEnabled) {
+                btnDeleteSpline.classList.add('active', 'btn-danger');
+                btnDeleteSpline.classList.remove('btn-secondary');
+            } else {
+                btnDeleteSpline.classList.remove('active', 'btn-danger');
+                btnDeleteSpline.classList.add('btn-secondary');
+            }
+        });
+        const mapButtons = document.createElement('div');
+        mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline);
+        const mapContainer = document.createElement('div');
+        mapContainer.replaceChildren(mapButtons, mapDiv);
+        // Frames
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
-        btnFrames.classList.add('button');
+        btnFrames.classList.add('btn', 'btn-secondary');
         btnFrames.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
@@ -37,9 +86,10 @@ class Studio {
             header.innerText = 'Frames';
             this.frames(table);
         });
+        // Industries
         const btnIndustries = document.createElement('button');
         btnIndustries.textContent = 'Industries';
-        btnIndustries.classList.add('button');
+        btnIndustries.classList.add('btn', 'btn-secondary');
         btnIndustries.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
@@ -47,9 +97,10 @@ class Studio {
             header.innerText = 'Industries';
             this.industries(table);
         });
+        // Players
         const btnPlayers = document.createElement('button');
         btnPlayers.textContent = 'Players';
-        btnPlayers.classList.add('button');
+        btnPlayers.classList.add('btn', 'btn-secondary');
         btnPlayers.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
@@ -57,10 +108,15 @@ class Studio {
             header.innerText = 'Players';
             this.players(table);
         });
-        const btnExport = document.createElement('button');
-        btnExport.textContent = 'Export .sav file';
-        btnIndustries.classList.add('button');
-        btnExport.addEventListener('click', () => {
+        // Export
+        const btnDownload = document.createElement('button');
+        const imgDownload = document.createElement('i');
+        imgDownload.classList.add('bi', 'bi-download');
+        imgDownload.setAttribute('role', 'img');
+        imgDownload.ariaLabel = 'Download';
+        btnDownload.appendChild(imgDownload);
+        btnDownload.classList.add('btn', 'btn-secondary');
+        btnDownload.addEventListener('click', () => {
             const gvas = railroadToGvas(this.railroad);
             const blob = gvasToBlob(gvas);
             const url = URL.createObjectURL(blob);
@@ -72,13 +128,16 @@ class Studio {
             window.URL.revokeObjectURL(url);
             a.remove();
         });
+        // Toggle dark mode
         const btnDark = document.createElement('button');
+        btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(this.bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', function() {
             eval('darkmode.toggleDarkMode();');
         });
-        buttons.replaceChildren(btnReplaceSplines, btnFrames, btnIndustries, btnPlayers, btnExport, btnDark);
-        element.replaceChildren(header, buttons);
+        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
+        element.replaceChildren(header, buttons, mapContainer);
+        this.map = new RailroadMap(this, mapDiv);
         document.title = this.filename + ' - Railroad Studio';
         console.log(railroad);
     }

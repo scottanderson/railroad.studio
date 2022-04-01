@@ -1,4 +1,7 @@
-/* global Gvas Studio gvasToRailroad parseGvas */
+import {Gvas} from './Gvas';
+import {Studio} from './Studio';
+import {gvasToRailroad} from './importer';
+import {parseGvas} from './parser';
 
 window.onload = () => {
     // Configure the drop area
@@ -77,10 +80,9 @@ function handleDrop(e: DragEvent) {
     handleFile(file);
 }
 
+interface StudioWindow extends Window { studio: Studio; }
 // eslint-disable-next-line no-redeclare
-interface Window {
-    studio: Studio;
-}
+declare let window: StudioWindow;
 
 function handleFile(file?: File): void {
     if (!file) return;
@@ -97,7 +99,7 @@ function handleFile(file?: File): void {
 }
 
 /**
- * Error handler. Prints a stack trace to the content div.
+ * Error handler. Prints a stack trace to the contggnt div.
  * @param {Error} error
  */
 function handleError(error: Error) {

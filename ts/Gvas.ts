@@ -1,7 +1,7 @@
 /**
  * Stores the data from a GVAS '.sav' file.
  */
-interface Gvas {
+export interface Gvas {
     _order: string[];
     _types: GvasMap<GvasTypes>;
     _header: GvasHeader;
@@ -16,7 +16,7 @@ interface Gvas {
     textArrays: GvasMap<GvasText[]>;
 }
 
-type GvasTypes = (
+export type GvasTypes = (
     [] |
     ['FloatProperty'] |
     ['StrProperty'] |
@@ -28,13 +28,13 @@ type GvasTypes = (
     ['ArrayProperty', 'StructProperty', 'Vector'] |
     ['ArrayProperty', 'TextProperty']);
 
-type GvasMap<V> = {
+export type GvasMap<V> = {
     [key: string]: V;
 };
 
-type GvasString = string | null;
+export type GvasString = string | null;
 
-interface GvasHeader {
+export interface GvasHeader {
     saveVersion: number;
     structureVersion: number;
     engineVersion: EngineVersion
@@ -43,7 +43,7 @@ interface GvasHeader {
     saveType: GvasString;
 }
 
-interface EngineVersion {
+export interface EngineVersion {
     major: number;
     minor: number;
     patch: number;
@@ -51,7 +51,7 @@ interface EngineVersion {
     buildID: GvasString;
 }
 
-interface CustomData {
+export interface CustomData {
     guid: number[];
     value: number;
 }
@@ -61,17 +61,17 @@ interface CustomData {
  *
  * {@link https://docs.unrealengine.com/4.26/en-US/API/Runtime/Core/Math/FVector/}
  */
-interface Vector {
+export interface Vector {
     /**
-     * Meters east of the origin.
+     * Centimeters west of the origin.
      */
     x: number;
     /**
-     * Meters south of the origin.
+     * Centimeters south of the origin.
      */
     y: number;
     /**
-     * Meters above the origin.
+     * Centimeters above the origin.
      */
     z: number;
 }
@@ -81,7 +81,7 @@ interface Vector {
  *
  * {@link https://docs.unrealengine.com/4.26/en-US/API/Runtime/Core/Math/FRotator/}
  */
-interface Rotator {
+export interface Rotator {
     /**
      * Rotation around the right axis (around Y axis), Looking up and down (0=Straight Ahead, +Up, -Down)
      */
@@ -96,15 +96,15 @@ interface Rotator {
     roll: number;
 }
 
-type GvasText = null | RichText | GvasString[];
+export type GvasText = null | RichText | GvasString[];
 
-interface RichText {
+export interface RichText {
     guid: GvasString;
     pattern: GvasString,
     textFormat: RichTextFormat[],
 }
 
-interface RichTextFormat {
+export interface RichTextFormat {
     formatKey: GvasString;
     contentType: number;
     values: GvasString[];

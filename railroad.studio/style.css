@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -25,11 +26,125 @@ body {
 
 #drop_zone {
   border: 5px solid blue;
-  width:  200px;
+  width: 200px;
   height: 100px;
 }
 
 #footer {
   flex-shrink: 0;
   padding-top: 1rem;
+}
+
+.rail,
+.rail-deck,
+.grade,
+.stone-wall,
+.wooden-bridge,
+.steel-bridge {
+  fill: none;
+}
+
+.rail {
+  stroke: black;
+  stroke-width: 128;
+}
+
+.rail.hidden {
+  stroke: blue;
+  stroke-width: 200;
+  opacity: 0.5;
+}
+
+.rail-deck {
+  stroke: brown;
+  stroke-width: 256;
+}
+
+.rail-deck.hidden {
+  stroke: green;
+  stroke-width: 350;
+  opacity: 0.5;
+}
+
+.grade {
+  stroke: sienna;
+}
+
+.stone-wall {
+  stroke: darkgray;
+}
+
+.wooden-bridge {
+  stroke: goldenrod;
+}
+
+.steel-bridge {
+  stroke: slateblue;
+}
+
+.grade,
+.stone-wall,
+.wooden-bridge,
+.steel-bridge {
+  stroke-width: 500;
+}
+
+.rail:hover,
+.rail-deck:hover,
+.grade:hover,
+.stone-wall:hover,
+.wooden-bridge:hover,
+.steel-bridge:hover {
+  opacity: 0.8;
+  stroke: red;
+}
+
+.grade.hidden,
+.stone-wall.hidden,
+.wooden-bridge.hidden,
+.steel-bridge.hidden {
+  stroke-width: 200;
+  opacity: 0.5;
+}
+
+.rail.hidden:hover,
+.rail-deck.hidden:hover,
+.grade.hidden:hover,
+.stone-wall.hidden:hover,
+.wooden-bridge.hidden:hover,
+.steel-bridge.hidden:hover {
+  opacity: 0.8;
+}
+
+.switch-leg.aligned {
+  stroke: black;
+  stroke-width: 128;
+}
+
+.switch-leg.not-aligned {
+  stroke: red;
+  stroke-width: 128;
+  opacity: 0.5;
+}
+
+.control-point-0 {
+  fill: red;
+}
+
+.control-point-1 {
+  fill: blue;
+}
+
+.control-point-2 {
+  fill: green;
+}
+
+.rail.xray,
+.rail-deck.xray,
+.grade.xray,
+.stone-wall.xray,
+.wooden-bridge.xray,
+.steel-bridge.xray,
+.switch-leg.aligned.xray {
+  opacity: 0.9;
 }

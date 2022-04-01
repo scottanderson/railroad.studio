@@ -1,5 +1,6 @@
-/* exported railroadToGvas, gvasToBlob */
-/* global CustomData EngineVersion Gvas GvasHeader GvasMap GvasString GvasText GvasTypes Railroad RichTextFormat Rotator Vector */
+/* global BlobPart */
+import {CustomData, EngineVersion, Gvas, GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
+import {Railroad} from './Railroad';
 
 const exportKeys = [
     'BoilerFireTempArray',
@@ -86,7 +87,7 @@ const exportKeys = [
  * @param {Railroad} railroad
  * @return {Gvas}
  */
-function railroadToGvas(railroad: Railroad): Gvas {
+export function railroadToGvas(railroad: Railroad): Gvas {
     // Flatten control points and segment arrays
     let splineControlPoints: Vector[] = [];
     const splineControlPointsIndexStart: number[] = [];
@@ -305,7 +306,7 @@ function propertyType(propertyName: string): GvasTypes {
     }
 }
 
-function gvasToBlob(gvas: Gvas): Blob {
+export function gvasToBlob(gvas: Gvas): Blob {
     // seq:
     //   - id: gvas
     //     contents: 'GVAS'
