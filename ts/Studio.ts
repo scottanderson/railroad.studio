@@ -1,5 +1,5 @@
 /* exported Studio */
-/* global GvasString GvasText Railroad gvasToBlob railroadToGvas simplifySplines */
+/* global GvasString GvasText Railroad Vector gvasToBlob railroadToGvas simplifySplines */
 
 /**
  * Web UI for editing a Railroad object.
@@ -73,11 +73,7 @@ class Studio {
             a.remove();
         });
         const btnDark = document.createElement('button');
-        const i = document.createElement('i');
-        i.classList.add('bi', 'bi-lightbulb');
-        i.setAttribute('role', 'img');
-        i.ariaLabel = 'Toggle dark mode';
-        btnDark.appendChild(i);
+        btnDark.appendChild(this.bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', function() {
             eval('darkmode.toggleDarkMode();');
         });
@@ -139,7 +135,7 @@ class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Industry Name', 'Inputs', 'Products']) {
+        for (const columnHeader of ['Industry Name', 'Inputs', 'Products', 'Location']) {
             const th = document.createElement('th');
             th.innerText = columnHeader;
             if (['Inputs', 'Products'].includes(columnHeader)) {
@@ -157,18 +153,21 @@ class Studio {
             let td = document.createElement('td');
             td.innerText = industryNames[industry.type];
             tr.appendChild(td);
-            // Inputs
-            for (const input of industry.inputs) {
+            industry.inputs.forEach((input, i) => {
                 td = document.createElement('td');
-                td.innerText = String(input);
+                td.appendChild(this.editNumber(input, '0', (input) => industry.inputs[i] = input));
                 tr.appendChild(td);
-            }
+            });
             // Products
-            for (const output of industry.outputs) {
+            industry.outputs.forEach((output, i) => {
                 td = document.createElement('td');
-                td.innerText = String(output);
+                td.appendChild(this.editNumber(output, '0', (output) => industry.outputs[i] = output));
                 tr.appendChild(td);
-            }
+            });
+            // Location
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(industry.location, (location) => industry.location = location));
+            tr.appendChild(td);
         }
     }
 
@@ -197,18 +196,115 @@ class Studio {
             tr.appendChild(td);
             // Money
             td = document.createElement('td');
-            td.innerText = String(player.money);
+            td.appendChild(this.editNumber(player.money, '0', (money) => player.money = money));
             tr.appendChild(td);
             // XP
             td = document.createElement('td');
-            td.innerText = String(player.xp);
+            td.appendChild(this.editNumber(player.xp, '0', (xp) => player.xp = xp));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
-            const pre = document.createElement('pre');
-            pre.innerText = JSON.stringify(player.location);
-            td.appendChild(pre);
+            td.appendChild(this.editVector(player.location, (location) => player.location = location));
             tr.appendChild(td);
         }
+    }
+
+    private bootstrapIcon(className: string, label: string) {
+        const i = document.createElement('i');
+        i.classList.add('bi', className);
+        i.setAttribute('role', 'img');
+        i.ariaLabel = label;
+        return i;
+    }
+
+    private editNumber(value: number, min: string, saveValue: (value: number) => void) {
+        const span = document.createElement('span');
+        span.innerText = String(value);
+        span.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = min;
+            input.value = String(value);
+            // Save
+            const btnSave = document.createElement('button');
+            btnSave.classList.add('btn', 'btn-success');
+            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
+            btnSave.addEventListener('click', () => {
+                span.innerText = input.value;
+                saveValue(Number(input.value));
+                div.parentElement?.replaceChildren(span);
+            });
+            // Cancel
+            const btnCancel = document.createElement('button');
+            btnCancel.classList.add('btn', 'btn-danger');
+            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
+            btnCancel.addEventListener('click', () => {
+                if (Number(input.value) !== value) {
+                    // Restore the original value
+                    input.value = String(value);
+                } else {
+                    // Close the edit control
+                    div.parentElement?.replaceChildren(span);
+                }
+            });
+            // Layout
+            const div = document.createElement('div');
+            div.replaceChildren(input, btnSave, btnCancel);
+            span.parentElement?.replaceChildren(div);
+        });
+        return span;
+    }
+
+    private editVector(value: Vector, saveValue: (value: Vector) => void) {
+        const pre = document.createElement('pre');
+        pre.innerText = JSON.stringify(value);
+        pre.addEventListener('click', () => {
+            const inputX = document.createElement('input');
+            const inputY = document.createElement('input');
+            const inputZ = document.createElement('input');
+            [inputX, inputY, inputZ].forEach((input) => {
+                input.type = 'string';
+                input.step = 'any';
+            });
+            inputX.value = String(value.x);
+            inputY.value = String(value.y);
+            inputZ.value = String(value.z);
+            // Save
+            const btnSave = document.createElement('button');
+            btnSave.classList.add('btn', 'btn-success');
+            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
+            btnSave.addEventListener('click', () => {
+                const newVector = {
+                    x: Number(inputX.value),
+                    y: Number(inputY.value),
+                    z: Number(inputZ.value),
+                };
+                saveValue(newVector);
+                div.parentElement?.replaceChildren(pre);
+                pre.innerText = JSON.stringify(newVector);
+            });
+            // Cancel
+            const btnCancel = document.createElement('button');
+            btnCancel.classList.add('btn', 'btn-danger');
+            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
+            btnCancel.addEventListener('click', () => {
+                if (Number(inputX.value) !== value.x ||
+                    Number(inputY.value) !== value.y ||
+                    Number(inputZ.value) !== value.z) {
+                    // Restore the original value
+                    inputX.value = String(value.x);
+                    inputY.value = String(value.y);
+                    inputZ.value = String(value.z);
+                } else {
+                    // Close the edit control
+                    div.parentElement?.replaceChildren(pre);
+                }
+            });
+            // Layout
+            const div = document.createElement('div');
+            div.replaceChildren(inputX, inputY, inputZ, btnSave, btnCancel);
+            pre.parentElement?.replaceChildren(div);
+        });
+        return pre;
     }
 }
