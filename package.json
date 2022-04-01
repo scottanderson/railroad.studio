@@ -1,13 +1,15 @@
 {
     "scripts": {
         "build": "eslint ts/*.ts && tsc",
+        "watch": "webpack --mode=development --watch",
         "build:prod": "webpack --mode=production",
         "sync": "aws s3 sync railroad.studio s3://railroad.studio"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.16.0",
-        "eslint": "^8.11.0",
+        "eslint": "^8.12.0",
         "eslint-config-google": "^0.14.0",
+        "eslint-webpack-plugin": "^3.1.1",
         "ts-loader": "^9.2.8",
         "typescript": "^4.6.2",
         "webpack-cli": "^4.9.2"

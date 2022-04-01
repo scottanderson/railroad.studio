@@ -4,7 +4,6 @@
     "lib": ["DOM", "ES6"],
     "noImplicitAny": true,
     "outFile": "railroad.studio/studio.js",
-    "removeComments": true,
     "rootDir": "ts",
     "sourceMap": true,
     "sourceRoot": "../ts/",

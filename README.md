@@ -12,9 +12,9 @@ The build script uses the node package manager `npm` to manage build dependencie
 Once installed, run `npm install` to install the necessary node package dependencies.
 
 ### Building
-Run `npm run build` to execute the linter and compile the TypeScript code.
+Run `npm run build` to execute the linter and compile the source code.
 
-When making changes to the code, it can be useful to run the typescript compiler in watch mode `tsc --watch` to rebuild typescript source files automatically. Note that this will bypass the linter, so remember to address any linter warnings before committing code.
+When making changes to the code, it can be useful to run the compiler in watch mode `npm run watch` to rebuild source files automatically.
 
 ### Testing
 After building, `open railroad.studio/index.html` to launch the page.
