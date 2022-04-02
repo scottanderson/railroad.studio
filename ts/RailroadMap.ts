@@ -2,7 +2,7 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
-import {Industry, IndustryType, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
+import {Industry, IndustryType, Player, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
@@ -29,6 +29,7 @@ export interface MapLayers {
     groundworks: G;
     groundworksHidden: G;
     industries: G;
+    players: G;
     trackControlPoints: G;
     tracks: G;
     tracksHidden: G;
@@ -40,6 +41,7 @@ interface MapLayerVisibility {
     groundworks: boolean;
     groundworksHidden: boolean;
     industries: boolean;
+    players: boolean;
     trackControlPoints: boolean;
     tracks: boolean;
     tracksHidden: boolean;
@@ -67,6 +69,7 @@ export class RailroadMap {
             .addTo(element);
         this.layers = this.createLayers();
         this.railroad.industries.forEach(this.renderIndustry, this);
+        this.railroad.players.forEach(this.renderPlayer, this);
         this.renderSwitches();
         this.renderSplines();
         this.panZoom = this.initPanZoom();
@@ -83,6 +86,7 @@ export class RailroadMap {
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
         this.railroad.industries.forEach(this.renderIndustry, this);
+        this.railroad.players.forEach(this.renderPlayer, this);
         this.renderSwitches();
         this.railroad.splines.forEach(this.renderSpline, this);
         this.panZoom = this.initPanZoom();
@@ -160,6 +164,7 @@ export class RailroadMap {
                 groundworks: true, // Boolean(parsed?.layerVisibility?.groundworks),
                 groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
                 industries: Boolean(parsed?.layerVisibility?.industries),
+                players: Boolean(parsed?.layerVisibility?.players),
                 trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
                 tracks: true, // Boolean(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
@@ -193,7 +198,9 @@ export class RailroadMap {
             tracks,
             tracksHidden,
             trackControlPoints,
+            players,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -209,6 +216,7 @@ export class RailroadMap {
             groundworks: groundworks,
             groundworksHidden: groundworksHidden,
             industries: industries,
+            players: players,
             trackControlPoints: trackControlPoints,
             tracks: tracks,
             tracksHidden: tracksHidden,
@@ -270,6 +278,16 @@ export class RailroadMap {
             .text((block) => block.text(industryName))
             .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
             .addClass('grade-text');
+    }
+
+    private renderPlayer(player: Player) {
+        if (!player.name) return;
+        const x = Math.round(player.location.x);
+        const y = Math.round(player.location.y);
+        return this.layers.players
+            .text(player.name)
+            .attr('transform', `translate(${x},${y}) rotate(180)`)
+            .addClass('player');
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {

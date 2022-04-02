@@ -84,6 +84,10 @@ export class Studio {
                 name: 'Industries',
             },
             {
+                key: 'players',
+                name: 'Players',
+            },
+            {
                 key: 'trackControlPoints',
                 name: 'Track Control Points',
             },
