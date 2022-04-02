@@ -42,7 +42,6 @@ export function simplifySplines(railroad: Railroad): Spline[] {
  * @return {Spline[]}
  */
 function splitSpline(spline: Spline): Spline[] {
-    // if (!spline.segmentsVisible.some(Boolean)) return [];
     const splines: Spline[] = [];
     const firstVisibleSegment = spline.segmentsVisible.findIndex(Boolean);
     let vectors: Vector[] = [];
@@ -148,6 +147,7 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
     const limit = 10; // Max distance between control points (10cm)
     const limit2 = limit * limit; // Limit squared
     const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg)
+    const inclinationLimit = 2.5; // Max inclination change between two adjacent splines (2.5 deg)
     if (spline1.type !== spline2.type) return null;
     [spline1, spline2].forEach(enforceSimpleSpline);
     // Iterate through each permutation of spline ordering (forward, reverse).
@@ -170,6 +170,13 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
             const bearing = Math.abs(normalizeAngle(ha - hb));
             if (bearing > bearingLimit) {
                 // Spline headings are too far apart to be merged
+                continue;
+            }
+            const ia = splineInclination(a, taila);
+            const ib = splineInclination(b, headb);
+            const di = Math.abs(normalizeAngle(ia - ib));
+            if (di > inclinationLimit) {
+                // Spline grades are too far apart to be merged
                 continue;
             }
             const result = mergeSubSplines(a, 0, taila, b, headb, b.segmentsVisible.length);
@@ -294,6 +301,31 @@ export function splineHeading(spline: Spline, i: number): number {
     }
 }
 
+export function splineInclination(spline: Spline, i: number): number {
+    const max = spline.segmentsVisible.length;
+    if (i === 0) {
+        // Head segment heading
+        const va = spline.controlPoints[1]!;
+        const vb = spline.controlPoints[0]!;
+        return vectorInclination(va, vb);
+    } else if (i === max) {
+        // Tail segment heading
+        const va = spline.controlPoints[i]!;
+        const vb = spline.controlPoints[i - 1]!;
+        return vectorInclination(va, vb);
+    } else if (i > 0 && i < max) {
+        // Average two adjacent segments
+        const va = spline.controlPoints[i + 1]!;
+        const vb = spline.controlPoints[i]!;
+        const vc = spline.controlPoints[i - 1]!;
+        const ha = vectorInclination(va, vb);
+        const hb = vectorInclination(vb, vc);
+        return circularMean(ha, hb);
+    } else {
+        throw new Error(`Illeval control point index ${i}`);
+    }
+}
+
 /**
  * Calculates the circular mean of any number of angles.
  * @param {number[]} args - an array of angles to average (in degrees)
@@ -317,6 +349,19 @@ function vectorHeading(va: Vector, vb: Vector) {
     const dx = (vb.x - va.x); // positive is west
     const dy = (vb.y - va.y); // positive is south
     return Math.atan2(-dy, -dx) * 180 / Math.PI;
+}
+
+/**
+ * Calculates the inclination between the origin and target vectors.
+ * @param {vector} va - origin vector
+ * @param {vector} vb - target vector
+ * @return {number} the inclination from a to b (in degrees)
+ */
+function vectorInclination(va: Vector, vb: Vector) {
+    const dx = (vb.x - va.x); // positive is west
+    const dy = (vb.y - va.y); // positive is south
+    const dz = (vb.z - va.z); // positive is up
+    return Math.atan2(dz, Math.sqrt(dx * dx + dy * dy)) * 180 / Math.PI;
 }
 
 export function normalizeAngle(angle: number): number {
