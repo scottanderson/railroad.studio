@@ -143,6 +143,92 @@
   opacity: 0.5;
 }
 
+.frame {
+  rx: 128;
+  stroke-width: 32;
+  stroke: black;
+}
+
+.frame:hover {
+  opacity: 0.5;
+}
+
+.frame .brakes-applied {
+  stroke: red;
+}
+
+.frame-class70,
+.frame-climax,
+.frame-cooke260,
+.frame-eureka,
+.frame-heisler,
+.frame-porter_040,
+.frame-porter_042 {
+  fill: purple;
+}
+
+.frame-class70_tender,
+.frame-cooke260_tender,
+.frame-eureka_tender {
+  fill: black;
+}
+
+.frame-caboose {
+  fill: black;
+}
+
+.frame-boxcar {
+  fill: #66f081;
+}
+
+.frame-boxcar .cargo-loaded {
+  fill: #36cc00;
+}
+
+.frame-flatcar_cordwood {
+  fill: #fdbf77;
+}
+
+.frame-flatcar_cordwood .cargo-loaded {
+  fill: orange;
+}
+
+.frame-flatcar_hopper {
+  fill: #a7a7a9;
+}
+
+.frame-flatcar_hopper .cargo-loaded {
+  fill: black;
+}
+
+.frame-flatcar_logs {
+  fill: #f99a9a;
+}
+
+.frame-flatcar_logs .cargo-loaded {
+  fill: red;
+}
+
+.frame-flatcar_stakes {
+  fill: #fdbf77;
+}
+
+.frame-flatcar_stakes .cargo-loaded {
+  fill: #f38a12;
+}
+
+.frame-flatcar_tanker {
+  fill: #9090f9;
+}
+
+.frame-flatcar_tanker .cargo-loaded {
+  fill: blue;
+}
+
+.frame-handcar {
+  fill: white;
+}
+
 .xray .rail,
 .xray .rail-deck,
 .xray .grade,

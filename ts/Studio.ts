@@ -64,6 +64,10 @@ export class Studio {
             listener?: () => void;
         }[] = [
             {
+                key: 'frames',
+                name: 'Frames',
+            },
+            {
                 key: 'grades',
                 name: 'Grade %',
             },

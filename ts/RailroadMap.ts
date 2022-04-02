@@ -2,11 +2,12 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
-import {Industry, IndustryType, Player, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
+import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenControlPoints} from './tool-flatten';
+import {frameLimits} from './frames';
 
 enum MapToolMode {
     pan_zoom,
@@ -24,6 +25,7 @@ interface MapOptions {
 }
 
 export interface MapLayers {
+    frames: G;
     grades: G;
     groundworkControlPoints: G;
     groundworks: G;
@@ -36,6 +38,7 @@ export interface MapLayers {
 }
 
 interface MapLayerVisibility {
+    frames: boolean;
     grades: boolean;
     groundworkControlPoints: boolean;
     groundworks: boolean;
@@ -68,6 +71,7 @@ export class RailroadMap {
             .addClass('map-svg')
             .addTo(element);
         this.layers = this.createLayers();
+        this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
         this.renderSwitches();
@@ -85,6 +89,7 @@ export class RailroadMap {
         this.panZoom?.destroy();
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
+        this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
         this.renderSwitches();
@@ -159,6 +164,7 @@ export class RailroadMap {
             },
             zoom: Number(parsed?.zoom || 1),
             layerVisibility: {
+                frames: Boolean(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
                 groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
                 groundworks: true, // Boolean(parsed?.layerVisibility?.groundworks),
@@ -198,6 +204,7 @@ export class RailroadMap {
             tracks,
             tracksHidden,
             trackControlPoints,
+            frames,
             players,
         ] = [
             group.group(),
@@ -209,8 +216,10 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
+            group.group(),
         ];
         const layers: MapLayers = {
+            frames: frames,
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
             groundworks: groundworks,
@@ -266,6 +275,38 @@ export class RailroadMap {
             onPan: onPanZoom,
             onZoom: onPanZoom,
         });
+    }
+
+    private renderFrame(frame: Frame) {
+        if (!frame.type || !(frame.type in frameLimits)) {
+            console.log(`Unknown frame type ${frame.type}`);
+            return;
+        }
+        const degrees = Math.round(normalizeAngle(180 + frame.rotation.yaw));
+        const x = Math.round(frame.location.x);
+        const y = Math.round(frame.location.y);
+        const f = this.layers.frames
+            .rect(frameLimits[frame.type].length, 300)
+            .center(0, 0)
+            .attr('transform', `translate(${x},${y}) rotate(${degrees})`)
+            .addClass('frame')
+            .addClass(`frame-${frame.type}`);
+        if (frame.state.brakeValue > 0) {
+            f.addClass('brakes-applied');
+        }
+        if (frame.state.freightAmount > 0) {
+            f.addClass('cargo-loaded');
+        }
+        // const simplified = simplifyText(frame.name);
+        // if (simplified && simplified.length > 0) {
+        //     const x = Math.round(frame.location.x);
+        //     const y = Math.round(frame.location.y);
+        //     this.layers.frames
+        //         .text(simplified.join('\n'))
+        //         .attr('transform', `translate(${x},${y}) rotate(180)`)
+        //         .addClass('frame-text');
+        // }
+        return f;
     }
 
     private renderIndustry(industry: Industry): Element {
