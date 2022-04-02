@@ -1,5 +1,5 @@
 import {Vector} from './Gvas';
-import {Railroad, Spline} from './Railroad';
+import {Railroad, Spline, SplineType} from './Railroad';
 
 /**
  * Create new splines through existing control points. There are three steps:
@@ -149,6 +149,11 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
     const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg)
     const inclinationLimit = 2.5; // Max inclination change between two adjacent splines (2.5 deg)
     if (spline1.type !== spline2.type) return null;
+    if (spline1.type === SplineType.steel_bridge) {
+        // Do not add supports to short steel bridges
+        if (spline1.segmentsVisible.length < 3) return null;
+        if (spline2.segmentsVisible.length < 3) return null;
+    }
     [spline1, spline2].forEach(enforceSimpleSpline);
     // Iterate through each permutation of spline ordering (forward, reverse).
     for (const a of [spline1, reverseSpline(spline1)]) {
