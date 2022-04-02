@@ -21,7 +21,7 @@ export function simplifySplines(railroad: Railroad): Spline[] {
         console.log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points.`);
     }
     // Step 2, split and trim
-    const simplified = splines.flatMap(splitSpline);
+    const simplified = visible.flatMap(splitSpline);
     if (visible.length !== simplified.length) {
         const simplifiedPoints = simplified.reduce((a, e) => a + e.controlPoints.length, 0);
         console.log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
