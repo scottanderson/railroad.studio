@@ -3,7 +3,7 @@ import {Railroad, Spline, SplineType} from './Railroad';
 
 /**
  * Create new splines through existing control points. There are three steps:
- * 1. Discard splines that are completely invisible.
+ * 1. Hide overlapping segments, and discard splines that are completely invisible.
  * 2. Split splines with hidden middle sections into separate splines. Trim every spline to have a max of one hidden segment at the head and one at the tail.
  * 3. Combine adjacent splines to make longer splines (limit 97 segments).
  * @param {Railroad} railroad - The railroad select splines from
@@ -14,11 +14,11 @@ export function simplifySplines(railroad: Railroad): Spline[] {
     const splines = railroad.splines;
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
     console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points, ${trackLength(splines)}.`);
-    // Step 1, discard invisible
-    const visible = splines.filter((spline) => spline.segmentsVisible.some(Boolean));
+    // Step 1, hide overlapping segments, discard invisible
+    const visible = removeOverlappedSegments(splines);
     if (splines.length !== visible.length) {
         const visiblePoints = visible.reduce((a, e) => a + e.controlPoints.length, 0);
-        console.log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points, ${trackLength(visible)}.`);
+        console.log(`After removing overlaps, ${visible.length} splines, ${visiblePoints} control points, ${trackLength(visible)}.`);
     }
     // Step 2, split and trim
     const simplified = visible.flatMap(splitSpline);
@@ -140,6 +140,64 @@ function splineLength(spline: Spline): number {
         }
     }
     return result;
+}
+
+/**
+ * Remove (by hiding) any spline segments which are overlapping another spline segment.
+ * @param {Spline[]} splines
+ * @return {Spline[]}
+ */
+function removeOverlappedSegments(splines: Spline[]): Spline[] {
+    // Make a deep copy of segment visibility
+    const result: Spline[] = splines.slice();
+    result.forEach((s) => s.segmentsVisible = s.segmentsVisible.slice());
+    let numHidden = 0;
+    const typesHidden: { [key: number]: number } = {};
+    for (let ai = 0; ai < result.length - 1; ai++) {
+        for (let bi = result.length - 1; bi > ai; bi--) {
+            const a = result[ai];
+            const b = result[bi];
+            if (a.type !== b.type) continue;
+            for (let j = 0; j < b.segmentsVisible.length; j++) {
+                if (!b.segmentsVisible[j]) continue;
+                for (let i = 0; i < a.segmentsVisible.length; i++) {
+                    if (!a.segmentsVisible[i]) continue;
+                    if (segmentsOverlap(a, i, b, j)) {
+                        // Segments overlap, hide one of them
+                        b.segmentsVisible[j] = false;
+                        numHidden++;
+                        typesHidden[a.type] = (typesHidden[a.type] || 0) + 1;
+                    }
+                }
+            }
+        }
+    }
+    if (numHidden > 0) {
+        console.log(`Hiding ${numHidden} duplicate spline segments:`,
+            Object.entries(typesHidden).map(([t, n]) => `${SplineType[Number(t)]}: ${n}`).join(', '));
+    }
+    // Filter out completely invisible splines
+    return result.filter((s) => s.segmentsVisible.some(Boolean));
+}
+
+/**
+ * Returns true if the spline segments overlap.
+ * @param {Spline} a - provides first spline segment (index i)
+ * @param {number} i - segment index for a
+ * @param {Spline} b - provides second spline segment (index j)
+ * @param {number} j - segment index for b
+ * @return {boolean}
+ */
+function segmentsOverlap(a: Spline, i: number, b: Spline, j: number): boolean {
+    const cpa0 = a.controlPoints[i];
+    const cpa1 = a.controlPoints[i + 1];
+    const cpb0 = b.controlPoints[j];
+    const cpb1 = b.controlPoints[j + 1];
+    const limit2 = 10 * 10; // 10cm
+    const pointsAdjacent = (a: Vector, b: Vector) => delta2(a, b) < limit2;
+    return false ||
+        (pointsAdjacent(cpa0, cpb0) && pointsAdjacent(cpa1, cpb1)) ||
+        (pointsAdjacent(cpa0, cpb1) && pointsAdjacent(cpa1, cpb0));
 }
 
 /**
