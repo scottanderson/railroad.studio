@@ -13,12 +13,12 @@ import {Railroad, Spline, SplineType} from './Railroad';
 export function simplifySplines(railroad: Railroad): Spline[] {
     const splines = railroad.splines;
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
-    console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points.`);
+    console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points, ${trackLength(splines)}.`);
     // Step 1, discard invisible
     const visible = splines.filter((spline) => spline.segmentsVisible.some(Boolean));
     if (splines.length !== visible.length) {
         const visiblePoints = visible.reduce((a, e) => a + e.controlPoints.length, 0);
-        console.log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points.`);
+        console.log(`After removing invisible, ${visible.length} splines, ${visiblePoints} control points, ${trackLength(visible)}.`);
     }
     // Step 2, split and trim
     const simplified = visible.flatMap(splitSpline);
@@ -28,10 +28,15 @@ export function simplifySplines(railroad: Railroad): Spline[] {
     }
     // Step 3, combine
     const merged = mergeSplines(simplified);
-    if (merged.length !== simplified.length) {
+    if (merged.length !== simplified.length || merged.length !== splines.length) {
         const mergedPoints = merged.reduce((a, e) => a + e.controlPoints.length, 0);
         console.log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
-        console.log(`Spline count reduced by ${(100 * (1 - (merged.length / splines.length))).toFixed(2)}%.\nControl point count reduced by ${(100 * (1 - (mergedPoints / numControlPoints))).toFixed(2)}%.`);
+        const fmtPercent = (n: number, d: number) => {
+            if (n === d) return 'unchanged';
+            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
+            return (n > d) ? `increased by ${pct}%` : `reduced by ${pct}%`;
+        };
+        console.log(`Spline count ${fmtPercent(merged.length, splines.length)}.\nControl point count ${fmtPercent(mergedPoints, numControlPoints)}.`);
     }
     return merged;
 }
@@ -105,7 +110,36 @@ function splitSpline(spline: Spline): Spline[] {
     // if (splines.length > 1) {
     //     console.log(`Split spline from ${spline.segmentsVisible.length} segments to ${splines.map((s) => s.segmentsVisible.length)}`);
     // }
+    splines.forEach(enforceSimpleSpline);
+    const splitLength = splines.map(splineLength).reduce((a, l) => a + l, 0);
+    const origLength = splineLength(spline);
+    if (Math.abs(splitLength - origLength) > 0.01) {
+        console.log(spline, splines);
+        throw new Error(`split spline length ${splitLength} is not same length as original ${origLength}`);
+    }
     return splines;
+}
+
+function trackLength(splines: Spline[]): string {
+    const len = splines
+        .filter((s) => s.type === SplineType.rail || s.type === SplineType.rail_deck)
+        .map(splineLength)
+        .reduce((a, l) => a + l, 0);
+    if (len < 100) return (len).toFixed(2) + 'cm';
+    if (len < 1000_00) return (len / 100).toFixed(2) + 'm';
+    return (len / 1000_00).toFixed(2) + 'km';
+}
+
+function splineLength(spline: Spline): number {
+    let result = 0;
+    for (let i = 0; i < spline.segmentsVisible.length; i++) {
+        if (spline.segmentsVisible[i]) {
+            const a = spline.controlPoints[i];
+            const b = spline.controlPoints[i + 1];
+            result += Math.sqrt(delta2(a, b));
+        }
+    }
+    return result;
 }
 
 /**
