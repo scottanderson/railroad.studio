@@ -83,7 +83,7 @@ export class RailroadMap {
         const zoom = this.getZoom();
         this.panZoom?.destroy();
         this.svg.node.replaceChildren();
-        const group = this.svg.group();
+        const group = this.svg.group().rotate(180);
         group.rect(4_000_00, 4_000_00)
             .center(0, 0)
             .addClass('map-border');
@@ -146,8 +146,8 @@ export class RailroadMap {
             ['m', 0, 0],
             ['v', 1888],
         ])
-            .rotate(normalizeAngle(180 + sw.rotation.yaw + yawOffset), 0, 0)
-            .translate(-sw.location.x, -sw.location.y)
+            .rotate(normalizeAngle(sw.rotation.yaw + yawOffset), 0, 0)
+            .translate(sw.location.x, sw.location.y)
             .addClass('switch-leg');
     }
 
@@ -189,8 +189,8 @@ export class RailroadMap {
                         ['l', -64, 64],
                         ['l', -64, -64],
                     ])
-                        .rotate(sw.rotation.yaw + 90, 0, 0)
-                        .translate(-sw.location.x, -sw.location.y)
+                        .rotate(sw.rotation.yaw - 90, 0, 0)
+                        .translate(sw.location.x, sw.location.y)
                         .fill('yellow')
                         .opacity(this.showHiddenSegments ? 0.9 : 1.0);
                     break;
@@ -203,7 +203,7 @@ export class RailroadMap {
 
     private renderSpline(group: G, spline: Spline, invisPass: boolean) {
         // Reverse x from west to east, and y from south to north
-        const points: ArrayXY[] = spline.controlPoints.map((cp) => [-cp.x, -cp.y]);
+        const points: ArrayXY[] = spline.controlPoints.map((cp) => [cp.x, cp.y]);
         if (invisPass && this.showControlPoints) {
             const last = points.length - 1;
             for (let i = 0; i < points.length; i++) {
