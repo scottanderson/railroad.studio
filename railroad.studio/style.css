@@ -35,6 +35,12 @@ body {
   padding-top: 1rem;
 }
 
+.map-border {
+  stroke: black;
+  fill: none;
+  stroke-width: 500;
+}
+
 .rail,
 .rail-deck,
 .grade,

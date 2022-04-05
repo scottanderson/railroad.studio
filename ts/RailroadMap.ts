@@ -84,6 +84,9 @@ export class RailroadMap {
         this.panZoom?.destroy();
         this.svg.node.replaceChildren();
         const group = this.svg.group();
+        group.rect(4_000_00, 4_000_00)
+            .center(0, 0)
+            .addClass('map-border');
 
         for (const currentGroup of [[
             SplineType.variable_grade,
