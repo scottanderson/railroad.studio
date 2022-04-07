@@ -236,6 +236,8 @@ export class RailroadMap {
                         } else {
                             rect.remove();
                         }
+                    } else {
+                        console.log(spline);
                     }
                 });
             if (invisPass) rect.addClass('hidden');
