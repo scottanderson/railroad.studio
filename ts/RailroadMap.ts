@@ -1,15 +1,17 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Element, G, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
 import {Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading} from './splines';
+import {flattenControlPoints} from './tool-flatten';
 
 enum MapToolMode {
     pan_zoom,
     delete_spline,
+    flatten_spline,
 }
 
 interface MapOptions {
@@ -18,8 +20,8 @@ interface MapOptions {
         y: number;
     };
     zoom: number;
-    showPoints: boolean;
-    showSegments: boolean;
+    showControlPoints: boolean;
+    showHiddenSegments: boolean;
 }
 
 interface MapLayers {
@@ -47,8 +49,8 @@ export class RailroadMap {
         this.railroad = studio.railroad;
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
-        this.showControlPoints = options.showPoints;
-        this.showHiddenSegments = options.showSegments;
+        this.showControlPoints = options.showControlPoints;
+        this.showHiddenSegments = options.showHiddenSegments;
         this.svg = new Svg().addTo(element).size('100%', '100%');
         this.svg.node.style.setProperty('position', 'fixed');
         this.layers = this.createLayers();
@@ -97,6 +99,21 @@ export class RailroadMap {
         }
     }
 
+    toggleFlattenTool(): boolean {
+        if (this.toolMode === MapToolMode.flatten_spline) {
+            // Disable flatten tool
+            this.toolMode = MapToolMode.pan_zoom;
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow flatten tool while another tool is active
+            return false;
+        } else {
+            // Enable flatten tool
+            this.toolMode = MapToolMode.flatten_spline;
+            return true;
+        }
+    }
+
     toggleShowControlPoints(): boolean {
         this.showControlPoints = !this.showControlPoints;
         this.writeOptions();
@@ -121,27 +138,26 @@ export class RailroadMap {
         return this.showHiddenSegments;
     }
 
-    getShowControlPoints() {
+    getShowControlPoints(): boolean {
         return this.showControlPoints;
     }
 
-    getShowHiddenSegments() {
+    getShowHiddenSegments(): boolean {
         return this.showHiddenSegments;
     }
 
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
-        const options: MapOptions = {
+        return {
             pan: {
                 x: Number(parsed?.pan?.x || 0),
                 y: Number(parsed?.pan?.y || 0),
             },
             zoom: Number(parsed?.zoom || 1),
-            showPoints: Boolean(parsed?.showPoints || false),
-            showSegments: Boolean(parsed?.showSegments || false),
+            showControlPoints: Boolean(parsed?.showControlPoints || false),
+            showHiddenSegments: Boolean(parsed?.showHiddenSegments || false),
         };
-        return options;
     }
 
     private writeOptions() {
@@ -149,8 +165,8 @@ export class RailroadMap {
         const options: MapOptions = {
             pan: this.panZoom.getPan(),
             zoom: this.panZoom.getZoom(),
-            showPoints: this.showControlPoints,
-            showSegments: this.showHiddenSegments,
+            showControlPoints: this.showControlPoints,
+            showHiddenSegments: this.showHiddenSegments,
         };
         localStorage.setItem(key, JSON.stringify(options));
     }
@@ -288,14 +304,14 @@ export class RailroadMap {
     private renderSpline(spline: Spline) {
         const elements: Element[] = [];
         const isRail = spline.type === SplineType.rail || spline.type === SplineType.rail_deck;
-        const group = this.layers.controlPoints;
+        // Control points
         spline.controlPoints.forEach((point, i) => {
             const adjacentVisible = spline.segmentsVisible.slice(i - 1, i + 1).filter(Boolean).length;
             let rect;
             if (isRail) {
-                rect = group.circle(300);
+                rect = this.layers.controlPoints.circle(300);
             } else {
-                rect = group.rect(300, 300)
+                rect = this.layers.controlPoints.rect(300, 300)
                     .rotate(splineHeading(spline, i), 150, 150);
             }
             rect
@@ -306,20 +322,13 @@ export class RailroadMap {
         const splineGroup = isRail ? this.layers.tracks : this.layers.groundworks;
         const hiddenGroup = isRail ? this.layers.tracksHidden : this.layers.groundworksHidden;
         const points: ArrayXY[] = spline.controlPoints.map((cp) => [cp.x, cp.y]);
+        // Splines
         for (const invisPass of [true, false]) {
             const d = svgPath(points, bezierCommand);
             const g = invisPass ? hiddenGroup : splineGroup;
             const rect = g.path(d)
                 .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
-                .on('click', () => {
-                    if (this.toolMode === MapToolMode.delete_spline) {
-                        this.railroad.splines = this.railroad.splines.filter((s) => s !== spline);
-                        this.setMapModified();
-                        elements.forEach((element) => element.remove());
-                    } else {
-                        console.log(spline);
-                    }
-                });
+                .on('click', () => this.onClickSpline(spline, rect, elements));
             if (invisPass) rect.addClass('hidden');
             else if (this.showHiddenSegments) rect.addClass('xray');
             switch (spline.type) {
@@ -347,6 +356,27 @@ export class RailroadMap {
                     throw new Error(`Unknown spline type ${spline.type}`);
             }
             elements.push(rect);
+        }
+    }
+
+    private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {
+        switch (this.toolMode) {
+            case MapToolMode.pan_zoom:
+                console.log(spline);
+                break;
+            case MapToolMode.delete_spline:
+                this.railroad.splines = this.railroad.splines.filter((s) => s !== spline);
+                this.setMapModified();
+                elements.forEach((element) => element.remove());
+                break;
+            case MapToolMode.flatten_spline: {
+                spline.controlPoints = flattenControlPoints(spline.controlPoints);
+                this.setMapModified();
+                // Re-render just this spline
+                elements.forEach((element) => element.remove());
+                this.renderSpline(spline);
+                break;
+            }
         }
     }
 }

@@ -132,7 +132,7 @@ function trackLength(splines: Spline[]): string {
     return (len / 1000_00).toFixed(2) + 'km';
 }
 
-function splineLength(spline: Spline): number {
+export function splineLength(spline: Spline): number {
     let result = 0;
     for (let i = 0; i < spline.segmentsVisible.length; i++) {
         if (spline.segmentsVisible[i]) {

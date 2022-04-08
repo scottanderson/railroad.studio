@@ -104,9 +104,28 @@ export class Studio {
                 btnDeleteSpline.classList.add('btn-secondary');
             }
         });
+        // Flatten spline tool
+        const btnFlattenSpline = document.createElement('button');
+        const imgFlattenSpline = document.createElement('i');
+        const txtFlattenSpline = document.createTextNode(' Flatten Spline Tool ');
+        imgFlattenSpline.classList.add('bi', 'bi-arrows-collapse');
+        imgFlattenSpline.setAttribute('role', 'img');
+        imgDeleteSpline.ariaLabel = 'Flatten Spline Tool';
+        btnFlattenSpline.classList.add('btn', 'btn-secondary');
+        btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
+        btnFlattenSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleFlattenTool();
+            if (toolEnabled) {
+                btnFlattenSpline.classList.add('active', 'btn-danger');
+                btnFlattenSpline.classList.remove('btn-secondary');
+            } else {
+                btnFlattenSpline.classList.remove('active', 'btn-danger');
+                btnFlattenSpline.classList.add('btn-secondary');
+            }
+        });
         // Map toolbar
         const mapButtons = document.createElement('div');
-        mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline);
+        mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
