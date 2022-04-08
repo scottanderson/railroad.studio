@@ -28,6 +28,7 @@ export class Studio {
         btnMap.addEventListener('click', () => {
             element.replaceChildren(header, buttons, mapButtons, mapDiv);
         });
+        // Show control points
         const btnTogglePoints = document.createElement('button');
         btnTogglePoints.textContent = 'Show control points';
         btnTogglePoints.classList.add('btn', 'btn-secondary');
@@ -36,7 +37,15 @@ export class Studio {
             btnTogglePoints.textContent = showing ?
                 'Hide control points' :
                 'Show control points';
+            if (showing) {
+                btnTogglePoints.classList.add('active', 'btn-primary');
+                btnTogglePoints.classList.remove('btn-secondary');
+            } else {
+                btnTogglePoints.classList.remove('active', 'btn-primary');
+                btnTogglePoints.classList.add('btn-secondary');
+            }
         });
+        // Show hidden segments
         const btnToggleSegments = document.createElement('button');
         btnToggleSegments.textContent = 'Show hidden segments';
         btnToggleSegments.classList.add('btn', 'btn-secondary');
@@ -45,20 +54,29 @@ export class Studio {
             btnToggleSegments.textContent = showing ?
                 'Hide hidden segments' :
                 'Show hidden segments';
+            if (showing) {
+                btnToggleSegments.classList.add('active', 'btn-primary');
+                btnToggleSegments.classList.remove('btn-secondary');
+            } else {
+                btnToggleSegments.classList.remove('active', 'btn-primary');
+                btnToggleSegments.classList.add('btn-secondary');
+            }
         });
+        // Minimize segment count
         const btnReplaceSplines = document.createElement('button');
-        btnReplaceSplines.textContent = 'Replace splines';
+        btnReplaceSplines.textContent = 'Minimize segment count';
         btnReplaceSplines.classList.add('btn', 'btn-secondary');
         btnReplaceSplines.addEventListener('click', () => {
             this.railroad.splines = simplifySplines(this.railroad);
             this.modified = true;
             this.map.refresh();
         });
+        // Delete spline tool
         const btnDeleteSpline = document.createElement('button');
         const imgDeleteSpline = document.createElement('i');
         imgDeleteSpline.classList.add('bi', 'bi-eraser-fill');
         imgDeleteSpline.setAttribute('role', 'img');
-        imgDeleteSpline.ariaLabel = 'Delete Splines';
+        imgDeleteSpline.ariaLabel = 'Delete Spline Tool';
         btnDeleteSpline.appendChild(imgDeleteSpline);
         btnDeleteSpline.classList.add('btn', 'btn-secondary');
         btnDeleteSpline.addEventListener('click', () => {
@@ -71,6 +89,7 @@ export class Studio {
                 btnDeleteSpline.classList.add('btn-secondary');
             }
         });
+        // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline);
         const mapContainer = document.createElement('div');

@@ -35,9 +35,17 @@ export class RailroadMap {
 
     toggleDeleteTool(): boolean {
         if (this.toolMode === MapToolMode.delete_spline) {
+            // Disable delete tool
             this.toolMode = MapToolMode.pan_zoom;
             return false;
+        } else if (this.showControlPoints) {
+            // Don't allow delete tool while control points are showing
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow delete tool while another tool is active
+            return false;
         } else {
+            // Enable delete tool
             this.toolMode = MapToolMode.delete_spline;
             return true;
         }

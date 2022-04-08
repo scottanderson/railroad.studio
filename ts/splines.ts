@@ -32,11 +32,13 @@ export function simplifySplines(railroad: Railroad): Spline[] {
         const mergedPoints = merged.reduce((a, e) => a + e.controlPoints.length, 0);
         console.log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
         const fmtPercent = (n: number, d: number) => {
-            if (n === d) return 'unchanged';
+            if (n === d) return `unchanged (${n})`;
             const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
-            return (n > d) ? `increased by ${pct}%` : `reduced by ${pct}%`;
+            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
         };
-        console.log(`Spline count ${fmtPercent(merged.length, splines.length)}.\nControl point count ${fmtPercent(mergedPoints, numControlPoints)}.`);
+        console.log(`Spline count ${fmtPercent(merged.length, splines.length)}.\n` +
+            `Control point count ${fmtPercent(mergedPoints, numControlPoints)}.\n` +
+            `Segment count ${fmtPercent(mergedPoints - merged.length, numControlPoints - splines.length)}.`);
     }
     return merged;
 }
