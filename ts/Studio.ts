@@ -30,36 +30,44 @@ export class Studio {
         });
         // Show control points
         const btnTogglePoints = document.createElement('button');
-        btnTogglePoints.textContent = 'Show control points';
+        const imgTogglePoints = document.createElement('i');
+        const txtTogglePoints = document.createTextNode(' Show control points ');
+        imgTogglePoints.classList.add('bi', 'bi-toggle-off');
         btnTogglePoints.classList.add('btn', 'btn-secondary');
+        btnTogglePoints.replaceChildren(imgTogglePoints, txtTogglePoints);
         btnTogglePoints.addEventListener('click', () => {
             const showing = this.map.toggleShowControlPoints();
-            btnTogglePoints.textContent = showing ?
-                'Hide control points' :
-                'Show control points';
             if (showing) {
                 btnTogglePoints.classList.add('active', 'btn-primary');
                 btnTogglePoints.classList.remove('btn-secondary');
+                imgTogglePoints.classList.replace('bi-toggle-off', 'bi-toggle-on');
+                txtTogglePoints.textContent = ' Hide control points ';
             } else {
                 btnTogglePoints.classList.remove('active', 'btn-primary');
                 btnTogglePoints.classList.add('btn-secondary');
+                imgTogglePoints.classList.replace('bi-toggle-on', 'bi-toggle-off');
+                txtTogglePoints.textContent = ' Show control points ';
             }
         });
         // Show hidden segments
         const btnToggleSegments = document.createElement('button');
-        btnToggleSegments.textContent = 'Show hidden segments';
+        const imgToggleSegments = document.createElement('i');
+        const txtToggleSegments = document.createTextNode(' Show hidden segments ');
+        imgToggleSegments.classList.add('bi', 'bi-toggle-off');
         btnToggleSegments.classList.add('btn', 'btn-secondary');
+        btnToggleSegments.replaceChildren(imgToggleSegments, txtToggleSegments);
         btnToggleSegments.addEventListener('click', () => {
             const showing = this.map.toggleShowHiddenSegments();
-            btnToggleSegments.textContent = showing ?
-                'Hide hidden segments' :
-                'Show hidden segments';
             if (showing) {
                 btnToggleSegments.classList.add('active', 'btn-primary');
                 btnToggleSegments.classList.remove('btn-secondary');
+                imgToggleSegments.classList.replace('bi-toggle-off', 'bi-toggle-on');
+                txtToggleSegments.textContent = ' Hide hidden segments ';
             } else {
                 btnToggleSegments.classList.remove('active', 'btn-primary');
                 btnToggleSegments.classList.add('btn-secondary');
+                imgToggleSegments.classList.replace('bi-toggle-on', 'bi-toggle-off');
+                txtToggleSegments.textContent = ' Show hidden segments ';
             }
         });
         // Minimize segment count
@@ -74,11 +82,12 @@ export class Studio {
         // Delete spline tool
         const btnDeleteSpline = document.createElement('button');
         const imgDeleteSpline = document.createElement('i');
+        const txtDeleteSpline = document.createTextNode(' Delete Spline Tool ');
         imgDeleteSpline.classList.add('bi', 'bi-eraser-fill');
         imgDeleteSpline.setAttribute('role', 'img');
         imgDeleteSpline.ariaLabel = 'Delete Spline Tool';
-        btnDeleteSpline.appendChild(imgDeleteSpline);
         btnDeleteSpline.classList.add('btn', 'btn-secondary');
+        btnDeleteSpline.replaceChildren(imgDeleteSpline, txtDeleteSpline);
         btnDeleteSpline.addEventListener('click', () => {
             const toolEnabled = this.map.toggleDeleteTool();
             if (toolEnabled) {
