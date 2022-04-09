@@ -27,6 +27,7 @@ export class Studio {
         const mapDiv = document.createElement('div');
         btnMap.addEventListener('click', () => {
             element.replaceChildren(header, buttons, mapButtons, mapDiv);
+            header.innerText = 'Map';
         });
         // Show control points
         const btnTogglePoints = document.createElement('button');
@@ -81,9 +82,17 @@ export class Studio {
         btnReplaceSplines.textContent = 'Minimize segment count';
         btnReplaceSplines.classList.add('btn', 'btn-secondary');
         btnReplaceSplines.addEventListener('click', () => {
+            const segmentCountBefore = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
             this.railroad.splines = simplifySplines(this.railroad);
+            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
+            if (segmentCountAfter > segmentCountBefore) {
+                btnReplaceSplines.classList.replace('btn-secondary', 'btn-danger');
+            } else if (segmentCountAfter < segmentCountBefore) {
+                header.innerText = `Segment count reduced from ${segmentCountBefore} to ${segmentCountAfter}`;
+                btnReplaceSplines.classList.replace('btn-secondary', 'btn-success');
+            }
             this.modified = true;
-            this.map.refresh();
+            setTimeout(() => this.map.refresh(), 1000);
         });
         // Delete spline tool
         const btnDeleteSpline = document.createElement('button');
