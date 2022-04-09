@@ -35,9 +35,8 @@ export class Studio {
         imgTogglePoints.classList.add('bi', 'bi-toggle-off');
         btnTogglePoints.classList.add('btn', 'btn-secondary');
         btnTogglePoints.replaceChildren(imgTogglePoints, txtTogglePoints);
-        btnTogglePoints.addEventListener('click', () => {
-            const showing = this.map.toggleShowControlPoints();
-            if (showing) {
+        const togglePointsListener = (): void => {
+            if (this.map.getShowControlPoints()) {
                 btnTogglePoints.classList.add('active', 'btn-primary');
                 btnTogglePoints.classList.remove('btn-secondary');
                 imgTogglePoints.classList.replace('bi-toggle-off', 'bi-toggle-on');
@@ -48,6 +47,10 @@ export class Studio {
                 imgTogglePoints.classList.replace('bi-toggle-on', 'bi-toggle-off');
                 txtTogglePoints.textContent = ' Show control points ';
             }
+        };
+        btnTogglePoints.addEventListener('click', () => {
+            this.map.toggleShowControlPoints();
+            togglePointsListener();
         });
         // Show hidden segments
         const btnToggleSegments = document.createElement('button');
@@ -56,9 +59,8 @@ export class Studio {
         imgToggleSegments.classList.add('bi', 'bi-toggle-off');
         btnToggleSegments.classList.add('btn', 'btn-secondary');
         btnToggleSegments.replaceChildren(imgToggleSegments, txtToggleSegments);
-        btnToggleSegments.addEventListener('click', () => {
-            const showing = this.map.toggleShowHiddenSegments();
-            if (showing) {
+        const toggleSegmentsListener = () => {
+            if (this.map.getShowHiddenSegments()) {
                 btnToggleSegments.classList.add('active', 'btn-primary');
                 btnToggleSegments.classList.remove('btn-secondary');
                 imgToggleSegments.classList.replace('bi-toggle-off', 'bi-toggle-on');
@@ -69,6 +71,10 @@ export class Studio {
                 imgToggleSegments.classList.replace('bi-toggle-on', 'bi-toggle-off');
                 txtToggleSegments.textContent = ' Show hidden segments ';
             }
+        };
+        btnToggleSegments.addEventListener('click', () => {
+            this.map.toggleShowHiddenSegments();
+            toggleSegmentsListener();
         });
         // Minimize segment count
         const btnReplaceSplines = document.createElement('button');
@@ -166,6 +172,8 @@ export class Studio {
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
         element.replaceChildren(header, buttons, mapContainer);
         this.map = new RailroadMap(this, mapDiv);
+        togglePointsListener();
+        toggleSegmentsListener();
         document.title = this.filename + ' - Railroad Studio';
         console.log(railroad);
     }

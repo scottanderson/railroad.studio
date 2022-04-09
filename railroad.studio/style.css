@@ -109,7 +109,7 @@ body {
 .stone-wall.hidden,
 .wooden-bridge.hidden,
 .steel-bridge.hidden {
-  stroke-width: 200;
+  stroke-width: 400;
   opacity: 0.5;
 }
 
