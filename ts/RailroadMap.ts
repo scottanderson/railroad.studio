@@ -26,10 +26,11 @@ interface MapOptions {
 }
 
 interface MapLayers {
-    controlPoints: G;
+    grades: G;
+    groundworkControlPoints: G;
     groundworks: G;
     groundworksHidden: G;
-    grades: G;
+    trackControlPoints: G;
     tracks: G;
     tracksHidden: G;
 }
@@ -139,9 +140,11 @@ export class RailroadMap {
         this.showControlPoints = !this.showControlPoints;
         this.writeOptions();
         if (this.showControlPoints) {
-            this.layers.controlPoints.show();
+            this.layers.groundworkControlPoints.show();
+            this.layers.trackControlPoints.show();
         } else {
-            this.layers.controlPoints.hide();
+            this.layers.groundworkControlPoints.hide();
+            this.layers.trackControlPoints.hide();
         }
         return this.showControlPoints;
     }
@@ -205,11 +208,13 @@ export class RailroadMap {
         const [
             groundworks,
             groundworksHidden,
+            groundworkControlPoints,
             grades,
             tracks,
             tracksHidden,
-            controlPoints,
+            trackControlPoints,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -218,7 +223,8 @@ export class RailroadMap {
             group.group(),
         ];
         if (!this.showControlPoints) {
-            controlPoints.hide();
+            groundworkControlPoints.hide();
+            trackControlPoints.hide();
         }
         if (!this.showHiddenSegments) {
             groundworksHidden.hide();
@@ -228,10 +234,11 @@ export class RailroadMap {
             grades.hide();
         }
         return {
-            controlPoints: controlPoints,
             grades: grades,
+            groundworkControlPoints: groundworkControlPoints,
             groundworks: groundworks,
             groundworksHidden: groundworksHidden,
+            trackControlPoints: trackControlPoints,
             tracks: tracks,
             tracksHidden: tracksHidden,
         };
@@ -342,9 +349,11 @@ export class RailroadMap {
             const adjacentVisible = spline.segmentsVisible.slice(i - 1, i + 1).filter(Boolean).length;
             let rect;
             if (isRail) {
-                rect = this.layers.controlPoints.circle(300);
+                rect = this.layers.trackControlPoints
+                    .circle(300);
             } else {
-                rect = this.layers.controlPoints.rect(300, 300)
+                rect = this.layers.groundworkControlPoints
+                    .rect(300, 300)
                     .rotate(splineHeading(spline, i), 150, 150);
             }
             rect
