@@ -5,8 +5,8 @@ import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
 import {Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
 import {bezierCommand, svgPath} from './bezier';
-import {delta2, normalizeAngle, splineHeading} from './splines';
-import {flattenControlPoints} from './tool-flatten';
+import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
+import {calculateGrade, flattenControlPoints} from './tool-flatten';
 
 enum MapToolMode {
     pan_zoom,
@@ -20,6 +20,7 @@ interface MapOptions {
         y: number;
     };
     zoom: number;
+    showGrades: boolean;
     showControlPoints: boolean;
     showHiddenSegments: boolean;
 }
@@ -28,6 +29,7 @@ interface MapLayers {
     controlPoints: G;
     groundworks: G;
     groundworksHidden: G;
+    grades: G;
     tracks: G;
     tracksHidden: G;
 }
@@ -36,6 +38,7 @@ export class RailroadMap {
     private railroad: Railroad;
     private svg: Svg;
     private panZoom: SvgPanZoom.Instance;
+    private showGrades: boolean;
     private showControlPoints: boolean;
     private showHiddenSegments: boolean;
     private toolMode: MapToolMode;
@@ -49,6 +52,7 @@ export class RailroadMap {
         this.railroad = studio.railroad;
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
+        this.showGrades = options.showGrades;
         this.showControlPoints = options.showControlPoints;
         this.showHiddenSegments = options.showHiddenSegments;
         this.svg = new Svg().addTo(element).size('100%', '100%');
@@ -103,6 +107,9 @@ export class RailroadMap {
         if (this.toolMode === MapToolMode.flatten_spline) {
             // Disable flatten tool
             this.toolMode = MapToolMode.pan_zoom;
+            if (this.showGrades) {
+                this.toggleShowGrades();
+            }
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow flatten tool while another tool is active
@@ -110,8 +117,22 @@ export class RailroadMap {
         } else {
             // Enable flatten tool
             this.toolMode = MapToolMode.flatten_spline;
+            if (!this.showGrades) {
+                this.toggleShowGrades();
+            }
             return true;
         }
+    }
+
+    toggleShowGrades(): boolean {
+        this.showGrades = !this.showGrades;
+        this.writeOptions();
+        if (this.showGrades) {
+            this.layers.grades.show();
+        } else {
+            this.layers.grades.hide();
+        }
+        return this.showGrades;
     }
 
     toggleShowControlPoints(): boolean {
@@ -138,6 +159,10 @@ export class RailroadMap {
         return this.showHiddenSegments;
     }
 
+    getShowGrades(): boolean {
+        return this.showGrades;
+    }
+
     getShowControlPoints(): boolean {
         return this.showControlPoints;
     }
@@ -155,6 +180,7 @@ export class RailroadMap {
                 y: Number(parsed?.pan?.y || 0),
             },
             zoom: Number(parsed?.zoom || 1),
+            showGrades: Boolean(parsed?.showGrades || false),
             showControlPoints: Boolean(parsed?.showControlPoints || false),
             showHiddenSegments: Boolean(parsed?.showHiddenSegments || false),
         };
@@ -165,6 +191,7 @@ export class RailroadMap {
         const options: MapOptions = {
             pan: this.panZoom.getPan(),
             zoom: this.panZoom.getZoom(),
+            showGrades: this.showGrades,
             showControlPoints: this.showControlPoints,
             showHiddenSegments: this.showHiddenSegments,
         };
@@ -178,10 +205,12 @@ export class RailroadMap {
         const [
             groundworks,
             groundworksHidden,
+            grades,
             tracks,
             tracksHidden,
             controlPoints,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -195,8 +224,12 @@ export class RailroadMap {
             groundworksHidden.hide();
             tracksHidden.hide();
         }
+        if (!this.showGrades) {
+            grades.hide();
+        }
         return {
             controlPoints: controlPoints,
+            grades: grades,
             groundworks: groundworks,
             groundworksHidden: groundworksHidden,
             tracks: tracks,
@@ -356,6 +389,29 @@ export class RailroadMap {
                     throw new Error(`Unknown spline type ${spline.type}`);
             }
             elements.push(rect);
+        }
+        // Grade
+        if (isRail) {
+            const c = calculateGrade(spline.controlPoints);
+            for (let i = 0; i < spline.segmentsVisible.length; i++) {
+                if (!spline.segmentsVisible[i]) continue;
+                const percentage = c[i].grade;
+                const heading = vectorHeading(spline.controlPoints[i], spline.controlPoints[i + 1]);
+                const degrees = heading > 0 ? heading + 90 : heading - 90;
+                const cp0 = spline.controlPoints[i];
+                const cp1 = spline.controlPoints[i + 1];
+                const x = (cp1.x + cp0.x) / 2;
+                const y = (cp1.y + cp0.y) / 2;
+                const text = this.layers.grades
+                    .text(percentage.toFixed(4) + '%')
+                    .font({
+                        family: 'Helvetica',
+                        size: 500,
+                    })
+                    .rotate(degrees)
+                    .translate(x, y);
+                elements.push(text);
+            }
         }
     }
 
