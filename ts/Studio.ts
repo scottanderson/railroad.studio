@@ -12,12 +12,14 @@ export class Studio {
     railroad: Railroad;
     modified: boolean;
     map: RailroadMap;
+    header: HTMLHeadingElement;
 
     constructor(filename: string, railroad: Railroad, element: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
         this.modified = false;
         const header = document.createElement('h2');
+        this.header = header;
         header.textContent = 'Loaded ' + this.filename;
         const buttons = document.createElement('div');
         // Map
@@ -27,7 +29,7 @@ export class Studio {
         const mapDiv = document.createElement('div');
         btnMap.addEventListener('click', () => {
             element.replaceChildren(header, buttons, mapButtons, mapDiv);
-            header.innerText = 'Map';
+            this.setTitle('Map');
         });
         // Show control points
         const btnTogglePoints = document.createElement('button');
@@ -88,7 +90,7 @@ export class Studio {
             if (segmentCountAfter > segmentCountBefore) {
                 btnReplaceSplines.classList.replace('btn-secondary', 'btn-danger');
             } else if (segmentCountAfter < segmentCountBefore) {
-                header.innerText = `Segment count reduced from ${segmentCountBefore} to ${segmentCountAfter}`;
+                this.setTitle(`Segment count reduced from ${segmentCountBefore} to ${segmentCountAfter}`);
                 btnReplaceSplines.classList.replace('btn-secondary', 'btn-success');
             }
             this.modified = true;
@@ -145,7 +147,6 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
             element.replaceChildren(header, buttons, table);
-            header.innerText = 'Frames';
             this.frames(table);
         });
         // Industries
@@ -156,7 +157,6 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
             element.replaceChildren(header, buttons, table);
-            header.innerText = 'Industries';
             this.industries(table);
         });
         // Players
@@ -167,7 +167,6 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
             element.replaceChildren(header, buttons, table);
-            header.innerText = 'Players';
             this.players(table);
         });
         // Export
@@ -206,7 +205,12 @@ export class Studio {
         console.log(railroad);
     }
 
+    setTitle(title: string) {
+        this.header.textContent = title + ' - ' + this.filename;
+    }
+
     frames(table: HTMLTableElement) {
+        this.setTitle('Frames');
         const thead = document.createElement('thead');
         table.appendChild(thead);
         let tr = document.createElement('tr');
@@ -244,6 +248,7 @@ export class Studio {
     }
 
     industries(table: HTMLTableElement): void {
+        this.setTitle('Industries');
         const industryNames: { [key: number]: string } = {};
         industryNames[1] = 'Logging Camp';
         industryNames[2] = 'Sawmill';
@@ -295,6 +300,7 @@ export class Studio {
     }
 
     players(table: HTMLTableElement) {
+        this.setTitle('Players');
         const thead = document.createElement('thead');
         table.appendChild(thead);
         let tr = document.createElement('tr');

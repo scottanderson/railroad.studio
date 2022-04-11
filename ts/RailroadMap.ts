@@ -45,11 +45,11 @@ export class RailroadMap {
     private toolMode: MapToolMode;
     private layers: MapLayers;
     private setMapModified: () => void;
+    private setTitle: (title: string) => void;
 
     constructor(studio: Studio, element: HTMLElement) {
-        this.setMapModified = () => {
-            studio.modified = true;
-        };
+        this.setMapModified = () => studio.modified = true;
+        this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
@@ -60,9 +60,7 @@ export class RailroadMap {
         this.svg.node.style.setProperty('position', 'fixed');
         this.layers = this.createLayers();
         this.renderSwitches();
-        for (const spline of this.railroad.splines) {
-            this.renderSpline(spline);
-        }
+        this.renderSplines();
         this.panZoom = this.initPanZoom();
         if (options.pan && options.zoom) {
             this.panZoom.zoom(options.zoom);
@@ -77,9 +75,7 @@ export class RailroadMap {
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
         this.renderSwitches();
-        for (const spline of this.railroad.splines) {
-            this.renderSpline(spline);
-        }
+        this.renderSplines();
         this.panZoom = this.initPanZoom();
         if (pan && zoom) {
             this.panZoom.zoom(zoom);
@@ -244,10 +240,12 @@ export class RailroadMap {
         };
     }
 
-    private renderBorder(group: G) {
+    private renderBorder(group: G): Element {
         // Border
-        group.rect(400000, 400000)
-            .center(0, 0)
+        return group
+            .rect(4_000_00, 4_000_00)
+            .translate(-2_000_00, -2_000_00)
+            .radius(100_00)
             .addClass('map-border');
     }
 
@@ -341,6 +339,31 @@ export class RailroadMap {
         }
     }
 
+    private renderSplines() {
+        const splines = this.railroad.splines.concat();
+        if (splines.length > 0) {
+            let updateTime = 0;
+            const fun = () => {
+                while (splines.length > 0) {
+                    const spline = splines.shift();
+                    if (spline) {
+                        this.renderSpline(spline);
+                    }
+                    const now = performance.now();
+                    if (now - updateTime > 200) {
+                        updateTime = now;
+                        const pct = 100 * (1 - (splines.length / this.railroad.splines.length));
+                        this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
+                        setTimeout(fun, 0);
+                        return;
+                    }
+                }
+                this.setTitle('Map');
+            };
+            setTimeout(fun, 0);
+        }
+    }
+
     private renderSpline(spline: Spline) {
         const elements: Element[] = [];
         const isRail = spline.type === SplineType.rail || spline.type === SplineType.rail_deck;
@@ -364,9 +387,9 @@ export class RailroadMap {
         const splineGroup = isRail ? this.layers.tracks : this.layers.groundworks;
         const hiddenGroup = isRail ? this.layers.tracksHidden : this.layers.groundworksHidden;
         const points: ArrayXY[] = spline.controlPoints.map((cp) => [cp.x, cp.y]);
+        const d = svgPath(points, bezierCommand);
         // Splines
         for (const invisPass of [true, false]) {
-            const d = svgPath(points, bezierCommand);
             const g = invisPass ? hiddenGroup : splineGroup;
             const rect = g.path(d)
                 .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
