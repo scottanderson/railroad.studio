@@ -1,27 +1,5 @@
-html,
-body {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-}
-
-#content {
-  flex: 1 0 auto;
-}
-
 .pad {
   padding: 1rem;
-}
-
-.light thead.sticky-top {
-  background-color: var(--bs-body-bg);
-}
-
-.dark thead.sticky-top {
-  background-color: var(--bs-body-bg-alt);
 }
 
 #drop_zone {
@@ -170,4 +148,8 @@ body {
 .steel-bridge.xray,
 .switch-leg.aligned.xray {
   opacity: 0.9;
+}
+
+.dark .grade-text {
+  fill: white;
 }

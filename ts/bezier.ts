@@ -42,7 +42,7 @@ function controlPoint(current: ArrayXY, previous: ArrayXY, next: ArrayXY, revers
     // The control point position is relative to the current point
     const x = current[0] + Math.cos(angle) * length;
     const y = current[1] + Math.sin(angle) * length;
-    return [x, y];
+    return [Math.round(x), Math.round(y)];
 }
 
 // Create the bezier curve command

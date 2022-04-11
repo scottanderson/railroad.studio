@@ -230,6 +230,8 @@ export class RailroadMap {
         if (!this.showGrades) {
             grades.hide();
         }
+        grades.font('family', 'sans-serif');
+        grades.font('size', 500);
         return {
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
@@ -281,12 +283,14 @@ export class RailroadMap {
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {
+        const degrees = normalizeAngle(sw.rotation.yaw + yawOffset).toFixed(1);
+        const x = Math.round(sw.location.x);
+        const y = Math.round(sw.location.y);
         return this.layers.tracks.path([
             ['m', 0, 0],
             ['v', 1888],
         ])
-            .rotate(normalizeAngle(sw.rotation.yaw + yawOffset), 0, 0)
-            .translate(sw.location.x, sw.location.y)
+            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('switch-leg');
     }
 
@@ -328,8 +332,8 @@ export class RailroadMap {
                         ['l', -64, 64],
                         ['l', -64, -64],
                     ])
-                        .rotate(sw.rotation.yaw - 90, 0, 0)
-                        .translate(sw.location.x, sw.location.y)
+                        .rotate(Math.round(sw.rotation.yaw - 90), 0, 0)
+                        .translate(Math.round(sw.location.x), Math.round(sw.location.y))
                         .fill('yellow')
                         .opacity(this.showHiddenSegments ? 0.9 : 1.0);
                     break;
@@ -371,23 +375,26 @@ export class RailroadMap {
         // Control points
         spline.controlPoints.forEach((point, i) => {
             const adjacentVisible = spline.segmentsVisible.slice(i - 1, i + 1).filter(Boolean).length;
+            const x = Math.round(point.x - 150);
+            const y = Math.round(point.y - 150);
             let rect;
             if (isRail) {
                 rect = this.layers.trackControlPoints
-                    .circle(300);
+                    .circle(300)
+                    .attr('transform', `translate(${x} ${y})`);
             } else {
+                const degrees = splineHeading(spline, i).toFixed(1);
                 rect = this.layers.groundworkControlPoints
                     .rect(300, 300)
-                    .rotate(splineHeading(spline, i), 150, 150);
+                    .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
             }
             rect
-                .translate(point.x - 150, point.y - 150)
                 .addClass(`control-point-${adjacentVisible}`);
             elements.push(rect);
         });
         const splineGroup = isRail ? this.layers.tracks : this.layers.groundworks;
         const hiddenGroup = isRail ? this.layers.tracksHidden : this.layers.groundworksHidden;
-        const points: ArrayXY[] = spline.controlPoints.map((cp) => [cp.x, cp.y]);
+        const points: ArrayXY[] = spline.controlPoints.map((cp) => [Math.round(cp.x), Math.round(cp.y)]);
         const d = svgPath(points, bezierCommand);
         // Splines
         for (const invisPass of [true, false]) {
@@ -436,13 +443,11 @@ export class RailroadMap {
                 const x = (cp1.x + cp0.x) / 2;
                 const y = (cp1.y + cp0.y) / 2;
                 const text = this.layers.grades
-                    .text(percentage.toFixed(4) + '%')
-                    .font({
-                        family: 'Helvetica',
-                        size: 500,
-                    })
-                    .rotate(degrees)
-                    .translate(x, y);
+                    .text((block) => block
+                        .text(percentage.toFixed(4) + '%')
+                        .dx(300))
+                    .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+                    .addClass('grade-text');
                 elements.push(text);
             }
         }
@@ -480,15 +485,15 @@ function splineToDashArray(spline: Spline, invert: boolean): string | null {
             if (!ret) {
                 ret = previousSegmentVisible === invert ? ['0'] : [];
             }
-            ret.push(String(dashlen));
+            ret.push(String(Math.round(dashlen)));
             dashlen = segmentLength;
         } else {
             dashlen += segmentLength;
         }
     }
-    if (!ret) return invert ? null : String(dashlen);
+    if (!ret) return invert ? null : String(Math.round(dashlen));
     if (dashlen > 0) {
-        ret.push(String(dashlen));
+        ret.push(String(Math.round(dashlen)));
     }
     return ret.join(',');
 }
