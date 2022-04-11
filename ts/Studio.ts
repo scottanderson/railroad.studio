@@ -14,7 +14,7 @@ export class Studio {
     map: RailroadMap;
     header: HTMLHeadingElement;
 
-    constructor(filename: string, railroad: Railroad, element: HTMLElement) {
+    constructor(filename: string, railroad: Railroad, content: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
         this.modified = false;
@@ -28,7 +28,8 @@ export class Studio {
         btnMap.classList.add('btn', 'btn-secondary');
         const mapDiv = document.createElement('div');
         btnMap.addEventListener('click', () => {
-            element.replaceChildren(header, buttons, mapButtons, mapDiv);
+            studioControls.replaceChildren(buttons, mapButtons);
+            content.replaceChildren(header, studioControls, mapDiv);
             this.setTitle('Map');
         });
         // Show control points
@@ -146,7 +147,8 @@ export class Studio {
         btnFrames.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
-            element.replaceChildren(header, buttons, table);
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(header, studioControls, table);
             this.frames(table);
         });
         // Industries
@@ -156,7 +158,8 @@ export class Studio {
         btnIndustries.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
-            element.replaceChildren(header, buttons, table);
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(header, studioControls, table);
             this.industries(table);
         });
         // Players
@@ -166,7 +169,8 @@ export class Studio {
         btnPlayers.addEventListener('click', () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
-            element.replaceChildren(header, buttons, table);
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(header, studioControls, table);
             this.players(table);
         });
         // Export
@@ -197,7 +201,11 @@ export class Studio {
             eval('darkmode.toggleDarkMode();');
         });
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
-        element.replaceChildren(header, buttons, mapContainer);
+        // Studio controls
+        const studioControls = document.createElement('div');
+        studioControls.classList.add('studio-controls');
+        studioControls.replaceChildren(buttons, mapButtons);
+        content.replaceChildren(header, studioControls, mapDiv);
         this.map = new RailroadMap(this, mapDiv);
         togglePointsListener();
         toggleSegmentsListener();

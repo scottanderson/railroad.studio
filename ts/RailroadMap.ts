@@ -56,8 +56,9 @@ export class RailroadMap {
         this.showGrades = options.showGrades;
         this.showControlPoints = options.showControlPoints;
         this.showHiddenSegments = options.showHiddenSegments;
-        this.svg = new Svg().addTo(element).size('100%', '100%');
-        this.svg.node.style.setProperty('position', 'fixed');
+        this.svg = new Svg()
+            .addClass('map-svg')
+            .addTo(element);
         this.layers = this.createLayers();
         this.renderSwitches();
         this.renderSplines();
@@ -75,7 +76,7 @@ export class RailroadMap {
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
         this.renderSwitches();
-        this.renderSplines();
+        this.railroad.splines.forEach(this.renderSpline, this);
         this.panZoom = this.initPanZoom();
         if (pan && zoom) {
             this.panZoom.zoom(zoom);
