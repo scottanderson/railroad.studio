@@ -1,6 +1,6 @@
 import {GvasString, GvasText, Vector} from './Gvas';
 import {Railroad} from './Railroad';
-import {RailroadMap} from './RailroadMap';
+import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 
@@ -33,54 +33,86 @@ export class Studio {
             content.replaceChildren(header, studioControls, mapDiv);
             this.setTitle('Map');
         });
-        // Show control points
-        const btnTogglePoints = document.createElement('button');
-        const imgTogglePoints = document.createElement('i');
-        const txtTogglePoints = document.createTextNode(' Show control points ');
-        imgTogglePoints.classList.add('bi', 'bi-toggle-off');
-        btnTogglePoints.classList.add('btn', 'btn-secondary');
-        btnTogglePoints.replaceChildren(imgTogglePoints, txtTogglePoints);
-        const togglePointsListener = (): void => {
-            if (this.map.getShowControlPoints()) {
-                btnTogglePoints.classList.add('active', 'btn-primary');
-                btnTogglePoints.classList.remove('btn-secondary');
-                imgTogglePoints.classList.replace('bi-toggle-off', 'bi-toggle-on');
-                txtTogglePoints.textContent = ' Hide control points ';
-            } else {
-                btnTogglePoints.classList.remove('active', 'btn-primary');
-                btnTogglePoints.classList.add('btn-secondary');
-                imgTogglePoints.classList.replace('bi-toggle-on', 'bi-toggle-off');
-                txtTogglePoints.textContent = ' Show control points ';
-            }
-        };
-        btnTogglePoints.addEventListener('click', () => {
-            this.map.toggleShowControlPoints();
-            togglePointsListener();
-        });
-        // Show hidden segments
-        const btnToggleSegments = document.createElement('button');
-        const imgToggleSegments = document.createElement('i');
-        const txtToggleSegments = document.createTextNode(' Show hidden segments ');
-        imgToggleSegments.classList.add('bi', 'bi-toggle-off');
-        btnToggleSegments.classList.add('btn', 'btn-secondary');
-        btnToggleSegments.replaceChildren(imgToggleSegments, txtToggleSegments);
-        const toggleSegmentsListener = () => {
-            if (this.map.getShowHiddenSegments()) {
-                btnToggleSegments.classList.add('active', 'btn-primary');
-                btnToggleSegments.classList.remove('btn-secondary');
-                imgToggleSegments.classList.replace('bi-toggle-off', 'bi-toggle-on');
-                txtToggleSegments.textContent = ' Hide hidden segments ';
-            } else {
-                btnToggleSegments.classList.remove('active', 'btn-primary');
-                btnToggleSegments.classList.add('btn-secondary');
-                imgToggleSegments.classList.replace('bi-toggle-on', 'bi-toggle-off');
-                txtToggleSegments.textContent = ' Show hidden segments ';
-            }
-        };
-        btnToggleSegments.addEventListener('click', () => {
-            this.map.toggleShowHiddenSegments();
-            toggleSegmentsListener();
-        });
+        // Layers dropdown
+        const txtLayers = document.createTextNode(' Layers ');
+        const imgLayers = document.createElement('i');
+        imgLayers.classList.add('bi', 'bi-layers');
+        imgLayers.setAttribute('role', 'img');
+        imgLayers.ariaLabel = 'Layers Dropdown';
+        const btnLayers = document.createElement('button');
+        btnLayers.id = 'btnLayers';
+        btnLayers.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnLayers.setAttribute('aria-expanded', 'false');
+        btnLayers.setAttribute('data-bs-auto-close', 'outside');
+        btnLayers.setAttribute('data-bs-toggle', 'dropdown');
+        btnLayers.replaceChildren(imgLayers, txtLayers);
+        const lstLayers = document.createElement('ul');
+        lstLayers.classList.add('dropdown-menu');
+        const grpLayers = document.createElement('div');
+        grpLayers.setAttribute('aria-labelledby', btnLayers.id);
+        grpLayers.classList.add('dropdown');
+        grpLayers.replaceChildren(btnLayers, lstLayers);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const layers: {
+            key: keyof MapLayers;
+            name: string;
+            listener?: () => void;
+        }[] = [
+            {
+                key: 'grades',
+                name: 'Grade %',
+            },
+            {
+                key: 'groundworkControlPoints',
+                name: 'Groundwork and Bridge Control Points',
+            },
+            {
+                key: 'groundworks',
+                name: 'Groundwork and Bridge Segments',
+            },
+            {
+                key: 'groundworksHidden',
+                name: 'Groundwork and Bridge Hidden Segments',
+            },
+            {
+                key: 'industries',
+                name: 'Industries',
+            },
+            {
+                key: 'trackControlPoints',
+                name: 'Track Control Points',
+            },
+            {
+                key: 'tracks',
+                name: 'Track Segments',
+            },
+            {
+                key: 'tracksHidden',
+                name: 'Track Hidden Segments',
+            },
+        ];
+        lstLayers.replaceChildren(...layers.map((layer) => {
+            const btnToggleLayer = document.createElement('button');
+            const imgToggleLayer = document.createElement('i');
+            const txtToggleLayer = document.createTextNode(` ${layer.name} `);
+            imgToggleLayer.classList.add('bi', 'bi-toggle-off');
+            btnToggleLayer.classList.add('dropdown-item', 'text-nowrap');
+            btnToggleLayer.replaceChildren(imgToggleLayer, txtToggleLayer);
+            layer.listener = () => {
+                if (this.map.getLayerVisibility(layer.key)) {
+                    imgToggleLayer.classList.replace('bi-toggle-off', 'bi-toggle-on');
+                } else {
+                    imgToggleLayer.classList.replace('bi-toggle-on', 'bi-toggle-off');
+                }
+            };
+            btnToggleLayer.addEventListener('click', () => {
+                this.map.toggleLayerVisibility(layer.key);
+                if (layer.listener) {
+                    layer.listener();
+                }
+            });
+            return btnToggleLayer;
+        }));
         // Minimize segment count
         const btnReplaceSplines = document.createElement('button');
         btnReplaceSplines.textContent = 'Minimize segment count';
@@ -139,7 +171,7 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
+        mapButtons.replaceChildren(grpLayers, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
@@ -209,8 +241,9 @@ export class Studio {
         studioControls.replaceChildren(buttons, mapButtons);
         content.replaceChildren(header, studioControls, mapDiv);
         this.map = new RailroadMap(this, mapDiv);
-        togglePointsListener();
-        toggleSegmentsListener();
+        layers.map((l) => l.listener)
+            .filter((item): item is (() => void) => !!item)
+            .forEach((l) => l());
         document.title = this.filename + ' - Railroad Studio';
         console.log(railroad);
     }

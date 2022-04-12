@@ -20,7 +20,7 @@
         "@typescript-eslint/no-type-alias": ["error", {
             "allowAliases": "in-unions",
             "allowLiterals": "always",
-            "allowTupleTypes": "in-unions"
+            "allowTupleTypes": "always"
         }],
         "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
         "@typescript-eslint/no-unused-vars": ["error"],

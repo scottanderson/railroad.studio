@@ -2,7 +2,7 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
-import {Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
+import {Industry, IndustryType, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
@@ -20,30 +20,38 @@ interface MapOptions {
         y: number;
     };
     zoom: number;
-    showGrades: boolean;
-    showControlPoints: boolean;
-    showHiddenSegments: boolean;
+    layerVisibility: MapLayerVisibility;
 }
 
-interface MapLayers {
+export interface MapLayers {
     grades: G;
     groundworkControlPoints: G;
     groundworks: G;
     groundworksHidden: G;
+    industries: G;
     trackControlPoints: G;
     tracks: G;
     tracksHidden: G;
+}
+
+interface MapLayerVisibility {
+    grades: boolean;
+    groundworkControlPoints: boolean;
+    groundworks: boolean;
+    groundworksHidden: boolean;
+    industries: boolean;
+    trackControlPoints: boolean;
+    tracks: boolean;
+    tracksHidden: boolean;
 }
 
 export class RailroadMap {
     private railroad: Railroad;
     private svg: Svg;
     private panZoom: SvgPanZoom.Instance;
-    private showGrades: boolean;
-    private showControlPoints: boolean;
-    private showHiddenSegments: boolean;
     private toolMode: MapToolMode;
     private layers: MapLayers;
+    private layerVisibility: MapLayerVisibility;
     private setMapModified: () => void;
     private setTitle: (title: string) => void;
 
@@ -53,13 +61,12 @@ export class RailroadMap {
         this.railroad = studio.railroad;
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
-        this.showGrades = options.showGrades;
-        this.showControlPoints = options.showControlPoints;
-        this.showHiddenSegments = options.showHiddenSegments;
+        this.layerVisibility = options.layerVisibility;
         this.svg = new Svg()
             .addClass('map-svg')
             .addTo(element);
         this.layers = this.createLayers();
+        this.railroad.industries.forEach(this.renderIndustry, this);
         this.renderSwitches();
         this.renderSplines();
         this.panZoom = this.initPanZoom();
@@ -75,6 +82,7 @@ export class RailroadMap {
         this.panZoom?.destroy();
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
+        this.railroad.industries.forEach(this.renderIndustry, this);
         this.renderSwitches();
         this.railroad.splines.forEach(this.renderSpline, this);
         this.panZoom = this.initPanZoom();
@@ -105,8 +113,8 @@ export class RailroadMap {
         if (this.toolMode === MapToolMode.flatten_spline) {
             // Disable flatten tool
             this.toolMode = MapToolMode.pan_zoom;
-            if (this.showGrades) {
-                this.toggleShowGrades();
+            if (this.layerVisibility.grades) {
+                this.toggleLayerVisibility('grades');
             }
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
@@ -115,60 +123,26 @@ export class RailroadMap {
         } else {
             // Enable flatten tool
             this.toolMode = MapToolMode.flatten_spline;
-            if (!this.showGrades) {
-                this.toggleShowGrades();
+            if (!this.layerVisibility.grades) {
+                this.toggleLayerVisibility('grades');
             }
             return true;
         }
     }
 
-    toggleShowGrades(): boolean {
-        this.showGrades = !this.showGrades;
+    toggleLayerVisibility(layer: keyof MapLayers): boolean {
+        this.layerVisibility[layer] = !this.layerVisibility[layer];
         this.writeOptions();
-        if (this.showGrades) {
-            this.layers.grades.show();
+        if (this.layerVisibility[layer]) {
+            this.layers[layer].show();
         } else {
-            this.layers.grades.hide();
+            this.layers[layer].hide();
         }
-        return this.showGrades;
+        return this.layerVisibility[layer];
     }
 
-    toggleShowControlPoints(): boolean {
-        this.showControlPoints = !this.showControlPoints;
-        this.writeOptions();
-        if (this.showControlPoints) {
-            this.layers.groundworkControlPoints.show();
-            this.layers.trackControlPoints.show();
-        } else {
-            this.layers.groundworkControlPoints.hide();
-            this.layers.trackControlPoints.hide();
-        }
-        return this.showControlPoints;
-    }
-
-    toggleShowHiddenSegments(): boolean {
-        this.showHiddenSegments = !this.showHiddenSegments;
-        this.writeOptions();
-        if (this.showHiddenSegments) {
-            this.layers.groundworksHidden.show();
-            this.layers.tracksHidden.show();
-        } else {
-            this.layers.groundworksHidden.hide();
-            this.layers.tracksHidden.hide();
-        }
-        return this.showHiddenSegments;
-    }
-
-    getShowGrades(): boolean {
-        return this.showGrades;
-    }
-
-    getShowControlPoints(): boolean {
-        return this.showControlPoints;
-    }
-
-    getShowHiddenSegments(): boolean {
-        return this.showHiddenSegments;
+    getLayerVisibility(layer: keyof MapLayers): boolean {
+        return this.layerVisibility[layer];
     }
 
     private readOptions(): MapOptions {
@@ -180,9 +154,16 @@ export class RailroadMap {
                 y: Number(parsed?.pan?.y || 0),
             },
             zoom: Number(parsed?.zoom || 1),
-            showGrades: Boolean(parsed?.showGrades || false),
-            showControlPoints: Boolean(parsed?.showControlPoints || false),
-            showHiddenSegments: Boolean(parsed?.showHiddenSegments || false),
+            layerVisibility: {
+                grades: Boolean(parsed?.layerVisibility?.grades),
+                groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
+                groundworks: true, // Boolean(parsed?.layerVisibility?.groundworks),
+                groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
+                industries: Boolean(parsed?.layerVisibility?.industries),
+                trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
+                tracks: true, // Boolean(parsed?.layerVisibility?.tracks),
+                tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
+            },
         };
     }
 
@@ -191,15 +172,16 @@ export class RailroadMap {
         const options: MapOptions = {
             pan: this.panZoom.getPan(),
             zoom: this.panZoom.getZoom(),
-            showGrades: this.showGrades,
-            showControlPoints: this.showControlPoints,
-            showHiddenSegments: this.showHiddenSegments,
+            layerVisibility: this.layerVisibility,
         };
         localStorage.setItem(key, JSON.stringify(options));
     }
 
     private createLayers(): MapLayers {
-        const group = this.svg.group().rotate(180);
+        const group = this.svg.group()
+            .rotate(180)
+            .font('family', 'sans-serif')
+            .font('size', 500);
         this.renderBorder(group);
         // The z-order of these groups is the order they are created
         const [
@@ -207,6 +189,7 @@ export class RailroadMap {
             groundworksHidden,
             groundworkControlPoints,
             grades,
+            industries,
             tracks,
             tracksHidden,
             trackControlPoints,
@@ -218,29 +201,24 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
+            group.group(),
         ];
-        if (!this.showControlPoints) {
-            groundworkControlPoints.hide();
-            trackControlPoints.hide();
-        }
-        if (!this.showHiddenSegments) {
-            groundworksHidden.hide();
-            tracksHidden.hide();
-        }
-        if (!this.showGrades) {
-            grades.hide();
-        }
-        grades.font('family', 'sans-serif');
-        grades.font('size', 500);
-        return {
+        const layers: MapLayers = {
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
             groundworks: groundworks,
             groundworksHidden: groundworksHidden,
+            industries: industries,
             trackControlPoints: trackControlPoints,
             tracks: tracks,
             tracksHidden: tracksHidden,
         };
+        const entries = Object.entries(layers) as [keyof MapLayers, G][];
+        entries.forEach(([key, group]) => {
+            group.id(key);
+            if (!this.layerVisibility[key]) group.hide();
+        });
+        return layers;
     }
 
     private renderBorder(group: G): Element {
@@ -282,6 +260,18 @@ export class RailroadMap {
         });
     }
 
+    private renderIndustry(industry: Industry): Element {
+        const industryName = IndustryType[industry.type] || `Unknown industry ${industry.type}`;
+        const x = industry.location.x;
+        const y = industry.location.y;
+        const heading = industry.rotation.yaw;
+        const degrees = heading > 0 ? heading + 90 : heading - 90;
+        return this.layers.industries
+            .text((block) => block.text(industryName))
+            .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+            .addClass('grade-text');
+    }
+
     private renderSwitchLeg(sw: Switch, yawOffset: number) {
         const degrees = normalizeAngle(sw.rotation.yaw + yawOffset).toFixed(1);
         const x = Math.round(sw.location.x);
@@ -308,11 +298,8 @@ export class RailroadMap {
                     const alignedYaw = Boolean(sw.state) === divergesRight ? divergence : 0;
                     this.renderSwitchLeg(sw, notAlignedYaw)
                         .addClass('not-aligned');
-                    const aligned = this.renderSwitchLeg(sw, alignedYaw)
+                    this.renderSwitchLeg(sw, alignedYaw)
                         .addClass('aligned');
-                    if (this.showHiddenSegments) {
-                        aligned.addClass('xray');
-                    }
                     break;
                 }
                 case SwitchType.diamond: { // 6
@@ -334,8 +321,7 @@ export class RailroadMap {
                     ])
                         .rotate(Math.round(sw.rotation.yaw - 90), 0, 0)
                         .translate(Math.round(sw.location.x), Math.round(sw.location.y))
-                        .fill('yellow')
-                        .opacity(this.showHiddenSegments ? 0.9 : 1.0);
+                        .addClass('diamond');
                     break;
                 }
                 default:
@@ -403,7 +389,6 @@ export class RailroadMap {
                 .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
                 .on('click', () => this.onClickSpline(spline, rect, elements));
             if (invisPass) rect.addClass('hidden');
-            else if (this.showHiddenSegments) rect.addClass('xray');
             switch (spline.type) {
                 case SplineType.rail:
                     rect.addClass('rail');

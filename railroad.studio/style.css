@@ -121,6 +121,10 @@
   opacity: 0.5;
 }
 
+.diamond {
+  fill: yellow;
+}
+
 .control-point-0 {
   fill: red;
 }
@@ -133,13 +137,14 @@
   fill: green;
 }
 
-.rail.xray,
-.rail-deck.xray,
-.grade.xray,
-.stone-wall.xray,
-.wooden-bridge.xray,
-.steel-bridge.xray,
-.switch-leg.aligned.xray {
+.xray .rail,
+.xray .rail-deck,
+.xray .grade,
+.xray .stone-wall,
+.xray .wooden-bridge,
+.xray .steel-bridge,
+.xray .switch-leg.aligned,
+.xray .diamond {
   opacity: 0.9;
 }
 
