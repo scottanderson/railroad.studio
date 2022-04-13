@@ -1,18 +1,7 @@
-.pad {
-  padding: 1rem;
-}
-
 #drop_zone {
   border: 5px solid blue;
   width: 200px;
   height: 100px;
-}
-
-#footer {
-  position: fixed;
-  bottom: 0;
-  flex-shrink: 0;
-  padding-top: 1rem;
 }
 
 .studio-controls {
@@ -34,6 +23,10 @@
   stroke: black;
   fill: none;
   stroke-width: 500;
+}
+
+.dark .map-border {
+  stroke: white;
 }
 
 .rail,

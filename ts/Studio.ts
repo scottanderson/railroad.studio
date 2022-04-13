@@ -22,6 +22,7 @@ export class Studio {
         this.header = header;
         header.textContent = 'Loaded ' + this.filename;
         const buttons = document.createElement('div');
+        buttons.classList.add('hstack', 'gap-2');
         // Map
         const btnMap = document.createElement('button');
         btnMap.innerText = 'Map';
@@ -137,6 +138,7 @@ export class Studio {
         });
         // Map toolbar
         const mapButtons = document.createElement('div');
+        mapButtons.classList.add('hstack', 'gap-2');
         mapButtons.replaceChildren(btnTogglePoints, btnToggleSegments, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
@@ -203,7 +205,7 @@ export class Studio {
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
         // Studio controls
         const studioControls = document.createElement('div');
-        studioControls.classList.add('studio-controls');
+        studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
         studioControls.replaceChildren(buttons, mapButtons);
         content.replaceChildren(header, studioControls, mapDiv);
         this.map = new RailroadMap(this, mapDiv);

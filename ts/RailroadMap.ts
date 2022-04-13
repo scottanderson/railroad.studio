@@ -436,6 +436,7 @@ export class RailroadMap {
             for (let i = 0; i < spline.segmentsVisible.length; i++) {
                 if (!spline.segmentsVisible[i]) continue;
                 const percentage = c[i].grade;
+                if (percentage === 0) continue;
                 const heading = vectorHeading(spline.controlPoints[i], spline.controlPoints[i + 1]);
                 const degrees = heading > 0 ? heading + 90 : heading - 90;
                 const cp0 = spline.controlPoints[i];
