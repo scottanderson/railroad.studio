@@ -171,7 +171,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'regulatorvaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.regulatorValue); break;
             case 'removedvegetationassetsarray': vectorArrays[propertyName] = railroad.removedVegetationAssets; break;
             case 'reverservaluearray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.reverserValue); break;
-            case 'sanderamountarray': floatArrays[propertyName] = railroad.frames.map((f) => f.state.sanderAmount); break;
+            case 'sanderamountarray': floatArrays[propertyName] = removeUndefinedTail(railroad.frames.map((f) => f.state.sanderAmount)); break;
             case 'sandhouselocationarray': vectorArrays[propertyName] = railroad.sandhouses.map((s) => s.location); break;
             case 'sandhouserotationarray': rotatorArrays[propertyName] = railroad.sandhouses.map((s) => s.rotation); break;
             case 'sandhousetypearray': intArrays[propertyName] = railroad.sandhouses.map((s) => s.type); break;

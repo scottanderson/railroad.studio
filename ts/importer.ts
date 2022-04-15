@@ -61,7 +61,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             !frameLocation || !frameName || !frameNumber || !frameRotation || !frameType || !freightAmount || !freightType ||
             !generatorValveValue || !headlightFrontState || !headlightRearState || !headlightType ||
             !markerLightsFrontLeftState || !markerLightsFrontRightState || !markerLightsRearLeftState || !markerLightsRearRightState ||
-            !regulatorValue || !reverserValue || !sanderAmount || !smokestackType || !tenderFuelAmount || !tenderWaterAmount) {
+            !regulatorValue || !reverserValue || !smokestackType || !tenderFuelAmount || !tenderWaterAmount) {
             throw new Error('Some frame values are missing');
         }
         enforceEqualLengths([
@@ -74,7 +74,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             generatorValveValue,
             headlightFrontState, headlightRearState, headlightType,
             markerLightsFrontLeftState, markerLightsFrontRightState, markerLightsRearLeftState, markerLightsRearRightState,
-            regulatorValue, reverserValue, sanderAmount,
+            regulatorValue, reverserValue,
             smokestackType,
             tenderFuelAmount, tenderWaterAmount,
         ]);
@@ -109,7 +109,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                     markerLightsRearRightState: markerLightsRearRightState[i],
                     regulatorValue: regulatorValue[i],
                     reverserValue: reverserValue[i],
-                    sanderAmount: sanderAmount[i],
+                    sanderAmount: optionalIndex(sanderAmount, i),
                     smokestackType: smokestackType[i],
                     tenderFuelAmount: tenderFuelAmount[i],
                     tenderWaterAmount: tenderWaterAmount[i],

@@ -56,7 +56,7 @@ export interface Frame {
         markerLightsRearRightState: number,
         regulatorValue: number;
         reverserValue: number;
-        sanderAmount: number;
+        sanderAmount?: number;
         smokestackType: number;
         tenderFuelAmount: number;
         tenderWaterAmount: number;
