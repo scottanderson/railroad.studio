@@ -88,6 +88,41 @@ export enum IndustryType {
     engine_house_brown = 14,
 }
 
+export function industryName(type: IndustryType): string {
+    switch (type) {
+        case IndustryType.logging_camp:
+            return 'Logging Camp';
+        case IndustryType.sawmill:
+            return 'Sawmill';
+        case IndustryType.smelter:
+            return 'Smelter';
+        case IndustryType.ironworks:
+            return 'Ironworks';
+        case IndustryType.oil_field:
+            return 'Oil Field';
+        case IndustryType.refinery:
+            return 'Refinery';
+        case IndustryType.coal_mine:
+            return 'Coal Mine';
+        case IndustryType.iron_mine:
+            return 'Iron Mine';
+        case IndustryType.freight_depot:
+            return 'Freight Depot';
+        case IndustryType.firewood_camp:
+            return 'Firewood Camp';
+        case IndustryType.engine_house_lightblue:
+            return 'Engine House (Blue)';
+        case IndustryType.engine_house_gold:
+            return 'Engine House (Gold)';
+        case IndustryType.engine_house_red:
+            return 'Engine House (Red)';
+        case IndustryType.engine_house_brown:
+            return 'Engine House (Brown)';
+        default:
+            throw new Error(`Unknown industry ${type}`);
+    }
+}
+
 export interface Player {
     id?: GvasString;
     name: GvasString;

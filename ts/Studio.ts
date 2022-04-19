@@ -1,8 +1,13 @@
 import {GvasString, GvasText, Vector} from './Gvas';
-import {Railroad} from './Railroad';
+import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
+
+interface InputTextOptions {
+    max?: string;
+    min?: string;
+}
 
 /**
  * Web UI for editing a Railroad object.
@@ -180,7 +185,7 @@ export class Studio {
         btnFrames.classList.add('btn', 'btn-secondary');
         btnFrames.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped');
+            table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(header, studioControls, table);
             this.frames(table);
@@ -191,7 +196,7 @@ export class Studio {
         btnIndustries.classList.add('btn', 'btn-secondary');
         btnIndustries.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped');
+            table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(header, studioControls, table);
             this.industries(table);
@@ -202,7 +207,7 @@ export class Studio {
         btnPlayers.classList.add('btn', 'btn-secondary');
         btnPlayers.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped');
+            table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(header, studioControls, table);
             this.players(table);
@@ -292,21 +297,11 @@ export class Studio {
 
     industries(table: HTMLTableElement): void {
         this.setTitle('Industries');
-        const industryNames: { [key: number]: string } = {};
-        industryNames[1] = 'Logging Camp';
-        industryNames[2] = 'Sawmill';
-        industryNames[3] = 'Smelter';
-        industryNames[4] = 'Ironworks';
-        industryNames[5] = 'Oil Field';
-        industryNames[6] = 'Refinery';
-        industryNames[7] = 'Coal Mine';
-        industryNames[8] = 'Iron Mine';
-        industryNames[9] = 'Freight Depot';
         const thead = document.createElement('thead');
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Industry Name', 'Inputs', 'Products', 'Location']) {
+        for (const columnHeader of ['Industry Name', 'Inputs', 'Products', 'Location', 'Rotation']) {
             const th = document.createElement('th');
             th.innerText = columnHeader;
             if (['Inputs', 'Products'].includes(columnHeader)) {
@@ -317,27 +312,31 @@ export class Studio {
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
         for (const industry of this.railroad.industries) {
-            if (industry.type > 9) continue;
             tr = document.createElement('tr');
             tbody.appendChild(tr);
             // Industry name
             let td = document.createElement('td');
-            td.innerText = industryNames[industry.type];
+            td.replaceChildren(this.editIndustryType(industry.type, (type) => industry.type = type));
             tr.appendChild(td);
+            // Inputs
             industry.inputs.forEach((input, i) => {
                 td = document.createElement('td');
-                td.appendChild(this.editNumber(input, '0', (input) => industry.inputs[i] = input));
+                td.appendChild(this.editNumber(input, {min: '0'}, (input) => industry.inputs[i] = input));
                 tr.appendChild(td);
             });
             // Products
             industry.outputs.forEach((output, i) => {
                 td = document.createElement('td');
-                td.appendChild(this.editNumber(output, '0', (output) => industry.outputs[i] = output));
+                td.appendChild(this.editNumber(output, {min: '0'}, (output) => industry.outputs[i] = output));
                 tr.appendChild(td);
             });
             // Location
             td = document.createElement('td');
             td.replaceChildren(this.editVector(industry.location, (location) => industry.location = location));
+            tr.appendChild(td);
+            // Rotation
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(industry.rotation.yaw, {min: '-180', max: '180'}, (yaw) => industry.rotation.yaw = yaw));
             tr.appendChild(td);
         }
     }
@@ -368,11 +367,11 @@ export class Studio {
             tr.appendChild(td);
             // Money
             td = document.createElement('td');
-            td.appendChild(this.editNumber(player.money, '0', (money) => player.money = money));
+            td.appendChild(this.editNumber(player.money, {min: '0'}, (money) => player.money = money));
             tr.appendChild(td);
             // XP
             td = document.createElement('td');
-            td.appendChild(this.editNumber(player.xp, '0', (xp) => player.xp = xp));
+            td.appendChild(this.editNumber(player.xp, {min: '0'}, (xp) => player.xp = xp));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
@@ -389,13 +388,15 @@ export class Studio {
         return i;
     }
 
-    private editNumber(value: number, min: string, saveValue: (value: number) => void) {
+    private editNumber(value: number, options: InputTextOptions, saveValue: (value: number) => void) {
         const span = document.createElement('span');
         span.innerText = String(value);
         span.addEventListener('click', () => {
             const input = document.createElement('input');
             input.type = 'number';
-            input.min = min;
+            if (options.max) input.max = options.max;
+            if (options.min) input.min = options.min;
+            input.pattern = '[0-9]+';
             input.value = String(value);
             // Save
             const btnSave = document.createElement('button');
@@ -475,6 +476,50 @@ export class Studio {
             // Layout
             const div = document.createElement('div');
             div.replaceChildren(inputX, inputY, inputZ, btnSave, btnCancel);
+            pre.parentElement?.replaceChildren(div);
+        });
+        return pre;
+    }
+
+    private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
+        // throw new Error('Method not implemented.');
+        const pre = document.createElement('pre');
+        pre.innerText = industryName(type);
+        pre.addEventListener('click', () => {
+            const select = document.createElement('select');
+            for (let i = 1; i < 15; i++) {
+                const option = document.createElement('option');
+                option.value = String(i);
+                option.innerText = industryName(i);
+                select.appendChild(option);
+            }
+            select.value = String(type);
+            // Save
+            const btnSave = document.createElement('button');
+            btnSave.classList.add('btn', 'btn-success');
+            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
+            btnSave.addEventListener('click', () => {
+                const newType = Number(select.value);
+                saveValue(newType);
+                div.parentElement?.replaceChildren(pre);
+                pre.innerText = industryName(newType);
+            });
+            // Cancel
+            const btnCancel = document.createElement('button');
+            btnCancel.classList.add('btn', 'btn-danger');
+            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
+            btnCancel.addEventListener('click', () => {
+                if (Number(select.value) !== type) {
+                    // Restore the original value
+                    select.value = String(type);
+                } else {
+                    // Close the edit control
+                    div.parentElement?.replaceChildren(pre);
+                }
+            });
+            // Layout
+            const div = document.createElement('div');
+            div.replaceChildren(select, btnSave, btnCancel);
             pre.parentElement?.replaceChildren(div);
         });
         return pre;
