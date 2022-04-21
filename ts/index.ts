@@ -1,9 +1,10 @@
-import {Gvas} from './Gvas';
 import {Studio} from './Studio';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
 
 window.onload = () => {
+    const url = new URLSearchParams(window.location.search).get('url');
+    if (url) return handleUrl(url);
     // Configure the drop area
     const dropArea = document.getElementById('drop-area');
     if (dropArea) {
@@ -86,16 +87,39 @@ declare let window: StudioWindow;
 
 function handleFile(file?: File): void {
     if (!file) return;
-    const handleGvas = (gvas: Gvas) => {
-        const railroad = gvasToRailroad(gvas);
-        const content = document.getElementById('content');
-        if (!content) throw new Error('Missing content');
-        window.studio = new Studio(file.name, railroad, content);
-    };
     file.arrayBuffer()
-        .then(parseGvas)
-        .then(handleGvas)
+        .then((buffer) => handleArrayBuffer(buffer, file.name))
         .catch(handleError);
+}
+
+/**
+ * Handler for URL load events.
+ * @param {string} url
+ */
+function handleUrl(url: string) {
+    if (url.startsWith('https://cdn.discordapp.com/attachments/')) {
+        // Workaround for CORS
+        url = 'https://railroad.studio/' + url.substring(27);
+    }
+    const filename = url.substring(url.lastIndexOf('/') + 1);
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                console.log(response);
+                throw new Error(`Fetch failed: ${url} ${response.status} ${response.statusText}`);
+            }
+            return response.arrayBuffer();
+        })
+        .then((buffer) => handleArrayBuffer(buffer, filename))
+        .catch(handleError);
+}
+
+function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
+    const gvas = parseGvas(buffer);
+    const railroad = gvasToRailroad(gvas);
+    const content = document.getElementById('content');
+    if (!content) throw new Error('Missing content');
+    window.studio = new Studio(filename, railroad, content);
 }
 
 /**
