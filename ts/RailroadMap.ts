@@ -360,7 +360,8 @@ export class RailroadMap {
         const isRail = spline.type === SplineType.rail || spline.type === SplineType.rail_deck;
         // Control points
         spline.controlPoints.forEach((point, i) => {
-            const adjacentVisible = spline.segmentsVisible.slice(i - 1, i + 1).filter(Boolean).length;
+            const start = Math.max(i - 1, 0);
+            const adjacentVisible = spline.segmentsVisible.slice(start, i + 1).filter(Boolean).length;
             const x = Math.round(point.x - 150);
             const y = Math.round(point.y - 150);
             let rect;
