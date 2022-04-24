@@ -253,7 +253,7 @@ export class RailroadMap {
         return svgPanZoom(this.svg.node, {
             zoomScaleSensitivity: 0.5,
             minZoom: 0.5,
-            maxZoom: 50,
+            maxZoom: 500,
             beforePan: beforePan,
             onPan: onPanZoom,
             onZoom: onPanZoom,
@@ -362,15 +362,25 @@ export class RailroadMap {
         spline.controlPoints.forEach((point, i) => {
             const start = Math.max(i - 1, 0);
             const adjacentVisible = spline.segmentsVisible.slice(start, i + 1).filter(Boolean).length;
-            const x = Math.round(point.x - 150);
-            const y = Math.round(point.y - 150);
+            const degrees = normalizeAngle(splineHeading(spline, i) - 90).toFixed(1);
             let rect;
             if (isRail) {
+                const r = 192;
+                const h = r * Math.sin(30 * Math.PI / 180);
+                const l = r * Math.cos(30 * Math.PI / 180);
+                const x = Math.round(point.x);
+                const y = Math.round(point.y);
                 rect = this.layers.trackControlPoints
-                    .circle(300)
-                    .attr('transform', `translate(${x} ${y})`);
+                    .polygon([[0, r],
+                        [l, 0 - h],
+                        [64, -h],
+                        [0, 0],
+                        [-64, -h],
+                        [-l, -h]])
+                    .attr('transform', `translate(${x} ${y}) rotate(${degrees})`);
             } else {
-                const degrees = splineHeading(spline, i).toFixed(1);
+                const x = Math.round(point.x - 150);
+                const y = Math.round(point.y - 150);
                 rect = this.layers.groundworkControlPoints
                     .rect(300, 300)
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);

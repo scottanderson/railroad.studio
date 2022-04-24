@@ -137,6 +137,12 @@
   fill: green;
 }
 
+.control-point-0:hover,
+.control-point-1:hover,
+.control-point-2:hover {
+  opacity: 0.5;
+}
+
 .xray .rail,
 .xray .rail-deck,
 .xray .grade,
