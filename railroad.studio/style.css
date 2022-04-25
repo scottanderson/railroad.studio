@@ -240,6 +240,7 @@
   opacity: 0.9;
 }
 
-.dark .grade-text {
+.dark .grade-text,
+.dark .player {
   fill: white;
 }

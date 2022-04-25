@@ -263,8 +263,10 @@ export class RailroadMap {
             };
         };
 
+        let timeoutId = 0;
         const onPanZoom = () => {
-            this.writeOptions();
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => this.writeOptions(), 100);
         };
 
         return svgPanZoom(this.svg.node, {
