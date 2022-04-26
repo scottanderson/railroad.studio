@@ -4,6 +4,8 @@ import * as svgPanZoom from 'svg-pan-zoom';
 import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
 import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
 import {Studio} from './Studio';
+import {TreeUtil} from './TreeUtil';
+import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenControlPoints} from './tool-flatten';
@@ -35,6 +37,7 @@ export interface MapLayers {
     trackControlPoints: G;
     tracks: G;
     tracksHidden: G;
+    trees: G;
 }
 
 interface MapLayerVisibility {
@@ -48,10 +51,12 @@ interface MapLayerVisibility {
     trackControlPoints: boolean;
     tracks: boolean;
     tracksHidden: boolean;
+    trees: boolean;
 }
 
 export class RailroadMap {
     private railroad: Railroad;
+    private treeUtil: TreeUtil;
     private svg: Svg;
     private panZoom: SvgPanZoom.Instance;
     private toolMode: MapToolMode;
@@ -64,6 +69,17 @@ export class RailroadMap {
         this.setMapModified = () => studio.modified = true;
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
+        this.treeUtil = new TreeUtil(this.railroad, (before, after) => {
+            if (before === after) {
+                this.setTitle(`No change, ${after} cut trees`);
+            } else if (before < after) {
+                this.setTitle(`Cut ${after - before} trees`);
+            } else {
+                this.setTitle(`Replanted ${before - after} trees`);
+            }
+            this.layers.trees.node.replaceChildren();
+            this.renderTrees();
+        });
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
         this.layerVisibility = options.layerVisibility;
@@ -74,13 +90,18 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
-        this.renderSwitches();
         this.renderSplines();
+        this.renderSwitches();
+        this.renderTrees();
         this.panZoom = this.initPanZoom();
         if (options.pan && options.zoom) {
             this.panZoom.zoom(options.zoom);
             this.panZoom.pan(options.pan);
         }
+    }
+
+    public getTreeUtil() {
+        return this.treeUtil;
     }
 
     refresh() {
@@ -92,8 +113,9 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
-        this.renderSwitches();
         this.railroad.splines.forEach(this.renderSpline, this);
+        this.renderSwitches();
+        this.renderTrees();
         this.panZoom = this.initPanZoom();
         if (pan && zoom) {
             this.panZoom.zoom(zoom);
@@ -174,6 +196,7 @@ export class RailroadMap {
                 trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
                 tracks: true, // Boolean(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
+                trees: Boolean(parsed?.layerVisibility?.trees),
             },
         };
     }
@@ -206,7 +229,9 @@ export class RailroadMap {
             trackControlPoints,
             frames,
             players,
+            trees,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -229,6 +254,7 @@ export class RailroadMap {
             trackControlPoints: trackControlPoints,
             tracks: tracks,
             tracksHidden: tracksHidden,
+            trees: trees,
         };
         const entries = Object.entries(layers) as [keyof MapLayers, G][];
         entries.forEach(([key, group]) => {
@@ -509,6 +535,22 @@ export class RailroadMap {
                 elements.push(text);
             }
         }
+    }
+
+    private renderTrees() {
+        const renderTrees = this.treeUtil.smartPeek();
+        if (renderTrees.length < 10_000) {
+            renderTrees.forEach(this.renderTree, this);
+        }
+    }
+
+    private renderTree(tree: Vector) {
+        const x = Math.round(tree.x);
+        const y = Math.round(tree.y);
+        this.layers.trees
+            .circle(5_00)
+            .center(x, y)
+            .addClass('tree');
     }
 
     private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {

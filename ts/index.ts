@@ -126,7 +126,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
  * Error handler. Prints a stack trace to the contggnt div.
  * @param {Error} error
  */
-function handleError(error: Error) {
+export function handleError(error: Error) {
     const title = document.createElement('h2');
     const titleText = document.createTextNode('Failed to load: ' + error);
     title.appendChild(titleText);

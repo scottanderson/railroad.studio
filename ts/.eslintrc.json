@@ -19,6 +19,7 @@
         "@typescript-eslint/no-require-imports": ["error"],
         "@typescript-eslint/no-type-alias": ["error", {
             "allowAliases": "in-unions",
+            "allowCallbacks": "always",
             "allowLiterals": "always",
             "allowTupleTypes": "always"
         }],

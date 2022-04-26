@@ -103,6 +103,10 @@ export class Studio {
                 key: 'tracksHidden',
                 name: 'Track Hidden Segments',
             },
+            {
+                key: 'trees',
+                name: 'Trees',
+            },
         ];
         lstLayers.replaceChildren(...layers.map((layer) => {
             const btnToggleLayer = document.createElement('button');
@@ -125,6 +129,50 @@ export class Studio {
                 }
             });
             return btnToggleLayer;
+        }));
+        // Trees dropdown
+        const txtTrees = document.createTextNode(' Trees ');
+        const imgTrees = document.createElement('i');
+        imgTrees.classList.add('bi', 'bi-tree');
+        imgTrees.setAttribute('role', 'img');
+        imgTrees.ariaLabel = 'Trees Dropdown';
+        const btnTrees = document.createElement('button');
+        btnTrees.id = 'btnTrees';
+        btnTrees.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnTrees.setAttribute('aria-expanded', 'false');
+        btnTrees.setAttribute('data-bs-auto-close', 'true');
+        btnTrees.setAttribute('data-bs-toggle', 'dropdown');
+        btnTrees.replaceChildren(imgTrees, txtTrees);
+        const lstTrees = document.createElement('ul');
+        lstTrees.classList.add('dropdown-menu');
+        const grpTrees = document.createElement('div');
+        grpTrees.setAttribute('aria-labelledby', btnTrees.id);
+        grpTrees.classList.add('dropdown');
+        grpTrees.replaceChildren(btnTrees, lstTrees);
+        const treeActions: {
+            name: string,
+            onClick: () => void,
+        }[] = [
+            {
+                name: 'Cut All Trees (increases save file size)',
+                onClick: () => this.map.getTreeUtil().cutAll(),
+            },
+            {
+                name: 'Replant all trees (dangerous!)',
+                onClick: () => this.map.getTreeUtil().replantAll(),
+            },
+            {
+                name: 'Smart replant',
+                onClick: () => this.map.getTreeUtil().smartReplant(),
+            },
+        ];
+        lstTrees.replaceChildren(...treeActions.map((action) => {
+            const btnAction = document.createElement('button');
+            const txtAction = document.createTextNode(` ${action.name} `);
+            btnAction.classList.add('dropdown-item', 'text-nowrap');
+            btnAction.replaceChildren(txtAction);
+            btnAction.addEventListener('click', action.onClick);
+            return btnAction;
         }));
         // Minimize segment count
         const btnReplaceSplines = document.createElement('button');
@@ -184,7 +232,7 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
+        mapButtons.replaceChildren(grpLayers, grpTrees, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
