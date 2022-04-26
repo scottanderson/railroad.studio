@@ -175,7 +175,7 @@
   fill: #66f081;
 }
 
-.frame-boxcar .cargo-loaded {
+.frame-boxcar.cargo-loaded {
   fill: #36cc00;
 }
 
@@ -183,7 +183,7 @@
   fill: #fdbf77;
 }
 
-.frame-flatcar_cordwood .cargo-loaded {
+.frame-flatcar_cordwood.cargo-loaded {
   fill: orange;
 }
 
@@ -191,7 +191,7 @@
   fill: #a7a7a9;
 }
 
-.frame-flatcar_hopper .cargo-loaded {
+.frame-flatcar_hopper.cargo-loaded {
   fill: black;
 }
 
@@ -199,7 +199,7 @@
   fill: #f99a9a;
 }
 
-.frame-flatcar_logs .cargo-loaded {
+.frame-flatcar_logs.cargo-loaded {
   fill: red;
 }
 
@@ -207,7 +207,7 @@
   fill: #fdbf77;
 }
 
-.frame-flatcar_stakes .cargo-loaded {
+.frame-flatcar_stakes.cargo-loaded {
   fill: #f38a12;
 }
 
@@ -215,7 +215,7 @@
   fill: #9090f9;
 }
 
-.frame-flatcar_tanker .cargo-loaded {
+.frame-flatcar_tanker.cargo-loaded {
   fill: blue;
 }
 

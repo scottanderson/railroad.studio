@@ -45,7 +45,7 @@ export class TreeUtil {
             this.fetchTrees();
         }
         return new Promise((resolve, reject) => {
-            if (this.trees) {
+            if (this.trees && this.trees.length > 0) {
                 resolve(this.trees.slice());
             } else {
                 this.treePromises.push([resolve, reject]);
