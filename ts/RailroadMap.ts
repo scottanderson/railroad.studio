@@ -27,6 +27,8 @@ interface MapOptions {
 }
 
 export interface MapLayers {
+    background: G;
+    border: G;
     frames: G;
     grades: G;
     groundworkControlPoints: G;
@@ -41,6 +43,8 @@ export interface MapLayers {
 }
 
 interface MapLayerVisibility {
+    background: boolean;
+    border: boolean;
     frames: boolean;
     grades: boolean;
     groundworkControlPoints: boolean;
@@ -87,12 +91,7 @@ export class RailroadMap {
             .addClass('map-svg')
             .addTo(element);
         this.layers = this.createLayers();
-        this.railroad.frames.forEach(this.renderFrame, this);
-        this.railroad.industries.forEach(this.renderIndustry, this);
-        this.railroad.players.forEach(this.renderPlayer, this);
-        this.renderSplines();
-        this.renderSwitches();
-        this.renderTrees();
+        this.render();
         this.panZoom = this.initPanZoom();
         if (options.pan && options.zoom) {
             this.panZoom.zoom(options.zoom);
@@ -110,17 +109,23 @@ export class RailroadMap {
         this.panZoom?.destroy();
         this.svg.node.replaceChildren();
         this.layers = this.createLayers();
+        this.render();
+        this.panZoom = this.initPanZoom();
+        if (pan && zoom) {
+            this.panZoom.zoom(zoom);
+            this.panZoom.pan(pan);
+        }
+    }
+
+    private render() {
+        this.renderBackground();
+        this.renderBorder();
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
         this.railroad.splines.forEach(this.renderSpline, this);
         this.renderSwitches();
         this.renderTrees();
-        this.panZoom = this.initPanZoom();
-        if (pan && zoom) {
-            this.panZoom.zoom(zoom);
-            this.panZoom.pan(pan);
-        }
     }
 
     toggleDeleteTool(): boolean {
@@ -179,6 +184,7 @@ export class RailroadMap {
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
+        const defaultTrue = (option: any) => typeof option === 'undefined' || Boolean(option);
         return {
             pan: {
                 x: Number(parsed?.pan?.x || 0),
@@ -186,15 +192,17 @@ export class RailroadMap {
             },
             zoom: Number(parsed?.zoom || 1),
             layerVisibility: {
+                background: defaultTrue(parsed?.layerVisibility?.background),
+                border: defaultTrue(parsed?.layerVisibility?.border),
                 frames: Boolean(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
                 groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
-                groundworks: true, // Boolean(parsed?.layerVisibility?.groundworks),
+                groundworks: defaultTrue(parsed?.layerVisibility?.groundworks),
                 groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
                 industries: Boolean(parsed?.layerVisibility?.industries),
                 players: Boolean(parsed?.layerVisibility?.players),
                 trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
-                tracks: true, // Boolean(parsed?.layerVisibility?.tracks),
+                tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
                 trees: Boolean(parsed?.layerVisibility?.trees),
             },
@@ -216,9 +224,10 @@ export class RailroadMap {
             .rotate(180)
             .font('family', 'sans-serif')
             .font('size', 500);
-        this.renderBorder(group);
         // The z-order of these groups is the order they are created
         const [
+            border,
+            background,
             groundworks,
             groundworksHidden,
             groundworkControlPoints,
@@ -242,8 +251,12 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
+            group.group(),
+            group.group(),
         ];
         const layers: MapLayers = {
+            background: background,
+            border: border,
             frames: frames,
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
@@ -264,9 +277,15 @@ export class RailroadMap {
         return layers;
     }
 
-    private renderBorder(group: G): Element {
+    private renderBackground(): Element {
+        return this.layers.background
+            .image('https://cdn.discordapp.com/attachments/897904338754756610/965238652223508480/RRO_Pine_Valley_topo_map.png')
+            .attr('transform', 'matrix(-116.75,0,0,-116.75,233700,231900)');
+    }
+
+    private renderBorder(): Element {
         // Border
-        return group
+        return this.layers.border
             .rect(4_000_00, 4_000_00)
             .translate(-2_000_00, -2_000_00)
             .radius(100_00)

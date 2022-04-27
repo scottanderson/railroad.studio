@@ -64,6 +64,14 @@ export class Studio {
             listener?: () => void;
         }[] = [
             {
+                key: 'border',
+                name: 'World Border',
+            },
+            {
+                key: 'background',
+                name: 'Background Map',
+            },
+            {
                 key: 'frames',
                 name: 'Frames',
             },
