@@ -19,7 +19,7 @@ export class Studio {
     map: RailroadMap;
     header: HTMLHeadingElement;
 
-    constructor(filename: string, railroad: Railroad, content: HTMLElement) {
+    constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
         this.modified = false;
@@ -35,7 +35,7 @@ export class Studio {
         const mapDiv = document.createElement('div');
         btnMap.addEventListener('click', () => {
             studioControls.replaceChildren(buttons, mapButtons);
-            content.replaceChildren(header, studioControls, mapDiv);
+            content.replaceChildren(mapDiv);
             this.setTitle('Map');
         });
         // Layers dropdown
@@ -251,7 +251,7 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(header, studioControls, table);
+            content.replaceChildren(table);
             this.frames(table);
         });
         // Industries
@@ -262,7 +262,7 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(header, studioControls, table);
+            content.replaceChildren(table);
             this.industries(table);
         });
         // Players
@@ -273,7 +273,7 @@ export class Studio {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(header, studioControls, table);
+            content.replaceChildren(table);
             this.players(table);
         });
         // Export
@@ -308,7 +308,8 @@ export class Studio {
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
         studioControls.replaceChildren(buttons, mapButtons);
-        content.replaceChildren(header, studioControls, mapDiv);
+        headerElement.replaceChildren(header, studioControls);
+        content.replaceChildren(mapDiv);
         this.map = new RailroadMap(this, mapDiv);
         layers.map((l) => l.listener)
             .filter((item): item is (() => void) => !!item)

@@ -115,11 +115,29 @@ function handleUrl(url: string) {
 }
 
 function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
-    const gvas = parseGvas(buffer);
-    const railroad = gvasToRailroad(gvas);
+    const header = document.getElementById('header');
+    if (!header) throw new Error('Missing header');
     const content = document.getElementById('content');
     if (!content) throw new Error('Missing content');
-    window.studio = new Studio(filename, railroad, content);
+    const title = document.createElement('h2');
+    const titleText = document.createTextNode('Parsing ' + filename);
+    title.appendChild(titleText);
+    header.replaceChildren(title);
+    content.replaceChildren();
+    return new Promise<Studio>((resolve) => {
+        window.setTimeout(() => {
+            const gvas = parseGvas(buffer);
+            titleText.textContent = 'Importing ' + filename;
+            window.setTimeout(() => {
+                const railroad = gvasToRailroad(gvas);
+                titleText.textContent = 'Initializing ' + filename;
+                window.setTimeout(() => {
+                    window.studio = new Studio(filename, railroad, header, content);
+                    resolve(window.studio);
+                }, 10);
+            }, 10);
+        }, 10);
+    });
 }
 
 /**
