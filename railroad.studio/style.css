@@ -37,6 +37,10 @@
   stroke-width: 128;
 }
 
+.dark .rail {
+  stroke: white;
+}
+
 .rail.hidden {
   stroke: blue;
   stroke-width: 200;
@@ -46,6 +50,10 @@
 .rail-deck {
   stroke: brown;
   stroke-width: 256;
+}
+
+.dark .rail-deck {
+  stroke: burlywood;
 }
 
 .rail-deck.hidden {
@@ -58,12 +66,20 @@
   stroke: sienna;
 }
 
+.dark .grade {
+  stroke: darkkhaki;
+}
+
 .stone-wall {
   stroke: darkgray;
 }
 
 .wooden-bridge {
   stroke: goldenrod;
+}
+
+.dark .wooden-bridge {
+  stroke: lightgoldenrodyellow;
 }
 
 .steel-bridge {
@@ -109,6 +125,10 @@
   stroke-width: 128;
 }
 
+.dark .switch-leg.aligned {
+  stroke: white;
+}
+
 .switch-leg.not-aligned {
   stroke: red;
   stroke-width: 128;
@@ -143,11 +163,15 @@
   stroke: black;
 }
 
+.dark .frame {
+  stroke: white;
+}
+
 .frame:hover {
   opacity: 0.5;
 }
 
-.frame .brakes-applied {
+.frame.brakes-applied {
   stroke: red;
 }
 
@@ -239,6 +263,11 @@
   fill: white;
 }
 
+.dark image {
+  --webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
 .tree {
   fill: green;
   stroke: darkgreen;
@@ -249,4 +278,9 @@
   stroke: black;
   stroke-width: 20;
   fill: white;
+}
+
+.dark .turntable {
+  stroke: white;
+  fill: black;
 }

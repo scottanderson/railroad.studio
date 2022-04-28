@@ -69,7 +69,7 @@ export class Studio {
             },
             {
                 key: 'background',
-                name: 'Background Map',
+                name: 'Topographical Map',
             },
             {
                 key: 'frames',
