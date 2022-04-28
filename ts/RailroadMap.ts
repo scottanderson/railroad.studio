@@ -2,7 +2,7 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
-import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType} from './Railroad';
+import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {TreeUtil} from './TreeUtil';
 import {Vector} from './Gvas';
@@ -41,6 +41,7 @@ export interface MapLayers {
     tracks: G;
     tracksHidden: G;
     trees: G;
+    turntables: G;
 }
 
 interface MapLayerVisibility {
@@ -57,6 +58,7 @@ interface MapLayerVisibility {
     tracks: boolean;
     tracksHidden: boolean;
     trees: boolean;
+    turntables: boolean;
 }
 
 export class RailroadMap {
@@ -126,6 +128,7 @@ export class RailroadMap {
         this.railroad.players.forEach(this.renderPlayer, this);
         this.renderSplines()
             .then(() => this.renderSwitches())
+            .then(() => this.railroad.turntables.forEach(this.renderTurntable, this))
             .then(() => this.renderTrees())
             .catch(handleError);
     }
@@ -207,6 +210,7 @@ export class RailroadMap {
                 tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
                 trees: Boolean(parsed?.layerVisibility?.trees),
+                turntables: defaultTrue(parsed?.layerVisibility?.turntables),
             },
         };
     }
@@ -235,6 +239,7 @@ export class RailroadMap {
             groundworkControlPoints,
             grades,
             industries,
+            turntables,
             tracks,
             tracksHidden,
             trackControlPoints,
@@ -242,6 +247,7 @@ export class RailroadMap {
             players,
             trees,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -270,6 +276,7 @@ export class RailroadMap {
             tracks: tracks,
             tracksHidden: tracksHidden,
             trees: trees,
+            turntables: turntables,
         };
         const entries = Object.entries(layers) as [keyof MapLayers, G][];
         entries.forEach(([key, group]) => {
@@ -605,6 +612,24 @@ export class RailroadMap {
             .circle(5_00)
             .center(x, y)
             .addClass('tree');
+    }
+
+    private renderTurntable(turntable: Turntable) {
+        const x = Math.round(turntable.location.x);
+        const y = Math.round(turntable.location.y);
+        const radians = (turntable.rotator.yaw - 90) * Math.PI / 180;
+        const dx = 1250 * Math.cos(radians);
+        const dy = 1250 * Math.sin(radians);
+        const cx = x + dx / 2;
+        const cy = y + dy / 2;
+        const c = this.layers.turntables
+            .circle(1250)
+            .center(cx, cy)
+            .addClass('turntable');
+        const l = this.layers.turntables
+            .line([[x, y], [x + dx, y + dy]])
+            .addClass('rail');
+        return [c, l];
     }
 
     private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {

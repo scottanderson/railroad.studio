@@ -115,6 +115,10 @@ export class Studio {
                 key: 'trees',
                 name: 'Trees',
             },
+            {
+                key: 'turntables',
+                name: 'Turntables',
+            },
         ];
         lstLayers.replaceChildren(...layers.map((layer) => {
             const btnToggleLayer = document.createElement('button');

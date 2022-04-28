@@ -244,3 +244,9 @@
   stroke: darkgreen;
   stroke-width: 50;
 }
+
+.turntable {
+  stroke: black;
+  stroke-width: 20;
+  fill: white;
+}
