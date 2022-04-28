@@ -10,6 +10,7 @@ import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenControlPoints} from './tool-flatten';
 import {frameLimits} from './frames';
+import {handleError} from './index';
 
 enum MapToolMode {
     pan_zoom,
@@ -123,9 +124,10 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
-        this.railroad.splines.forEach(this.renderSpline, this);
-        this.renderSwitches();
-        this.renderTrees();
+        this.renderSplines()
+            .then(() => this.renderSwitches())
+            .then(() => this.renderTrees())
+            .catch(handleError);
     }
 
     toggleDeleteTool(): boolean {
@@ -437,28 +439,35 @@ export class RailroadMap {
     }
 
     private renderSplines() {
-        const splines = this.railroad.splines.concat();
-        if (splines.length > 0) {
-            let updateTime = 0;
-            const fun = () => {
-                while (splines.length > 0) {
-                    const spline = splines.shift();
-                    if (spline) {
-                        this.renderSpline(spline);
-                    }
-                    const now = performance.now();
-                    if (now - updateTime > 200) {
-                        updateTime = now;
-                        const pct = 100 * (1 - (splines.length / this.railroad.splines.length));
-                        this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
-                        setTimeout(fun, 0);
-                        return;
-                    }
+        return new Promise((resolve, reject) => {
+            try {
+                const splines = this.railroad.splines.concat();
+                if (splines.length > 0) {
+                    let updateTime = 0;
+                    const fun = () => {
+                        while (splines.length > 0) {
+                            const spline = splines.shift();
+                            if (spline) {
+                                this.renderSpline(spline);
+                            }
+                            const now = performance.now();
+                            if (now - updateTime > 200) {
+                                updateTime = now;
+                                const pct = 100 * (1 - (splines.length / this.railroad.splines.length));
+                                this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
+                                setTimeout(fun, 0);
+                                return;
+                            }
+                        }
+                        this.setTitle('Map');
+                    };
+                    setTimeout(fun, 0);
                 }
-                this.setTitle('Map');
-            };
-            setTimeout(fun, 0);
-        }
+                resolve(null);
+            } catch (e) {
+                reject(e);
+            }
+        });
     }
 
     private renderSpline(spline: Spline) {
@@ -557,10 +566,36 @@ export class RailroadMap {
     }
 
     private renderTrees() {
-        const renderTrees = this.treeUtil.smartPeek();
-        if (renderTrees.length < 10_000) {
-            renderTrees.forEach(this.renderTree, this);
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                const renderTrees = this.treeUtil.smartPeek();
+                const remaining = renderTrees.concat();
+                if (remaining.length > 0) {
+                    let updateTime = 0;
+                    const fun = () => {
+                        while (remaining.length > 0) {
+                            const tree = remaining.shift();
+                            if (tree) {
+                                this.renderTree(tree);
+                            }
+                            const now = performance.now();
+                            if (now - updateTime > 200) {
+                                updateTime = now;
+                                const pct = 100 * (1 - (remaining.length / renderTrees.length));
+                                this.setTitle(`Rendering trees... ${pct.toFixed(1)}%`);
+                                setTimeout(fun, 0);
+                                return;
+                            }
+                        }
+                        this.setTitle('Map');
+                    };
+                    setTimeout(fun, 0);
+                }
+                resolve(renderTrees);
+            } catch (e) {
+                reject(e);
+            }
+        });
     }
 
     private renderTree(tree: Vector) {
