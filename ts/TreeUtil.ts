@@ -185,6 +185,7 @@ function splineFilter(spline: Spline, tree: Vector): boolean {
     const limit = 4_50; // 4.5m
     const limit2 = limit * limit;
     for (let i = 0; i < spline.segmentsVisible.length; i++) {
+        if (!spline.segmentsVisible[i]) continue;
         const d2 = distToSegment2(tree, spline.controlPoints[i], spline.controlPoints[i + 1]);
         if (d2 < limit2) return true;
     }

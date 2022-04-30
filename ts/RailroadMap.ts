@@ -423,10 +423,14 @@ export class RailroadMap {
                                     !alreadyCut(t));
                                 if (cut.length === 0) return;
                                 console.log(`Cut ${cut.length} trees`);
+                                const buckets = cut.map(treeBucket)
+                                    .filter((value, index, self) => self.indexOf(value) === index);
                                 cut.forEach((t) => {
                                     this.railroad.removedVegetationAssets.push(t);
                                     this.layers.trees
                                         .children()
+                                        .filter((e) => buckets.includes(e.id()))
+                                        .flatMap((e) => e.children())
                                         .filter((e) => e.cx() === Math.round(t.x) && e.cy() === Math.round(t.y))
                                         .forEach((e) => e.remove());
                                     if (this.treeUtil.treeFilter(t)) {
@@ -449,8 +453,12 @@ export class RailroadMap {
                             const removedXY = planted.map((v) => [Math.round(v.x), Math.round(v.y)]);
                             const isRemoved = (e: Element) => -1 !== removedXY.findIndex(
                                 (t) => Math.round(e.cx()) === t[0] && Math.round(e.cy()) === t[1]);
+                            const buckets = planted.map(treeBucket)
+                                .filter((value, index, self) => self.indexOf(value) === index);
                             const plantedElements = this.layers.trees
                                 .children()
+                                .filter((e) => buckets.includes(e.id()))
+                                .flatMap((e) => e.children())
                                 .filter(isRemoved);
                             plantedElements.forEach((e) => e.remove());
                         }
@@ -800,7 +808,17 @@ export class RailroadMap {
     private renderTree(tree: Vector) {
         const x = Math.round(tree.x);
         const y = Math.round(tree.y);
-        this.layers.trees
+        const id = treeBucket(tree);
+        const element = document.getElementById(id);
+        let group: G;
+        if (!element) {
+            group = this.layers.trees
+                .group()
+                .id(id);
+        } else {
+            group = new G(element as unknown as SVGGElement);
+        }
+        return group
             .circle(5_00)
             .center(x, y)
             .addClass('tree');
@@ -867,4 +885,10 @@ function splineToDashArray(spline: Spline, invert: boolean): string | null {
         ret.push(String(Math.round(dashlen)));
     }
     return ret.join(',');
+}
+
+function treeBucket(tree: Vector) {
+    const bucketX = Math.floor((tree.x + 2_005_00) / 500_00);
+    const bucketY = Math.floor((tree.y + 2_005_00) / 500_00);
+    return `trees_${bucketX}_${bucketY}`;
 }
