@@ -120,6 +120,17 @@ export class RailroadMap {
         }
     }
 
+    refreshSplines() {
+        this.layers.grades.node.replaceChildren();
+        this.layers.groundworkControlPoints.node.replaceChildren();
+        this.layers.groundworks.node.replaceChildren();
+        this.layers.groundworksHidden.node.replaceChildren();
+        this.layers.trackControlPoints.node.replaceChildren();
+        this.layers.tracks.node.replaceChildren();
+        this.layers.tracksHidden.node.replaceChildren();
+        this.renderSplines();
+    }
+
     private render() {
         this.renderBackground();
         this.renderBorder();
@@ -467,10 +478,12 @@ export class RailroadMap {
                             }
                         }
                         this.setTitle('Map');
+                        resolve(null);
                     };
                     setTimeout(fun, 0);
+                } else {
+                    resolve(null);
                 }
-                resolve(null);
             } catch (e) {
                 reject(e);
             }
@@ -595,10 +608,12 @@ export class RailroadMap {
                             }
                         }
                         this.setTitle('Map');
+                        resolve(renderTrees);
                     };
                     setTimeout(fun, 0);
+                } else {
+                    resolve(renderTrees);
                 }
-                resolve(renderTrees);
             } catch (e) {
                 reject(e);
             }

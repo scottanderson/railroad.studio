@@ -201,7 +201,7 @@ export class Studio {
                 btnReplaceSplines.classList.replace('btn-secondary', 'btn-success');
             }
             this.modified = true;
-            setTimeout(() => this.map.refresh(), 1000);
+            setTimeout(() => this.map.refreshSplines(), 1000);
         });
         // Delete spline tool
         const btnDeleteSpline = document.createElement('button');

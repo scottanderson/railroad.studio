@@ -152,5 +152,6 @@ export function handleError(error: Error) {
     const preText = document.createTextNode(error.stack || '');
     pre.appendChild(preText);
     document.getElementById('content')!.replaceChildren(title, pre);
+    document.getElementById('header')!.replaceChildren();
     throw error; // also print the stack trace with TypeScript mapped source links in the console
 }
