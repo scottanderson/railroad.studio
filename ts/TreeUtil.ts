@@ -135,26 +135,30 @@ function radiusFilter(obstacle: Point, tree: Point, radius: number): boolean {
     return dist2(obstacle, tree) <= radius * radius;
 }
 
+function rectFilter(x0: number, x1: number, y0: number, y1: number, tree: Vector) {
+    return tree.x >= x0 && tree.x <= x1 && tree.y >= y0 && tree.y <= y1;
+}
+
 function industryFilter(industry: Industry, tree: Vector): boolean {
     switch (industry.type) {
         case IndustryType.logging_camp:
-            return radiusFilter(industry.location, tree, 50_00); // 50m
+            return radiusFilter(industry.location, tree, 45_00); // 45m
         case IndustryType.sawmill:
             return radiusFilter(industry.location, tree, 60_00); // 60m
         case IndustryType.smelter:
-            return radiusFilter(industry.location, tree, 50_00); // 50m
+            return radiusFilter(industry.location, tree, 40_00); // 40m
         case IndustryType.ironworks:
-            return radiusFilter(industry.location, tree, 50_00); // 50m
+            return radiusFilter(industry.location, tree, 40_00); // 40m
         case IndustryType.oil_field:
             return radiusFilter(industry.location, tree, 100_00); // 100m
         case IndustryType.refinery:
-            return radiusFilter(industry.location, tree, 50_00); // 50m
+            return radiusFilter(industry.location, tree, 45_00); // 45m
         case IndustryType.coal_mine:
-            return radiusFilter(industry.location, tree, 50_00); // 50m
+            return radiusFilter(industry.location, tree, 40_00); // 40m
         case IndustryType.iron_mine:
-            return radiusFilter(industry.location, tree, 40_00); // 40m
+            return radiusFilter(industry.location, tree, 30_00); // 30m
         case IndustryType.freight_depot:
-            return radiusFilter(industry.location, tree, 40_00); // 40m
+            return radiusFilter(industry.location, tree, 35_00); // 35m
         case IndustryType.firewood_camp:
             return radiusFilter(industry.location, tree, 15_00); // 15m
         case IndustryType.engine_house_lightblue:
@@ -172,13 +176,13 @@ function sandhouseFilter(sandhouse: Sandhouse, tree: Vector): boolean {
 }
 
 function spawnFilter(tree: Vector): boolean {
-    return false ||
-        radiusFilter({x: 1250, y: -2300}, tree, 100_00) || // 100m
-        radiusFilter({x: -6600, y: -1200}, tree, 40_00); // 40m
+    return rectFilter(674, 2000, 3056, 8513, tree) ||
+        radiusFilter({x: 1250, y: -2300}, tree, 50_00) || // 50m
+        radiusFilter({x: -6600, y: -1200}, tree, 20_00); // 20m
 }
 
 function splineFilter(spline: Spline, tree: Vector): boolean {
-    const limit = 9_00; // 9m
+    const limit = 4_50; // 4.5m
     const limit2 = limit * limit;
     for (let i = 0; i < spline.segmentsVisible.length; i++) {
         const d2 = distToSegment2(tree, spline.controlPoints[i], spline.controlPoints[i + 1]);
