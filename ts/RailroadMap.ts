@@ -120,7 +120,7 @@ export class RailroadMap {
         }
     }
 
-    refreshSplines() {
+    refreshSplines(): Promise<void> {
         this.layers.grades.node.replaceChildren();
         this.layers.groundworkControlPoints.node.replaceChildren();
         this.layers.groundworks.node.replaceChildren();
@@ -128,16 +128,18 @@ export class RailroadMap {
         this.layers.trackControlPoints.node.replaceChildren();
         this.layers.tracks.node.replaceChildren();
         this.layers.tracksHidden.node.replaceChildren();
-        this.renderSplines();
+        return this.renderSplines()
+            .then(() => this.renderSwitches())
+            .catch(handleError);
     }
 
-    private render() {
+    private render(): Promise<void> {
         this.renderBackground();
         this.renderBorder();
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
-        this.renderSplines()
+        return this.renderSplines()
             .then(() => this.renderSwitches())
             .then(() => this.railroad.turntables.forEach(this.renderTurntable, this))
             .then(() => this.renderTrees())
@@ -585,7 +587,7 @@ export class RailroadMap {
         }
     }
 
-    private renderTrees() {
+    private renderTrees(): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
                 const renderTrees = this.treeUtil.smartPeek();
@@ -608,11 +610,11 @@ export class RailroadMap {
                             }
                         }
                         this.setTitle('Map');
-                        resolve(renderTrees);
+                        resolve();
                     };
                     setTimeout(fun, 0);
                 } else {
-                    resolve(renderTrees);
+                    resolve();
                 }
             } catch (e) {
                 reject(e);
