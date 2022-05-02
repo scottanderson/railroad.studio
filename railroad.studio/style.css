@@ -13,6 +13,14 @@
   z-index: 1;
 }
 
+.brush
+{
+  fill:green;
+  stroke:green;
+  stroke-width: 100;
+  fill-opacity: .2;
+}
+
 .map-border {
   stroke: black;
   fill: none;

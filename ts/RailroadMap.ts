@@ -1,10 +1,10 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Element, G, Path, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Circle, Element, G, Matrix, Path, Svg} from '@svgdotjs/svg.js';
 import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
-import {TreeUtil} from './TreeUtil';
+import {radiusFilter, TreeUtil} from './TreeUtil';
 import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
@@ -16,6 +16,7 @@ enum MapToolMode {
     pan_zoom,
     delete_spline,
     flatten_spline,
+    tree_brush,
 }
 
 interface MapOptions {
@@ -30,6 +31,7 @@ interface MapOptions {
 export interface MapLayers {
     background: G;
     border: G;
+    brush: G;
     frames: G;
     grades: G;
     groundworkControlPoints: G;
@@ -47,6 +49,7 @@ export interface MapLayers {
 interface MapLayerVisibility {
     background: boolean;
     border: boolean;
+    brush: boolean;
     frames: boolean;
     grades: boolean;
     groundworkControlPoints: boolean;
@@ -71,6 +74,7 @@ export class RailroadMap {
     private layerVisibility: MapLayerVisibility;
     private setMapModified: () => void;
     private setTitle: (title: string) => void;
+    private brush: Circle | undefined;
 
     constructor(studio: Studio, element: HTMLElement) {
         this.setMapModified = () => studio.modified = true;
@@ -136,6 +140,7 @@ export class RailroadMap {
     private render(): Promise<void> {
         this.renderBackground();
         this.renderBorder();
+        this.renderBrush();
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
@@ -195,6 +200,39 @@ export class RailroadMap {
         return this.layerVisibility[layer];
     }
 
+    toggleTreeBrush(): boolean {
+        if (this.toolMode === MapToolMode.tree_brush) {
+            // Disable tree brush
+            this.toolMode = MapToolMode.pan_zoom;
+            this.panZoom
+                .enableDblClickZoom()
+                .enablePan()
+                .enableZoom();
+            if (this.layerVisibility.brush) {
+                this.toggleLayerVisibility('brush');
+            }
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow tree brush while another tool is active
+            return false;
+        } else {
+            // Enable tree brush
+            this.toolMode = MapToolMode.tree_brush;
+            this.panZoom
+                .disableDblClickZoom()
+                .disablePan()
+                .disableZoom();
+            if (!this.layerVisibility.brush) {
+                this.toggleLayerVisibility('brush');
+            }
+            if (!this.layerVisibility.trees) {
+                this.toggleLayerVisibility('trees');
+            }
+            return true;
+        }
+    }
+
+
     getLayerVisibility(layer: keyof MapLayers): boolean {
         return this.layerVisibility[layer];
     }
@@ -212,6 +250,7 @@ export class RailroadMap {
             layerVisibility: {
                 background: defaultTrue(parsed?.layerVisibility?.background),
                 border: defaultTrue(parsed?.layerVisibility?.border),
+                brush: false,
                 frames: Boolean(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
                 groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
@@ -259,7 +298,9 @@ export class RailroadMap {
             frames,
             players,
             trees,
+            brush,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -278,6 +319,7 @@ export class RailroadMap {
         const layers: MapLayers = {
             background: background,
             border: border,
+            brush: brush,
             frames: frames,
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
@@ -314,6 +356,14 @@ export class RailroadMap {
             .addClass('map-border');
     }
 
+    private renderBrush() {
+        // Brush
+        return this.brush = this.layers.brush
+            .circle(50_00)
+            .center(0, 0)
+            .addClass('brush');
+    }
+
     private initPanZoom() {
         const beforePan = (oldPan: SvgPanZoom.Point, newPan: SvgPanZoom.Point) => {
             const gutterWidth = 100;
@@ -336,11 +386,136 @@ export class RailroadMap {
             timeoutId = window.setTimeout(() => this.writeOptions(), 100);
         };
 
+        type Partitions<T> = [T[], T[]];
+        function partition<T>(trees: T[], filter: (e: T) => boolean): Partitions<T> {
+            return trees.reduce((p: Partitions<T>, v: T) => {
+                (filter(v) ? p[0] : p[1]).push(v);
+                return p;
+            }, [[], []]);
+        }
+
+        let listeners: { [key: string]: (e: Event) => any };
         return svgPanZoom(this.svg.node, {
             zoomScaleSensitivity: 0.5,
             minZoom: 0.5,
             maxZoom: 500,
             beforePan: beforePan,
+            customEventsHandler: {
+                haltEventListeners: [],
+                init: (options) => {
+                    let mouseDown = false;
+                    let mouseButton = 0;
+                    let treeBrushAsync = false;
+                    const treeBrush = () => {
+                        if (treeBrushAsync) return;
+                        if (this.toolMode !== MapToolMode.tree_brush) return;
+                        if (!this.brush) return;
+                        const point = {x: this.brush.cx(), y: this.brush.cy()};
+                        const radius = Number(this.brush.attr('r'));
+                        if (mouseButton !== 0) {
+                            // Cut tree brush
+                            treeBrushAsync = true;
+                            return this.treeUtil.allTrees().then((trees) => {
+                                const alreadyCut = (tree: Vector) => -1 !== this.railroad.removedVegetationAssets.findIndex(
+                                    (t) => tree.x === t.x && tree.y === t.y && tree.z === t.z);
+                                const cut = trees.filter((t) =>
+                                    radiusFilter(point, t, radius) &&
+                                    !alreadyCut(t));
+                                if (cut.length === 0) return;
+                                console.log(`Cut ${cut.length} trees`);
+                                cut.forEach((t) => {
+                                    this.railroad.removedVegetationAssets.push(t);
+                                    this.layers.trees
+                                        .children()
+                                        .filter((e) => e.cx() === Math.round(t.x) && e.cy() === Math.round(t.y))
+                                        .forEach((e) => e.remove());
+                                    if (this.treeUtil.treeFilter(t)) {
+                                        this.renderTree(t);
+                                    }
+                                });
+                            }).finally(() => {
+                                treeBrushAsync = false;
+                            });
+                        } else {
+                            // Replant tree brush
+                            const trees = this.railroad.removedVegetationAssets;
+                            const filter = (t: Vector) =>
+                                radiusFilter(point, t, radius) &&
+                                this.treeUtil.treeFilter(t);
+                            const [planted, retained] = partition(trees, filter);
+                            if (planted.length === 0) return;
+                            this.railroad.removedVegetationAssets = retained;
+                            console.log(`Planted ${planted.length} trees`);
+                            const removedXY = planted.map((v) => [Math.round(v.x), Math.round(v.y)]);
+                            const isRemoved = (e: Element) => -1 !== removedXY.findIndex(
+                                (t) => Math.round(e.cx()) === t[0] && Math.round(e.cy()) === t[1]);
+                            const plantedElements = this.layers.trees
+                                .children()
+                                .filter(isRemoved);
+                            plantedElements.forEach((e) => e.remove());
+                        }
+                    };
+                    // Initialize mouse event listeners
+                    listeners = {
+                        contextmenu: (e) => {
+                            if (this.toolMode === MapToolMode.tree_brush && this.brush) {
+                                e.preventDefault();
+                                return true;
+                            }
+                        },
+                        mousedown: (e) => {
+                            if (this.toolMode === MapToolMode.tree_brush && this.brush) {
+                                mouseButton = (e as MouseEvent).button;
+                                mouseDown = true;
+                                treeBrush();
+                            }
+                        },
+                        mousemove: (e) => {
+                            if (this.brush) {
+                                const ctm = this.svg.node.getScreenCTM();
+                                if (!ctm) throw new Error('Missing CTM');
+                                const me = e as MouseEvent;
+                                const point = this.layers.trees
+                                    .point(me.clientX, me.clientY)
+                                    .transform(new Matrix(ctm.inverse()));
+                                this.brush.center(point.x, point.y);
+                                if (this.toolMode === MapToolMode.tree_brush && mouseDown) {
+                                    // Cut or replant
+                                    treeBrush();
+                                }
+                            }
+                        },
+                        mouseup: () => {
+                            mouseDown = false;
+                        },
+                        wheel: (e) => {
+                            if (this.toolMode === MapToolMode.tree_brush && this.brush) {
+                                const dy = (e as WheelEvent).deltaY;
+                                let radius = Number(this.brush.attr('r'));
+                                if (dy > 0) {
+                                    // Scroll down, shrink brush
+                                    radius /= 1.2;
+                                } else {
+                                    // Scroll up, expand brush
+                                    radius *= 1.2;
+                                }
+                                radius = Math.max(10_00, Math.min(100_00, radius));
+                                this.brush.radius(radius);
+                            }
+                        },
+                    };
+                    // Register listeners
+                    for (const eventName of Object.keys(listeners)) {
+                        options.svgElement.addEventListener(eventName, listeners[eventName]);
+                    }
+                },
+                destroy: () => {
+                    // Unregister listeners
+                    for (const eventName of Object.keys(listeners)) {
+                        this.svg.node.removeEventListener(eventName, listeners[eventName]);
+                    }
+                },
+            },
             onPan: onPanZoom,
             onZoom: onPanZoom,
         });

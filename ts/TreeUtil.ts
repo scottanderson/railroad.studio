@@ -131,11 +131,11 @@ function distToSegment2(p: Point, v: Point, w: Point) {
     return dist2(p, {x: x, y: y});
 }
 
-function radiusFilter(obstacle: Point, tree: Point, radius: number): boolean {
+export function radiusFilter(obstacle: Point, tree: Point, radius: number): boolean {
     return dist2(obstacle, tree) <= radius * radius;
 }
 
-function rectFilter(x0: number, x1: number, y0: number, y1: number, tree: Vector) {
+function rectFilter(x0: number, x1: number, y0: number, y1: number, tree: Point) {
     return tree.x >= x0 && tree.x <= x1 && tree.y >= y0 && tree.y <= y1;
 }
 

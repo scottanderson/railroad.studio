@@ -203,6 +203,25 @@ export class Studio {
             this.modified = true;
             setTimeout(() => this.map.refreshSplines(), 1000);
         });
+        // Tree brush
+        const btnTreeBrush = document.createElement('button');
+        const imgTreeBrush = document.createElement('i');
+        const txtTreeBrush = document.createTextNode(' Tree Brush ');
+        imgTreeBrush.classList.add('bi', 'bi-tree-fill');
+        imgTreeBrush.setAttribute('role', 'img');
+        imgTreeBrush.ariaLabel = 'Tree Brush';
+        btnTreeBrush.classList.add('btn', 'btn-secondary');
+        btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
+        btnTreeBrush.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleTreeBrush();
+            if (toolEnabled) {
+                btnTreeBrush.classList.add('active', 'btn-danger');
+                btnTreeBrush.classList.remove('btn-secondary');
+            } else {
+                btnTreeBrush.classList.remove('active', 'btn-danger');
+                btnTreeBrush.classList.add('btn-secondary');
+            }
+        });
         // Delete spline tool
         const btnDeleteSpline = document.createElement('button');
         const imgDeleteSpline = document.createElement('i');
@@ -244,7 +263,7 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, grpTrees, btnReplaceSplines, btnDeleteSpline, btnFlattenSpline);
+        mapButtons.replaceChildren(grpLayers, grpTrees, btnReplaceSplines, btnTreeBrush, btnDeleteSpline, btnFlattenSpline);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
