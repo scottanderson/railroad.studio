@@ -6,6 +6,12 @@ interface Grade {
     grade: number;
 }
 
+function fp32(n: number): number {
+    const float = new Float32Array(1);
+    float[0] = n;
+    return float[0];
+}
+
 export function flattenControlPoints(controlPoints: Vector[]): Vector[] {
     const result = controlPoints.slice();
     const cp0 = controlPoints[0];
@@ -20,7 +26,7 @@ export function flattenControlPoints(controlPoints: Vector[]): Vector[] {
         result[i] = {
             x: controlPoints[i].x,
             y: controlPoints[i].y,
-            z: cp0.z + (totalZ * cumulativeXY / totalXY),
+            z: fp32(cp0.z + (totalZ * cumulativeXY / totalXY)),
         };
     }
     const after = calculateGrade(result);
