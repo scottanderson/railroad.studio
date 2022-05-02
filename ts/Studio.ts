@@ -18,10 +18,12 @@ export class Studio {
     modified: boolean;
     map: RailroadMap;
     header: HTMLHeadingElement;
+    originalSegmentCount: number;
 
     constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
+        this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
         const header = document.createElement('h2');
         this.header = header;
@@ -186,23 +188,6 @@ export class Studio {
             btnAction.addEventListener('click', action.onClick);
             return btnAction;
         }));
-        // Minimize segment count
-        const btnReplaceSplines = document.createElement('button');
-        btnReplaceSplines.textContent = 'Minimize segment count';
-        btnReplaceSplines.classList.add('btn', 'btn-secondary');
-        btnReplaceSplines.addEventListener('click', () => {
-            const segmentCountBefore = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
-            this.railroad.splines = simplifySplines(this.railroad);
-            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
-            if (segmentCountAfter > segmentCountBefore) {
-                btnReplaceSplines.classList.replace('btn-secondary', 'btn-danger');
-            } else if (segmentCountAfter < segmentCountBefore) {
-                this.setTitle(`Segment count reduced from ${segmentCountBefore} to ${segmentCountAfter}`);
-                btnReplaceSplines.classList.replace('btn-secondary', 'btn-success');
-            }
-            this.modified = true;
-            setTimeout(() => this.map.refreshSplines(), 1000);
-        });
         // Tree brush
         const btnTreeBrush = document.createElement('button');
         const imgTreeBrush = document.createElement('i');
@@ -260,10 +245,30 @@ export class Studio {
                 btnFlattenSpline.classList.add('btn-secondary');
             }
         });
+        // Minimize segment count
+        const btnMinimizeSegments = document.createElement('button');
+        btnMinimizeSegments.textContent = 'Minimize segment count';
+        btnMinimizeSegments.classList.add('btn', 'btn-secondary');
+        btnMinimizeSegments.addEventListener('click', () => {
+            this.railroad.splines = simplifySplines(this.railroad);
+            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
+            if (segmentCountAfter > this.originalSegmentCount) {
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
+            } else if (segmentCountAfter < this.originalSegmentCount) {
+                this.setTitle(`Segment count reduced from ${this.originalSegmentCount} to ${segmentCountAfter}`);
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
+            }
+            this.modified = true;
+            this.map.refreshSplines().then(() => {
+                if (segmentCountAfter < this.originalSegmentCount) {
+                    this.setTitle(`Segment count reduced from ${this.originalSegmentCount} to ${segmentCountAfter}`);
+                }
+            });
+        });
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, grpTrees, btnReplaceSplines, btnTreeBrush, btnDeleteSpline, btnFlattenSpline);
+        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDeleteSpline, btnFlattenSpline, btnMinimizeSegments);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
