@@ -422,7 +422,8 @@ export class RailroadMap {
                                     radiusFilter(point, t, radius) &&
                                     !alreadyCut(t));
                                 if (cut.length === 0) return;
-                                console.log(`Cut ${cut.length} trees`);
+                                // console.log(`Cut ${cut.length} trees`);
+                                this.setMapModified();
                                 const buckets = cut.map(treeBucket)
                                     .filter((value, index, self) => self.indexOf(value) === index);
                                 cut.forEach((t) => {
@@ -449,7 +450,8 @@ export class RailroadMap {
                             const [planted, retained] = partition(trees, filter);
                             if (planted.length === 0) return;
                             this.railroad.removedVegetationAssets = retained;
-                            console.log(`Planted ${planted.length} trees`);
+                            // console.log(`Planted ${planted.length} trees`);
+                            this.setMapModified();
                             const removedXY = planted.map((v) => [Math.round(v.x), Math.round(v.y)]);
                             const isRemoved = (e: Element) => -1 !== removedXY.findIndex(
                                 (t) => Math.round(e.cx()) === t[0] && Math.round(e.cy()) === t[1]);
