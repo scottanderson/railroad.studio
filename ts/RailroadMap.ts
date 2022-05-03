@@ -75,6 +75,7 @@ export class RailroadMap {
     private setMapModified: () => void;
     private setTitle: (title: string) => void;
     private brush: Circle | undefined;
+    private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
 
     constructor(studio: Studio, element: HTMLElement) {
         this.setMapModified = () => studio.modified = true;
@@ -194,6 +195,9 @@ export class RailroadMap {
         this.writeOptions();
         if (this.layerVisibility[layer]) {
             this.layers[layer].show();
+            if (layer === 'trees') {
+                this.renderTrees();
+            }
         } else {
             this.layers[layer].hide();
         }
@@ -261,7 +265,7 @@ export class RailroadMap {
                 trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
                 tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
-                trees: Boolean(parsed?.layerVisibility?.trees),
+                trees: false,
                 turntables: defaultTrue(parsed?.layerVisibility?.turntables),
             },
         };
@@ -424,20 +428,8 @@ export class RailroadMap {
                                 if (cut.length === 0) return;
                                 // console.log(`Cut ${cut.length} trees`);
                                 this.setMapModified();
-                                const buckets = cut.map(treeBucket)
-                                    .filter((value, index, self) => self.indexOf(value) === index);
-                                cut.forEach((t) => {
-                                    this.railroad.removedVegetationAssets.push(t);
-                                    this.layers.trees
-                                        .children()
-                                        .filter((e) => buckets.includes(e.id()))
-                                        .flatMap((e) => e.children())
-                                        .filter((e) => e.cx() === Math.round(t.x) && e.cy() === Math.round(t.y))
-                                        .forEach((e) => e.remove());
-                                    if (this.treeUtil.treeFilter(t)) {
-                                        this.renderTree(t);
-                                    }
-                                });
+                                this.railroad.removedVegetationAssets = this.railroad.removedVegetationAssets.concat(cut);
+                                return this.renderTreeArray(cut);
                             }).finally(() => {
                                 treeBrushAsync = false;
                             });
@@ -644,37 +636,14 @@ export class RailroadMap {
     }
 
     private renderSplines() {
-        return new Promise((resolve, reject) => {
-            try {
-                const splines = this.railroad.splines.concat();
-                if (splines.length > 0) {
-                    let updateTime = 0;
-                    const fun = () => {
-                        while (splines.length > 0) {
-                            const spline = splines.shift();
-                            if (spline) {
-                                this.renderSpline(spline);
-                            }
-                            const now = performance.now();
-                            if (now - updateTime > 200) {
-                                updateTime = now;
-                                const pct = 100 * (1 - (splines.length / this.railroad.splines.length));
-                                this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
-                                setTimeout(fun, 0);
-                                return;
-                            }
-                        }
-                        this.setTitle('Map');
-                        resolve(null);
-                    };
-                    setTimeout(fun, 0);
-                } else {
-                    resolve(null);
-                }
-            } catch (e) {
-                reject(e);
-            }
-        });
+        return asyncForEach(this.railroad.splines, (spline) => {
+            this.renderSpline(spline);
+        }, (r, t) => {
+            const pct = 100 * (1 - (r / t));
+            this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
+        }, () => {
+            this.setTitle('Map');
+        }).promise;
     }
 
     private renderSpline(spline: Spline) {
@@ -773,38 +742,26 @@ export class RailroadMap {
     }
 
     private renderTrees(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                const renderTrees = this.treeUtil.smartPeek();
-                const remaining = renderTrees.concat();
-                if (remaining.length > 0) {
-                    let updateTime = 0;
-                    const fun = () => {
-                        while (remaining.length > 0) {
-                            const tree = remaining.shift();
-                            if (tree) {
-                                this.renderTree(tree);
-                            }
-                            const now = performance.now();
-                            if (now - updateTime > 200) {
-                                updateTime = now;
-                                const pct = 100 * (1 - (remaining.length / renderTrees.length));
-                                this.setTitle(`Rendering trees... ${pct.toFixed(1)}%`);
-                                setTimeout(fun, 0);
-                                return;
-                            }
-                        }
-                        this.setTitle('Map');
-                        resolve();
-                    };
-                    setTimeout(fun, 0);
-                } else {
-                    resolve();
-                }
-            } catch (e) {
-                reject(e);
-            }
+        if (!this.layerVisibility.trees) return Promise.resolve();
+        if (this.remainingTreesAppender) return Promise.resolve();
+        const trees = this.treeUtil.smartPeek();
+        return this.renderTreeArray(trees);
+    }
+
+    private renderTreeArray(trees: Vector[]): Promise<void> {
+        if (this.remainingTreesAppender) {
+            return this.remainingTreesAppender(trees);
+        }
+        const {appender, promise} = asyncForEach(trees.concat(), (t) => {
+            this.renderTree(t);
+        }, (r, t) => {
+            const pct = 100 * (1 - (r / t));
+            this.setTitle(`Rendering trees... ${pct.toFixed(1)}%`);
+        }, () => {
+            this.setTitle('Map');
         });
+        this.remainingTreesAppender = appender;
+        return promise;
     }
 
     private renderTree(tree: Vector) {
@@ -890,7 +847,63 @@ function splineToDashArray(spline: Spline, invert: boolean): string | null {
 }
 
 function treeBucket(tree: Vector) {
-    const bucketX = Math.floor((tree.x + 2_005_00) / 500_00);
-    const bucketY = Math.floor((tree.y + 2_005_00) / 500_00);
+    const bucketX = Math.floor((tree.x + 2_005_00) / 250_00);
+    const bucketY = Math.floor((tree.y + 2_005_00) / 250_00);
     return `trees_${bucketX}_${bucketY}`;
+}
+
+interface AsyncForEachResult<T> {
+    appender: (a: T[]) => Promise<void>;
+    promise: Promise<void>;
+}
+
+function asyncForEach<T>(
+    a: T[],
+    func: (e: T) => void,
+    updateFunc?: (remaining: number, total: number) => void,
+    thenClause?: () => void,
+): AsyncForEachResult<T> {
+    const promise = () => new Promise<void>((resolve, reject) => {
+        let updateTime = 0;
+        const fun = () => {
+            try {
+                while (remaining.length > 0) {
+                    const e = remaining.shift();
+                    if (!e) continue;
+                    func(e);
+                    const now = performance.now();
+                    if (now - updateTime > 200) {
+                        updateTime = now;
+                        if (updateFunc) {
+                            updateFunc(remaining.length, total);
+                        }
+                        setTimeout(fun, 1);
+                        return;
+                    }
+                }
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        };
+        setTimeout(fun, 1);
+    }).then(thenClause);
+    let remaining = a.concat();
+    let total = remaining.length;
+    let p = promise();
+    const appender = (elements: T[]) => {
+        if (remaining.length !== 0) {
+            Array.prototype.push.apply(remaining, elements);
+            total += elements.length;
+            return p;
+        }
+        remaining = elements.concat();
+        total = remaining.length;
+        p = promise();
+        return p;
+    };
+    return {
+        appender: appender,
+        promise: p,
+    };
 }
