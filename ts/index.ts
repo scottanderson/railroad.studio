@@ -124,19 +124,26 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     title.appendChild(titleText);
     header.replaceChildren(title);
     content.replaceChildren();
-    return new Promise<Studio>((resolve) => {
-        window.setTimeout(() => {
+    const rejectOnCatch = (reject: (reason: unknown) => void, func: () => void) => () => {
+        try {
+            func();
+        } catch (e) {
+            reject(e);
+        }
+    };
+    return new Promise<Studio>((resolve, reject) => {
+        window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
             titleText.textContent = 'Importing ' + filename;
-            window.setTimeout(() => {
+            window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
                 titleText.textContent = 'Initializing ' + filename;
-                window.setTimeout(() => {
+                window.setTimeout(rejectOnCatch(reject, () => {
                     window.studio = new Studio(filename, railroad, header, content);
                     resolve(window.studio);
-                }, 10);
-            }, 10);
-        }, 10);
+                }), 10);
+            }), 10);
+        }), 10);
     });
 }
 
