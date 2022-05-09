@@ -475,6 +475,12 @@ export class Studio {
             td = document.createElement('td');
             td.appendChild(this.editVector(player.location, (location) => player.location = location));
             tr.appendChild(td);
+            // Rotation
+            if (player.rotation) {
+                td = document.createElement('td');
+                td.replaceChildren(this.editNumber(player.rotation, {min: '-180', max: '180'}, (r) => player.rotation = r));
+                tr.appendChild(td);
+            }
         }
     }
 

@@ -162,6 +162,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const playerLocation = optionalMap(gvas.vectorArrays, 'PlayerLocationArray');
     const playerMoney = optionalMap(gvas.floatArrays, 'PlayerMoneyArray');
     const playerName = optionalMap(gvas.stringArrays, 'PlayerNameArray');
+    const playerRotation = optionalMap(gvas.floatArrays, 'PlayerRotationArray');
     const playerXp = optionalMap(gvas.intArrays, 'PlayerXPArray');
     if (playerId || playerLocation || playerMoney || playerName || playerXp) {
         if (!playerLocation || !playerMoney || !playerName || !playerXp) {
@@ -171,12 +172,16 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         if (playerId && playerId.length !== playerName.length) {
             console.log('Warning: playerId array does not match other player arrays', playerId, playerName);
         }
+        if (playerRotation && playerRotation.length !== playerName.length) {
+            console.log('Warning: playerRotation array does not match other player arrays', playerRotation, playerName);
+        }
         for (let i = 0; i < playerName.length; i++) {
             const player: Player = {
                 id: optionalIndex(playerId, i),
                 name: playerName[i],
                 location: playerLocation[i],
                 money: playerMoney[i],
+                rotation: optionalIndex(playerRotation, i),
                 xp: playerXp[i],
             };
             players.push(player);
