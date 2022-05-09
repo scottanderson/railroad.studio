@@ -278,7 +278,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'savegameuniqueid': return ['StrProperty'];
         // case 'savegameuniqueworldid': return ['StrProperty'];
         case 'savegameuniqueworldid': return ['StrProperty'];
-        // case 'savegameversion': return ['StrProperty'];
+        case 'savegameversion': return ['StrProperty'];
         case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinecontrolpointsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinecontrolpointsindexendarray': return ['ArrayProperty', 'IntProperty'];
@@ -319,14 +319,16 @@ export function gvasToBlob(gvas: Gvas): Blob {
     const data: BlobPart[] = ['GVAS', gvasHeaderBlob];
     for (const propertyName of gvas._order) {
         if (!propertyName) continue;
-        data.push(propertyToBlob(gvas, propertyName));
+        const blob = propertyToBlob(gvas, propertyName);
+        if (!blob) continue;
+        data.push(blob);
     }
     data.push(stringToBlob('None'));
     data.push(stringToBlob(null));
     return new Blob(data, {type: 'application/octet-stream'});
 }
 
-function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart {
+function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
     // property:
     //   seq:
     //     - id: property_name
@@ -367,6 +369,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart {
     switch (propertyType) {
         case 'StrProperty': {
             const str = gvas.strings[propertyName] || null;
+            if (!str) return;
             propertyData.push(stringToBlob(str));
             break;
         }
@@ -380,30 +383,36 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart {
             switch (dataType) {
                 case 'BoolProperty': {
                     const bools = gvas.boolArrays[propertyName] || [];
+                    if (bools.length === 0) return;
                     propertyData.push(new Uint32Array([bools.length]));
                     propertyData.push(new Uint8Array(bools.map((b) => b ? 1 : 0)));
                     break;
                 }
                 case 'FloatProperty': {
                     const floats = gvas.floatArrays[propertyName] || [];
+                    if (floats.length === 0) return;
                     propertyData.push(new Uint32Array([floats.length]));
                     propertyData.push(new Float32Array(floats));
                     break;
                 }
                 case 'IntProperty': {
                     const ints = gvas.intArrays[propertyName] || [];
+                    if (ints.length === 0) return;
                     propertyData.push(new Uint32Array([ints.length]));
                     propertyData.push(new Uint32Array(ints));
                     break;
                 }
                 case 'StrProperty': {
                     const strs = gvas.stringArrays[propertyName] || [];
+                    if (strs.length === 0) return;
                     propertyData.push(new Uint32Array([strs.length]));
                     propertyData.push(new Blob(strs.map(stringToBlob)));
                     break;
                 }
                 case 'StructProperty': {
-                    propertyData.push(structPropertyToBlob(structType, gvas, propertyName));
+                    const blob = structPropertyToBlob(structType, gvas, propertyName);
+                    if (!blob) return;
+                    propertyData.push(blob);
                     break;
                 }
                 case 'TextProperty': {
@@ -416,6 +425,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart {
                     //       repeat: expr
                     //       repeat-expr: entry_count
                     const texts = gvas.textArrays[propertyName] || [];
+                    if (texts.length === 0) return;
                     propertyData.push(new Uint32Array([texts.length]));
                     propertyData.push(new Blob(texts.map(textToBlob)));
                     break;
@@ -443,7 +453,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart {
     return new Blob(data);
 }
 
-function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: string): Blob {
+function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: string): void | Blob {
     const data: BlobPart[] = [];
     let structs; let structSize;
     if (structType === 'Vector') {
@@ -455,6 +465,7 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
     } else {
         throw new Error('Unexpected structType: ' + structType);
     }
+    if (structs.length === 0) return;
     // struct_array:
     //   seq:
     //     - id: entry_count
