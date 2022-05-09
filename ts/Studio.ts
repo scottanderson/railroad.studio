@@ -249,19 +249,24 @@ export class Studio {
         const btnMinimizeSegments = document.createElement('button');
         btnMinimizeSegments.textContent = 'Minimize segment count';
         btnMinimizeSegments.classList.add('btn', 'btn-secondary');
+        const fmtPercent = (n: number, d: number) => {
+            if (n === d) return `unchanged (${n})`;
+            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
+            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
+        };
         btnMinimizeSegments.addEventListener('click', () => {
             this.railroad.splines = simplifySplines(this.railroad);
             const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
             if (segmentCountAfter > this.originalSegmentCount) {
                 btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
             } else if (segmentCountAfter < this.originalSegmentCount) {
-                this.setTitle(`Segment count reduced from ${this.originalSegmentCount} to ${segmentCountAfter}`);
+                this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
                 btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
             }
             this.modified = true;
             this.map.refreshSplines().then(() => {
                 if (segmentCountAfter < this.originalSegmentCount) {
-                    this.setTitle(`Segment count reduced from ${this.originalSegmentCount} to ${segmentCountAfter}`);
+                    this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
                 }
             });
         });
