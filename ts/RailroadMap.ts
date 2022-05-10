@@ -863,7 +863,21 @@ export class RailroadMap {
             }
             case MapToolMode.parallel: {
                 const offset = 382.7; // Length of a diamond
-                const parallel = parallelSpline(spline, offset);
+                const keepSpline = (a: Spline) =>
+                    !this.railroad.splines.some((b) =>
+                        a !== b &&
+                        a.type === b.type &&
+                        a.controlPoints.some((cp1) =>
+                            b.controlPoints.some((cp2) => {
+                                const dx = cp2.x - cp1.x;
+                                const dy = cp2.y - cp1.y;
+                                const dz = cp2.z - cp1.z;
+                                const m2 = dx * dx + dy * dy + dz * dz;
+                                return m2 < 1; // Points within 1cm
+                            })));
+                const parallel = parallelSpline(spline, offset).filter(keepSpline);
+                if (parallel.length === 0) return;
+                console.log(...parallel);
                 this.railroad.splines.push(...parallel);
                 this.setMapModified();
                 parallel.forEach(this.renderSpline, this);
