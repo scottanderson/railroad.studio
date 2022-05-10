@@ -11,12 +11,14 @@ import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenControlPoints} from './tool-flatten';
 import {frameLimits} from './frames';
 import {handleError} from './index';
+import {parallelSpline} from './tool-parallel';
 
 enum MapToolMode {
     pan_zoom,
     delete,
     flatten_spline,
     tree_brush,
+    parallel,
 }
 
 interface MapOptions {
@@ -204,6 +206,27 @@ export class RailroadMap {
         return this.layerVisibility[layer];
     }
 
+    toggleParallelTool(): boolean {
+        if (this.toolMode === MapToolMode.parallel) {
+            // Disable flatten tool
+            this.toolMode = MapToolMode.pan_zoom;
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow flatten tool while another tool is active
+            return false;
+        } else {
+            // Enable flatten tool
+            this.toolMode = MapToolMode.parallel;
+            if (!this.layerVisibility.tracks) {
+                this.toggleLayerVisibility('tracks');
+            }
+            if (this.layerVisibility.tracksHidden) {
+                this.toggleLayerVisibility('tracksHidden');
+            }
+            return true;
+        }
+    }
+
     toggleTreeBrush(): boolean {
         if (this.toolMode === MapToolMode.tree_brush) {
             // Disable tree brush
@@ -235,7 +258,6 @@ export class RailroadMap {
             return true;
         }
     }
-
 
     getLayerVisibility(layer: keyof MapLayers): boolean {
         return this.layerVisibility[layer];
@@ -685,6 +707,7 @@ export class RailroadMap {
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
             }
             rect
+                .on('click', () => this.onClickControlPoint(point))
                 .addClass(`control-point-${adjacentVisible}`);
             elements.push(rect);
         });
@@ -812,6 +835,14 @@ export class RailroadMap {
         return elements;
     }
 
+    private onClickControlPoint(point: Vector): void {
+        switch (this.toolMode) {
+            case MapToolMode.pan_zoom:
+                console.log(point);
+                break;
+        }
+    }
+
     private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
@@ -829,6 +860,13 @@ export class RailroadMap {
                 elements.forEach((element) => element.remove());
                 this.renderSpline(spline);
                 break;
+            }
+            case MapToolMode.parallel: {
+                const offset = 382.7; // Length of a diamond
+                const parallel = parallelSpline(spline, offset);
+                this.railroad.splines.push(...parallel);
+                this.setMapModified();
+                parallel.forEach(this.renderSpline, this);
             }
         }
     }

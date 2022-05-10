@@ -245,6 +245,25 @@ export class Studio {
                 btnFlattenSpline.classList.add('btn-secondary');
             }
         });
+        // Parallel spline tool
+        const btnParallelSpline = document.createElement('button');
+        const imgParallelSpline = document.createElement('i');
+        const txtParallelSpline = document.createTextNode(' Parallel Spline Tool ');
+        imgParallelSpline.classList.add('bi', 'bi-distribute-horizontal');
+        imgParallelSpline.setAttribute('role', 'img');
+        imgParallelSpline.ariaLabel = 'Parallel Spline Tool';
+        btnParallelSpline.classList.add('btn', 'btn-secondary');
+        btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
+        btnParallelSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleParallelTool();
+            if (toolEnabled) {
+                btnParallelSpline.classList.add('active', 'btn-danger');
+                btnParallelSpline.classList.remove('btn-secondary');
+            } else {
+                btnParallelSpline.classList.remove('active', 'btn-danger');
+                btnParallelSpline.classList.add('btn-secondary');
+            }
+        });
         // Minimize segment count
         const btnMinimizeSegments = document.createElement('button');
         btnMinimizeSegments.textContent = 'Minimize segment count';
@@ -273,7 +292,7 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDelete, btnFlattenSpline, btnMinimizeSegments);
+        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDelete, btnFlattenSpline, btnParallelSpline, btnMinimizeSegments);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames
