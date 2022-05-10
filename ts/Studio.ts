@@ -207,23 +207,23 @@ export class Studio {
                 btnTreeBrush.classList.add('btn-secondary');
             }
         });
-        // Delete spline tool
-        const btnDeleteSpline = document.createElement('button');
-        const imgDeleteSpline = document.createElement('i');
-        const txtDeleteSpline = document.createTextNode(' Delete Spline Tool ');
-        imgDeleteSpline.classList.add('bi', 'bi-eraser-fill');
-        imgDeleteSpline.setAttribute('role', 'img');
-        imgDeleteSpline.ariaLabel = 'Delete Spline Tool';
-        btnDeleteSpline.classList.add('btn', 'btn-secondary');
-        btnDeleteSpline.replaceChildren(imgDeleteSpline, txtDeleteSpline);
-        btnDeleteSpline.addEventListener('click', () => {
+        // Delete tool
+        const btnDelete = document.createElement('button');
+        const imgDelete = document.createElement('i');
+        const txtDelete = document.createTextNode(' Delete Tool ');
+        imgDelete.classList.add('bi', 'bi-eraser-fill');
+        imgDelete.setAttribute('role', 'img');
+        imgDelete.ariaLabel = 'Delete Tool';
+        btnDelete.classList.add('btn', 'btn-secondary');
+        btnDelete.replaceChildren(imgDelete, txtDelete);
+        btnDelete.addEventListener('click', () => {
             const toolEnabled = this.map.toggleDeleteTool();
             if (toolEnabled) {
-                btnDeleteSpline.classList.add('active', 'btn-danger');
-                btnDeleteSpline.classList.remove('btn-secondary');
+                btnDelete.classList.add('active', 'btn-danger');
+                btnDelete.classList.remove('btn-secondary');
             } else {
-                btnDeleteSpline.classList.remove('active', 'btn-danger');
-                btnDeleteSpline.classList.add('btn-secondary');
+                btnDelete.classList.remove('active', 'btn-danger');
+                btnDelete.classList.add('btn-secondary');
             }
         });
         // Flatten spline tool
@@ -232,7 +232,7 @@ export class Studio {
         const txtFlattenSpline = document.createTextNode(' Flatten Spline Tool ');
         imgFlattenSpline.classList.add('bi', 'bi-arrows-collapse');
         imgFlattenSpline.setAttribute('role', 'img');
-        imgDeleteSpline.ariaLabel = 'Flatten Spline Tool';
+        imgFlattenSpline.ariaLabel = 'Flatten Spline Tool';
         btnFlattenSpline.classList.add('btn', 'btn-secondary');
         btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
         btnFlattenSpline.addEventListener('click', () => {
@@ -273,7 +273,7 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDeleteSpline, btnFlattenSpline, btnMinimizeSegments);
+        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDelete, btnFlattenSpline, btnMinimizeSegments);
         const mapContainer = document.createElement('div');
         mapContainer.replaceChildren(mapButtons, mapDiv);
         // Frames

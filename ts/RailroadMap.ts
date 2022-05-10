@@ -1,7 +1,7 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Circle, Element, G, Matrix, Path, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
 import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {radiusFilter, TreeUtil} from './TreeUtil';
@@ -14,7 +14,7 @@ import {handleError} from './index';
 
 enum MapToolMode {
     pan_zoom,
-    delete_spline,
+    delete,
     flatten_spline,
     tree_brush,
 }
@@ -153,7 +153,7 @@ export class RailroadMap {
     }
 
     toggleDeleteTool(): boolean {
-        if (this.toolMode === MapToolMode.delete_spline) {
+        if (this.toolMode === MapToolMode.delete) {
             // Disable delete tool
             this.toolMode = MapToolMode.pan_zoom;
             this.panZoom.enableDblClickZoom();
@@ -163,7 +163,7 @@ export class RailroadMap {
             return false;
         } else {
             // Enable delete tool
-            this.toolMode = MapToolMode.delete_spline;
+            this.toolMode = MapToolMode.delete;
             this.panZoom.disableDblClickZoom();
             return true;
         }
@@ -601,14 +601,18 @@ export class RailroadMap {
                     const divergence = divergesRight ? 5.75 : -5.75;
                     const notAlignedYaw = Boolean(sw.state) === divergesRight ? 0 : divergence;
                     const alignedYaw = Boolean(sw.state) === divergesRight ? divergence : 0;
-                    this.renderSwitchLeg(sw, notAlignedYaw)
-                        .addClass('not-aligned');
-                    this.renderSwitchLeg(sw, alignedYaw)
-                        .addClass('aligned');
+                    const legs = [
+                        this.renderSwitchLeg(sw, notAlignedYaw)
+                            .addClass('not-aligned'),
+                        this.renderSwitchLeg(sw, alignedYaw)
+                            .addClass('aligned'),
+                    ];
+                    const onClick = () => this.onClickSwitch(sw, legs);
+                    legs.forEach((l) => l.on('click', onClick));
                     break;
                 }
                 case SwitchType.diamond: { // 6
-                    this.layers.tracks.path([
+                    const d: PathCommand[] = [
                         ['m', -64, 0],
                         ['v', 128],
                         ['h', -128],
@@ -623,10 +627,14 @@ export class RailroadMap {
                         ['v', -128],
                         ['l', -64, 64],
                         ['l', -64, -64],
-                    ])
+                    ];
+                    const diamond = this.layers.tracks
+                        .path(d)
                         .rotate(Math.round(sw.rotation.yaw - 90), 0, 0)
                         .translate(Math.round(sw.location.x), Math.round(sw.location.y))
                         .addClass('diamond');
+                    diamond
+                        .on('click', () => this.onClickSwitch(sw, [diamond]));
                     break;
                 }
                 default:
@@ -798,7 +806,10 @@ export class RailroadMap {
         const l = this.layers.turntables
             .line([[x, y], [x + dx, y + dy]])
             .addClass('rail');
-        return [c, l];
+        const elements = [c, l];
+        const onClick = () => this.onClickTurntable(turntable, elements);
+        elements.forEach((e) => e.on('click', onClick));
+        return elements;
     }
 
     private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {
@@ -806,7 +817,7 @@ export class RailroadMap {
             case MapToolMode.pan_zoom:
                 console.log(spline);
                 break;
-            case MapToolMode.delete_spline:
+            case MapToolMode.delete:
                 this.railroad.splines = this.railroad.splines.filter((s) => s !== spline);
                 this.setMapModified();
                 elements.forEach((element) => element.remove());
@@ -819,6 +830,26 @@ export class RailroadMap {
                 this.renderSpline(spline);
                 break;
             }
+        }
+    }
+
+    private onClickSwitch(sw: Switch, elements: Element[]) {
+        switch (this.toolMode) {
+            case MapToolMode.delete:
+                this.railroad.switches = this.railroad.switches.filter((s) => s !== sw);
+                this.setMapModified();
+                elements.forEach((element) => element.remove());
+                break;
+        }
+    }
+
+    private onClickTurntable(turntable: Turntable, elements: Element[]) {
+        switch (this.toolMode) {
+            case MapToolMode.delete:
+                this.railroad.turntables = this.railroad.turntables.filter((t) => t !== turntable);
+                this.setMapModified();
+                elements.forEach((element) => element.remove());
+                break;
         }
     }
 }
