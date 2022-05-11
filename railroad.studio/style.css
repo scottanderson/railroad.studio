@@ -159,6 +159,18 @@
   fill: green;
 }
 
+.dark .control-point-0 {
+  fill: magenta;
+}
+
+.dark .control-point-1 {
+  fill: cyan;
+}
+
+.dark .control-point-2 {
+  fill: yellow;
+}
+
 .control-point-0:hover,
 .control-point-1:hover,
 .control-point-2:hover {
