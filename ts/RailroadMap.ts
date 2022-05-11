@@ -7,7 +7,7 @@ import {Studio} from './Studio';
 import {radiusFilter, TreeUtil} from './TreeUtil';
 import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
-import {delta2, normalizeAngle, splineHeading, vectorHeading} from './splines';
+import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenControlPoints} from './tool-flatten';
 import {frameLimits} from './frames';
 import {handleError} from './index';
@@ -28,6 +28,7 @@ interface MapOptions {
     };
     zoom: number;
     layerVisibility: MapLayerVisibility;
+    mergeLimits: MergeLimits;
 }
 
 export interface MapLayers {
@@ -78,6 +79,7 @@ export class RailroadMap {
     private setTitle: (title: string) => void;
     private brush: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
+    private mergeLimits: MergeLimits;
 
     constructor(studio: Studio, element: HTMLElement) {
         this.setMapModified = () => studio.modified = true;
@@ -97,6 +99,7 @@ export class RailroadMap {
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
         this.layerVisibility = options.layerVisibility;
+        this.mergeLimits = options.mergeLimits;
         this.svg = new Svg()
             .addClass('map-svg')
             .addTo(element);
@@ -107,6 +110,10 @@ export class RailroadMap {
             this.panZoom.zoom(options.zoom);
             this.panZoom.pan(options.pan);
         }
+    }
+
+    public getMergeLimits() {
+        return this.mergeLimits;
     }
 
     public getTreeUtil() {
@@ -267,6 +274,7 @@ export class RailroadMap {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
         const defaultTrue = (option: any) => typeof option === 'undefined' || Boolean(option);
+        const defaultNumber = (option: any, n: number) => typeof option === 'undefined' ? n : Number(option);
         return {
             pan: {
                 x: Number(parsed?.pan?.x || 0),
@@ -290,15 +298,22 @@ export class RailroadMap {
                 trees: false,
                 turntables: defaultTrue(parsed?.layerVisibility?.turntables),
             },
+            mergeLimits: {
+                bearing: defaultNumber(parsed?.mergeLimits?.bearing, 10),
+                inclination: defaultNumber(parsed?.mergeLimits?.inclination, 2.5),
+                horizontal: defaultNumber(parsed?.mergeLimits?.horizontal, 10),
+                vertical: defaultNumber(parsed?.mergeLimits?.vertical, 1),
+            },
         };
     }
 
-    private writeOptions() {
+    writeOptions() {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const options: MapOptions = {
             pan: this.panZoom.getPan(),
             zoom: this.panZoom.getZoom(),
             layerVisibility: this.layerVisibility,
+            mergeLimits: this.mergeLimits,
         };
         localStorage.setItem(key, JSON.stringify(options));
     }

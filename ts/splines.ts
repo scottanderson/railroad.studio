@@ -1,16 +1,27 @@
 import {Vector} from './Gvas';
 import {Railroad, Spline, SplineType} from './Railroad';
 
+export type MergeLimits = {
+    /** Bearing limit for merging control points (degrees). */
+    bearing: number;
+    /** Inclination limit for merging control points (degrees). */
+    inclination: number;
+    /** Horizontal limit for merging control points (centimeters). */
+    horizontal: number;
+    /** Vertical limit for merging control points (centimeters). */
+    vertical: number;
+};
+
 /**
  * Create new splines through existing control points. There are three steps:
  * 1. Hide overlapping segments, and discard splines that are completely invisible.
  * 2. Split splines with hidden middle sections into separate splines. Trim every spline to have a max of one hidden segment at the head and one at the tail.
  * 3. Combine adjacent splines to make longer splines (limit 97 segments).
  * @param {Railroad} railroad - The railroad select splines from
- * @param {loggingCallback} log - Handler for logging output
+ * @param {MergeLimits} limits
  * @return {Spline[]}
  */
-export function simplifySplines(railroad: Railroad): Spline[] {
+export function simplifySplines(railroad: Railroad, limits: MergeLimits): Spline[] {
     const splines = railroad.splines;
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
     console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points, ${trackLength(splines)}.`);
@@ -27,7 +38,7 @@ export function simplifySplines(railroad: Railroad): Spline[] {
         console.log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
     }
     // Step 3, combine
-    const merged = mergeSplines(simplified);
+    const merged = mergeSplines(simplified, limits);
     if (merged.length !== simplified.length || merged.length !== splines.length) {
         const mergedPoints = merged.reduce((a, e) => a + e.controlPoints.length, 0);
         console.log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
@@ -205,9 +216,10 @@ function segmentsOverlap(a: Spline, i: number, b: Spline, j: number): boolean {
 /**
  * Attempt spline merging between every pair of splines.
  * @param {Spline[]} splines
+ * @param {MergeLimits} limits
  * @return {Spline[]}
  */
-function mergeSplines(splines: Spline[]): Spline[] {
+function mergeSplines(splines: Spline[], limits: MergeLimits): Spline[] {
     const result: Spline[] = splines.slice();
     let replaced;
     // Repeat this loop until no more splines can be merged
@@ -218,7 +230,7 @@ function mergeSplines(splines: Spline[]): Spline[] {
                 if (typeof result[j] === 'undefined') {
                     throw new Error(`unexpected undef at idx i=${i}, j=${j}`);
                 }
-                const merged = mergeAdjacentSplines(result[i]!, result[j]!);
+                const merged = mergeAdjacentSplines(result[i]!, result[j]!, limits);
                 if (merged) {
                     // console.log(`Merged splines ${i} and ${j}`);
                     result[i] = merged;
@@ -235,13 +247,10 @@ function mergeSplines(splines: Spline[]): Spline[] {
  * Merge two simplified splines, if they are adjacent.
  * @param {Spline} spline1
  * @param {Spline} spline2
+ * @param {MergeLimits} limits
  * @return {Spline | null} a merged spline, or null if merging failed
  */
-function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
-    const limit = 10; // Max distance between control points (10cm)
-    const limit2 = limit * limit; // Limit squared
-    const bearingLimit = 10; // Max bearing between two adjacent splines (10 deg)
-    const inclinationLimit = 2.5; // Max inclination change between two adjacent splines (2.5 deg)
+function mergeAdjacentSplines(spline1: Spline, spline2: Spline, limits: MergeLimits): Spline | null {
     if (spline1.type !== spline2.type) return null;
     if (spline1.type === SplineType.steel_bridge) {
         // Do not add supports to short steel bridges
@@ -253,29 +262,11 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
     for (const a of [spline1, reverseSpline(spline1)]) {
         // The tail CP is the last visible segment index plus one
         const taila = tailControlPoint(a);
-        const cpa = a.controlPoints[taila]!;
         for (const b of [spline2, reverseSpline(spline2)]) {
             // The head CP is the first visible segment index
             const headb = headControlPoint(b);
-            const cpb = b.controlPoints[headb]!;
-            // Compare the tail control point of A to the head control point of B
-            const d2 = delta2(cpa, cpb);
-            if (d2 > limit2) {
-                // Control points are too far apart to be merged
-                continue;
-            }
-            const ha = splineHeading(a, taila);
-            const hb = splineHeading(b, headb);
-            const bearing = Math.abs(normalizeAngle(ha - hb));
-            if (bearing > bearingLimit) {
-                // Spline headings are too far apart to be merged
-                continue;
-            }
-            const ia = splineInclination(a, taila);
-            const ib = splineInclination(b, headb);
-            const di = Math.abs(normalizeAngle(ia - ib));
-            if (di > inclinationLimit) {
-                // Spline grades are too far apart to be merged
+            if (!splinesAdjacent(a, taila, b, headb, limits)) {
+                // Conditions for merging not met, continue checking other points
                 continue;
             }
             const result = mergeSubSplines(a, 0, taila, b, headb, b.segmentsVisible.length);
@@ -289,6 +280,55 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline): Spline | null {
         }
     }
     return null;
+}
+
+/**
+ * Returns true if control points a[taila] and b[headb] are within the various limits for spline merging.
+ * @param {Spline} a - the spline to beocme the new head
+ * @param {number} enda - end control point index for a
+ * @param {Spline} b - the spline to become the new tail
+ * @param {number} startb - start control point index for b
+ * @param {MergeLimits} limits
+ * @return {boolean} true if splines can be merged.
+ */
+function splinesAdjacent(a: Spline, enda: number, b: Spline, startb: number, limits: MergeLimits): boolean {
+    const cpa = a.controlPoints[enda]!;
+    const cpb = b.controlPoints[startb]!;
+    // Compare the tail control point of A to the head control point of B
+    if (!pointsAdjacent(cpa, cpb, limits)) {
+        // Control points are too far apart to be merged
+        return false;
+    }
+    const ha = splineHeading(a, enda);
+    const hb = splineHeading(b, startb);
+    const bearing = Math.abs(normalizeAngle(ha - hb));
+    if (bearing > limits.bearing) {
+        // Spline headings are too far apart to be merged
+        return false;
+    }
+    const ia = splineInclination(a, enda);
+    const ib = splineInclination(b, startb);
+    const di = Math.abs(normalizeAngle(ia - ib));
+    if (di > limits.inclination) {
+        // Spline grades are too far apart to be merged
+        return false;
+    }
+    return true;
+}
+
+function pointsAdjacent(a: Vector, b: Vector, limits: MergeLimits) {
+    const hlimit2 = limits.horizontal * limits.horizontal; // Horizontal limit squared
+    const vlimit2 = limits.vertical * limits.vertical; // Vertical limit squared
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const dz = b.z - a.z;
+    const h2 = (dx * dx) + (dy * dy);
+    const v2 = (dz * dz);
+    if (h2 > hlimit2 || v2 > vlimit2) {
+        // Control points are too far apart to be merged
+        return false;
+    }
+    return true;
 }
 
 /**
