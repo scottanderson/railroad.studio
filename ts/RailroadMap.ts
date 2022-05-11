@@ -142,8 +142,8 @@ export class RailroadMap {
         this.layers.trackControlPoints.node.replaceChildren();
         this.layers.tracks.node.replaceChildren();
         this.layers.tracksHidden.node.replaceChildren();
+        this.renderSwitches();
         return this.renderSplines()
-            .then(() => this.renderSwitches())
             .catch(handleError);
     }
 
@@ -154,9 +154,9 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
+        this.railroad.turntables.forEach(this.renderTurntable, this);
+        this.renderSwitches();
         return this.renderSplines()
-            .then(() => this.renderSwitches())
-            .then(() => this.railroad.turntables.forEach(this.renderTurntable, this))
             .then(() => this.renderTrees())
             .catch(handleError);
     }
