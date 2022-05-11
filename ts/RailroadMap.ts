@@ -862,12 +862,12 @@ export class RailroadMap {
                 break;
             }
             case MapToolMode.parallel: {
-                const offset = 382.7; // Length of a diamond
+                const offset = 3_83; // Length of a diamond
                 const keepSpline = (a: Spline) =>
                     !this.railroad.splines.some((b) =>
                         a !== b &&
                         a.type === b.type &&
-                        a.controlPoints.some((cp1) =>
+                        a.controlPoints.every((cp1) =>
                             b.controlPoints.some((cp2) => {
                                 const dx = cp2.x - cp1.x;
                                 const dy = cp2.y - cp1.y;
