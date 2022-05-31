@@ -8,7 +8,7 @@ import {radiusFilter, TreeUtil} from './TreeUtil';
 import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
-import {calculateGrade, flattenControlPoints} from './tool-flatten';
+import {calculateGrade, flattenSpline} from './tool-flatten';
 import {frameLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
@@ -869,7 +869,7 @@ export class RailroadMap {
                 elements.forEach((element) => element.remove());
                 break;
             case MapToolMode.flatten_spline: {
-                spline.controlPoints = flattenControlPoints(spline.controlPoints);
+                spline.controlPoints = flattenSpline(spline);
                 this.setMapModified();
                 // Re-render just this spline
                 elements.forEach((element) => element.remove());

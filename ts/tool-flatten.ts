@@ -1,4 +1,6 @@
 import {Vector} from './Gvas';
+import {Spline} from './Railroad';
+import {findLastIndex, fp32} from './util';
 
 interface Grade {
     length: number;
@@ -6,34 +8,42 @@ interface Grade {
     grade: number;
 }
 
-function fp32(n: number): number {
-    const float = new Float32Array(1);
-    float[0] = n;
-    return float[0];
+export function flattenSpline(spline: Spline): Vector[] {
+    // Find first and last visible segments
+    const first = spline.segmentsVisible.findIndex(Boolean);
+    const last = findLastIndex(spline.segmentsVisible, Boolean);
+    return flattenSegments(spline.controlPoints, first, last + 1);
 }
 
-export function flattenControlPoints(controlPoints: Vector[]): Vector[] {
-    const result = controlPoints.slice();
-    const cp0 = controlPoints[0];
-    const last = controlPoints.length - 1;
+function flattenSegments(controlPoints: Vector[], start: number, end: number): Vector[] {
+    // Calculate the run and rise of each segment
     const before = calculateGrade(controlPoints);
-    const totalXY = before.reduce((a, d) => a + d.length, 0);
-    const totalZ = before.reduce((a, d) => a + d.height, 0);
-    let cumulativeXY = 0;
-    // Loop through the control points, skipping first and last
-    for (let i = 1; i < last; i++) {
-        cumulativeXY += before[i - 1].length;
+    const gradeIncluded = before.slice(start, end);
+    const includeXY = gradeIncluded.reduce((a, d) => a + d.length, 0);
+    const includeZ = gradeIncluded.reduce((a, d) => a + d.height, 0);
+    const gradeBeforeStart = before.slice(0, start);
+    const lengthBeforeStart = gradeBeforeStart.reduce((a, d) => a + d.length, 0);
+    let cumulativeXY = -lengthBeforeStart;
+    const z0 = controlPoints[start].z;
+    const result = Array<Vector>(controlPoints.length);
+    for (let i = 0; i < controlPoints.length; i++) {
+        if (i > 0) {
+            cumulativeXY += before[i - 1].length;
+        }
         result[i] = {
             x: controlPoints[i].x,
             y: controlPoints[i].y,
-            z: fp32(cp0.z + (totalZ * cumulativeXY / totalXY)),
+            z: fp32(z0 + (cumulativeXY * includeZ / includeXY)),
         };
     }
     const after = calculateGrade(result);
-    const maxGradeBefore = before.reduce((a, d) => Math.max(a, d.grade), 0);
+    const maxGradeBefore = gradeIncluded.reduce((a, d) => Math.max(a, d.grade), 0);
     const maxGradeAfter = after.reduce((a, d) => Math.max(a, d.grade), 0);
     if (maxGradeBefore !== maxGradeAfter) {
-        console.log(`Flattened spline, max grade reduced from ${maxGradeBefore.toFixed(4)} to ${maxGradeAfter.toFixed(4)}`);
+        const a = start > 0 ? start : '';
+        const b = end < before.length ? end + '/' + before.length : '';
+        const index = (start > 0 || end < before.length) ? `(${a}..${b})` : '';
+        console.log(`Flattened spline${index}, max grade reduced from ${maxGradeBefore.toFixed(4)} to ${maxGradeAfter.toFixed(4)}`);
     }
     return result;
 }

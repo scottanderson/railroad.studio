@@ -1,5 +1,6 @@
 import {Vector} from './Gvas';
 import {Railroad, Spline, SplineType} from './Railroad';
+import {findLastIndex} from './util';
 
 export type MergeLimits = {
     /** Bearing limit for merging control points (degrees). */
@@ -402,11 +403,6 @@ function headControlPoint(spline: Spline): number {
 
 function tailControlPoint(spline: Spline): number {
     return findLastIndex(spline.segmentsVisible, Boolean) + 1;
-}
-
-function findLastIndex<T>(array: T[], predicate: (value: T, index: number, obj: T[]) => unknown): number {
-    const index = array.slice().reverse().findIndex(predicate);
-    return (index >= 0) ? (array.length - 1 - index) : index;
 }
 
 /**
