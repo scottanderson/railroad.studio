@@ -10,9 +10,6 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     if (gvas._header.saveType !== '/Script/arr.arrSaveGame') throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
     // Read save game data
     const saveGameVersion = optionalMap(gvas.strings, 'SaveGameVersion');
-    if (Number(saveGameVersion || 0) !== 220127) {
-        console.log(`Warning: Save game version ${saveGameVersion} has not been tested. Proceed with caution.`);
-    }
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
     const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
     const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');

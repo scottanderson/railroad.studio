@@ -9,6 +9,9 @@ interface InputTextOptions {
     min?: string;
 }
 
+const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
+const NEWEST_TESTED_SAVE_GAME_VERSION = 220127;
+
 /**
  * Web UI for editing a Railroad object.
  */
@@ -460,6 +463,20 @@ export class Studio {
             .forEach((l) => l());
         document.title = this.filename + ' - Railroad Studio';
         console.log(railroad);
+        // Version warning
+        const saveGameVersionNumber = Number(railroad.saveGame.version);
+        const showSaveVersionWarning =
+            saveGameVersionNumber < OLDEST_TESTED_SAVE_GAME_VERSION ||
+            saveGameVersionNumber > NEWEST_TESTED_SAVE_GAME_VERSION;
+        if (showSaveVersionWarning) {
+            const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested. Proceed with caution.`;
+            console.log(warning);
+            const headerWarning = document.createElement('h2');
+            headerWarning.innerText = warning;
+            headerWarning.classList.add('warning');
+            headerElement.insertBefore(headerWarning, studioControls);
+            // headerElement.replaceChildren(header, headerWarning, studioControls);
+        }
     }
 
     setTitle(title: string) {
