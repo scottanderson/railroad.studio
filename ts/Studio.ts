@@ -1,4 +1,4 @@
-import {GvasString, GvasText, Vector} from './Gvas';
+import {GvasString, GvasText, Rotator, Vector} from './Gvas';
 import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
@@ -8,6 +8,8 @@ interface InputTextOptions {
     max?: string;
     min?: string;
 }
+
+type Triplet<T> = [T, T, T];
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 220527;
@@ -425,6 +427,17 @@ export class Studio {
             content.replaceChildren(table);
             this.players(table);
         });
+        // Spline Tracks
+        const btnSplineTracks = document.createElement('button');
+        btnSplineTracks.textContent = 'Spline Tracks';
+        btnSplineTracks.classList.add('btn', 'btn-secondary');
+        btnSplineTracks.addEventListener('click', () => {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-striped', 'mt-5');
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(table);
+            this.splineTracks(table);
+        });
         // Export
         const btnDownload = document.createElement('button');
         const imgDownload = document.createElement('i');
@@ -452,7 +465,7 @@ export class Studio {
         btnDark.addEventListener('click', function() {
             eval('darkmode.toggleDarkMode();');
         });
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
+        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnSplineTracks, btnDownload, btnDark);
         // Studio controls
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
@@ -483,7 +496,98 @@ export class Studio {
         this.header.textContent = title + ' - ' + this.filename;
     }
 
-    frames(table: HTMLTableElement) {
+    private splineTracks(table: HTMLTableElement): void {
+        this.setTitle('Spline Tracks');
+        const thead = document.createElement('thead');
+        table.appendChild(thead);
+        let tr = document.createElement('tr');
+        thead.appendChild(tr);
+        for (const columnHeader of [
+            'ID',
+            'Start Link',
+            'End Link 1',
+            'End Link 2',
+            'Location',
+            'Start Point',
+            'End Point',
+            'Start Tangent',
+            'End Tangent',
+            'Paint style',
+            'Rotation',
+            'Switch State',
+            'Type',
+        ]) {
+            const th = document.createElement('th');
+            th.innerText = columnHeader;
+            tr.appendChild(th);
+        }
+        const tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        const trackCount = this.railroad.splineTracks.length;
+        for (let idx = 0; idx < trackCount; idx++) {
+            const track = this.railroad.splineTracks[idx];
+            tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            // ID
+            let td = document.createElement('td');
+            td.innerText = String(idx);
+            tr.appendChild(td);
+            // Start Link
+            const linkOptions = {
+                min: '-1',
+                max: String(trackCount - 1),
+            };
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(track.startSplineId, linkOptions, (startSplineId) => track.startSplineId = startSplineId));
+            tr.appendChild(td);
+            // End Link 1
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(track.endSpline1Id, linkOptions, (endSpline1Id) => track.endSpline1Id = endSpline1Id));
+            tr.appendChild(td);
+            // End Link 2
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(track.endSpline2Id, linkOptions, (endSpline2Id) => track.endSpline2Id = endSpline2Id));
+            tr.appendChild(td);
+            // Location
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(track.location, (location) => track.location = location));
+            tr.appendChild(td);
+            // Start point
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(track.startPoint, (startPoint) => track.startPoint = startPoint));
+            tr.appendChild(td);
+            // End point
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(track.endPoint, (endPoint) => track.endPoint = endPoint));
+            tr.appendChild(td);
+            // Start tangent
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(track.startTangent, (startTangent) => track.startTangent = startTangent));
+            tr.appendChild(td);
+            // End tangent
+            td = document.createElement('td');
+            td.replaceChildren(this.editVector(track.endTangent, (endTangent) => track.endTangent = endTangent));
+            tr.appendChild(td);
+            // Paint style
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(track.paintStyle, {min: '0'}, (paintStyle) => track.paintStyle = paintStyle));
+            tr.appendChild(td);
+            // Rotation
+            td = document.createElement('td');
+            td.replaceChildren(this.editRotator(track.rotation, (rotation) => track.rotation = rotation));
+            tr.appendChild(td);
+            // Switch state
+            td = document.createElement('td');
+            td.replaceChildren(this.editNumber(track.switchState, {min: '0'}, (switchState) => track.switchState = switchState));
+            tr.appendChild(td);
+            // Type
+            td = document.createElement('td');
+            td.replaceChildren(this.editString(track.type, (type) => track.type = type));
+            tr.appendChild(td);
+        }
+    }
+
+    private frames(table: HTMLTableElement): void {
         this.setTitle('Frames');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -521,7 +625,7 @@ export class Studio {
         }
     }
 
-    industries(table: HTMLTableElement): void {
+    private industries(table: HTMLTableElement): void {
         this.setTitle('Industries');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -567,7 +671,7 @@ export class Studio {
         }
     }
 
-    players(table: HTMLTableElement) {
+    private players(table: HTMLTableElement): void {
         this.setTitle('Players');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -620,9 +724,27 @@ export class Studio {
         return i;
     }
 
+    private saveContext(input: Node, saveAction: () => void, cancelAction: () => void): Node {
+        // Save
+        const btnSave = document.createElement('button');
+        btnSave.classList.add('btn', 'btn-success');
+        btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
+        btnSave.addEventListener('click', saveAction);
+        // Cancel
+        const btnCancel = document.createElement('button');
+        btnCancel.classList.add('btn', 'btn-danger');
+        btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
+        btnCancel.addEventListener('click', cancelAction);
+        // Layout
+        const div = document.createElement('div');
+        div.classList.add('hstack');
+        div.replaceChildren(input, btnSave, btnCancel);
+        return div;
+    }
+
     private editNumber(value: number, options: InputTextOptions, saveValue: (value: number) => void) {
         const span = document.createElement('span');
-        span.innerText = String(value);
+        span.innerText = Number.isInteger(value) ? String(value) : value.toFixed(2);
         span.addEventListener('click', () => {
             const input = document.createElement('input');
             input.type = 'number';
@@ -630,20 +752,14 @@ export class Studio {
             if (options.min) input.min = options.min;
             input.pattern = '[0-9]+';
             input.value = String(value);
-            // Save
-            const btnSave = document.createElement('button');
-            btnSave.classList.add('btn', 'btn-success');
-            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
-            btnSave.addEventListener('click', () => {
-                span.innerText = input.value;
-                saveValue(Number(input.value));
+            const saveAction = () => {
+                value = Number(input.value);
+                span.innerText = Number.isInteger(value) ? String(value) : value.toFixed(2);
+                saveValue(value);
+                this.modified = true;
                 div.parentElement?.replaceChildren(span);
-            });
-            // Cancel
-            const btnCancel = document.createElement('button');
-            btnCancel.classList.add('btn', 'btn-danger');
-            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
-            btnCancel.addEventListener('click', () => {
+            };
+            const cancelAction = () => {
                 if (Number(input.value) !== value) {
                     // Restore the original value
                     input.value = String(value);
@@ -651,70 +767,135 @@ export class Studio {
                     // Close the edit control
                     div.parentElement?.replaceChildren(span);
                 }
-            });
-            // Layout
-            const div = document.createElement('div');
-            div.replaceChildren(input, btnSave, btnCancel);
+            };
+            const div = this.saveContext(input, saveAction, cancelAction);
             span.parentElement?.replaceChildren(div);
         });
         return span;
     }
 
-    private editVector(value: Vector, saveValue: (value: Vector) => void) {
-        const pre = document.createElement('pre');
-        pre.innerText = JSON.stringify(value);
-        pre.addEventListener('click', () => {
-            const inputX = document.createElement('input');
-            const inputY = document.createElement('input');
-            const inputZ = document.createElement('input');
-            [inputX, inputY, inputZ].forEach((input) => {
-                input.type = 'string';
-                input.step = 'any';
-            });
-            inputX.value = String(value.x);
-            inputY.value = String(value.y);
-            inputZ.value = String(value.z);
-            // Save
-            const btnSave = document.createElement('button');
-            btnSave.classList.add('btn', 'btn-success');
-            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
-            btnSave.addEventListener('click', () => {
-                const newVector = {
-                    x: Number(inputX.value),
-                    y: Number(inputY.value),
-                    z: Number(inputZ.value),
-                };
-                saveValue(newVector);
-                div.parentElement?.replaceChildren(pre);
-                pre.innerText = JSON.stringify(newVector);
-            });
-            // Cancel
-            const btnCancel = document.createElement('button');
-            btnCancel.classList.add('btn', 'btn-danger');
-            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
-            btnCancel.addEventListener('click', () => {
-                if (Number(inputX.value) !== value.x ||
-                    Number(inputY.value) !== value.y ||
-                    Number(inputZ.value) !== value.z) {
+    private editString(value: GvasString, saveValue: (value: GvasString) => void) {
+        const span = document.createElement('span');
+        span.innerText = (value === null) ? '[null]' : value || '[blank]';
+        span.addEventListener('click', () => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = 'Null';
+            checkbox.checked = (value === null);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = value || '';
+            const onSave = () => {
+                value = checkbox.checked ? null : input.value;
+                span.innerText = (value === null) ? '[null]' : value || '[blank]';
+                saveValue(value);
+                this.modified = true;
+                div.parentElement?.replaceChildren(span);
+            };
+            const onCancel = () => {
+                const newValue = checkbox.checked ? null : input.value;
+                if (newValue !== value) {
                     // Restore the original value
-                    inputX.value = String(value.x);
-                    inputY.value = String(value.y);
-                    inputZ.value = String(value.z);
+                    checkbox.checked = (value === null);
+                    input.value = value || '';
+                } else {
+                    // Close the edit control
+                    div.parentElement?.replaceChildren(span);
+                }
+            };
+            // Layout
+            const form = document.createElement('form');
+            form.replaceChildren(checkbox, input);
+            const div = this.saveContext(form, onSave, onCancel);
+            span.parentElement?.replaceChildren(div);
+        });
+        return span;
+    }
+
+    private editThreeNumbers(
+        value: Triplet<number>,
+        display: (value: Triplet<number>) => string,
+        saveValue: (value: Triplet<number>) => void,
+    ) {
+        const pre = document.createElement('pre');
+        pre.innerText = display(value);
+        pre.addEventListener('click', () => {
+            const input0 = document.createElement('input');
+            const input1 = document.createElement('input');
+            const input2 = document.createElement('input');
+            [input0, input1, input2].forEach((input, i) => {
+                input.type = 'text';
+                input.step = 'any';
+                input.value = String(value[i]);
+            });
+            const onSave = () => {
+                value = [
+                    Number(input0.value),
+                    Number(input1.value),
+                    Number(input2.value),
+                ];
+                pre.innerText = display(value);
+                saveValue(value);
+                this.modified = true;
+                div.parentElement?.replaceChildren(pre);
+            };
+            const onCancel = () => {
+                if (Number(input0.value) !== value[0] ||
+                    Number(input1.value) !== value[1] ||
+                    Number(input2.value) !== value[2]) {
+                    // Restore the original value
+                    input0.value = String(value[0]);
+                    input1.value = String(value[1]);
+                    input2.value = String(value[2]);
                 } else {
                     // Close the edit control
                     div.parentElement?.replaceChildren(pre);
                 }
-            });
+            };
             // Layout
-            const div = document.createElement('div');
-            div.replaceChildren(inputX, inputY, inputZ, btnSave, btnCancel);
+            const vstack = document.createElement('div');
+            vstack.classList.add('vstack');
+            vstack.replaceChildren(input0, input1, input2);
+            const div = this.saveContext(vstack, onSave, onCancel);
             pre.parentElement?.replaceChildren(div);
         });
         return pre;
     }
 
+    private editRotator(value: Rotator, saveValue: (value: Rotator) => void) {
+        const encode = (r: Rotator): Triplet<number> => [r.roll, r.yaw, r.pitch];
+        const decode = (t: Triplet<number>) => {
+            return {roll: t[0], yaw: t[1], pitch: t[2]};
+        };
+        const display = (t: Triplet<number>) => {
+            if (t[0] === 0 && t[2] === 0) {
+                return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
+            }
+            return '[Rotator]';
+        };
+        return this.editThreeNumbers(encode(value), display, (t) => saveValue(decode(t)));
+    }
+
+    private editVector(value: Vector, saveValue: (value: Vector) => void) {
+        const encode = (v: Vector): Triplet<number> => [v.x, v.y, v.z];
+        const decode = (t: Triplet<number>) => {
+            return {x: t[0], y: t[1], z: t[2]};
+        };
+        const display = (t: Triplet<number>) => {
+            const z0 = t[0] === 0;
+            const z1 = t[1] === 0;
+            const z2 = t[2] === 0;
+            if (z0 && z1 && z2) return '{0,0,0}';
+            if (z1 && z2) return (t[0] > 0) ? `X+${t[0].toFixed(2)}` : `X${t[0].toFixed(2)}`;
+            if (z0 && z2) return (t[1] > 0) ? `Y+${t[1].toFixed(2)}` : `Y${t[1].toFixed(2)}`;
+            if (z0 && z1) return (t[2] > 0) ? `Z+${t[2].toFixed(2)}` : `Z${t[2].toFixed(2)}`;
+            if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]}}`;
+            return '[Vector]';
+        };
+        return this.editThreeNumbers(encode(value), display, (t) => saveValue(decode(t)));
+    }
+
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
-        // throw new Error('Method not implemented.');
         const pre = document.createElement('pre');
         pre.innerText = industryName(type);
         pre.addEventListener('click', () => {
@@ -733,6 +914,7 @@ export class Studio {
             btnSave.addEventListener('click', () => {
                 const newType = Number(select.value);
                 saveValue(newType);
+                this.modified = true;
                 div.parentElement?.replaceChildren(pre);
                 pre.innerText = industryName(newType);
             });
