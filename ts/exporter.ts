@@ -63,6 +63,18 @@ const exportKeys = [
     'SplineControlPointsindexstartArray',
     'SplineLocationArray',
     'SplineSegmentsVisibilityArray',
+    'SplineTrackEndPointArray',
+    'SplineTrackEndSpline1IDArray',
+    'SplineTrackEndSpline2IDArray',
+    'SplineTrackEndTangentArray',
+    'SplineTrackLocationArray',
+    'SplineTrackPaintStyleArray',
+    'SplineTrackRotationArray',
+    'SplineTrackStartPointArray',
+    'SplineTrackStartSplineIDArray',
+    'SplineTrackStartTangentArray',
+    'SplineTrackSwitchStateArray',
+    'SplineTrackTypeArray',
     'SplineTypeArray',
     'SplineVisibilityendArray',
     'SplineVisibilitystartArray',
@@ -185,6 +197,18 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'splinecontrolpointsindexstartarray': intArrays[propertyName] = splineControlPointsIndexStart; break;
             case 'splinelocationarray': vectorArrays[propertyName] = railroad.splines.map((s) => s.location); break;
             case 'splinesegmentsvisibilityarray': boolArrays[propertyName] = splineSegmentVisibility; break;
+            case 'splinetrackendpointarray': vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.endPoint); break;
+            case 'splinetrackendspline1idarray': intArrays[propertyName] = triangularPadding(railroad.splineTracks.map((st) => st.endSpline1Id)); break;
+            case 'splinetrackendspline2idarray': intArrays[propertyName] = triangularPadding(railroad.splineTracks.map((st) => st.endSpline2Id)); break;
+            case 'splinetrackendtangentarray': vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.endTangent); break;
+            case 'splinetracklocationarray': vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.location); break;
+            case 'splinetrackpaintstylearray': intArrays[propertyName] = railroad.splineTracks.map((st) => st.paintStyle); break;
+            case 'splinetrackrotationarray': rotatorArrays[propertyName] = railroad.splineTracks.map((st) => st.rotation); break;
+            case 'splinetrackstartpointarray': vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.startPoint); break;
+            case 'splinetrackstartsplineidarray': intArrays[propertyName] = triangularPadding(railroad.splineTracks.map((st) => st.startSplineId)); break;
+            case 'splinetrackstarttangentarray': vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.startTangent); break;
+            case 'splinetrackswitchstatearray': intArrays[propertyName] = railroad.splineTracks.map((st) => st.switchState); break;
+            case 'splinetracktypearray': stringArrays[propertyName] = railroad.splineTracks.map((st) => st.type); break;
             case 'splinetypearray': intArrays[propertyName] = railroad.splines.map((s) => s.type); break;
             case 'splinevisibilityendarray': intArrays[propertyName] = splineVisibilityEnd; break;
             case 'splinevisibilitystartarray': intArrays[propertyName] = splineVisibilityStart; break;
@@ -709,3 +733,8 @@ function removeUndefinedTail<T>(arr: (T | undefined)[]): T[] {
     throw new Error('Found undefined elements before tail');
 }
 
+function triangularPadding(arr: number[]) {
+    const triangle = (n: number) => n * (n + 1) / 2;
+    const t = triangle(arr.length);
+    return arr.concat(Array(t - arr.length).fill(-1));
+}

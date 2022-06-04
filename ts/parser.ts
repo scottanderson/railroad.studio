@@ -191,8 +191,8 @@ function parseBoolArray(buffer: ArrayBuffer) {
 
 function parseIntArray(buffer: ArrayBuffer) {
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
-    const uint32View = new Uint32Array(buffer, 4, entryCount);
-    return [...uint32View];
+    const int32View = new Int32Array(buffer, 4, entryCount);
+    return [...int32View];
 }
 
 function parseFloatArray(buffer: ArrayBuffer) {

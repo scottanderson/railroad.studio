@@ -1,5 +1,5 @@
 import {Gvas, GvasMap} from './Gvas';
-import {Frame, Industry, Player, Railroad, Sandhouse, Spline, Switch, Turntable, Watertower} from './Railroad';
+import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 
 /**
  * Convert a raw Gvas object into a Railroad
@@ -325,6 +325,89 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             splines.push(spline);
         }
     }
+    // Read spline tracks
+    const splineTracks: SplineTrack[] = [];
+    const splineTrackEndPoint = optionalMap(gvas.vectorArrays, 'SplineTrackEndPointArray');
+    const splineTrackEndSpline1Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline1IDArray');
+    const splineTrackEndSpline2Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline2IDArray');
+    const splineTrackEndTangent = optionalMap(gvas.vectorArrays, 'SplineTrackEndTangentArray');
+    const splineTrackLocation = optionalMap(gvas.vectorArrays, 'SplineTrackLocationArray');
+    const splineTrackPaintStyle = optionalMap(gvas.intArrays, 'SplineTrackPaintStyleArray');
+    const splineTrackRotation = optionalMap(gvas.rotatorArrays, 'SplineTrackRotationArray');
+    const splineTrackStartPoint = optionalMap(gvas.vectorArrays, 'SplineTrackStartPointArray');
+    const splineTrackStartSplineId = optionalMap(gvas.intArrays, 'SplineTrackStartSplineIDArray');
+    const splineTrackStartTangent = optionalMap(gvas.vectorArrays, 'SplineTrackStartTangentArray');
+    const splineTrackSwitchState = optionalMap(gvas.intArrays, 'SplineTrackSwitchStateArray');
+    const splineTrackType = optionalMap(gvas.stringArrays, 'SplineTrackTypeArray');
+    if (splineTrackEndPoint ||
+        splineTrackEndSpline1Id ||
+        splineTrackEndSpline2Id ||
+        splineTrackEndTangent ||
+        splineTrackLocation ||
+        splineTrackPaintStyle ||
+        splineTrackRotation ||
+        splineTrackStartPoint ||
+        splineTrackStartSplineId||
+        splineTrackStartTangent ||
+        splineTrackSwitchState ||
+        splineTrackType) {
+        if (!splineTrackEndPoint ||
+            !splineTrackEndSpline1Id ||
+            !splineTrackEndSpline2Id ||
+            !splineTrackEndTangent ||
+            !splineTrackLocation ||
+            !splineTrackPaintStyle ||
+            !splineTrackRotation ||
+            !splineTrackStartPoint ||
+            !splineTrackStartSplineId||
+            !splineTrackStartTangent ||
+            !splineTrackSwitchState ||
+            !splineTrackType ||
+            splineTrackEndPoint.length > splineTrackEndSpline1Id.length) {
+            throw new Error('Some spline track values are missing');
+        }
+        enforceEqualLengths([
+            splineTrackEndPoint,
+            splineTrackEndTangent,
+            splineTrackLocation,
+            splineTrackPaintStyle,
+            splineTrackRotation,
+            splineTrackStartPoint,
+            splineTrackStartTangent,
+            splineTrackSwitchState,
+            splineTrackType,
+        ]);
+        enforceEqualLengths([
+            splineTrackEndSpline1Id,
+            splineTrackEndSpline2Id,
+            splineTrackStartSplineId,
+        ]);
+        for (let i = splineTrackEndPoint.length; i < splineTrackStartPoint.length; i++) {
+            const start = splineTrackStartSplineId[i];
+            const end1 = splineTrackEndSpline1Id[i];
+            const end2 = splineTrackEndSpline2Id[i];
+            if (start !== -1 || end1 !== -1 || end2 !== -1) {
+                throw new Error(`Unexpected link ${i}: ${start} ${end1} ${end2}`);
+            }
+        }
+        for (let i = 0; i < splineTrackType.length; i++) {
+            const splineTrack: SplineTrack = {
+                endPoint: splineTrackEndPoint[i],
+                endSpline1Id: splineTrackEndSpline1Id[i],
+                endSpline2Id: splineTrackEndSpline2Id[i],
+                endTangent: splineTrackEndTangent[i],
+                location: splineTrackLocation[i],
+                paintStyle: splineTrackPaintStyle[i],
+                rotation: splineTrackRotation[i],
+                startPoint: splineTrackStartPoint[i],
+                startSplineId: splineTrackStartSplineId[i],
+                startTangent: splineTrackStartTangent[i],
+                switchState: splineTrackSwitchState[i],
+                type: splineTrackType[i],
+            };
+            splineTracks.push(splineTrack);
+        }
+    }
     // Read cut trees
     const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') || [];
     // Import complete, build the railroad
@@ -344,6 +427,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             version: saveGameVersion,
         },
         splines: splines,
+        splineTracks: splineTracks,
         switches: switches,
         turntables: turntables,
         watertowers: watertowers,

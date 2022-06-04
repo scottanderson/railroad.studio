@@ -10,7 +10,7 @@ interface InputTextOptions {
 }
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
-const NEWEST_TESTED_SAVE_GAME_VERSION = 220127;
+const NEWEST_TESTED_SAVE_GAME_VERSION = 220527;
 
 /**
  * Web UI for editing a Railroad object.
@@ -471,9 +471,9 @@ export class Studio {
         if (showSaveVersionWarning) {
             const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested. Proceed with caution.`;
             console.log(warning);
-            const headerWarning = document.createElement('h2');
+            const headerWarning = document.createElement('h4');
             headerWarning.innerText = warning;
-            headerWarning.classList.add('warning');
+            headerWarning.classList.add('text-warning');
             headerElement.insertBefore(headerWarning, studioControls);
             // headerElement.replaceChildren(header, headerWarning, studioControls);
         }

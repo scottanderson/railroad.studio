@@ -24,6 +24,7 @@ export interface Railroad {
         version: GvasString;
     };
     splines: Spline[];
+    splineTracks: SplineTrack[];
 }
 
 export interface Frame {
@@ -147,6 +148,21 @@ export interface Spline {
     location: Vector;
     segmentsVisible: boolean[];
     type: SplineType;
+}
+
+export interface SplineTrack {
+    endPoint: Vector;
+    endSpline1Id: number;
+    endSpline2Id: number;
+    endTangent: Vector;
+    location: Vector;
+    paintStyle: number;
+    rotation: Rotator;
+    startPoint: Vector;
+    startSplineId: number;
+    startTangent: Vector;
+    switchState: number;
+    type: GvasString;
 }
 
 export enum SplineType {
