@@ -309,6 +309,18 @@ function propertyType(propertyName: string): GvasTypes {
         case 'splinecontrolpointsindexstartarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinesegmentsvisibilityarray': return ['ArrayProperty', 'BoolProperty'];
+        case 'splinetrackendpointarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetrackendspline1idarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinetrackendspline2idarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinetrackendtangentarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetracklocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetrackpaintstylearray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinetrackrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
+        case 'splinetrackstartpointarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetrackstartsplineidarray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinetrackstarttangentarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetrackswitchstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'splinetracktypearray': return ['ArrayProperty', 'StrProperty'];
         case 'splinetypearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinevisibilityendarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinevisibilitystartarray': return ['ArrayProperty', 'IntProperty'];
