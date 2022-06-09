@@ -2,6 +2,12 @@ import {Studio} from './Studio';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
 
+// Expose `window.studio` in the global context for advanced users to inspect or modify application state.
+interface StudioWindow extends Window { studio: Studio; }
+// eslint-disable-next-line no-redeclare
+declare let window: StudioWindow;
+
+// Main app entry point
 window.onload = () => {
     const url = new URLSearchParams(window.location.search).get('url');
     if (url) return handleUrl(url);
@@ -81,10 +87,6 @@ function handleDrop(e: DragEvent) {
     handleFile(file);
 }
 
-interface StudioWindow extends Window { studio: Studio; }
-// eslint-disable-next-line no-redeclare
-declare let window: StudioWindow;
-
 function handleFile(file?: File): void {
     if (!file) return;
     file.arrayBuffer()
@@ -131,7 +133,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
             reject(e);
         }
     };
-    return new Promise<Studio>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
             titleText.textContent = 'Importing ' + filename;
@@ -140,7 +142,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     window.studio = new Studio(filename, railroad, header, content);
-                    resolve(window.studio);
+                    resolve();
                 }), 10);
             }), 10);
         }), 10);
