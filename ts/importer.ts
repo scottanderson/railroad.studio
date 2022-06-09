@@ -347,7 +347,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         splineTrackPaintStyle ||
         splineTrackRotation ||
         splineTrackStartPoint ||
-        splineTrackStartSplineId||
+        splineTrackStartSplineId ||
         splineTrackStartTangent ||
         splineTrackSwitchState ||
         splineTrackType) {
@@ -359,7 +359,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             !splineTrackPaintStyle ||
             !splineTrackRotation ||
             !splineTrackStartPoint ||
-            !splineTrackStartSplineId||
+            !splineTrackStartSplineId ||
             !splineTrackStartTangent ||
             !splineTrackSwitchState ||
             !splineTrackType ||

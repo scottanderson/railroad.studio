@@ -26,12 +26,14 @@
         "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
         "@typescript-eslint/no-unused-vars": ["error"],
         "@typescript-eslint/semi": ["error"],
+        "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
         "eqeqeq": "error",
         "indent": "off", // @typescript-eslint/indent
         "max-len": "off",
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
         "require-jsdoc": "off",
-        "semi": "off" // @typescript-eslint/semi
+        "semi": "off", // @typescript-eslint/semi
+        "space-infix-ops": ["off"]
     }
 }
