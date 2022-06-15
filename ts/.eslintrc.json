@@ -27,6 +27,15 @@
         "@typescript-eslint/no-unused-vars": ["error"],
         "@typescript-eslint/semi": ["error"],
         "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
+        "@typescript-eslint/type-annotation-spacing": ["error", {
+            "before": true,
+            "after": true,
+            "overrides": {
+                "colon": {
+                    "before": false
+                }
+            }
+        }],
         "eqeqeq": "error",
         "indent": "off", // @typescript-eslint/indent
         "max-len": "off",
