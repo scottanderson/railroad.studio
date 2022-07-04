@@ -619,6 +619,14 @@ export class Studio {
             td = document.createElement('td');
             td.appendChild(this.editString(frame.number, (frameNo) => frame.number = frameNo));
             tr.appendChild(td);
+            // Location
+            td = document.createElement('td');
+            td.appendChild(this.editVector(frame.location, (location) => frame.location = location));
+            tr.appendChild(td);
+            // Rotation
+            td = document.createElement('td');
+            td.appendChild(this.editRotator(frame.rotation, (rotation) => frame.rotation = rotation));
+            tr.appendChild(td);
         }
     }
 
