@@ -267,6 +267,10 @@
   fill: white;
 }
 
+.frame-text {
+  font-size: 50%;
+}
+
 .xray .rail,
 .xray .rail-deck,
 .xray .grade,
@@ -278,6 +282,7 @@
   opacity: 0.9;
 }
 
+.dark .frame-text,
 .dark .grade-text,
 .dark .player {
   fill: white;

@@ -1,6 +1,7 @@
 /* global BlobPart */
 import {CustomData, EngineVersion, Gvas, GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
 import {Railroad} from './Railroad';
+import {stringToText} from './util';
 
 const exportKeys = [
     'BoilerFireTempArray',
@@ -148,8 +149,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'couplerfrontstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerFrontState); break;
             case 'couplerrearstatearray': boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerRearState); break;
             case 'framelocationarray': vectorArrays[propertyName] = railroad.frames.map((f) => f.location); break;
-            case 'framenamearray': textArrays[propertyName] = railroad.frames.map((f) => f.name); break;
-            case 'framenumberarray': textArrays[propertyName] = railroad.frames.map((f) => f.number); break;
+            case 'framenamearray': textArrays[propertyName] = railroad.frames.map((f) => stringToText(f.name)); break;
+            case 'framenumberarray': textArrays[propertyName] = railroad.frames.map((f) => stringToText(f.number)); break;
             case 'framerotationarray': rotatorArrays[propertyName] = railroad.frames.map((f) => f.rotation); break;
             case 'frametypearray': stringArrays[propertyName] = railroad.frames.map((f) => f.type); break;
             case 'freightamountarray': intArrays[propertyName] = railroad.frames.map((f) => f.state.freightAmount); break;

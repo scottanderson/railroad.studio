@@ -1,4 +1,4 @@
-import {GvasString, GvasText, Rotator, Vector} from './Gvas';
+import {GvasString, Rotator, Vector} from './Gvas';
 import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
@@ -83,6 +83,10 @@ export class Studio {
             {
                 key: 'frames',
                 name: 'Frames',
+            },
+            {
+                key: 'frameNumbers',
+                name: 'Frame Numbers',
             },
             {
                 key: 'grades',
@@ -609,18 +613,11 @@ export class Studio {
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
-            const pre = document.createElement('pre');
-            td.appendChild(pre);
-            let name: GvasText | GvasString[][] = frame.name;
-            if (name && 'textFormat' in name) {
-                name = name.textFormat.map((tf) => tf.values);
-            }
-            pre.innerText = JSON.stringify(name);
-            // td.innerText = String(frame.name && 'textFormat' in frame.name ? frame.name.textFormat.map((tf)=>tf.values) : frame.name);
+            td.appendChild(this.editString(frame.name, (name) => frame.name = name));
             tr.appendChild(td);
             // Number
             td = document.createElement('td');
-            td.innerText = String(frame.number);
+            td.appendChild(this.editString(frame.number, (frameNo) => frame.number = frameNo));
             tr.appendChild(td);
         }
     }

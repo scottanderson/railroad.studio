@@ -1,5 +1,6 @@
 import {Gvas, GvasMap} from './Gvas';
 import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
+import {textToString} from './util';
 
 /**
  * Convert a raw Gvas object into a Railroad
@@ -78,8 +79,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         for (let i = 0; i < frameLocation.length; i++) {
             const frame: Frame = {
                 location: frameLocation[i],
-                name: frameName[i],
-                number: frameNumber[i],
+                name: textToString(frameName[i]),
+                number: textToString(frameNumber[i]),
                 rotation: frameRotation[i],
                 type: frameType[i],
                 state: {

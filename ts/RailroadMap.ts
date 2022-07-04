@@ -5,7 +5,7 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {radiusFilter, TreeUtil} from './TreeUtil';
-import {Vector} from './Gvas';
+import {GvasString, Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, flattenSpline} from './tool-flatten';
@@ -35,6 +35,7 @@ export interface MapLayers {
     background: G;
     border: G;
     brush: G;
+    frameNumbers: G;
     frames: G;
     grades: G;
     groundworkControlPoints: G;
@@ -53,6 +54,7 @@ interface MapLayerVisibility {
     background: boolean;
     border: boolean;
     brush: boolean;
+    frameNumbers: boolean;
     frames: boolean;
     grades: boolean;
     groundworkControlPoints: boolean;
@@ -285,6 +287,7 @@ export class RailroadMap {
                 background: defaultTrue(parsed?.layerVisibility?.background),
                 border: defaultTrue(parsed?.layerVisibility?.border),
                 brush: false,
+                frameNumbers: defaultTrue(parsed?.layerVisibility?.frameNumbers),
                 frames: Boolean(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
                 groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
@@ -337,10 +340,12 @@ export class RailroadMap {
             tracksHidden,
             trackControlPoints,
             frames,
+            frameNumbers,
             players,
             trees,
             brush,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -361,6 +366,7 @@ export class RailroadMap {
             background: background,
             border: border,
             brush: brush,
+            frameNumbers: frameNumbers,
             frames: frames,
             grades: grades,
             groundworkControlPoints: groundworkControlPoints,
@@ -565,11 +571,12 @@ export class RailroadMap {
             console.log(`Unknown frame type ${frame.type}`);
             return;
         }
+        const limits = frameLimits[frame.type];
         const degrees = Math.round(normalizeAngle(180 + frame.rotation.yaw));
         const x = Math.round(frame.location.x);
         const y = Math.round(frame.location.y);
         const f = this.layers.frames
-            .rect(frameLimits[frame.type].length, 300)
+            .rect(limits.length, 300)
             .center(0, 0)
             .attr('transform', `translate(${x},${y}) rotate(${degrees})`)
             .addClass('frame')
@@ -580,16 +587,21 @@ export class RailroadMap {
         if (frame.state.freightAmount > 0) {
             f.addClass('cargo-loaded');
         }
-        // const simplified = simplifyText(frame.name);
-        // if (simplified && simplified.length > 0) {
-        //     const x = Math.round(frame.location.x);
-        //     const y = Math.round(frame.location.y);
-        //     this.layers.frames
-        //         .text(simplified.join('\n'))
-        //         .attr('transform', `translate(${x},${y}) rotate(180)`)
-        //         .addClass('frame-text');
-        // }
+        this.renderFrameText(
+            frame.number,
+            x, y,
+            degrees,
+            Math.round(45 - limits.length / 2), 90);
         return f;
+    }
+
+    private renderFrameText(frameText: GvasString, x: number, y: number, r: number, dx: number, dy: number) {
+        if (frameText) {
+            this.layers.frameNumbers
+                .text(frameText.replace('<br>', '\n'))
+                .attr('transform', `translate(${x},${y}) rotate(${r}), translate(${dx},${dy})`)
+                .addClass('frame-text');
+        }
     }
 
     private renderIndustry(industry: Industry): Element {
