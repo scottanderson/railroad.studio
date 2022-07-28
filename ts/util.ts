@@ -16,6 +16,7 @@ export function fp32(n: number): number {
 export function stringToText(str: GvasString): GvasText {
     if (str === null) return null;
     const lines = str.split('<br>');
+    if (lines.length === 0) return [];
     if (lines.length === 1) return [str];
     return {
         guid: RRO_TEXT_GUID,
@@ -38,6 +39,10 @@ export function textToString(value: GvasText): GvasString {
             (m, i) => value.textFormat[i].values[0] || '');
     } else {
         // Simple text
+        if (0 === value.length) {
+            console.log(`Warning: GvasText contains zero-length string array, converting to null`);
+            return null;
+        }
         if (1 !== value.length) throw new Error('Expected single entry in simple GvasText');
         if (value[0] === null) throw new Error('Null in simple text');
         return value[0];
