@@ -390,7 +390,7 @@ export class RailroadMap {
 
     private renderBackground(): Element {
         return this.layers.background
-            .image('https://cdn.discordapp.com/attachments/897904338754756610/965238652223508480/RRO_Pine_Valley_topo_map.png')
+            .image('https://cdn.discordapp.com/attachments/949906083625975868/1009629576529449000/RRO_Pine_Valley_topo_map.png')
             .attr('transform', 'matrix(-116.75,0,0,-116.75,233700,231900)');
     }
 
