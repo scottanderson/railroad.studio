@@ -508,9 +508,6 @@ export class Studio {
         thead.appendChild(tr);
         for (const columnHeader of [
             'ID',
-            'Start Link',
-            'End Link 1',
-            'End Link 2',
             'Location',
             'Start Point',
             'End Point',
@@ -535,22 +532,6 @@ export class Studio {
             // ID
             let td = document.createElement('td');
             td.innerText = String(idx);
-            tr.appendChild(td);
-            // Start Link
-            const linkOptions = {
-                min: '-1',
-                max: String(trackCount - 1),
-            };
-            td = document.createElement('td');
-            td.replaceChildren(this.editNumber(track.startSplineId, linkOptions, (startSplineId) => track.startSplineId = startSplineId));
-            tr.appendChild(td);
-            // End Link 1
-            td = document.createElement('td');
-            td.replaceChildren(this.editNumber(track.endSpline1Id, linkOptions, (endSpline1Id) => track.endSpline1Id = endSpline1Id));
-            tr.appendChild(td);
-            // End Link 2
-            td = document.createElement('td');
-            td.replaceChildren(this.editNumber(track.endSpline2Id, linkOptions, (endSpline2Id) => track.endSpline2Id = endSpline2Id));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
