@@ -12,7 +12,7 @@ interface InputTextOptions {
 type Triplet<T> = [T, T, T];
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
-const NEWEST_TESTED_SAVE_GAME_VERSION = 220527;
+const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
 
 /**
  * Web UI for editing a Railroad object.
