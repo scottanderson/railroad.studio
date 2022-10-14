@@ -2,7 +2,7 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
-import {Industry, IndustryType, Frame, Player, Railroad, Spline, SplineType, Switch, SwitchType, Turntable} from './Railroad';
+import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {radiusFilter, TreeUtil} from './TreeUtil';
 import {GvasString, Vector} from './Gvas';
@@ -146,6 +146,7 @@ export class RailroadMap {
         this.layers.tracksHidden.node.replaceChildren();
         this.renderSwitches();
         return this.renderSplines()
+            .then(() => this.renderSplineTracks())
             .catch(handleError);
     }
 
@@ -159,6 +160,7 @@ export class RailroadMap {
         this.railroad.turntables.forEach(this.renderTurntable, this);
         this.renderSwitches();
         return this.renderSplines()
+            .then(() => this.renderSplineTracks())
             .then(() => this.renderTrees())
             .catch(handleError);
     }
@@ -797,6 +799,90 @@ export class RailroadMap {
                 elements.push(text);
             }
         }
+        return elements;
+    }
+
+    private renderSplineTracks(): Promise<void> {
+        return asyncForEach(this.railroad.splineTracks, (spline) => {
+            this.renderSplineTrack(spline);
+        }, (r, t) => {
+            const pct = 100 * (1 - (r / t));
+            this.setTitle(`Reticulating spline tracks... ${pct.toFixed(1)}%`);
+        }, () => {
+            this.setTitle('Map');
+        }).promise;
+    }
+
+    private renderSplineTrack(spline: SplineTrack) {
+        const elements: Element[] = [];
+        const x0 = spline.startPoint.x;
+        const y0 = spline.startPoint.y;
+        const x3 = spline.endPoint.x;
+        const y3 = spline.endPoint.y;
+        // Convert hermite to bezier form
+        const x1 = x0 + spline.startTangent.x / 3;
+        const y1 = y0 + spline.startTangent.y / 3;
+        const x2 = x3 - spline.endTangent.x / 3;
+        const y2 = y3 - spline.endTangent.y / 3;
+        const trackPath = ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3];
+        const makePath: (group: G, classes: string[]) => void = (group, classes) => {
+            const path = group.path(trackPath);
+            classes.forEach((c) => path.addClass(c));
+            elements.push(path);
+        };
+        switch (spline.type) {
+            case 'ballast_h01':
+            case 'ballast_h05':
+            case 'ballast_h10':
+                makePath(this.layers.groundworks, ['grade']);
+                break;
+            case 'rail_914':
+                makePath(this.layers.tracks, ['rail']);
+                break;
+            case 'rail_914_h01':
+            case 'rail_914_h05':
+            case 'rail_914_h10':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['grade']);
+                break;
+            case 'rail_914_switch_cross_90':
+                makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
+                break;
+            case 'rail_914_switch_left':
+            case 'rail_914_switch_left_mirror':
+            case 'rail_914_switch_left_mirror_noballast':
+            case 'rail_914_switch_left_noballast':
+            case 'rail_914_switch_right':
+            case 'rail_914_switch_right_mirror':
+            case 'rail_914_switch_right_mirror_noballast':
+            case 'rail_914_switch_right_noballast':
+                makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
+                // TODO: Render the other switch leg
+                break;
+            case 'rail_914_trestle_pile_01':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['wooden-bridge']); // TODO: Give this a different style
+                break;
+            case 'rail_914_trestle_steel_01':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['steel-bridge']);
+                break;
+            case 'rail_914_trestle_wood_01':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['wooden-bridge']);
+                break;
+            case 'rail_914_wall_01':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['stone-wall']);
+                break;
+            case 'rail_914_wall_01_norail':
+                makePath(this.layers.groundworks, ['stone-wall']);
+                break;
+            default:
+                console.log(`Unknown spline type ${spline.type}`);
+                return;
+        }
+        return elements;
     }
 
     private renderTrees(): Promise<void> {
