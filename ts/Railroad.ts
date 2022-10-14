@@ -55,6 +55,7 @@ export interface Frame {
         markerLightsFrontRightState: number,
         markerLightsRearLeftState: number,
         markerLightsRearRightState: number,
+        paintType?: number;
         regulatorValue: number;
         reverserValue: number;
         sanderAmount?: number;

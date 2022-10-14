@@ -41,6 +41,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const markerLightsFrontRightState = optionalMap(gvas.intArrays, 'MarkerLightsFrontRightStateArray');
     const markerLightsRearLeftState = optionalMap(gvas.intArrays, 'MarkerLightsRearLeftStateArray');
     const markerLightsRearRightState = optionalMap(gvas.intArrays, 'MarkerLightsRearRightStateArray');
+    const paintType = optionalMap(gvas.intArrays, 'PaintTypeArray');
     const regulatorValue = optionalMap(gvas.floatArrays, 'RegulatorValueArray');
     const reverserValue = optionalMap(gvas.floatArrays, 'ReverserValueArray');
     const sanderAmount = optionalMap(gvas.floatArrays, 'SanderAmountArray');
@@ -105,6 +106,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                     markerLightsFrontRightState: markerLightsFrontRightState[i],
                     markerLightsRearLeftState: markerLightsRearLeftState[i],
                     markerLightsRearRightState: markerLightsRearRightState[i],
+                    paintType: optionalIndex(paintType, i),
                     regulatorValue: regulatorValue[i],
                     reverserValue: reverserValue[i],
                     sanderAmount: optionalIndex(sanderAmount, i),

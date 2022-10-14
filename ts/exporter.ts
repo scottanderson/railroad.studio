@@ -65,14 +65,11 @@ const exportKeys = [
     'SplineLocationArray',
     'SplineSegmentsVisibilityArray',
     'SplineTrackEndPointArray',
-    'SplineTrackEndSpline1IDArray',
-    'SplineTrackEndSpline2IDArray',
     'SplineTrackEndTangentArray',
     'SplineTrackLocationArray',
     'SplineTrackPaintStyleArray',
     'SplineTrackRotationArray',
     'SplineTrackStartPointArray',
-    'SplineTrackStartSplineIDArray',
     'SplineTrackStartTangentArray',
     'SplineTrackSwitchStateArray',
     'SplineTrackTypeArray',
@@ -175,6 +172,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'markerlightsfrontrightstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsFrontRightState); break;
             case 'markerlightsrearleftstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearLeftState); break;
             case 'markerlightsrearrightstatearray': intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearRightState); break;
+            case 'painttypearray': intArrays[propertyName] = removeUndefinedTail(railroad.frames.map((f) => f.state.paintType)); break;
             case 'playeridarray': stringArrays[propertyName] = removeUndefinedTail(railroad.players.map((p) => p.id)); break;
             case 'playerlocationarray': vectorArrays[propertyName] = railroad.players.map((p) => p.location); break;
             case 'playermoneyarray': floatArrays[propertyName] = railroad.players.map((p) => p.money); break;
@@ -282,6 +280,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'markerlightsfrontrightstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'markerlightsrearleftstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'markerlightsrearrightstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'painttypearray': return ['ArrayProperty', 'IntProperty'];
         case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
         // case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         // case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
@@ -308,14 +307,11 @@ function propertyType(propertyName: string): GvasTypes {
         case 'splinelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinesegmentsvisibilityarray': return ['ArrayProperty', 'BoolProperty'];
         case 'splinetrackendpointarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
-        case 'splinetrackendspline1idarray': return ['ArrayProperty', 'IntProperty'];
-        case 'splinetrackendspline2idarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinetrackendtangentarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinetracklocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinetrackpaintstylearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinetrackrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'splinetrackstartpointarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
-        case 'splinetrackstartsplineidarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinetrackstarttangentarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinetrackswitchstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinetracktypearray': return ['ArrayProperty', 'StrProperty'];
