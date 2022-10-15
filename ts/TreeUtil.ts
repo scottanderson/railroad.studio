@@ -1,6 +1,7 @@
-import {Industry, IndustryType, Railroad, Sandhouse, Spline, Switch, Turntable, Watertower} from './Railroad';
+import {Industry, IndustryType, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Vector} from './Gvas';
 import {handleError} from './index';
+import {cubicBezier, hermiteToBezier} from './util-bezier';
 
 type Callback<T> = (value: T) => void;
 
@@ -87,6 +88,7 @@ export class TreeUtil {
             this.railroad.industries.find((i) => industryFilter(i, tree)) ||
             this.railroad.sandhouses.find((s) => sandhouseFilter(s, tree)) ||
             this.railroad.splines.find((s) => splineFilter(s, tree)) ||
+            this.railroad.splineTracks.find((s) => splineTrackFilter(s, tree)) ||
             this.railroad.switches.find((s) => switchFilter(s, tree)) ||
             this.railroad.turntables.find((t) => turntableFilter(t, tree)) ||
             this.railroad.watertowers.find((w) => watertowerFilter(w, tree)));
@@ -188,6 +190,27 @@ function splineFilter(spline: Spline, tree: Vector): boolean {
         if (!spline.segmentsVisible[i]) continue;
         const d2 = distToSegment2(tree, spline.controlPoints[i], spline.controlPoints[i + 1]);
         if (d2 < limit2) return true;
+    }
+    return false;
+}
+
+function splineTrackFilter(spline: SplineTrack, tree: Vector): boolean {
+    const limit = 4_50; // 4.5m
+    const limit2 = limit * limit;
+    const samples = 10;
+    const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
+    let px = NaN;
+    let py = NaN;
+    for (let i = 0; i <= samples; i++) {
+        const t = i / samples;
+        const x = cubicBezier(t, x0, x1, x2, x3);
+        const y = cubicBezier(t, y0, y1, y2, y3);
+        if (i > 0) {
+            const d2 = distToSegment2(tree, {x: px, y: py}, {x, y});
+            if (d2 < limit2) return true;
+        }
+        px = x;
+        py = y;
     }
     return false;
 }

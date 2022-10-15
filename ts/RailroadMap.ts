@@ -12,6 +12,7 @@ import {calculateGrade, flattenSpline} from './tool-flatten';
 import {frameLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
+import {hermiteToBezier} from './util-bezier';
 
 enum MapToolMode {
     pan_zoom,
@@ -815,15 +816,7 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
-        const x0 = spline.startPoint.x;
-        const y0 = spline.startPoint.y;
-        const x3 = spline.endPoint.x;
-        const y3 = spline.endPoint.y;
-        // Convert hermite to bezier form
-        const x1 = x0 + spline.startTangent.x / 3;
-        const y1 = y0 + spline.startTangent.y / 3;
-        const x2 = x3 - spline.endTangent.x / 3;
-        const y2 = y3 - spline.endTangent.y / 3;
+        const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
         const trackPath = ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3];
         const makePath: (group: G, classes: string[]) => void = (group, classes) => {
             const path = group.path(trackPath);
