@@ -175,8 +175,8 @@ export class Studio {
         grpTrees.classList.add('dropdown');
         grpTrees.replaceChildren(btnTrees, lstTrees);
         const treeActions: {
-            name: string,
-            onClick: () => void,
+            name: string;
+            onClick: () => void;
         }[] = [
             {
                 name: 'Cut All Trees (increases save file size)',
@@ -331,7 +331,8 @@ export class Studio {
                 (ev) => {
                     this.map.getMergeLimits().bearing = Number((ev.target as HTMLInputElement).value);
                     this.map.writeOptions();
-                });
+                },
+            );
             const inputInclination = makeInput(
                 'inputInclination',
                 'number',
@@ -339,7 +340,8 @@ export class Studio {
                 (ev) => {
                     this.map.getMergeLimits().inclination = Number((ev.target as HTMLInputElement).value);
                     this.map.writeOptions();
-                });
+                },
+            );
             const inputHorizontal = makeInput(
                 'inputHorizontal',
                 'number',
@@ -347,7 +349,8 @@ export class Studio {
                 (ev) => {
                     this.map.getMergeLimits().horizontal = Number((ev.target as HTMLInputElement).value);
                     this.map.writeOptions();
-                });
+                },
+            );
             const inputVertical = makeInput(
                 'inputVertical',
                 'number',
@@ -355,7 +358,8 @@ export class Studio {
                 (ev) => {
                     this.map.getMergeLimits().vertical = Number((ev.target as HTMLInputElement).value);
                     this.map.writeOptions();
-                });
+                },
+            );
             const btnDefaults = document.createElement('button');
             btnDefaults.type = 'button';
             btnDefaults.classList.add('btn', 'btn-warning');
@@ -397,7 +401,15 @@ export class Studio {
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(grpLayers, grpTrees, btnTreeBrush, btnDelete, btnFlattenSpline, btnParallelSpline, grpMinimizeSegments);
+        mapButtons.replaceChildren(
+            grpLayers,
+            grpTrees,
+            btnTreeBrush,
+            btnDelete,
+            btnFlattenSpline,
+            btnParallelSpline,
+            grpMinimizeSegments,
+        );
         // Frames
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
@@ -475,7 +487,8 @@ export class Studio {
         studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
         studioControls.replaceChildren(buttons, mapButtons);
         headerElement.replaceChildren(header, studioControls);
-        layers.map((l) => l.listener)
+        layers
+            .map((l) => l.listener)
             .filter((item): item is (() => void) => !!item)
             .forEach((l) => l());
         document.title = this.filename + ' - Railroad Studio';

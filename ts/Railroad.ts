@@ -12,9 +12,9 @@ export interface Railroad {
     frames: Frame[];
     industries: Industry[];
     players: Player[];
-    sandhouses: Sandhouse[],
+    sandhouses: Sandhouse[];
     switches: Switch[];
-    turntables: Turntable[],
+    turntables: Turntable[];
     watertowers: Watertower[];
     removedVegetationAssets: Vector[];
     saveGame: {
@@ -47,14 +47,14 @@ export interface Frame {
         freightAmount: number;
         freightType: GvasString;
         generatorValveValue: number;
-        headlightFrontState: boolean,
-        headlightRearState: boolean,
-        headlightType: number,
-        markerLightsCenterState?: number,
-        markerLightsFrontLeftState: number,
-        markerLightsFrontRightState: number,
-        markerLightsRearLeftState: number,
-        markerLightsRearRightState: number,
+        headlightFrontState: boolean;
+        headlightRearState: boolean;
+        headlightType: number;
+        markerLightsCenterState?: number;
+        markerLightsFrontLeftState: number;
+        markerLightsFrontRightState: number;
+        markerLightsRearLeftState: number;
+        markerLightsRearRightState: number;
         paintType?: number;
         regulatorValue: number;
         reverserValue: number;

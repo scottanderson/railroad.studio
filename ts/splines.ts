@@ -323,8 +323,8 @@ function pointsAdjacent(a: Vector, b: Vector, limits: MergeLimits) {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     const dz = b.z - a.z;
-    const h2 = (dx * dx) + (dy * dy);
-    const v2 = (dz * dz);
+    const h2 = dx * dx + dy * dy;
+    const v2 = dz * dz;
     if (h2 > hlimit2 || v2 > vlimit2) {
         // Control points are too far apart to be merged
         return false;
@@ -342,7 +342,7 @@ export function delta2(a: Vector, b: Vector): number {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     const dz = b.z - a.z;
-    const m2 = (dx * dx) + (dy * dy) + (dz * dz);
+    const m2 = dx * dx + dy * dy + dz * dz;
     return m2;
 }
 

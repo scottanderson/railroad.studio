@@ -406,7 +406,7 @@ export class RailroadMap {
             .addClass('map-border');
     }
 
-    private renderBrush() {
+    private renderBrush(): Element {
         // Brush
         return this.brush = this.layers.brush
             .circle(50_00)
@@ -460,7 +460,10 @@ export class RailroadMap {
                         if (treeBrushAsync) return;
                         if (this.toolMode !== MapToolMode.tree_brush) return;
                         if (!this.brush) return;
-                        const point = {x: this.brush.cx(), y: this.brush.cy()};
+                        const point = {
+                            x: this.brush.cx(),
+                            y: this.brush.cy(),
+                        };
                         const radius = Number(this.brush.attr('r'));
                         if (mouseButton !== 0) {
                             // Cut tree brush
@@ -633,10 +636,11 @@ export class RailroadMap {
         const degrees = normalizeAngle(sw.rotation.yaw + yawOffset).toFixed(1);
         const x = Math.round(sw.location.x);
         const y = Math.round(sw.location.y);
-        return this.layers.tracks.path([
-            ['m', 0, 0],
-            ['v', 1888],
-        ])
+        return this.layers.tracks
+            .path([
+                ['m', 0, 0],
+                ['v', 1888],
+            ])
             .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('switch-leg');
     }
@@ -722,12 +726,14 @@ export class RailroadMap {
                 const x = Math.round(point.x);
                 const y = Math.round(point.y);
                 rect = this.layers.trackControlPoints
-                    .polygon([[0, r],
+                    .polygon([
+                        [0, r],
                         [l, 0 - h],
                         [64, -h],
                         [0, 0],
                         [-64, -h],
-                        [-l, -h]])
+                        [-l, -h],
+                    ])
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees})`);
             } else {
                 const x = Math.round(point.x - 150);
@@ -748,7 +754,8 @@ export class RailroadMap {
         // Splines
         for (const invisPass of [true, false]) {
             const g = invisPass ? hiddenGroup : splineGroup;
-            const rect = g.path(d)
+            const rect = g
+                .path(d)
                 .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
                 .on('click', () => this.onClickSpline(spline, rect, elements));
             if (invisPass) rect.addClass('hidden');

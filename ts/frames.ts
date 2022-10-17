@@ -1,16 +1,15 @@
-
 interface FrameType {
-    firewood?: number,
-    headlights?: number,
-    length: number,
-    name_length: number,
-    name_lines: number,
-    number_length: number,
-    number_lines: number,
-    sandLevelMax?: number,
-    smokestacks?: number,
-    waterBoilerMax?: number,
-    waterTankMax?: number,
+    firewood?: number;
+    headlights?: number;
+    length: number;
+    name_length: number;
+    name_lines: number;
+    number_length: number;
+    number_lines: number;
+    sandLevelMax?: number;
+    smokestacks?: number;
+    waterBoilerMax?: number;
+    waterTankMax?: number;
 }
 
 const frameTypeBoxcar: FrameType = {
@@ -23,7 +22,7 @@ const frameTypeBoxcar: FrameType = {
 
 const frameTypeCaboose: FrameType = {
     firewood: 15,
-    length: 679.00,
+    length: 679.0,
     name_length: 20,
     name_lines: 1,
     number_length: 12,
@@ -33,7 +32,7 @@ const frameTypeCaboose: FrameType = {
 const frameTypeClass70: FrameType = {
     firewood: 1350,
     headlights: 2,
-    length: 938.90,
+    length: 938.9,
     name_length: 14,
     name_lines: 1,
     number_length: 3,
@@ -112,7 +111,7 @@ const frameTypeEurekaTender: FrameType = {
 };
 
 const frameTypeFlatcarCordwood: FrameType = {
-    length: 785.60,
+    length: 785.6,
     name_length: 8,
     name_lines: 1,
     number_length: 8,
@@ -120,7 +119,7 @@ const frameTypeFlatcarCordwood: FrameType = {
 };
 
 const frameTypeFlatcarHopper: FrameType = {
-    length: 785.60,
+    length: 785.6,
     name_length: 7,
     name_lines: 1,
     number_length: 4,
@@ -128,7 +127,7 @@ const frameTypeFlatcarHopper: FrameType = {
 };
 
 const frameTypeFlatcarLogs: FrameType = {
-    length: 785.60,
+    length: 785.6,
     name_length: 7,
     name_lines: 1,
     number_length: 12,
@@ -136,7 +135,7 @@ const frameTypeFlatcarLogs: FrameType = {
 };
 
 const frameTypeFlatcarStakes: FrameType = {
-    length: 785.60,
+    length: 785.6,
     name_length: 8,
     name_lines: 1,
     number_length: 8,
@@ -144,7 +143,7 @@ const frameTypeFlatcarStakes: FrameType = {
 };
 
 const frameTypeFlatcarTanker: FrameType = {
-    length: 785.60,
+    length: 785.6,
     name_length: 19,
     name_lines: 1,
     number_length: 12,
@@ -152,7 +151,7 @@ const frameTypeFlatcarTanker: FrameType = {
 };
 
 const frameTypeHandcard: FrameType = {
-    length: 220.20,
+    length: 220.2,
     name_length: 18,
     name_lines: 1,
     number_length: 5,
@@ -176,7 +175,7 @@ const frameTypeHeisler: FrameType = {
 const frameTypePorter040: FrameType = {
     firewood: 66,
     headlights: 2,
-    length: 391.20,
+    length: 391.2,
     name_length: 12,
     name_lines: 1,
     number_length: 2,

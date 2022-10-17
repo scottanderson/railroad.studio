@@ -16,17 +16,17 @@ export interface Gvas {
     textArrays: GvasMap<GvasText[]>;
 }
 
-export type GvasTypes = (
-    [] |
-    ['FloatProperty'] |
-    ['StrProperty'] |
-    ['ArrayProperty', 'BoolProperty'] |
-    ['ArrayProperty', 'FloatProperty'] |
-    ['ArrayProperty', 'IntProperty'] |
-    ['ArrayProperty', 'StrProperty'] |
-    ['ArrayProperty', 'StructProperty', 'Rotator'] |
-    ['ArrayProperty', 'StructProperty', 'Vector'] |
-    ['ArrayProperty', 'TextProperty']);
+export type GvasTypes =
+    | []
+    | ['FloatProperty']
+    | ['StrProperty']
+    | ['ArrayProperty', 'BoolProperty']
+    | ['ArrayProperty', 'FloatProperty']
+    | ['ArrayProperty', 'IntProperty']
+    | ['ArrayProperty', 'StrProperty']
+    | ['ArrayProperty', 'StructProperty', 'Rotator']
+    | ['ArrayProperty', 'StructProperty', 'Vector']
+    | ['ArrayProperty', 'TextProperty'];
 
 export type GvasMap<V> = {
     [key: string]: V;
@@ -37,7 +37,7 @@ export type GvasString = string | null;
 export interface GvasHeader {
     saveVersion: number;
     structureVersion: number;
-    engineVersion: EngineVersion
+    engineVersion: EngineVersion;
     customFormatVersion: number;
     customData: CustomData[];
     saveType: GvasString;
@@ -100,8 +100,8 @@ export type GvasText = null | RichText | GvasString[];
 
 export interface RichText {
     guid: GvasString;
-    pattern: GvasString,
-    textFormat: RichTextFormat[],
+    pattern: GvasString;
+    textFormat: RichTextFormat[];
 }
 
 export interface RichTextFormat {
@@ -109,4 +109,3 @@ export interface RichTextFormat {
     contentType: number;
     values: GvasString[];
 }
-
