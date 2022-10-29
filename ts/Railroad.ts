@@ -153,11 +153,14 @@ export interface Spline {
 
 export interface SplineTrack {
     endPoint: Vector;
+    endSpline1Id?: number;
+    endSpline2Id?: number;
     endTangent: Vector;
     location: Vector;
     paintStyle: number;
     rotation: Rotator;
     startPoint: Vector;
+    startSplineId?: number;
     startTangent: Vector;
     switchState: number;
     type: GvasString;

@@ -331,20 +331,26 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     // Read spline tracks
     const splineTracks: SplineTrack[] = [];
     const splineTrackEndPoint = optionalMap(gvas.vectorArrays, 'SplineTrackEndPointArray');
+    const splineTrackEndSpline1Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline1IDArray');
+    const splineTrackEndSpline2Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline2IDArray');
     const splineTrackEndTangent = optionalMap(gvas.vectorArrays, 'SplineTrackEndTangentArray');
     const splineTrackLocation = optionalMap(gvas.vectorArrays, 'SplineTrackLocationArray');
     const splineTrackPaintStyle = optionalMap(gvas.intArrays, 'SplineTrackPaintStyleArray');
     const splineTrackRotation = optionalMap(gvas.rotatorArrays, 'SplineTrackRotationArray');
     const splineTrackStartPoint = optionalMap(gvas.vectorArrays, 'SplineTrackStartPointArray');
+    const splineTrackStartSplineId = optionalMap(gvas.intArrays, 'SplineTrackStartSplineIDArray');
     const splineTrackStartTangent = optionalMap(gvas.vectorArrays, 'SplineTrackStartTangentArray');
     const splineTrackSwitchState = optionalMap(gvas.intArrays, 'SplineTrackSwitchStateArray');
     const splineTrackType = optionalMap(gvas.stringArrays, 'SplineTrackTypeArray');
     if (splineTrackEndPoint ||
+        splineTrackEndSpline1Id ||
+        splineTrackEndSpline2Id ||
         splineTrackEndTangent ||
         splineTrackLocation ||
         splineTrackPaintStyle ||
         splineTrackRotation ||
         splineTrackStartPoint ||
+        splineTrackStartSplineId ||
         splineTrackStartTangent ||
         splineTrackSwitchState ||
         splineTrackType) {
@@ -373,11 +379,14 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         for (let i = 0; i < splineTrackType.length; i++) {
             const splineTrack: SplineTrack = {
                 endPoint: splineTrackEndPoint[i],
+                endSpline1Id: optionalIndex(splineTrackEndSpline1Id, i),
+                endSpline2Id: optionalIndex(splineTrackEndSpline2Id, i),
                 endTangent: splineTrackEndTangent[i],
                 location: splineTrackLocation[i],
                 paintStyle: splineTrackPaintStyle[i],
                 rotation: splineTrackRotation[i],
                 startPoint: splineTrackStartPoint[i],
+                startSplineId: optionalIndex(splineTrackStartSplineId, i),
                 startTangent: splineTrackStartTangent[i],
                 switchState: splineTrackSwitchState[i],
                 type: splineTrackType[i],
