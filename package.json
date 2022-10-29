@@ -8,6 +8,8 @@
         "build": "webpack --mode=development",
         "watch": "webpack --mode=development --watch",
         "start": "webpack server --mode=development",
+        "check": "npx prettier -c .",
+        "format": "npx prettier -w .",
         "build:prod": "webpack --mode=production",
         "sync": "aws s3 sync railroad.studio s3://railroad.studio"
     },
