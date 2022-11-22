@@ -8,7 +8,7 @@ import {radiusFilter, TreeUtil} from './TreeUtil';
 import {GvasString, Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
-import {calculateGrade, flattenSpline} from './tool-flatten';
+import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
 import {frameLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
@@ -830,6 +830,22 @@ export class RailroadMap {
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
         };
+        const makeGradeText: () => void = () => {
+            const {steepest, startPoint, endPoint} = calculateSteepestGrade(spline);
+            const percentage = steepest.grade;
+            if (percentage === 0) return;
+            const heading = vectorHeading(startPoint, endPoint);
+            const degrees = heading > 0 ? heading + 90 : heading - 90;
+            const x = (endPoint.x + startPoint.x) / 2;
+            const y = (endPoint.y + startPoint.y) / 2;
+            const text = this.layers.grades
+                .text((block) => block
+                    .text(percentage.toFixed(4) + '%')
+                    .dx(300))
+                .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+                .addClass('grade-text');
+            elements.push(text);
+        };
         switch (spline.type) {
             case 'ballast_h01':
             case 'ballast_h05':
@@ -838,15 +854,18 @@ export class RailroadMap {
                 break;
             case 'rail_914':
                 makePath(this.layers.tracks, ['rail']);
+                makeGradeText();
                 break;
             case 'rail_914_h01':
             case 'rail_914_h05':
             case 'rail_914_h10':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['grade']);
+                makeGradeText();
                 break;
             case 'rail_914_switch_cross_90':
                 makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
+                makeGradeText();
                 break;
             case 'rail_914_switch_left':
             case 'rail_914_switch_left_mirror':
@@ -857,26 +876,32 @@ export class RailroadMap {
             case 'rail_914_switch_right_mirror_noballast':
             case 'rail_914_switch_right_noballast':
                 makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
+                makeGradeText();
                 // TODO: Render the other switch leg
                 break;
             case 'rail_914_trestle_pile_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['wooden-bridge']); // TODO: Give this a different style
+                makeGradeText();
                 break;
             case 'rail_914_trestle_steel_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['steel-bridge']);
+                makeGradeText();
                 break;
             case 'rail_914_trestle_wood_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['wooden-bridge']);
+                makeGradeText();
                 break;
             case 'rail_914_wall_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['stone-wall']);
+                makeGradeText();
                 break;
             case 'rail_914_wall_01_norail':
                 makePath(this.layers.groundworks, ['stone-wall']);
+                makeGradeText();
                 break;
             default:
                 console.log(`Unknown spline type ${spline.type}`);

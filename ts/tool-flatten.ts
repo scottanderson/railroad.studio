@@ -1,6 +1,7 @@
 import {Vector} from './Gvas';
-import {Spline} from './Railroad';
+import {Spline, SplineTrack} from './Railroad';
 import {findLastIndex, fp32} from './util';
+import {cubicBezier, hermiteToBezier} from './util-bezier';
 
 interface Grade {
     length: number;
@@ -60,4 +61,37 @@ export function calculateGrade(controlPoints: Vector[]): Grade[] {
             grade: 100 * Math.abs(height) / length,
         };
     });
+}
+
+export function calculateSteepestGrade(spline: SplineTrack): {
+    steepest: Grade,
+    startPoint: Vector,
+    endPoint: Vector
+} {
+    const controlPoints: Vector[] = [];
+    const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
+    const z0 = spline.startPoint.z;
+    const z3 = spline.endPoint.z;
+    const z1 = z0 + spline.startTangent.z / 3;
+    const z2 = z3 - spline.endTangent.z / 3;
+    const samples = 10;
+    for (let i = 0; i <= samples; i++) {
+        const t = i / samples;
+        const x = cubicBezier(t, x0, x1, x2, x3);
+        const y = cubicBezier(t, y0, y1, y2, y3);
+        const z = cubicBezier(t, z0, z1, z2, z3);
+        controlPoints.push({x, y, z});
+    }
+    const grades = calculateGrade(controlPoints);
+    let steepestIndex = 0;
+    for (let i = 1; i < samples; i++) {
+        if (grades[i].grade > grades[steepestIndex].grade) {
+            steepestIndex = i;
+        }
+    }
+    return {
+        steepest: grades[steepestIndex],
+        startPoint: controlPoints[steepestIndex],
+        endPoint: controlPoints[steepestIndex + 1],
+    };
 }
