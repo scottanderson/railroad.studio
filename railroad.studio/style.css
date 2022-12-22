@@ -195,23 +195,34 @@
   stroke: red;
 }
 
+.frame-class48,
 .frame-class70,
 .frame-climax,
 .frame-cooke260,
+.frame-cooke280,
 .frame-eureka,
+.frame-glenbrook,
 .frame-heisler,
+.frame-montezuma,
+.frame-mosca,
 .frame-porter_040,
-.frame-porter_042 {
+.frame-porter_042,
+.frame-shay {
   fill: purple;
 }
 
 .frame-class70_tender,
 .frame-cooke260_tender,
-.frame-eureka_tender {
+.frame-cooke280_tender,
+.frame-eureka_tender,
+.frame-glenbrook_tender,
+.frame-montezuma_tender,
+.frame-mosca_tender {
   fill: black;
 }
 
-.frame-caboose {
+.frame-caboose,
+.frame-waycar {
   fill: black;
 }
 
