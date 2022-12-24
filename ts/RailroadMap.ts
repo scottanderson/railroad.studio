@@ -522,7 +522,11 @@ export class RailroadMap {
                             if (this.toolMode === MapToolMode.tree_brush && this.brush) {
                                 mouseButton = (e as MouseEvent).button;
                                 mouseDown = true;
-                                treeBrush();
+                                if (mouseButton === 1) {
+                                    this.panZoom.enablePan();
+                                } else {
+                                    treeBrush();
+                                }
                             }
                         },
                         mousemove: (e) => {
@@ -534,7 +538,7 @@ export class RailroadMap {
                                     .point(me.clientX, me.clientY)
                                     .transform(new Matrix(ctm.inverse()));
                                 this.brush.center(point.x, point.y);
-                                if (this.toolMode === MapToolMode.tree_brush && mouseDown) {
+                                if (this.toolMode === MapToolMode.tree_brush && mouseDown && mouseButton !== 1) {
                                     // Cut or replant
                                     treeBrush();
                                 }
@@ -542,6 +546,9 @@ export class RailroadMap {
                         },
                         mouseup: () => {
                             mouseDown = false;
+                            if (mouseButton === 1) {
+                                this.panZoom.disablePan();
+                            }
                         },
                         wheel: (e) => {
                             if (this.toolMode === MapToolMode.tree_brush && this.brush) {
