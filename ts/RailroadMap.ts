@@ -831,6 +831,7 @@ export class RailroadMap {
         const trackPath = ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3];
         const makePath: (group: G, classes: string[]) => void = (group, classes) => {
             const path = group.path(trackPath);
+            path.on('click', () => this.onClickSplineTrack(spline, path, elements));
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
         };
@@ -1024,6 +1025,19 @@ export class RailroadMap {
                 this.setMapModified();
                 parallel.forEach(this.renderSpline, this);
             }
+        }
+    }
+
+    private onClickSplineTrack(spline: SplineTrack, path: Path, elements: Element[]) {
+        switch (this.toolMode) {
+            case MapToolMode.pan_zoom:
+                console.log(spline);
+                break;
+            case MapToolMode.delete:
+                this.railroad.splineTracks = this.railroad.splineTracks.filter((s) => s !== spline);
+                this.setMapModified();
+                elements.forEach((element) => element.remove());
+                break;
         }
     }
 

@@ -409,6 +409,18 @@ export class Studio {
             btnParallelSpline,
             grpMinimizeSegments,
         );
+        if (railroad.splines.length === 0) {
+            // Disable tools that only work for old splines
+            mapButtons.replaceChildren(
+                grpLayers,
+                grpTrees,
+                btnTreeBrush,
+                btnDelete,
+                // btnFlattenSpline,
+                // btnParallelSpline,
+                // grpMinimizeSegments,
+            );
+        }
         // Frames
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
