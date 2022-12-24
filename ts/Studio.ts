@@ -66,7 +66,6 @@ export class Studio {
         grpLayers.setAttribute('aria-labelledby', btnLayers.id);
         grpLayers.classList.add('dropdown');
         grpLayers.replaceChildren(btnLayers, lstLayers);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const layers: {
             key: keyof MapLayers;
             name: string;

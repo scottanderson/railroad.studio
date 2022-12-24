@@ -3,7 +3,15 @@ import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switc
 import {textToString} from './util';
 
 /**
- * Convert a raw Gvas object into a Railroad
+ * Converts a Gvas object, which represents the contents of a GVAS file, into a Railroad object.
+ *
+ * The function first checks the value of the saveType property in the Gvas object to verify that it is a supported save type.
+ *
+ * The function then reads various properties from the Gvas object and stores them in variables. These properties include data from the save game, such as the save game version, date, and unique IDs, as well as data about individual frames, such as their location, rotation, type, and freight information.
+ *
+ * The function then uses this data to create an array of Frame objects, representing the individual frames in the railroad, and returns a Railroad object with this array as well as other information about the railroad, such as the player, industries, and splines.
+ *
+ * The function also makes use of several helper functions, such as optionalMap, which is used to retrieve a property from the Gvas object if it exists, and textToString, which is used to convert a GvasText object (a special type of string used in GVAS files) into a regular string.
  * @param {Gvas} gvas
  * @return {Railroad}
  */

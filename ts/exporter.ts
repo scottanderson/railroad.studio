@@ -93,7 +93,11 @@ const exportKeys = [
 ];
 
 /**
- * Converts a Railroad to a Gvas for export.
+ * Converts a Railroad object into a Gvas object, which can be exported to a file in the GVAS format.
+ *
+ * The function first flattens the spline control points and segment arrays, so that they are stored in a single list rather than being split up into multiple arrays. It then iterates over all the elements of the Railroad object and stores their properties into the appropriate fields in the Gvas object. Finally, it constructs the GvasHeader object and returns the Gvas object.
+ *
+ * The Gvas object is a representation of the data in a GVAS file, with properties for each of the different types of data that can be stored in a GVAS file (e.g. strings, integers, arrays of vectors). The Railroad object, on the other hand, is a higher-level representation of a train game, with objects representing different types of game elements (e.g. frames, splines, industries).
  * @param {Railroad} railroad
  * @return {Gvas}
  */

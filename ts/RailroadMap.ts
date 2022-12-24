@@ -12,6 +12,7 @@ import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flat
 import {frameLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
+import {asyncForEach} from './util-async';
 import {hermiteToBezier} from './util-bezier';
 
 enum MapToolMode {
@@ -70,6 +71,9 @@ interface MapLayerVisibility {
     turntables: boolean;
 }
 
+/**
+ * The RailroadMap class is used to create a visual representation of a Railroad object on a web page and provide tools for interacting with it. It can render different components of the Railroad object, such as tracks, industries, and trees. It also allows for panning and zooming, selecting and deleting elements, and using tools such as a tree brush or spline flattening tool. Additionally, it has functions for reading and writing user preferences, such as pan and zoom settings and layer visibility. The RailroadMap class uses the SvgPanZoom library for panning and zooming and the svg.js library to create and manipulate SVG elements.
+ */
 export class RailroadMap {
     private railroad: Railroad;
     private treeUtil: TreeUtil;
@@ -1071,60 +1075,4 @@ function treeBucket(tree: Vector) {
     const bucketX = Math.floor((tree.x + 2_005_00) / 250_00);
     const bucketY = Math.floor((tree.y + 2_005_00) / 250_00);
     return `trees_${bucketX}_${bucketY}`;
-}
-
-interface AsyncForEachResult<T> {
-    appender: (a: T[]) => Promise<void>;
-    promise: Promise<void>;
-}
-
-function asyncForEach<T>(
-    a: T[],
-    func: (e: T) => void,
-    updateFunc?: (remaining: number, total: number) => void,
-    thenClause?: () => void,
-): AsyncForEachResult<T> {
-    const promise = () => new Promise<void>((resolve, reject) => {
-        let updateTime = 0;
-        const fun = () => {
-            try {
-                while (remaining.length > 0) {
-                    const e = remaining.shift();
-                    if (!e) continue;
-                    func(e);
-                    const now = performance.now();
-                    if (now - updateTime > 200) {
-                        updateTime = now;
-                        if (updateFunc) {
-                            updateFunc(remaining.length, total);
-                        }
-                        setTimeout(fun, 1);
-                        return;
-                    }
-                }
-                resolve();
-            } catch (e) {
-                reject(e);
-            }
-        };
-        setTimeout(fun, 1);
-    }).then(thenClause);
-    let remaining = a.concat();
-    let total = remaining.length;
-    let p = promise();
-    const appender = (elements: T[]) => {
-        if (remaining.length !== 0) {
-            Array.prototype.push.apply(remaining, elements);
-            total += elements.length;
-            return p;
-        }
-        remaining = elements.concat();
-        total = remaining.length;
-        p = promise();
-        return p;
-    };
-    return {
-        appender: appender,
-        promise: p,
-    };
 }

@@ -1,7 +1,10 @@
 import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
 
 /**
- * Parse a GVAS file from an ArrayBuffer.
+ * Parses a GVAS file stored in an ArrayBuffer and returns an object with the contents of the file.
+ *
+ * The function first checks the magic number at the beginning of the file to verify that it is a GVAS file, and then parses the header data, including the engine version, custom format data, and save game type. After the header, the function reads the data variables stored in the GVAS file. These variables are stored as name-value pairs, where the name is a GvasString and the value is a property of a specific type, such as a boolean, a float, or an array of integers. The function reads the name and type of each variable, and stores them in the _order and _types properties of the result object, respectively. It then reads the value of the variable and stores it in the corresponding property of the result object, depending on its type.
+ *
  * @param {ArrayBuffer} buffer
  * @return {Gvas}
  */
