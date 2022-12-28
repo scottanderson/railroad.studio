@@ -114,8 +114,12 @@ export class RailroadMap {
         this.render();
         this.panZoom = this.initPanZoom();
         if (options.pan && options.zoom) {
-            this.panZoom.zoom(options.zoom);
-            this.panZoom.pan(options.pan);
+            try {
+                this.panZoom.zoom(options.zoom);
+                this.panZoom.pan(options.pan);
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 
