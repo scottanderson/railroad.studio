@@ -169,7 +169,8 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
         case IndustryType.engine_house_brown:
             return radiusFilter(industry.location, tree, 15_00); // 15m
         default:
-            throw new Error(`Unknown industry type ${industry.type}`);
+            console.log(`Unknown industry type ${industry.type}`);
+            return false;
     }
 }
 
