@@ -66,7 +66,10 @@ export function bezierCommand(point: ArrayXY, i: number, a: ArrayXY[]) {
 //           - a (array): complete array of points coordinates
 //       O:  - (string) a svg path command
 // O:  - (string): a Svg <path> element
-export function svgPath(points: ArrayXY[], command: (point: ArrayXY, i: number, a: ArrayXY[]) => PathCommand | string): PathArrayAlias {
+export function svgPath(
+    points: ArrayXY[],
+    command: (point: ArrayXY, i: number, a: ArrayXY[]) => PathCommand | string):
+    PathArrayAlias {
     // build the d attributes by looping over the points
     return points.reduce((acc, point, i, a) => i === 0 ?
         // if first point

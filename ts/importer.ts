@@ -1,22 +1,36 @@
 import {Gvas, GvasMap} from './Gvas';
+// eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {textToString} from './util';
 
 /**
- * Converts a Gvas object, which represents the contents of a GVAS file, into a Railroad object.
+ * Converts a Gvas object, which represents the contents of a GVAS file, into a
+ * Railroad object.
  *
- * The function first checks the value of the saveType property in the Gvas object to verify that it is a supported save type.
+ * The function first checks the value of the saveType property in the Gvas
+ * object to verify that it is a supported save type.
  *
- * The function then reads various properties from the Gvas object and stores them in variables. These properties include data from the save game, such as the save game version, date, and unique IDs, as well as data about individual frames, such as their location, rotation, type, and freight information.
+ * The function then reads various properties from the Gvas object and stores
+ * them in variables. These properties include data from the save game, such as
+ * the save game version, date, and unique IDs, as well as data about individual
+ * frames, such as their location, rotation, type, and freight information.
  *
- * The function then uses this data to create an array of Frame objects, representing the individual frames in the railroad, and returns a Railroad object with this array as well as other information about the railroad, such as the player, industries, and splines.
+ * The function then uses this data to create an array of Frame objects,
+ * representing the individual frames in the railroad, and returns a Railroad
+ * object with this array as well as other information about the railroad, such
+ * as the player, industries, and splines.
  *
- * The function also makes use of several helper functions, such as optionalMap, which is used to retrieve a property from the Gvas object if it exists, and textToString, which is used to convert a GvasText object (a special type of string used in GVAS files) into a regular string.
+ * The function also makes use of several helper functions, such as optionalMap,
+ * which is used to retrieve a property from the Gvas object if it exists, and
+ * textToString, which is used to convert a GvasText object (a special type of
+ * string used in GVAS files) into a regular string.
  * @param {Gvas} gvas
  * @return {Railroad}
  */
 export function gvasToRailroad(gvas: Gvas): Railroad {
-    if (gvas._header.saveType !== '/Script/arr.arrSaveGame') throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
+    if (gvas._header.saveType !== '/Script/arr.arrSaveGame') {
+        throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
+    }
     // Read save game data
     const saveGameVersion = optionalMap(gvas.strings, 'SaveGameVersion');
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
@@ -61,13 +75,16 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         brakeValue || compressorAirPressure || compressorValveValue || couplerFrontState || couplerRearState ||
         frameLocation || frameName || frameNumber || frameRotation || frameType || freightAmount || freightType ||
         generatorValveValue || headlightFrontState || headlightRearState || headlightType ||
-        markerLightsFrontLeftState || markerLightsFrontRightState || markerLightsRearLeftState || markerLightsRearRightState ||
+        markerLightsFrontLeftState || markerLightsFrontRightState ||
+        markerLightsRearLeftState || markerLightsRearRightState ||
         regulatorValue || reverserValue || sanderAmount || smokestackType || tenderFuelAmount || tenderWaterAmount) {
         if (!boilerFireTemp || !boilerFuelAmount || !boilerPressure || !boilerWaterLevel || !boilerWaterTemp ||
             !brakeValue || !compressorAirPressure || !compressorValveValue || !couplerFrontState || !couplerRearState ||
-            !frameLocation || !frameName || !frameNumber || !frameRotation || !frameType || !freightAmount || !freightType ||
+            !frameLocation || !frameName || !frameNumber || !frameRotation || !frameType ||
+            !freightAmount || !freightType ||
             !generatorValveValue || !headlightFrontState || !headlightRearState || !headlightType ||
-            !markerLightsFrontLeftState || !markerLightsFrontRightState || !markerLightsRearLeftState || !markerLightsRearRightState ||
+            !markerLightsFrontLeftState || !markerLightsFrontRightState ||
+            !markerLightsRearLeftState || !markerLightsRearRightState ||
             !regulatorValue || !reverserValue || !smokestackType || !tenderFuelAmount || !tenderWaterAmount) {
             throw new Error('Some frame values are missing');
         }
@@ -80,7 +97,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             freightAmount, freightType,
             generatorValveValue,
             headlightFrontState, headlightRearState, headlightType,
-            markerLightsFrontLeftState, markerLightsFrontRightState, markerLightsRearLeftState, markerLightsRearRightState,
+            markerLightsFrontLeftState, markerLightsFrontRightState,
+            markerLightsRearLeftState, markerLightsRearRightState,
             regulatorValue, reverserValue,
             smokestackType,
             tenderFuelAmount, tenderWaterAmount,
@@ -145,7 +163,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         industryType) {
         if (!industryLocation || !industryRotation ||
             !industryStorageEduct1 || !industryStorageEduct2 || !industryStorageEduct3 || !industryStorageEduct4 ||
-            !industryStorageProduct1 || !industryStorageProduct2 || !industryStorageProduct3 || !industryStorageProduct4 ||
+            !industryStorageProduct1 || !industryStorageProduct2 ||
+            !industryStorageProduct3 || !industryStorageProduct4 ||
             !industryType) {
             throw new Error('Some industry values are missing');
         }
@@ -157,8 +176,12 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             const industry: Industry = {
                 location: industryLocation[i],
                 rotation: industryRotation[i],
-                inputs: [industryStorageEduct1[i], industryStorageEduct2[i], industryStorageEduct3[i], industryStorageEduct4[i]],
-                outputs: [industryStorageProduct1[i], industryStorageProduct2[i], industryStorageProduct3[i], industryStorageProduct4[i]],
+                inputs: [
+                    industryStorageEduct1[i], industryStorageEduct2[i],
+                    industryStorageEduct3[i], industryStorageEduct4[i]],
+                outputs: [
+                    industryStorageProduct1[i], industryStorageProduct2[i],
+                    industryStorageProduct3[i], industryStorageProduct4[i]],
                 type: industryType[i],
             };
             industries.push(industry);
@@ -324,8 +347,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             const visibilityEnd = splineVisibilityEnd[i];
             const segmentsVisible = splineSegmentsVisibility.slice(visibilityStart, visibilityEnd + 1);
             // Sanity check
-            if (controlPoints.length - segmentsVisible.length !== 1) {
-                throw new Error(`Segment length does not match control point length, ${controlPoints.length}, ${segmentsVisible.length}`);
+            if (controlPoints.length !== 1 + segmentsVisible.length) {
+                throw new Error(
+                    `Spline array length mismatch. ${controlPoints.length} != 1 + ${segmentsVisible.length}`);
             }
             const spline: Spline = {
                 controlPoints: controlPoints,
@@ -452,7 +476,9 @@ function optionalMap<T>(map: GvasMap<T>, key: string): T | null {
 //     if (Array.isArray(text)) return text;
 //     if (text.guid !== '56F8D27149CC5E2D12103BBEBFCA9097') throw new Error(`Unexpected guid ${text.guid}`);
 //     if (text.pattern !== '{0}<br>{1}') throw new Error(`Unexpected format pattern ${text.pattern}`);
-//     if (text.textFormat.length !== 2) throw new Error(`TextFormat entry_count > 1, is not supported, ${text.textFormat.length}`);
+//     if (text.textFormat.length !== 2) {
+//         throw new Error(`TextFormat entry_count > 1, is not supported, ${text.textFormat.length}`);
+//     }
 //     const simplified = text.textFormat.map((tf, i) => {
 //         if (tf.contentType !== 2) throw new Error('Unexpected content type');
 //         if (String(i) !== tf.formatKey) throw new Error('Unexpected format key');

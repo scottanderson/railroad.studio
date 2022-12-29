@@ -2,6 +2,7 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
+// eslint-disable-next-line max-len
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {radiusFilter, TreeUtil} from './TreeUtil';
@@ -72,7 +73,15 @@ interface MapLayerVisibility {
 }
 
 /**
- * The RailroadMap class is used to create a visual representation of a Railroad object on a web page and provide tools for interacting with it. It can render different components of the Railroad object, such as tracks, industries, and trees. It also allows for panning and zooming, selecting and deleting elements, and using tools such as a tree brush or spline flattening tool. Additionally, it has functions for reading and writing user preferences, such as pan and zoom settings and layer visibility. The RailroadMap class uses the SvgPanZoom library for panning and zooming and the svg.js library to create and manipulate SVG elements.
+ * The RailroadMap class is used to create a visual representation of a Railroad
+ * object on a web page and provide tools for interacting with it. It can render
+ * different components of the Railroad object, such as tracks, industries, and
+ * trees. It also allows for panning and zooming, selecting and deleting
+ * elements, and using tools such as a tree brush or spline flattening tool.
+ * Additionally, it has functions for reading and writing user preferences, such
+ * as pan and zoom settings and layer visibility. The RailroadMap class uses the
+ * SvgPanZoom library for panning and zooming and the svg.js library to create
+ * and manipulate SVG elements.
  */
 export class RailroadMap {
     private railroad: Railroad;
@@ -401,6 +410,7 @@ export class RailroadMap {
 
     private renderBackground(): Element {
         return this.layers.background
+            // eslint-disable-next-line max-len
             .image('https://cdn.discordapp.com/attachments/949906083625975868/1009629576529449000/RRO_Pine_Valley_topo_map.png')
             .attr('transform', 'matrix(-116.75,0,0,-116.75,233700,231900)');
     }
@@ -477,15 +487,17 @@ export class RailroadMap {
                             // Cut tree brush
                             treeBrushAsync = true;
                             return this.treeUtil.allTrees().then((trees) => {
-                                const alreadyCut = (tree: Vector) => -1 !== this.railroad.removedVegetationAssets.findIndex(
-                                    (t) => tree.x === t.x && tree.y === t.y && tree.z === t.z);
+                                const alreadyCut = (tree: Vector): boolean =>
+                                    -1 !== this.railroad.removedVegetationAssets.findIndex(
+                                        (t) => tree.x === t.x && tree.y === t.y && tree.z === t.z);
                                 const cut = trees.filter((t) =>
                                     radiusFilter(point, t, radius) &&
                                     !alreadyCut(t));
                                 if (cut.length === 0) return;
                                 // console.log(`Cut ${cut.length} trees`);
                                 this.setMapModified();
-                                this.railroad.removedVegetationAssets = this.railroad.removedVegetationAssets.concat(cut);
+                                this.railroad.removedVegetationAssets =
+                                    this.railroad.removedVegetationAssets.concat(cut);
                                 return this.renderTreeArray(cut);
                             }).finally(() => {
                                 treeBrushAsync = false;
@@ -599,7 +611,7 @@ export class RailroadMap {
         const f = this.layers.frames
             .rect(limits.length, 300)
             .center(0, 0)
-            .attr('transform', `translate(${x},${y}) rotate(${degrees})`)
+            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('frame')
             .addClass(`frame-${frame.type}`);
         if (frame.state.brakeValue > 0) {
@@ -620,20 +632,20 @@ export class RailroadMap {
         if (frameText) {
             this.layers.frameNumbers
                 .text(frameText.replace('<br>', '\n'))
-                .attr('transform', `translate(${x},${y}) rotate(${r}), translate(${dx},${dy})`)
+                .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
                 .addClass('frame-text');
         }
     }
 
     private renderIndustry(industry: Industry): Element {
         const industryName = IndustryType[industry.type] || `Unknown industry ${industry.type}`;
-        const x = industry.location.x;
-        const y = industry.location.y;
+        const x = Math.round(industry.location.x);
+        const y = Math.round(industry.location.y);
         const heading = industry.rotation.yaw;
-        const degrees = heading > 0 ? heading + 90 : heading - 90;
+        const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
         return this.layers.industries
             .text((block) => block.text(industryName))
-            .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('grade-text');
     }
 
@@ -643,12 +655,12 @@ export class RailroadMap {
         const y = Math.round(player.location.y);
         return this.layers.players
             .text(player.name)
-            .attr('transform', `translate(${x},${y}) rotate(180)`)
+            .attr('transform', `translate(${x} ${y}) rotate(180)`)
             .addClass('player');
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {
-        const degrees = normalizeAngle(sw.rotation.yaw + yawOffset).toFixed(1);
+        const degrees = Math.round(normalizeAngle(sw.rotation.yaw + yawOffset));
         const x = Math.round(sw.location.x);
         const y = Math.round(sw.location.y);
         return this.layers.tracks
@@ -668,7 +680,9 @@ export class RailroadMap {
                 case SwitchType.rightSwitchRight: // 1
                 case SwitchType.leftSwitchRight: // 4
                 case SwitchType.rightSwitchLeft: { // 5
-                    const divergesRight = (sw.type === SwitchType.leftSwitchRight || sw.type === SwitchType.rightSwitchRight);
+                    const divergesRight =
+                        sw.type === SwitchType.leftSwitchRight ||
+                        sw.type === SwitchType.rightSwitchRight;
                     const divergence = divergesRight ? 5.75 : -5.75;
                     const notAlignedYaw = Boolean(sw.state) === divergesRight ? 0 : divergence;
                     const alignedYaw = Boolean(sw.state) === divergesRight ? divergence : 0;
@@ -808,16 +822,16 @@ export class RailroadMap {
                 const percentage = c[i].grade;
                 if (percentage === 0) continue;
                 const heading = vectorHeading(spline.controlPoints[i], spline.controlPoints[i + 1]);
-                const degrees = heading > 0 ? heading + 90 : heading - 90;
+                const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
-                const x = (cp1.x + cp0.x) / 2;
-                const y = (cp1.y + cp0.y) / 2;
+                const x = Math.round((cp1.x + cp0.x) / 2);
+                const y = Math.round((cp1.y + cp0.y) / 2);
                 const text = this.layers.grades
                     .text((block) => block
                         .text(percentage.toFixed(4) + '%')
                         .dx(300))
-                    .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+                    .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
                     .addClass('grade-text');
                 elements.push(text);
             }
@@ -851,14 +865,14 @@ export class RailroadMap {
             const percentage = steepest.grade;
             if (percentage === 0) return;
             const heading = vectorHeading(startPoint, endPoint);
-            const degrees = heading > 0 ? heading + 90 : heading - 90;
-            const x = (endPoint.x + startPoint.x) / 2;
-            const y = (endPoint.y + startPoint.y) / 2;
+            const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
+            const x = Math.round((endPoint.x + startPoint.x) / 2);
+            const y = Math.round((endPoint.y + startPoint.y) / 2);
             const text = this.layers.grades
                 .text((block) => block
                     .text(percentage.toFixed(4) + '%')
                     .dx(300))
-                .attr('transform', `translate(${Math.round(x)},${Math.round(y)}) rotate(${Math.round(degrees)})`)
+                .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
                 .addClass('grade-text');
             elements.push(text);
         };

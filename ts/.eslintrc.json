@@ -38,7 +38,7 @@
         }],
         "eqeqeq": "error",
         "indent": "off", // @typescript-eslint/indent
-        "max-len": "off",
+        "max-len": ["error", { "code": 120 }],
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
         "require-jsdoc": "off",

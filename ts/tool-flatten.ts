@@ -44,7 +44,9 @@ function flattenSegments(controlPoints: Vector[], start: number, end: number): V
         const a = start > 0 ? start : '';
         const b = end < before.length ? end + '/' + before.length : '';
         const index = (start > 0 || end < before.length) ? `(${a}..${b})` : '';
-        console.log(`Flattened spline${index}, max grade reduced from ${maxGradeBefore.toFixed(4)} to ${maxGradeAfter.toFixed(4)}`);
+        const beforeText = maxGradeBefore.toFixed(4);
+        const afterText = maxGradeAfter.toFixed(4);
+        console.log(`Flattened spline${index}, max grade reduced from ${beforeText} to ${afterText}`);
     }
     return result;
 }

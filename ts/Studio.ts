@@ -385,10 +385,14 @@ export class Studio {
             const frmMinimizeSegments = document.createElement('form');
             frmMinimizeSegments.classList.add('px-4', 'py-3');
             frmMinimizeSegments.replaceChildren(
-                wrapInput(inputBearing, 'Bearing limit', 'Maximum difference between segment headings for spline merging, in degrees.'),
-                wrapInput(inputInclination, 'Inclination limit', 'Maximum difference between segment inclinations for spline merging, in degrees.'),
-                wrapInput(inputHorizontal, 'Horizontal limit', 'Maximum distance between control points for spline merging, in centimeters.'),
-                wrapInput(inputVertical, 'Vertical limit', 'Maximum distance between control points for spline merging, in centimeters.'),
+                wrapInput(inputBearing, 'Bearing limit',
+                    'Maximum difference between segment headings for spline merging, in degrees.'),
+                wrapInput(inputInclination, 'Inclination limit',
+                    'Maximum difference between segment inclinations for spline merging, in degrees.'),
+                wrapInput(inputHorizontal, 'Horizontal limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
+                wrapInput(inputVertical, 'Vertical limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
                 btnDefaults,
             );
             const mnuMinimizeSegments = document.createElement('div');
@@ -510,7 +514,7 @@ export class Studio {
             saveGameVersionNumber < OLDEST_TESTED_SAVE_GAME_VERSION ||
             saveGameVersionNumber > NEWEST_TESTED_SAVE_GAME_VERSION;
         if (showSaveVersionWarning) {
-            const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested. Proceed with caution.`;
+            const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested.`;
             console.log(warning);
             const headerWarning = document.createElement('h4');
             headerWarning.innerText = warning;
@@ -559,39 +563,48 @@ export class Studio {
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(track.location, (location) => track.location = location));
+            const setTrackLocation = (location: Vector) => track.location = location;
+            td.replaceChildren(this.editVector(track.location, setTrackLocation));
             tr.appendChild(td);
             // Start point
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(track.startPoint, (startPoint) => track.startPoint = startPoint));
+            const setTrackStartPoint = (startPoint: Vector) => track.startPoint = startPoint;
+            td.replaceChildren(this.editVector(track.startPoint, setTrackStartPoint));
             tr.appendChild(td);
             // End point
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(track.endPoint, (endPoint) => track.endPoint = endPoint));
+            const setTrackEndPoint = (endPoint: Vector) => track.endPoint = endPoint;
+            td.replaceChildren(this.editVector(track.endPoint, setTrackEndPoint));
             tr.appendChild(td);
             // Start tangent
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(track.startTangent, (startTangent) => track.startTangent = startTangent));
+            const setTrackStartTangent = (startTangent: Vector) => track.startTangent = startTangent;
+            td.replaceChildren(this.editVector(track.startTangent, setTrackStartTangent));
             tr.appendChild(td);
             // End tangent
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(track.endTangent, (endTangent) => track.endTangent = endTangent));
+            const setTrackEndTangent = (endTangent: Vector) => track.endTangent = endTangent;
+            td.replaceChildren(this.editVector(track.endTangent, setTrackEndTangent));
             tr.appendChild(td);
             // Paint style
             td = document.createElement('td');
-            td.replaceChildren(this.editNumber(track.paintStyle, {min: '0'}, (paintStyle) => track.paintStyle = paintStyle));
+            const setTrackPaintStyle = (paintStyle: number) => track.paintStyle = paintStyle;
+            td.replaceChildren(this.editNumber(track.paintStyle, {min: '0'}, setTrackPaintStyle));
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
-            td.replaceChildren(this.editRotator(track.rotation, (rotation) => track.rotation = rotation));
+            const setTrackRotation = (rotation: Rotator) => track.rotation = rotation;
+            td.replaceChildren(this.editRotator(track.rotation, setTrackRotation));
             tr.appendChild(td);
             // Switch state
             td = document.createElement('td');
-            td.replaceChildren(this.editNumber(track.switchState, {min: '0'}, (switchState) => track.switchState = switchState));
+            const setTrackSwitchState = (switchState: number) => track.switchState = switchState;
+            td.replaceChildren(this.editNumber(track.switchState, {min: '0'}, setTrackSwitchState));
             tr.appendChild(td);
             // Type
             td = document.createElement('td');
-            td.replaceChildren(this.editString(track.type, (type) => track.type = type));
+            const setTrackType = (type: GvasString) => track.type = type;
+            td.replaceChildren(this.editString(track.type, setTrackType));
             tr.appendChild(td);
         }
     }
@@ -618,19 +631,23 @@ export class Studio {
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
-            td.appendChild(this.editString(frame.name, (name) => frame.name = name));
+            const setFrameName = (name: GvasString) => frame.name = name;
+            td.appendChild(this.editString(frame.name, setFrameName));
             tr.appendChild(td);
             // Number
             td = document.createElement('td');
-            td.appendChild(this.editString(frame.number, (frameNo) => frame.number = frameNo));
+            const setFrameNumber = (frameNo: GvasString) => frame.number = frameNo;
+            td.appendChild(this.editString(frame.number, setFrameNumber));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
-            td.appendChild(this.editVector(frame.location, (location) => frame.location = location));
+            const setFrameLocation = (location: Vector) => frame.location = location;
+            td.appendChild(this.editVector(frame.location, setFrameLocation));
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
-            td.appendChild(this.editRotator(frame.rotation, (rotation) => frame.rotation = rotation));
+            const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
+            td.appendChild(this.editRotator(frame.rotation, setFrameRotation));
             tr.appendChild(td);
         }
     }
@@ -641,7 +658,7 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Industry Name', 'Inputs', 'Products', 'Location', 'Rotation']) {
+        for (const columnHeader of ['Industry Type', 'Inputs', 'Products', 'Location', 'Rotation']) {
             const th = document.createElement('th');
             th.innerText = columnHeader;
             if (['Inputs', 'Products'].includes(columnHeader)) {
@@ -654,29 +671,34 @@ export class Studio {
         for (const industry of this.railroad.industries) {
             tr = document.createElement('tr');
             tbody.appendChild(tr);
-            // Industry name
+            // Industry type
             let td = document.createElement('td');
-            td.replaceChildren(this.editIndustryType(industry.type, (type) => industry.type = type));
+            const setIndustryType = (type: IndustryType) => industry.type = type;
+            td.replaceChildren(this.editIndustryType(industry.type, setIndustryType));
             tr.appendChild(td);
             // Inputs
             industry.inputs.forEach((input, i) => {
                 td = document.createElement('td');
-                td.appendChild(this.editNumber(input, {min: '0'}, (input) => industry.inputs[i] = input));
+                const setIndustryInputs = (input: number) => industry.inputs[i] = input;
+                td.appendChild(this.editNumber(input, {min: '0'}, setIndustryInputs));
                 tr.appendChild(td);
             });
             // Products
             industry.outputs.forEach((output, i) => {
                 td = document.createElement('td');
-                td.appendChild(this.editNumber(output, {min: '0'}, (output) => industry.outputs[i] = output));
+                const setIndustryProducts = (output: number) => industry.outputs[i] = output;
+                td.appendChild(this.editNumber(output, {min: '0'}, setIndustryProducts));
                 tr.appendChild(td);
             });
             // Location
             td = document.createElement('td');
-            td.replaceChildren(this.editVector(industry.location, (location) => industry.location = location));
+            const setIndustryLocation = (location: Vector) => industry.location = location;
+            td.replaceChildren(this.editVector(industry.location, setIndustryLocation));
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
-            td.replaceChildren(this.editNumber(industry.rotation.yaw, {min: '-180', max: '180'}, (yaw) => industry.rotation.yaw = yaw));
+            const setIndustryYaw = (yaw: number): number => industry.rotation.yaw = yaw;
+            td.replaceChildren(this.editNumber(industry.rotation.yaw, {min: '-180', max: '180'}, setIndustryYaw));
             tr.appendChild(td);
         }
     }
@@ -720,7 +742,8 @@ export class Studio {
             // Rotation
             if (player.rotation) {
                 td = document.createElement('td');
-                td.replaceChildren(this.editNumber(player.rotation, {min: '-180', max: '180'}, (r) => player.rotation = r));
+                const setPlayerRotation = (r: number) => player.rotation = r;
+                td.replaceChildren(this.editNumber(player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
                 tr.appendChild(td);
             }
         }

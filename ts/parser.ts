@@ -1,9 +1,20 @@
+// eslint-disable-next-line max-len
 import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
 
 /**
- * Parses a GVAS file stored in an ArrayBuffer and returns an object with the contents of the file.
+ * Parses a GVAS file stored in an ArrayBuffer and returns an object with the
+ * contents of the file.
  *
- * The function first checks the magic number at the beginning of the file to verify that it is a GVAS file, and then parses the header data, including the engine version, custom format data, and save game type. After the header, the function reads the data variables stored in the GVAS file. These variables are stored as name-value pairs, where the name is a GvasString and the value is a property of a specific type, such as a boolean, a float, or an array of integers. The function reads the name and type of each variable, and stores them in the _order and _types properties of the result object, respectively. It then reads the value of the variable and stores it in the corresponding property of the result object, depending on its type.
+ * The function first checks the magic number at the beginning of the file to
+ * verify that it is a GVAS file, and then parses the header data, including the
+ * engine version, custom format data, and save game type. After the header, the
+ * function reads the data variables stored in the GVAS file. These variables
+ * are stored as name-value pairs, where the name is a GvasString and the value
+ * is a property of a specific type, such as a boolean, a float, or an array of
+ * integers. The function reads the name and type of each variable, and stores
+ * them in the _order and _types properties of the result object, respectively.
+ * It then reads the value of the variable and stores it in the corresponding
+ * property of the result object, depending on its type.
  *
  * @param {ArrayBuffer} buffer
  * @return {Gvas}
@@ -64,7 +75,9 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         result._order.push(pname);
         result._types[pname] = ptype;
     }
-    if (pos !== buffer.byteLength) throw new Error(`Found extra data at EOF, pos=${pos}, byteLength=${buffer.byteLength}`);
+    if (pos !== buffer.byteLength) {
+        throw new Error(`Found extra data at EOF, pos=${pos}, byteLength=${buffer.byteLength}`);
+    }
     return result;
 }
 
@@ -236,12 +249,16 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
     //   type: string
     let propertyName;
     [pos, propertyName] = parseString(buffer, pos);
-    if (propertyName !== expectPropertyName) throw new Error(`Expected propertyName = ${expectPropertyName}, ${propertyName}`);
+    if (propertyName !== expectPropertyName) {
+        throw new Error(`Expected propertyName = ${expectPropertyName}, ${propertyName}`);
+    }
     // - id: struct_property
     //   contents: [15, 0, 0, 0, "StructProperty", 0]
     let structProperty;
     [pos, structProperty] = parseString(buffer, pos);
-    if (structProperty !== 'StructProperty') throw new Error(`Invalid struct header: ${structProperty}`);
+    if (structProperty !== 'StructProperty') {
+        throw new Error(`Invalid struct header: ${structProperty}`);
+    }
     // - id: field_size
     //   type: u8
     const fieldSize = new Uint32Array(buffer.slice(pos, pos + 8));
@@ -293,10 +310,13 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
         }
     }
     if (pos > buffer.byteLength) {
-        throw new Error(`${propertyName} Struct[] size ${pos} greater than ArrayProperty data size ${buffer.byteLength}, .sav file is corrupt.`);
+        throw new Error(
+            `${propertyName} Struct[] size ${pos} greater than ArrayProperty data size ${buffer.byteLength}, ` +
+            '.sav file is corrupt.');
     }
     if (pos !== buffer.byteLength) {
-        console.log(`Warning: Struct[] size ${pos} does not match ArrayProperty data size ${buffer.byteLength}, .sav file may be corrupt. Proceed with caution.`);
+        console.log(`Warning: Struct[] size ${pos} does not match ArrayProperty data size ${buffer.byteLength}, ` +
+            '.sav file may be corrupt. Proceed with caution.');
     }
     return [fieldName, value];
 }

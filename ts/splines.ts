@@ -16,7 +16,8 @@ export type MergeLimits = {
 /**
  * Create new splines through existing control points. There are three steps:
  * 1. Hide overlapping segments, and discard splines that are completely invisible.
- * 2. Split splines with hidden middle sections into separate splines. Trim every spline to have a max of one hidden segment at the head and one at the tail.
+ * 2. Split splines with hidden middle sections into separate splines. Trim every
+ *    spline to have a max of one hidden segment at the head and one at the tail.
  * 3. Combine adjacent splines to make longer splines (limit 97 segments).
  * @param {Railroad} railroad - The railroad select splines from
  * @param {MergeLimits} limits
@@ -24,25 +25,30 @@ export type MergeLimits = {
  */
 export function simplifySplines(railroad: Railroad, limits: MergeLimits): Spline[] {
     const splines = railroad.splines;
+    const debugPrint: (header: string, numSplines: number, numControlPoints: number, footer?: string) => void =
+        (header, numSplines, numControlPoints, footer) => {
+            const suffix = (footer) ? `, ${footer}` : '';
+            console.log(`${header} ${numSplines} splines, ${numControlPoints} control points${suffix}.`);
+        };
     const numControlPoints = splines.reduce((a, e) => a + e.controlPoints.length, 0);
-    console.log(`Starting with ${splines.length} splines, ${numControlPoints} control points, ${trackLength(splines)}.`);
+    debugPrint('Starting with', splines.length, numControlPoints, trackLength(splines));
     // Step 1, hide overlapping segments, discard invisible
     const visible = removeOverlappedSegments(splines);
     if (splines.length !== visible.length) {
         const visiblePoints = visible.reduce((a, e) => a + e.controlPoints.length, 0);
-        console.log(`After removing overlaps, ${visible.length} splines, ${visiblePoints} control points, ${trackLength(visible)}.`);
+        debugPrint('After removing overlaps,', visible.length, visiblePoints, trackLength(visible));
     }
     // Step 2, split and trim
     const simplified = visible.flatMap(splitSpline);
     if (visible.length !== simplified.length) {
         const simplifiedPoints = simplified.reduce((a, e) => a + e.controlPoints.length, 0);
-        console.log(`After splitting, ${simplified.length} splines, ${simplifiedPoints} control points.`);
+        debugPrint('After splitting,', simplified.length, simplifiedPoints);
     }
     // Step 3, combine
     const merged = mergeSplines(simplified, limits);
     if (merged.length !== simplified.length || merged.length !== splines.length) {
         const mergedPoints = merged.reduce((a, e) => a + e.controlPoints.length, 0);
-        console.log(`After merging, ${merged.length} splines, ${mergedPoints} control points.`);
+        debugPrint('After merging,', merged.length, mergedPoints);
         const fmtPercent = (n: number, d: number) => {
             if (n === d) return `unchanged (${n})`;
             const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
@@ -122,7 +128,8 @@ function splitSpline(spline: Spline): Spline[] {
         });
     }
     // if (splines.length > 1) {
-    //     console.log(`Split spline from ${spline.segmentsVisible.length} segments to ${splines.map((s) => s.segmentsVisible.length)}`);
+    //     const numSegsVis = splines.map((s) => s.segmentsVisible.length);
+    //     console.log(`Split spline from ${spline.segmentsVisible.length} segments to ${numSegsVis}`);
     // }
     splines.forEach(enforceSimpleSpline);
     const splitLength = splines.map(splineLength).reduce((a, l) => a + l, 0);
@@ -374,7 +381,9 @@ function reverseSpline(spline: Spline): Spline {
     };
 }
 
-function mergeSubSplines(spline1: Spline, starta: number, enda: number, spline2: Spline, startb: number, endb: number): Spline {
+function mergeSubSplines(
+    spline1: Spline, starta: number, enda: number,
+    spline2: Spline, startb: number, endb: number): Spline {
     const headControlPoints = spline1.controlPoints.slice(starta, enda); // Remove one of the shared control points
     const tailControlPoints = spline2.controlPoints.slice(startb, endb + 1);
     const controlPoints = headControlPoints.concat(tailControlPoints);
@@ -385,7 +394,8 @@ function mergeSubSplines(spline1: Spline, starta: number, enda: number, spline2:
     const segmentsVisible = headVisible.concat(tailVisible);
     // Sanity check
     if (controlPoints.length - segmentsVisible.length !== 1) {
-        throw new Error(`Segment length does not match control point length, ${controlPoints.length}, ${segmentsVisible.length}`);
+        throw new Error(
+            `Segment length does not match control point length, ${controlPoints.length}, ${segmentsVisible.length}`);
     }
     const newSpline = {
         controlPoints: controlPoints,
