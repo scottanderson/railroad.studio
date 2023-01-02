@@ -942,7 +942,8 @@ export class Studio {
         pre.innerText = industryName(type);
         pre.addEventListener('click', () => {
             const select = document.createElement('select');
-            for (let i = 1; i < 15; i++) {
+            for (let i = 1; i < 17; i++) {
+                if (i === 15) continue;
                 const option = document.createElement('option');
                 option.value = String(i);
                 option.innerText = industryName(i);
