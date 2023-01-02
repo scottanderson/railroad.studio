@@ -308,7 +308,7 @@ export class RailroadMap {
                 border: defaultTrue(parsed?.layerVisibility?.border),
                 brush: false,
                 frameNumbers: defaultTrue(parsed?.layerVisibility?.frameNumbers),
-                frames: Boolean(parsed?.layerVisibility?.frames),
+                frames: defaultTrue(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
                 groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
                 groundworks: defaultTrue(parsed?.layerVisibility?.groundworks),

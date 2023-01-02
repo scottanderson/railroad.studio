@@ -66,7 +66,7 @@ export class Studio {
         grpLayers.setAttribute('aria-labelledby', btnLayers.id);
         grpLayers.classList.add('dropdown');
         grpLayers.replaceChildren(btnLayers, lstLayers);
-        const layers: {
+        let layers: {
             key: keyof MapLayers;
             name: string;
             listener?: () => void;
@@ -97,7 +97,7 @@ export class Studio {
             },
             {
                 key: 'groundworks',
-                name: 'Groundwork and Bridge Segments',
+                name: 'Groundwork and Bridges',
             },
             {
                 key: 'groundworksHidden',
@@ -117,7 +117,7 @@ export class Studio {
             },
             {
                 key: 'tracks',
-                name: 'Track Segments',
+                name: 'Tracks',
             },
             {
                 key: 'tracksHidden',
@@ -132,6 +132,19 @@ export class Studio {
                 name: 'Turntables',
             },
         ];
+        if (railroad.splines.length === 0) {
+            // Hide layers that only apply to old splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'groundworkControlPoints':
+                    case 'groundworksHidden':
+                    case 'trackControlPoints':
+                    case 'tracksHidden':
+                        return false;
+                }
+                return true;
+            });
+        }
         lstLayers.replaceChildren(...layers.map((layer) => {
             const btnToggleLayer = document.createElement('button');
             const imgToggleLayer = document.createElement('i');
