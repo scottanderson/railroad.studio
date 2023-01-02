@@ -88,6 +88,7 @@ export enum IndustryType {
     engine_house_gold = 12,
     engine_house_red = 13,
     engine_house_brown = 14,
+    telegraph_office = 16,
 }
 
 export function industryName(type: IndustryType): string {
@@ -120,6 +121,8 @@ export function industryName(type: IndustryType): string {
             return 'Engine House (Red)';
         case IndustryType.engine_house_brown:
             return 'Engine House (Brown)';
+        case IndustryType.telegraph_office:
+            return 'Telegraph Office';
         default:
             throw new Error(`Unknown industry ${type}`);
     }
