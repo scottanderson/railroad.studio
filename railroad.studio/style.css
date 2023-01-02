@@ -33,6 +33,7 @@
 
 .rail,
 .rail-deck,
+.bumper,
 .grade,
 .stone-wall,
 .wooden-bridge,
@@ -76,6 +77,15 @@
 
 .dark .grade {
   stroke: darkkhaki;
+}
+
+.bumper {
+  stroke: black;
+  stroke-width: 400;
+}
+
+.dark .bumper {
+  stroke: white;
 }
 
 .stone-wall {

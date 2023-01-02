@@ -886,6 +886,9 @@ export class RailroadMap {
                 makePath(this.layers.tracks, ['rail']);
                 makeGradeText();
                 break;
+            case 'rail_914_bumper':
+                makePath(this.layers.groundworks, ['bumper']);
+                break;
             case 'rail_914_h01':
             case 'rail_914_h05':
             case 'rail_914_h10':
