@@ -864,13 +864,15 @@ export class RailroadMap {
             const {steepest, startPoint, endPoint} = calculateSteepestGrade(spline);
             const percentage = steepest.grade;
             if (percentage === 0) return;
+            const fixed = percentage.toFixed(4);
+            if (fixed === '0.0000') return;
             const heading = vectorHeading(startPoint, endPoint);
             const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
             const x = Math.round((endPoint.x + startPoint.x) / 2);
             const y = Math.round((endPoint.y + startPoint.y) / 2);
             const text = this.layers.grades
                 .text((block) => block
-                    .text(percentage.toFixed(4) + '%')
+                    .text(fixed + '%')
                     .dx(300))
                 .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
                 .addClass('grade-text');
@@ -898,7 +900,7 @@ export class RailroadMap {
                 break;
             case 'rail_914_switch_cross_90':
                 makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
-                makeGradeText();
+                // TODO: Render the cross
                 break;
             case 'rail_914_switch_left':
             case 'rail_914_switch_left_mirror':
@@ -909,7 +911,6 @@ export class RailroadMap {
             case 'rail_914_switch_right_mirror_noballast':
             case 'rail_914_switch_right_noballast':
                 makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
-                makeGradeText();
                 // TODO: Render the other switch leg
                 break;
             case 'rail_914_trestle_pile_01':

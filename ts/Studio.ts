@@ -897,9 +897,7 @@ export class Studio {
 
     private editRotator(value: Rotator, saveValue: (value: Rotator) => void) {
         const encode = (r: Rotator): Triplet<number> => [r.roll, r.yaw, r.pitch];
-        const decode = (t: Triplet<number>) => {
-            return {roll: t[0], yaw: t[1], pitch: t[2]};
-        };
+        const decode = (t: Triplet<number>): Rotator => ({roll: t[0], yaw: t[1], pitch: t[2]});
         const display = (t: Triplet<number>) => {
             if (t[0] === 0 && t[2] === 0) {
                 return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
@@ -911,9 +909,7 @@ export class Studio {
 
     private editVector(value: Vector, saveValue: (value: Vector) => void) {
         const encode = (v: Vector): Triplet<number> => [v.x, v.y, v.z];
-        const decode = (t: Triplet<number>) => {
-            return {x: t[0], y: t[1], z: t[2]};
-        };
+        const decode = (t: Triplet<number>): Vector => ({x: t[0], y: t[1], z: t[2]});
         const display = (t: Triplet<number>) => {
             const z0 = t[0] === 0;
             const z1 = t[1] === 0;
