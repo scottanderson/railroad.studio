@@ -5,7 +5,7 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 // eslint-disable-next-line max-len
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
-import {radiusFilter, TreeUtil} from './TreeUtil';
+import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {GvasString, Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
@@ -825,8 +825,7 @@ export class RailroadMap {
                 const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
-                const x = Math.round((cp1.x + cp0.x) / 2);
-                const y = Math.round((cp1.y + cp0.y) / 2);
+                const {x, y} = roundMidpoint2D(cp1, cp0);
                 const text = this.layers.grades
                     .text((block) => block
                         .text(percentage.toFixed(4) + '%')
@@ -868,8 +867,7 @@ export class RailroadMap {
             if (fixed === '0.0000') return;
             const heading = vectorHeading(startPoint, endPoint);
             const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
-            const x = Math.round((endPoint.x + startPoint.x) / 2);
-            const y = Math.round((endPoint.y + startPoint.y) / 2);
+            const {x, y} = roundMidpoint2D(startPoint, endPoint);
             const text = this.layers.grades
                 .text((block) => block
                     .text(fixed + '%')
@@ -1118,4 +1116,10 @@ function treeBucket(tree: Vector) {
     const bucketX = Math.floor((tree.x + 2_005_00) / 250_00);
     const bucketY = Math.floor((tree.y + 2_005_00) / 250_00);
     return `trees_${bucketX}_${bucketY}`;
+}
+
+function roundMidpoint2D(cp1: Point, cp0: Point): Point {
+    const x = Math.round((cp1.x + cp0.x) / 2);
+    const y = Math.round((cp1.y + cp0.y) / 2);
+    return {x, y};
 }

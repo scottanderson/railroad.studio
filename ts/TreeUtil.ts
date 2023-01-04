@@ -6,6 +6,11 @@ import {cubicBezier, hermiteToBezier} from './util-bezier';
 
 type Callback<T> = (value: T) => void;
 
+export interface Point {
+    x: number;
+    y: number;
+}
+
 export class TreeUtil {
     private railroad: Railroad;
     private trees?: Vector[];
@@ -112,11 +117,6 @@ function parseTrees(buffer: ArrayBuffer) {
     }
     return vectors;
 }
-
-type Point = {
-    x: number;
-    y: number;
-};
 
 function dist2(v: Point, w: Point) {
     const dx = v.x - w.x;

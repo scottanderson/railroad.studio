@@ -1,5 +1,6 @@
 import {Vector} from './Gvas';
 import {Railroad, Spline, SplineType} from './Railroad';
+import {Point} from './TreeUtil';
 import {findLastIndex} from './util';
 
 export type MergeLimits = {
@@ -490,7 +491,7 @@ function circularMean(...args: number[]): number {
  * @param {vector} vb - target vector
  * @return {number} the heading from a to b (in degrees)
  */
-export function vectorHeading(va: Vector, vb: Vector) {
+export function vectorHeading(va: Point, vb: Point) {
     const dx = (vb.x - va.x); // positive is west
     const dy = (vb.y - va.y); // positive is south
     return Math.atan2(-dy, -dx) * 180 / Math.PI;
