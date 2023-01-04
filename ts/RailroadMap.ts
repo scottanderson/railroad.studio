@@ -993,19 +993,21 @@ export class RailroadMap {
     }
 
     private renderTurntable(turntable: Turntable) {
-        const x = Math.round(turntable.location.x);
-        const y = Math.round(turntable.location.y);
         const radians = (turntable.rotator.yaw - 90) * Math.PI / 180;
         const dx = 1250 * Math.cos(radians);
         const dy = 1250 * Math.sin(radians);
-        const cx = x + dx / 2;
-        const cy = y + dy / 2;
+        const x = Math.round(turntable.location.x);
+        const y = Math.round(turntable.location.y);
+        const cx = Math.round(turntable.location.x + (dx * 0.5));
+        const cy = Math.round(turntable.location.y + (dy * 0.5));
+        const x1 = Math.round(turntable.location.x + dx);
+        const y1 = Math.round(turntable.location.y + dy);
         const c = this.layers.turntables
             .circle(1250)
             .center(cx, cy)
             .addClass('turntable');
         const l = this.layers.turntables
-            .line([[x, y], [x + dx, y + dy]])
+            .line([[x, y], [x1, y1]])
             .addClass('rail');
         const elements = [c, l];
         const onClick = () => this.onClickTurntable(turntable, elements);
