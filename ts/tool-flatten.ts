@@ -65,11 +65,7 @@ export function calculateGrade(controlPoints: Vector[]): Grade[] {
     });
 }
 
-export function calculateSteepestGrade(spline: SplineTrack): {
-    steepest: Grade,
-    startPoint: Vector,
-    endPoint: Vector
-} {
+export function calculateSteepestGrade(spline: SplineTrack): number {
     const controlPoints: Vector[] = [];
     const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
     const z0 = spline.startPoint.z;
@@ -91,9 +87,5 @@ export function calculateSteepestGrade(spline: SplineTrack): {
             steepestIndex = i;
         }
     }
-    return {
-        steepest: grades[steepestIndex],
-        startPoint: controlPoints[steepestIndex],
-        endPoint: controlPoints[steepestIndex + 1],
-    };
+    return grades[steepestIndex].grade;
 }

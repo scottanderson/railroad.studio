@@ -14,7 +14,7 @@ import {frameLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {hermiteToBezier} from './util-bezier';
+import {cubicBezier, hermiteToBezier} from './util-bezier';
 
 enum MapToolMode {
     pan_zoom,
@@ -860,17 +860,25 @@ export class RailroadMap {
             elements.push(path);
         };
         const makeGradeText: () => void = () => {
-            const {steepest, startPoint, endPoint} = calculateSteepestGrade(spline);
-            const percentage = steepest.grade;
+            const percentage = calculateSteepestGrade(spline);
             if (percentage === 0) return;
             const fixed = percentage.toFixed(4);
             if (fixed === '0.0000') return;
+            return makeText(fixed + '%');
+        };
+        const makeText = (str: string) => {
+            const calculatePoint: (t: number) => Point = (t) => ({
+                x: cubicBezier(t, x0, x1, x2, x3),
+                y: cubicBezier(t, y0, y1, y2, y3),
+            });
+            const startPoint = calculatePoint(0.49);
+            const endPoint = calculatePoint(0.51);
             const heading = vectorHeading(startPoint, endPoint);
             const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
             const {x, y} = roundMidpoint2D(startPoint, endPoint);
             const text = this.layers.grades
                 .text((block) => block
-                    .text(fixed + '%')
+                    .text(str)
                     .dx(300))
                 .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
                 .addClass('grade-text');
