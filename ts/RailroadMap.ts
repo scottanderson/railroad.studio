@@ -38,15 +38,14 @@ export interface MapLayers {
     background: G;
     border: G;
     brush: G;
+    controlPoints: G;
     frameNumbers: G;
     frames: G;
     grades: G;
-    groundworkControlPoints: G;
     groundworks: G;
     groundworksHidden: G;
     industries: G;
     players: G;
-    trackControlPoints: G;
     tracks: G;
     tracksHidden: G;
     trees: G;
@@ -57,15 +56,14 @@ interface MapLayerVisibility {
     background: boolean;
     border: boolean;
     brush: boolean;
+    controlPoints: boolean;
     frameNumbers: boolean;
     frames: boolean;
     grades: boolean;
-    groundworkControlPoints: boolean;
     groundworks: boolean;
     groundworksHidden: boolean;
     industries: boolean;
     players: boolean;
-    trackControlPoints: boolean;
     tracks: boolean;
     tracksHidden: boolean;
     trees: boolean;
@@ -156,10 +154,9 @@ export class RailroadMap {
 
     refreshSplines(): Promise<void> {
         this.layers.grades.node.replaceChildren();
-        this.layers.groundworkControlPoints.node.replaceChildren();
+        this.layers.controlPoints.node.replaceChildren();
         this.layers.groundworks.node.replaceChildren();
         this.layers.groundworksHidden.node.replaceChildren();
-        this.layers.trackControlPoints.node.replaceChildren();
         this.layers.tracks.node.replaceChildren();
         this.layers.tracksHidden.node.replaceChildren();
         this.renderSwitches();
@@ -307,15 +304,14 @@ export class RailroadMap {
                 background: defaultTrue(parsed?.layerVisibility?.background),
                 border: defaultTrue(parsed?.layerVisibility?.border),
                 brush: false,
+                controlPoints: Boolean(parsed?.layerVisibility?.controlPoints),
                 frameNumbers: defaultTrue(parsed?.layerVisibility?.frameNumbers),
                 frames: defaultTrue(parsed?.layerVisibility?.frames),
                 grades: Boolean(parsed?.layerVisibility?.grades),
-                groundworkControlPoints: Boolean(parsed?.layerVisibility?.groundworkControlPoints),
                 groundworks: defaultTrue(parsed?.layerVisibility?.groundworks),
                 groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
                 industries: Boolean(parsed?.layerVisibility?.industries),
                 players: Boolean(parsed?.layerVisibility?.players),
-                trackControlPoints: Boolean(parsed?.layerVisibility?.trackControlPoints),
                 tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
                 trees: false,
@@ -352,13 +348,12 @@ export class RailroadMap {
             background,
             groundworks,
             groundworksHidden,
-            groundworkControlPoints,
             grades,
             industries,
             turntables,
             tracks,
             tracksHidden,
-            trackControlPoints,
+            controlPoints,
             frames,
             frameNumbers,
             players,
@@ -380,21 +375,19 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
-            group.group(),
         ];
         const layers: MapLayers = {
             background: background,
             border: border,
             brush: brush,
+            controlPoints: controlPoints,
             frameNumbers: frameNumbers,
             frames: frames,
             grades: grades,
-            groundworkControlPoints: groundworkControlPoints,
             groundworks: groundworks,
             groundworksHidden: groundworksHidden,
             industries: industries,
             players: players,
-            trackControlPoints: trackControlPoints,
             tracks: tracks,
             tracksHidden: tracksHidden,
             trees: trees,
@@ -765,7 +758,7 @@ export class RailroadMap {
                 const l = r * Math.cos(30 * Math.PI / 180);
                 const x = Math.round(point.x);
                 const y = Math.round(point.y);
-                rect = this.layers.trackControlPoints
+                rect = this.layers.controlPoints
                     .polygon([
                         [0, r],
                         [l, 0 - h],
@@ -778,7 +771,7 @@ export class RailroadMap {
             } else {
                 const x = Math.round(point.x - 150);
                 const y = Math.round(point.y - 150);
-                rect = this.layers.groundworkControlPoints
+                rect = this.layers.controlPoints
                     .rect(300, 300)
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
             }
@@ -869,6 +862,27 @@ export class RailroadMap {
             path.on('click', () => this.onClickSplineTrack(spline, path, elements));
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
+            [
+                {x: x0, y: y0},
+                {x: x1, y: y1},
+                {x: x2, y: y2},
+                {x: x3, y: y3},
+            ].forEach((point, i, a) => {
+                if (i === 3) return;
+                const x = Math.round(point.x);
+                const y = Math.round(point.y);
+                const x1 = Math.round(a[i + 1].x);
+                const y1 = Math.round(a[i + 1].y);
+                const cp = this.layers.controlPoints
+                    .circle(192)
+                    .center(x, y)
+                    .addClass(`control-point-${i}`);
+                elements.push(cp);
+                const line = this.layers.controlPoints
+                    .line(x, y, x1, y1)
+                    .addClass(`control-line-${i}`);
+                elements.push(line);
+            });
         };
         const makeGradeText: () => void = () => {
             const percentage = calculateSteepestGrade(spline);

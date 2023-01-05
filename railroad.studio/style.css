@@ -157,29 +157,25 @@
   fill: yellow;
 }
 
-.control-point-0 {
-  fill: red;
-}
+.control-point-0 { fill: red; }
+.control-point-1 { fill: blue; }
+.control-point-2 { fill: green; }
+.dark .control-point-0 { fill: magenta; }
+.dark .control-point-1 { fill: cyan; }
+.dark .control-point-2 { fill: yellow; }
 
-.control-point-1 {
-  fill: blue;
+.control-line-0,
+.control-line-1,
+.control-line-2 {
+  fill: none;
+  stroke-width: 64;
 }
-
-.control-point-2 {
-  fill: green;
-}
-
-.dark .control-point-0 {
-  fill: magenta;
-}
-
-.dark .control-point-1 {
-  fill: cyan;
-}
-
-.dark .control-point-2 {
-  fill: yellow;
-}
+.control-line-0 { stroke: red; }
+.control-line-1 { stroke: blue; }
+.control-line-2 { stroke: green; }
+.dark .control-line-0 { stroke: magenta; }
+.dark .control-line-1 { stroke: cyan; }
+.dark .control-line-2 { stroke: yellow; }
 
 .control-point-0:hover,
 .control-point-1:hover,

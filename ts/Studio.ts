@@ -80,6 +80,10 @@ export class Studio {
                 name: 'Topographical Map',
             },
             {
+                key: 'controlPoints',
+                name: 'Control Points',
+            },
+            {
                 key: 'frames',
                 name: 'Frames',
             },
@@ -90,10 +94,6 @@ export class Studio {
             {
                 key: 'grades',
                 name: 'Grade %',
-            },
-            {
-                key: 'groundworkControlPoints',
-                name: 'Groundwork and Bridge Control Points',
             },
             {
                 key: 'groundworks',
@@ -110,10 +110,6 @@ export class Studio {
             {
                 key: 'players',
                 name: 'Players',
-            },
-            {
-                key: 'trackControlPoints',
-                name: 'Track Control Points',
             },
             {
                 key: 'tracks',
@@ -136,9 +132,7 @@ export class Studio {
             // Hide layers that only apply to old splines
             layers = layers.filter((layer) => {
                 switch (layer.key) {
-                    case 'groundworkControlPoints':
                     case 'groundworksHidden':
-                    case 'trackControlPoints':
                     case 'tracksHidden':
                         return false;
                 }
