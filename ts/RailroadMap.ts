@@ -6,11 +6,11 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
-import {GvasString, Vector} from './Gvas';
+import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
-import {frameLimits} from './frames';
+import {frameDefinitions, FrameDefinition} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -592,52 +592,72 @@ export class RailroadMap {
         });
     }
 
-    private renderFrame(frame: Frame) {
-        if (!frame.type || !(frame.type in frameLimits)) {
+    private renderFrame(frame: Frame): Element[] {
+        const elements: Element[] = [];
+        if (!frame.type || !(frame.type in frameDefinitions)) {
             console.log(`Unknown frame type ${frame.type}`);
-            return;
+            return [];
         }
-        const limits = frameLimits[frame.type];
+        const definition = frameDefinitions[frame.type];
         const degrees = Math.round(normalizeAngle(180 + frame.rotation.yaw));
         const x = Math.round(frame.location.x);
         const y = Math.round(frame.location.y);
+        // Frame outline
         const f = this.layers.frames
-            .rect(limits.length, 300)
+            .rect(definition.length, 300)
             .center(0, 0)
             .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('frame')
-            .addClass(`frame-${frame.type}`);
-        f.element('title')
-            .words(`${frame.type}\n${frame.name}`);
+            .addClass(frame.type);
         if (frame.state.brakeValue > 0) {
             f.addClass('brakes-applied');
         }
         if (frame.state.freightAmount > 0) {
             f.addClass('cargo-loaded');
         }
-        this.renderFrameText(
-            frame.number,
-            frame.type,
+        if (definition.engine) {
+            f.addClass('engine');
+        }
+        if (definition.tender) {
+            f.addClass('tender');
+        }
+        elements.push(f);
+        // Tooltip
+        const title = f.element('title')
+            .words(`${frame.type}\n${frame.name}`);
+        elements.push(title);
+        // Frame text (number)
+        const text = this.renderFrameText(
+            frame,
+            definition,
             x, y,
             degrees,
-            Math.round(45 - limits.length / 2), 90);
-        return f;
+            Math.round(45 - definition.length / 2), 90);
+        if (text) elements.push(text);
+        return elements;
     }
 
     private renderFrameText(
-        frameText: GvasString,
-        frameType: GvasString,
+        frame: Frame,
+        definition: FrameDefinition,
         x: number,
         y: number,
         r: number,
         dx: number,
         dy: number) {
+        const frameText = frame.number;
         if (frameText) {
-            this.layers.frameNumbers
+            const text = this.layers.frameNumbers
                 .text(frameText.replace('<br>', '\n'))
                 .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
-                .addClass('frame-text')
-                .addClass(`frame-${frameType}-text`);
+                .addClass('frame-text');
+            if (definition.engine) {
+                text.addClass('engine');
+            }
+            if (definition.tender) {
+                text.addClass('tender');
+            }
+            return text;
         }
     }
 

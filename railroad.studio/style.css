@@ -201,86 +201,68 @@
   stroke: red;
 }
 
-.frame-622D,
-.frame-class70,
-.frame-climax,
-.frame-cooke260,
-.frame-cooke280,
-.frame-eureka,
-.frame-glenbrook,
-.frame-heisler,
-.frame-montezuma,
-.frame-mosca,
-.frame-porter_040,
-.frame-porter_042,
-.frame-shay {
+.frame.engine {
   fill: purple;
 }
 
-.frame-class70_tender,
-.frame-cooke260_tender,
-.frame-cooke280_tender,
-.frame-eureka_tender,
-.frame-glenbrook_tender,
-.frame-montezuma_tender,
-.frame-mosca_tender {
+.frame.tender {
   fill: black;
 }
 
-.frame-caboose,
-.frame-waycar {
+.frame.caboose,
+.frame.waycar {
   fill: lightpink;
 }
 
-.frame-boxcar {
+.frame.boxcar {
   fill: #66f081;
 }
 
-.frame-boxcar.cargo-loaded {
+.frame.boxcar.cargo-loaded {
   fill: #36cc00;
 }
 
-.frame-flatcar_cordwood {
+.frame.flatcar_cordwood {
   fill: #fdbf77;
 }
 
-.frame-flatcar_cordwood.cargo-loaded {
+.frame.flatcar_cordwood.cargo-loaded {
   fill: orange;
 }
 
-.frame-flatcar_hopper {
+.frame.flatcar_hopper {
   fill: #a7a7a9;
 }
 
-.frame-flatcar_hopper.cargo-loaded {
+.frame.flatcar_hopper.cargo-loaded {
   fill: black;
 }
 
-.frame-flatcar_logs {
+.frame.flatcar_logs {
   fill: #f99a9a;
 }
 
-.frame-flatcar_logs.cargo-loaded {
+.frame.flatcar_logs.cargo-loaded {
   fill: red;
 }
 
-.frame-flatcar_stakes {
+.frame.flatcar_stakes {
   fill: #fdbf77;
 }
 
-.frame-flatcar_stakes.cargo-loaded {
+.frame.flatcar_stakes.cargo-loaded {
   fill: #f38a12;
 }
 
-.frame-flatcar_tanker {
+.frame.flatcar_tanker {
   fill: #9090f9;
 }
 
-.frame-flatcar_tanker.cargo-loaded {
+.frame.flatcar_tanker.cargo-loaded {
   fill: blue;
 }
 
-.frame-handcar {
+.frame.handcar {
   fill: white;
 }
 
@@ -288,26 +270,8 @@
   font-size: 50%;
 }
 
-.frame-text.frame-622D-text,
-.frame-text.frame-class70-text,
-.frame-text.frame-class70_tender-text,
-.frame-text.frame-climax-text,
-.frame-text.frame-cooke260-text,
-.frame-text.frame-cooke260_tender-text,
-.frame-text.frame-cooke280-text,
-.frame-text.frame-cooke280_tender-text,
-.frame-text.frame-eureka-text,
-.frame-text.frame-eureka_tender-text,
-.frame-text.frame-glenbrook-text,
-.frame-text.frame-glenbrook_tender-text,
-.frame-text.frame-heisler-text,
-.frame-text.frame-montezuma-text,
-.frame-text.frame-montezuma_tender-text,
-.frame-text.frame-mosca-text,
-.frame-text.frame-mosca_tender-text,
-.frame-text.frame-porter_040-text,
-.frame-text.frame-porter_042-text,
-.frame-text.frame-shay-text {
+.frame-text.engine,
+.frame-text.tender {
   fill: white;
 }
 
