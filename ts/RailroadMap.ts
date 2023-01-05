@@ -614,6 +614,8 @@ export class RailroadMap {
             .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
             .addClass('frame')
             .addClass(`frame-${frame.type}`);
+        f.element('title')
+            .words(`${frame.type}\n${frame.name}`);
         if (frame.state.brakeValue > 0) {
             f.addClass('brakes-applied');
         }
@@ -622,18 +624,27 @@ export class RailroadMap {
         }
         this.renderFrameText(
             frame.number,
+            frame.type,
             x, y,
             degrees,
             Math.round(45 - limits.length / 2), 90);
         return f;
     }
 
-    private renderFrameText(frameText: GvasString, x: number, y: number, r: number, dx: number, dy: number) {
+    private renderFrameText(
+        frameText: GvasString,
+        frameType: GvasString,
+        x: number,
+        y: number,
+        r: number,
+        dx: number,
+        dy: number) {
         if (frameText) {
             this.layers.frameNumbers
                 .text(frameText.replace('<br>', '\n'))
                 .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
-                .addClass('frame-text');
+                .addClass('frame-text')
+                .addClass(`frame-${frameType}-text`);
         }
     }
 
