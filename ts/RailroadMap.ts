@@ -10,7 +10,7 @@ import {Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
-import {frameDefinitions, FrameDefinition} from './frames';
+import {frameDefinitions, FrameDefinition, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -623,8 +623,16 @@ export class RailroadMap {
         }
         elements.push(f);
         // Tooltip
+        const tooltipText = [
+            definition.name,
+            frame.name,
+            frame.number,
+            cargoText(frame)]
+            .filter((e) => Boolean(e))
+            .map((s) => s?.replace(/<br>/g, '\n').trimEnd() || '[blank]')
+            .join('\n');
         const title = f.element('title')
-            .words(`${frame.type}\n${frame.name}`);
+            .words(tooltipText);
         elements.push(title);
         // Frame text (number)
         const text = this.renderFrameText(
@@ -648,7 +656,7 @@ export class RailroadMap {
         const frameText = frame.number;
         if (frameText) {
             const text = this.layers.frameNumbers
-                .text(frameText.replace('<br>', '\n'))
+                .text(frameText.replace(/<br>/g, '\n').trimEnd() || '[blank]')
                 .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
                 .addClass('frame-text');
             if (definition.engine) {
@@ -1142,6 +1150,15 @@ export class RailroadMap {
                 break;
         }
     }
+}
+
+function cargoText(frame: Frame) {
+    if (!frame.type) return null;
+    if (!frame.state.freightType) return null;
+    if (!(frame.type in cargoLimits)) return null;
+    if (!(frame.state.freightType in cargoLimits[frame.type])) return null;
+    const limit = cargoLimits[frame.type][frame.state.freightType];
+    return `${frame.state.freightType} [${frame.state.freightAmount} / ${limit}]`;
 }
 
 function splineToDashArray(spline: Spline, invert: boolean): string | null {

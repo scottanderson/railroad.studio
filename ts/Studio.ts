@@ -816,7 +816,7 @@ export class Studio {
 
     private editString(value: GvasString, saveValue: (value: GvasString) => void) {
         const span = document.createElement('span');
-        span.innerText = (value === null) ? '[null]' : value || '[blank]';
+        span.innerText = (value === null) ? '[null]' : value.replace(/<br>/g, '\n').trimEnd() || '[blank]';
         span.addEventListener('click', () => {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
