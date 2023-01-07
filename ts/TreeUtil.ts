@@ -84,11 +84,6 @@ export class TreeUtil {
         this.onTreesChanged(before, after);
     }
 
-    smartPeek() {
-        return this.railroad.removedVegetationAssets
-            .filter((tree) => this.treeFilter(tree));
-    }
-
     treeFilter(tree: Vector) {
         return !spawnFilter(tree) && undefined === (
             this.railroad.industries.find((i) => industryFilter(i, tree)) ||

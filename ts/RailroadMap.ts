@@ -1006,7 +1006,7 @@ export class RailroadMap {
     private renderTrees(): Promise<void> {
         if (!this.layerVisibility.trees) return Promise.resolve();
         if (this.remainingTreesAppender) return Promise.resolve();
-        const trees = this.treeUtil.smartPeek();
+        const trees = this.railroad.removedVegetationAssets;
         return this.renderTreeArray(trees);
     }
 
@@ -1015,7 +1015,9 @@ export class RailroadMap {
             return this.remainingTreesAppender(trees);
         }
         const {appender, promise} = asyncForEach(trees.concat(), (t) => {
-            this.renderTree(t);
+            if (this.treeUtil.treeFilter(t)) {
+                this.renderTree(t);
+            }
         }, (r, t) => {
             const pct = 100 * (1 - (r / t));
             this.setTitle(`Rendering trees... ${pct.toFixed(1)}%`);
