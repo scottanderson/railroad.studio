@@ -6,7 +6,7 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
-import {Vector} from './Gvas';
+import {gvasToString, Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -629,7 +629,7 @@ export class RailroadMap {
             frame.number,
             cargoText(frame)]
             .filter((e) => Boolean(e))
-            .map((s) => s?.replace(/<br>/g, '\n').trimEnd() || '[blank]')
+            .map(gvasToString)
             .join('\n');
         const title = f.element('title')
             .words(tooltipText);
@@ -656,7 +656,7 @@ export class RailroadMap {
         const frameText = frame.number;
         if (frameText) {
             const text = this.layers.frameNumbers
-                .text(frameText.replace(/<br>/g, '\n').trimEnd() || '[blank]')
+                .text(gvasToString(frameText))
                 .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
                 .addClass('frame-text');
             if (definition.engine) {

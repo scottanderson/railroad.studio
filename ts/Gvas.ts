@@ -34,6 +34,10 @@ export type GvasMap<V> = {
 
 export type GvasString = string | null;
 
+export function gvasToString(gs: GvasString): string {
+    return (gs === null) ? 'null' : (gs.replace(/<br>/g, '\n').trimEnd() || '[blank]');
+}
+
 export interface GvasHeader {
     saveVersion: number;
     structureVersion: number;
