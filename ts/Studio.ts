@@ -3,6 +3,7 @@ import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
+import {frameDefinitions} from './frames';
 
 interface InputTextOptions {
     max?: string;
@@ -160,6 +161,44 @@ export class Studio {
                 }
             });
             return btnToggleLayer;
+        }));
+        // Find rolling stock dropdown
+        const txtFrameList = document.createTextNode(' Frames ');
+        const imgFrameList = document.createElement('i');
+        imgFrameList.classList.add('bi', 'bi-car-front-fill');
+        imgFrameList.setAttribute('role', 'img');
+        imgFrameList.ariaLabel = 'Find rolling stock';
+        const btnFrameList = document.createElement('button');
+        btnFrameList.id = 'btnFrameList';
+        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnFrameList.setAttribute('aria-expanded', 'false');
+        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
+        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
+        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
+        const lstFrameList = document.createElement('ul');
+        lstFrameList.classList.add('dropdown-menu');
+        lstFrameList.style.maxHeight = '50rem';
+        lstFrameList.style.overflowY = 'auto';
+        const grpFrameList = document.createElement('div');
+        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
+        grpFrameList.classList.add('dropdown');
+        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
+        lstFrameList.replaceChildren(...railroad.frames.map((frame) => {
+            const btnFrame = document.createElement('button');
+            const imgFrame = document.createElement('i');
+            const text =
+                (frame.type ? frameDefinitions[frame.type].name + ' ' : '') +
+                (frame.number ? '#' + gvasToString(frame.number) + ' ' : '') +
+                (frame.name ? gvasToString(frame.name) : '');
+            const txtFrame = document.createTextNode(` ${text} `);
+            imgFrame.classList.add('bi', 'bi-geo');
+            btnFrame.classList.add('dropdown-item', 'text-nowrap');
+            btnFrame.replaceChildren(imgFrame, txtFrame);
+            btnFrame.addEventListener('click', () => {
+                // Center vewport on frame location
+                this.map.panTo(frame.location);
+            });
+            return btnFrame;
         }));
         // Trees dropdown
         const txtTrees = document.createTextNode(' Trees ');
@@ -413,6 +452,7 @@ export class Studio {
         mapButtons.classList.add('hstack', 'gap-2');
         mapButtons.replaceChildren(
             grpLayers,
+            grpFrameList,
             grpTrees,
             btnTreeBrush,
             btnDelete,
@@ -424,6 +464,7 @@ export class Studio {
             // Disable tools that only work for old splines
             mapButtons.replaceChildren(
                 grpLayers,
+                grpFrameList,
                 grpTrees,
                 btnTreeBrush,
                 btnDelete,

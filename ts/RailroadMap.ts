@@ -138,6 +138,13 @@ export class RailroadMap {
         return this.treeUtil;
     }
 
+    panTo(point: {x: number, y: number}) {
+        const sizes = this.panZoom.getSizes();
+        const x = (point.x * sizes.realZoom) + (sizes.width / 2);
+        const y = (point.y * sizes.realZoom) + (sizes.height / 2);
+        this.panZoom.pan({x, y});
+    }
+
     refresh() {
         const pan = this.panZoom.getPan();
         const zoom = this.panZoom.getZoom();
