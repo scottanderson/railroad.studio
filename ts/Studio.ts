@@ -50,10 +50,7 @@ export class Studio {
         this.map = new RailroadMap(this, mapDiv);
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
-        const imgLayers = document.createElement('i');
-        imgLayers.classList.add('bi', 'bi-layers');
-        imgLayers.setAttribute('role', 'img');
-        imgLayers.ariaLabel = 'Layers Dropdown';
+        const imgLayers = this.bootstrapIcon('bi-layers', 'Layers Dropdown');
         const btnLayers = document.createElement('button');
         btnLayers.id = 'btnLayers';
         btnLayers.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -164,10 +161,7 @@ export class Studio {
         }));
         // Find rolling stock dropdown
         const txtFrameList = document.createTextNode(' Frames ');
-        const imgFrameList = document.createElement('i');
-        imgFrameList.classList.add('bi', 'bi-car-front-fill');
-        imgFrameList.setAttribute('role', 'img');
-        imgFrameList.ariaLabel = 'Find rolling stock';
+        const imgFrameList = this.bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
         const btnFrameList = document.createElement('button');
         btnFrameList.id = 'btnFrameList';
         btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -202,10 +196,7 @@ export class Studio {
         }));
         // Trees dropdown
         const txtTrees = document.createTextNode(' Trees ');
-        const imgTrees = document.createElement('i');
-        imgTrees.classList.add('bi', 'bi-tree');
-        imgTrees.setAttribute('role', 'img');
-        imgTrees.ariaLabel = 'Trees Dropdown';
+        const imgTrees = this.bootstrapIcon('bi-tree', 'Trees Dropdown');
         const btnTrees = document.createElement('button');
         btnTrees.id = 'btnTrees';
         btnTrees.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -246,11 +237,8 @@ export class Studio {
         }));
         // Tree brush
         const btnTreeBrush = document.createElement('button');
-        const imgTreeBrush = document.createElement('i');
+        const imgTreeBrush = this.bootstrapIcon('bi-tree-fill', 'Tree Brush');
         const txtTreeBrush = document.createTextNode(' Tree Brush ');
-        imgTreeBrush.classList.add('bi', 'bi-tree-fill');
-        imgTreeBrush.setAttribute('role', 'img');
-        imgTreeBrush.ariaLabel = 'Tree Brush';
         btnTreeBrush.classList.add('btn', 'btn-secondary');
         btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
         btnTreeBrush.addEventListener('click', () => {
@@ -265,11 +253,8 @@ export class Studio {
         });
         // Delete tool
         const btnDelete = document.createElement('button');
-        const imgDelete = document.createElement('i');
+        const imgDelete = this.bootstrapIcon('bi-eraser-fill', 'Delete Tool');
         const txtDelete = document.createTextNode(' Delete Tool ');
-        imgDelete.classList.add('bi', 'bi-eraser-fill');
-        imgDelete.setAttribute('role', 'img');
-        imgDelete.ariaLabel = 'Delete Tool';
         btnDelete.classList.add('btn', 'btn-secondary');
         btnDelete.replaceChildren(imgDelete, txtDelete);
         btnDelete.addEventListener('click', () => {
@@ -284,11 +269,8 @@ export class Studio {
         });
         // Flatten spline tool
         const btnFlattenSpline = document.createElement('button');
-        const imgFlattenSpline = document.createElement('i');
+        const imgFlattenSpline = this.bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
         const txtFlattenSpline = document.createTextNode(' Flatten Spline Tool ');
-        imgFlattenSpline.classList.add('bi', 'bi-arrows-collapse');
-        imgFlattenSpline.setAttribute('role', 'img');
-        imgFlattenSpline.ariaLabel = 'Flatten Spline Tool';
         btnFlattenSpline.classList.add('btn', 'btn-secondary');
         btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
         btnFlattenSpline.addEventListener('click', () => {
@@ -303,11 +285,8 @@ export class Studio {
         });
         // Parallel spline tool
         const btnParallelSpline = document.createElement('button');
-        const imgParallelSpline = document.createElement('i');
+        const imgParallelSpline = this.bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
         const txtParallelSpline = document.createTextNode(' Parallel Spline Tool ');
-        imgParallelSpline.classList.add('bi', 'bi-distribute-horizontal');
-        imgParallelSpline.setAttribute('role', 'img');
-        imgParallelSpline.ariaLabel = 'Parallel Spline Tool';
         btnParallelSpline.classList.add('btn', 'btn-secondary');
         btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
         btnParallelSpline.addEventListener('click', () => {
@@ -322,11 +301,8 @@ export class Studio {
         });
         // Minimize segment count
         const btnMinimizeSegments = document.createElement('button');
-        const imgMinimizeSegments = document.createElement('i');
+        const imgMinimizeSegments = this.bootstrapIcon('bi-binoculars', 'Minimize segment count');
         const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
-        imgMinimizeSegments.classList.add('bi', 'bi-binoculars');
-        imgMinimizeSegments.setAttribute('role', 'img');
-        imgMinimizeSegments.ariaLabel = 'Minimize segment count';
         btnMinimizeSegments.classList.add('btn', 'btn-secondary');
         btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
         const fmtPercent = (n: number, d: number) => {
@@ -479,7 +455,7 @@ export class Studio {
         btnFrames.classList.add('btn', 'btn-secondary');
         btnFrames.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
             this.frames(table);
@@ -490,7 +466,7 @@ export class Studio {
         btnIndustries.classList.add('btn', 'btn-secondary');
         btnIndustries.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
             this.industries(table);
@@ -501,7 +477,7 @@ export class Studio {
         btnPlayers.classList.add('btn', 'btn-secondary');
         btnPlayers.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
             this.players(table);
@@ -512,17 +488,14 @@ export class Studio {
         btnSplineTracks.classList.add('btn', 'btn-secondary');
         btnSplineTracks.addEventListener('click', () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
             this.splineTracks(table);
         });
         // Export
         const btnDownload = document.createElement('button');
-        const imgDownload = document.createElement('i');
-        imgDownload.classList.add('bi', 'bi-download');
-        imgDownload.setAttribute('role', 'img');
-        imgDownload.ariaLabel = 'Download';
+        const imgDownload = this.bootstrapIcon('bi-download', 'Download');
         btnDownload.appendChild(imgDownload);
         btnDownload.classList.add('btn', 'btn-secondary');
         btnDownload.addEventListener('click', () => {
@@ -547,7 +520,7 @@ export class Studio {
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnSplineTracks, btnDownload, btnDark);
         // Studio controls
         const studioControls = document.createElement('div');
-        studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
+        studioControls.classList.add('vstack', 'gap-2');
         studioControls.replaceChildren(buttons, mapButtons);
         headerElement.replaceChildren(header, studioControls);
         layers
