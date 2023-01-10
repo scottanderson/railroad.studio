@@ -778,142 +778,150 @@ export class Studio {
         return i;
     }
 
-    private saveContext(input: Node, saveAction: () => void, cancelAction: () => void): Node {
+    private saveContext(
+        input: Node,
+        saveAction: () => void,
+        cancelAction: () => boolean,
+        formatValue: () => string,
+    ): Node {
+        const span = document.createElement('span');
+        span.innerText = formatValue();
+        span.addEventListener('click', () => {
+            span.parentElement?.replaceChildren(div);
+        });
         // Save
         const btnSave = document.createElement('button');
         btnSave.classList.add('btn', 'btn-success');
         btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
-        btnSave.addEventListener('click', saveAction);
+        btnSave.addEventListener('click', () => {
+            saveAction();
+            this.modified = true;
+            span.innerText = formatValue();
+            div.parentElement?.replaceChildren(span);
+        });
         // Cancel
         const btnCancel = document.createElement('button');
         btnCancel.classList.add('btn', 'btn-danger');
         btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
-        btnCancel.addEventListener('click', cancelAction);
+        btnCancel.addEventListener('click', () => {
+            if (cancelAction()) return;
+            // Close the edit control
+            div.parentElement?.replaceChildren(span);
+        });
         // Layout
         const div = document.createElement('div');
         div.classList.add('hstack');
         div.replaceChildren(input, btnSave, btnCancel);
-        return div;
+        return span;
     }
 
     private editNumber(value: number, options: InputTextOptions, saveValue: (value: number) => void) {
-        const span = document.createElement('span');
-        span.innerText = Number.isInteger(value) ? String(value) : value.toFixed(2);
-        span.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'number';
-            if (options.max) input.max = options.max;
-            if (options.min) input.min = options.min;
-            input.pattern = '[0-9]+';
-            input.value = String(value);
-            const saveAction = () => {
-                value = Number(input.value);
-                span.innerText = Number.isInteger(value) ? String(value) : value.toFixed(2);
-                saveValue(value);
-                this.modified = true;
-                div.parentElement?.replaceChildren(span);
-            };
-            const cancelAction = () => {
-                if (Number(input.value) !== value) {
-                    // Restore the original value
-                    input.value = String(value);
-                } else {
-                    // Close the edit control
-                    div.parentElement?.replaceChildren(span);
-                }
-            };
-            const div = this.saveContext(input, saveAction, cancelAction);
-            span.parentElement?.replaceChildren(div);
-        });
-        return span;
+        const formatValue = () => {
+            const num = Number.isInteger(value) ? String(value) : value.toFixed(2);
+            return options.max ? `${num} / ${options.max}` : num;
+        };
+        const input = document.createElement('input');
+        input.type = 'number';
+        if (options.max) input.max = options.max;
+        if (options.min) input.min = options.min;
+        input.pattern = '[0-9]+';
+        input.value = String(value);
+        const onSaveValue = () => {
+            value = Number(input.value);
+            saveValue(value);
+        };
+        const onCancel = () => {
+            if (Number(input.value) !== value) {
+                // Restore the original value
+                input.value = String(value);
+                return true;
+            }
+            // Close the edit control
+            return false;
+        };
+        return this.saveContext(input, onSaveValue, onCancel, formatValue);
     }
 
     private editString(value: GvasString, saveValue: (value: GvasString) => void) {
-        const span = document.createElement('span');
-        span.innerText = gvasToString(value);
-        span.addEventListener('click', () => {
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = 'Null';
-            checkbox.checked = (value === null);
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = value || '';
-            const onSave = () => {
-                value = checkbox.checked ? null : input.value;
-                span.innerText = gvasToString(value);
-                saveValue(value);
-                this.modified = true;
-                div.parentElement?.replaceChildren(span);
-            };
-            const onCancel = () => {
-                const newValue = checkbox.checked ? null : input.value;
-                if (newValue !== value) {
-                    // Restore the original value
-                    checkbox.checked = (value === null);
-                    input.value = value || '';
-                } else {
-                    // Close the edit control
-                    div.parentElement?.replaceChildren(span);
-                }
-            };
-            // Layout
-            const form = document.createElement('form');
-            form.replaceChildren(checkbox, input);
-            const div = this.saveContext(form, onSave, onCancel);
-            span.parentElement?.replaceChildren(div);
-        });
-        return span;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = 'Null';
+        checkbox.checked = (value === null);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value || '';
+        const onSave = () => {
+            value = checkbox.checked ? null : input.value;
+            saveValue(value);
+        };
+        const onCancel = () => {
+            const newValue = checkbox.checked ? null : input.value;
+            if (newValue !== value) {
+                // Restore the original value
+                checkbox.checked = (value === null);
+                input.value = value || '';
+                return true;
+            }
+            // Close the edit control
+            return false;
+        };
+        // Layout
+        const form = document.createElement('form');
+        form.replaceChildren(checkbox, input);
+        const formatValue = () => gvasToString(value);
+        return this.saveContext(form, onSave, onCancel, formatValue);
     }
 
     private editThreeNumbers(
+        labels: Triplet<string>,
         value: Triplet<number>,
         display: (value: Triplet<number>) => string,
         saveValue: (value: Triplet<number>) => void,
     ) {
-        const pre = document.createElement('pre');
-        pre.innerText = display(value);
-        pre.addEventListener('click', () => {
-            const input0 = document.createElement('input');
-            const input1 = document.createElement('input');
-            const input2 = document.createElement('input');
-            [input0, input1, input2].forEach((input, i) => {
-                input.type = 'text';
-                input.step = 'any';
-                input.value = String(value[i]);
-            });
-            const onSave = () => {
-                value = [
-                    Number(input0.value),
-                    Number(input1.value),
-                    Number(input2.value),
-                ];
-                pre.innerText = display(value);
-                saveValue(value);
-                this.modified = true;
-                div.parentElement?.replaceChildren(pre);
-            };
-            const onCancel = () => {
-                if (Number(input0.value) !== value[0] ||
-                    Number(input1.value) !== value[1] ||
-                    Number(input2.value) !== value[2]) {
-                    // Restore the original value
-                    input0.value = String(value[0]);
-                    input1.value = String(value[1]);
-                    input2.value = String(value[2]);
-                } else {
-                    // Close the edit control
-                    div.parentElement?.replaceChildren(pre);
-                }
-            };
-            // Layout
-            const vstack = document.createElement('div');
-            vstack.classList.add('vstack');
-            vstack.replaceChildren(input0, input1, input2);
-            const div = this.saveContext(vstack, onSave, onCancel);
-            pre.parentElement?.replaceChildren(div);
+        const formatValue = () => display(value);
+        const input0 = document.createElement('input');
+        const input1 = document.createElement('input');
+        const input2 = document.createElement('input');
+        const divs: Node[] = [];
+        [input0, input1, input2].forEach((input, i) => {
+            input.type = 'text';
+            input.step = 'any';
+            input.value = String(value[i]);
+            input.placeholder = '0';
+            input.classList.add('form-control');
+            const div = document.createElement('div');
+            div.classList.add('form-floating', 'mb-3');
+            const label = document.createElement('label');
+            label.innerText = labels[i];
+            div.replaceChildren(input, label);
+            divs.push(div);
         });
-        return pre;
+        const onSave = () => {
+            value = [
+                Number(input0.value),
+                Number(input1.value),
+                Number(input2.value),
+            ];
+            saveValue(value);
+        };
+        const onCancel = () => {
+            if (Number(input0.value) !== value[0] ||
+                Number(input1.value) !== value[1] ||
+                Number(input2.value) !== value[2]) {
+                // Restore the original value
+                input0.value = String(value[0]);
+                input1.value = String(value[1]);
+                input2.value = String(value[2]);
+                return true;
+            }
+            // Close the edit control
+            return false;
+        };
+        // Layout
+        const vstack = document.createElement('div');
+        vstack.classList.add('vstack');
+        vstack.replaceChildren(...divs);
+        return this.saveContext(vstack, onSave, onCancel, formatValue);
     }
 
     private editRotator(value: Rotator, saveValue: (value: Rotator) => void) {
@@ -925,7 +933,8 @@ export class Studio {
             }
             return '[Rotator]';
         };
-        return this.editThreeNumbers(encode(value), display, (t) => saveValue(decode(t)));
+        const labels: Triplet<string> = ['roll', 'yaw', 'pitch'];
+        return this.editThreeNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
     }
 
     private editVector(value: Vector, saveValue: (value: Vector) => void) {
@@ -942,51 +951,34 @@ export class Studio {
             if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]}}`;
             return '[Vector]';
         };
-        return this.editThreeNumbers(encode(value), display, (t) => saveValue(decode(t)));
+        const labels: Triplet<string> = ['x', 'y', 'z'];
+        return this.editThreeNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
     }
 
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
-        const pre = document.createElement('pre');
-        pre.innerText = industryName(type);
-        pre.addEventListener('click', () => {
-            const select = document.createElement('select');
-            for (let i = 1; i < 17; i++) {
-                if (i === 15) continue;
-                const option = document.createElement('option');
-                option.value = String(i);
-                option.innerText = industryName(i);
-                select.appendChild(option);
+        const select = document.createElement('select');
+        for (let i = 1; i < 17; i++) {
+            if (i === 15) continue;
+            const option = document.createElement('option');
+            option.value = String(i);
+            option.innerText = industryName(i);
+            select.appendChild(option);
+        }
+        select.value = String(type);
+        const onSave = () => {
+            type = Number(select.value);
+            saveValue(type);
+        };
+        const onCancel = () => {
+            if (Number(select.value) !== type) {
+                // Restore the original value
+                select.value = String(type);
+                return true;
             }
-            select.value = String(type);
-            // Save
-            const btnSave = document.createElement('button');
-            btnSave.classList.add('btn', 'btn-success');
-            btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
-            btnSave.addEventListener('click', () => {
-                const newType = Number(select.value);
-                saveValue(newType);
-                this.modified = true;
-                div.parentElement?.replaceChildren(pre);
-                pre.innerText = industryName(newType);
-            });
-            // Cancel
-            const btnCancel = document.createElement('button');
-            btnCancel.classList.add('btn', 'btn-danger');
-            btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
-            btnCancel.addEventListener('click', () => {
-                if (Number(select.value) !== type) {
-                    // Restore the original value
-                    select.value = String(type);
-                } else {
-                    // Close the edit control
-                    div.parentElement?.replaceChildren(pre);
-                }
-            });
-            // Layout
-            const div = document.createElement('div');
-            div.replaceChildren(select, btnSave, btnCancel);
-            pre.parentElement?.replaceChildren(div);
-        });
-        return pre;
+            // Close the edit control
+            return false;
+        };
+        const formatValue = () => industryName(type);
+        return this.saveContext(select, onSave, onCancel, formatValue);
     }
 }
