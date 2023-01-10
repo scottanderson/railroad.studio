@@ -3,7 +3,7 @@ import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {frameDefinitions} from './frames';
+import {cargoLimits, frameDefinitions} from './frames';
 
 interface InputTextOptions {
     max?: string;
@@ -636,11 +636,12 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Type', 'Name', 'Number']) {
+        ['Type', 'Name', 'Number', 'State'].forEach((columnHeader, i) => {
             const th = document.createElement('th');
+            th.classList.add((i < 3) ? 'col-1' : 'col-auto');
             th.innerText = columnHeader;
             tr.appendChild(th);
-        }
+        });
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
         for (const frame of this.railroad.frames) {
@@ -660,16 +661,67 @@ export class Studio {
             const setFrameNumber = (frameNo: GvasString) => frame.number = frameNo;
             td.appendChild(this.editString(frame.number, setFrameNumber));
             tr.appendChild(td);
+            // State table
+            td = document.createElement('td');
+            tr.appendChild(td);
+            const table2 = document.createElement('table');
+            table2.classList.add('table', 'mb-0');
+            td.appendChild(table2);
+            const tbody2 = document.createElement('tbody');
+            table2.appendChild(tbody2);
+            const addStat = (title: string, input: Node) => {
+                tr = document.createElement('tr');
+                td = document.createElement('td');
+                td.classList.add('col-2', 'text-nowrap');
+                td.innerText = title;
+                tr.appendChild(td);
+                td = document.createElement('td');
+                td.classList.add('col-auto');
+                td.appendChild(input);
+                tr.appendChild(td);
+                tbody2.append(tr);
+            };
             // Location
-            td = document.createElement('td');
             const setFrameLocation = (location: Vector) => frame.location = location;
-            td.appendChild(this.editVector(frame.location, setFrameLocation));
-            tr.appendChild(td);
+            addStat('Location', this.editVector(frame.location, setFrameLocation));
             // Rotation
-            td = document.createElement('td');
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
-            td.appendChild(this.editRotator(frame.rotation, setFrameRotation));
-            tr.appendChild(td);
+            addStat('Rotation', this.editRotator(frame.rotation, setFrameRotation));
+            if (frame.type && frame.type in frameDefinitions) {
+                const definition = frameDefinitions[frame.type];
+                // Water (boiler)
+                if (definition.waterBoilerMax) {
+                    const setWater = (water: number) => frame.state.boilerWaterLevel = water;
+                    const options = {min: '0', max: String(definition.waterBoilerMax)};
+                    addStat('Boiler Water', this.editNumber(frame.state.boilerWaterLevel, options, setWater));
+                }
+                // Water (tender)
+                if (definition.waterTankMax) {
+                    const setWater = (water: number) => frame.state.tenderWaterAmount = water;
+                    const options = {min: '0', max: String(definition.waterTankMax)};
+                    addStat('Tank Water', this.editNumber(frame.state.tenderWaterAmount, options, setWater));
+                }
+                // Firewood
+                if (definition.firewood) {
+                    const setFuel = (fuel: number) => frame.state.tenderFuelAmount = fuel;
+                    const options = {min: '0', max: String(definition.firewood)};
+                    addStat('Firewood', this.editNumber(frame.state.tenderFuelAmount, options, setFuel));
+                }
+                // Sand
+                if (definition.sandLevelMax) {
+                    const setSand = (sand: number) => frame.state.sanderAmount = sand;
+                    const options = {min: '0', max: String(definition.sandLevelMax)};
+                    addStat('Sand', this.editNumber(frame.state.sanderAmount || 0, options, setSand));
+                }
+            }
+            // Freight
+            const freightType = frame.state.freightType;
+            if (frame.type && freightType && freightType in cargoLimits[frame.type]) {
+                const limit = cargoLimits[frame.type][freightType];
+                const setFreight = (freight: number) => frame.state.freightAmount = freight;
+                const options = {min: '0', max: String(limit)};
+                addStat(`Freight (${freightType})`, this.editNumber(frame.state.freightAmount, options, setFreight));
+            }
         }
     }
 
@@ -718,8 +770,8 @@ export class Studio {
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
-            const setIndustryYaw = (yaw: number): number => industry.rotation.yaw = yaw;
-            td.replaceChildren(this.editNumber(industry.rotation.yaw, {min: '-180', max: '180'}, setIndustryYaw));
+            const setIndustryRotation = (rotation: Rotator) => industry.rotation = rotation;
+            td.replaceChildren(this.editRotator(industry.rotation, setIndustryRotation));
             tr.appendChild(td);
         }
     }
