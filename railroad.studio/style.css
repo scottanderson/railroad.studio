@@ -148,6 +148,10 @@
   opacity: 0.5;
 }
 
+.dark path.switch-leg.not-aligned {
+  stroke: cyan;
+}
+
 .diamond {
   fill: yellow;
 }
