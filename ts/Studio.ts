@@ -520,7 +520,7 @@ export class Studio {
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnSplineTracks, btnDownload, btnDark);
         // Studio controls
         const studioControls = document.createElement('div');
-        studioControls.classList.add('vstack', 'gap-2');
+        studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
         studioControls.replaceChildren(buttons, mapButtons);
         headerElement.replaceChildren(header, studioControls);
         layers
