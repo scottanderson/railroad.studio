@@ -65,6 +65,7 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
         smokestacks: 3,
         tender: false,
         waterBoilerMax: 5000,
+        waterTankMax: 1600,
     },
     [FrameTypes.BOXCAR]: {
         engine: false,
@@ -439,7 +440,7 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
         smokestacks: 4,
         tender: false,
         waterBoilerMax: 4000,
-        waterTankMax: 800,
+        waterTankMax: 3000,
     },
     [FrameTypes.TANKER]: {
         engine: false,
