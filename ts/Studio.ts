@@ -10,7 +10,7 @@ interface InputTextOptions {
     min?: string;
 }
 
-type Triplet<T> = [T, T, T];
+type Quadruplet<T> = [T, T, T, T];
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
@@ -731,12 +731,9 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Industry Type', 'Inputs', 'Products', 'Location', 'Rotation']) {
+        for (const columnHeader of ['Industry Type', 'Inputs', 'Outputs', 'Location', 'Rotation']) {
             const th = document.createElement('th');
             th.innerText = columnHeader;
-            if (['Inputs', 'Products'].includes(columnHeader)) {
-                th.colSpan = 4;
-            }
             tr.appendChild(th);
         }
         const tbody = document.createElement('tbody');
@@ -750,19 +747,15 @@ export class Studio {
             td.replaceChildren(this.editIndustryType(industry.type, setIndustryType));
             tr.appendChild(td);
             // Inputs
-            industry.inputs.forEach((input, i) => {
-                td = document.createElement('td');
-                const setIndustryInputs = (input: number) => industry.inputs[i] = input;
-                td.appendChild(this.editNumber(input, {min: '0'}, setIndustryInputs));
-                tr.appendChild(td);
-            });
-            // Products
-            industry.outputs.forEach((output, i) => {
-                td = document.createElement('td');
-                const setIndustryProducts = (output: number) => industry.outputs[i] = output;
-                td.appendChild(this.editNumber(output, {min: '0'}, setIndustryProducts));
-                tr.appendChild(td);
-            });
+            td = document.createElement('td');
+            const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
+            td.appendChild(this.editIndustryProducts('Input', industry.inputs, setIndustryInputs));
+            tr.appendChild(td);
+            // Outputs
+            td = document.createElement('td');
+            const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
+            td.appendChild(this.editIndustryProducts('Output', industry.outputs, setIndustryOutputs));
+            tr.appendChild(td);
             // Location
             td = document.createElement('td');
             const setIndustryLocation = (location: Vector) => industry.location = location;
@@ -924,75 +917,83 @@ export class Studio {
         return this.saveContext(form, onSave, onCancel, formatValue);
     }
 
-    private editThreeNumbers(
-        labels: Triplet<string>,
-        value: Triplet<number>,
-        display: (value: Triplet<number>) => string,
-        saveValue: (value: Triplet<number>) => void,
+    private editNumbers(
+        labels: string[],
+        value: number[],
+        display: (value: number[]) => string,
+        saveValue: (value: number[]) => void,
+        options?: InputTextOptions,
     ) {
         const formatValue = () => display(value);
-        const input0 = document.createElement('input');
-        const input1 = document.createElement('input');
-        const input2 = document.createElement('input');
-        const divs: Node[] = [];
-        [input0, input1, input2].forEach((input, i) => {
-            input.type = 'text';
+        const vstack = document.createElement('div');
+        vstack.classList.add('vstack');
+        const inputs: HTMLInputElement[] = [];
+        value.forEach((v, i) => {
+            const input = document.createElement('input');
+            inputs.push(input);
+            input.type = 'number';
             input.step = 'any';
             input.value = String(value[i]);
-            input.placeholder = '0';
+            if (options) {
+                if (options.min) input.min = options.min;
+                if (options.max) input.max = options.max;
+            }
+            input.pattern = '[0-9]+';
             input.classList.add('form-control');
             const div = document.createElement('div');
             div.classList.add('form-floating', 'mb-3');
             const label = document.createElement('label');
             label.innerText = labels[i];
             div.replaceChildren(input, label);
-            divs.push(div);
+            vstack.appendChild(div);
         });
         const onSave = () => {
-            value = [
-                Number(input0.value),
-                Number(input1.value),
-                Number(input2.value),
-            ];
+            value = inputs.map((i) => Number(i.value));
             saveValue(value);
         };
         const onCancel = () => {
-            if (Number(input0.value) !== value[0] ||
-                Number(input1.value) !== value[1] ||
-                Number(input2.value) !== value[2]) {
-                // Restore the original value
-                input0.value = String(value[0]);
-                input1.value = String(value[1]);
-                input2.value = String(value[2]);
+            if (!value.every((v, i) => v === Number(inputs[i].value))) {
+                // Restore the original values
+                inputs.forEach((input, i) => input.value = String(value[i]));
                 return true;
             }
             // Close the edit control
             return false;
         };
-        // Layout
-        const vstack = document.createElement('div');
-        vstack.classList.add('vstack');
-        vstack.replaceChildren(...divs);
         return this.saveContext(vstack, onSave, onCancel, formatValue);
     }
 
+    private editIndustryProducts(
+        type: string,
+        values: number[],
+        saveValue: (value: number[]) => void,
+    ): Node {
+        const display = (value: number[]) => {
+            const zeroPredicate = (v: number): boolean => v === 0;
+            if (value.every(zeroPredicate)) return '[Empty]';
+            return String(value).replace(/(,0)+$/g, '');
+        };
+        const labels = values.map((_, i) => `${type} ${i + 1}`);
+        return this.editNumbers(labels, values, display, saveValue, {min: '0'});
+    }
+
     private editRotator(value: Rotator, saveValue: (value: Rotator) => void) {
-        const encode = (r: Rotator): Triplet<number> => [r.roll, r.yaw, r.pitch];
-        const decode = (t: Triplet<number>): Rotator => ({roll: t[0], yaw: t[1], pitch: t[2]});
-        const display = (t: Triplet<number>) => {
+        const encode = (r: Rotator): number[] => [r.roll, r.yaw, r.pitch];
+        const decode = (t: number[]): Rotator => ({roll: t[0], yaw: t[1], pitch: t[2]});
+        const display = (t: number[]) => {
             if (t[0] === 0 && t[2] === 0) {
                 return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
             }
             return '[Rotator]';
         };
-        const labels: Triplet<string> = ['roll', 'yaw', 'pitch'];
-        return this.editThreeNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
+        const labels = ['roll', 'yaw', 'pitch'];
+        return this.editNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
     }
 
     private editVector(value: Vector, saveValue: (value: Vector) => void) {
-        const encode = (v: Vector): Triplet<number> => [v.x, v.y, v.z];
-        const decode = (t: Triplet<number>): Vector => ({x: t[0], y: t[1], z: t[2]});
-        const display = (t: Triplet<number>) => {
+        const encode = (v: Vector): number[] => [v.x, v.y, v.z];
+        const decode = (t: number[]): Vector => ({x: t[0], y: t[1], z: t[2]});
+        const display = (t: number[]) => {
             const z0 = t[0] === 0;
             const z1 = t[1] === 0;
             const z2 = t[2] === 0;
@@ -1003,8 +1004,8 @@ export class Studio {
             if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]}}`;
             return '[Vector]';
         };
-        const labels: Triplet<string> = ['x', 'y', 'z'];
-        return this.editThreeNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
+        const labels = ['x', 'y', 'z'];
+        return this.editNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
     }
 
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
