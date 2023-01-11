@@ -836,10 +836,10 @@ export class Studio {
         cancelAction: () => boolean,
         formatValue: () => string,
     ): Node {
-        const span = document.createElement('span');
-        span.innerText = formatValue();
-        span.addEventListener('click', () => {
-            span.parentElement?.replaceChildren(div);
+        const pre = document.createElement('pre');
+        pre.innerText = formatValue();
+        pre.addEventListener('click', () => {
+            pre.parentElement?.replaceChildren(div);
         });
         // Save
         const btnSave = document.createElement('button');
@@ -848,8 +848,8 @@ export class Studio {
         btnSave.addEventListener('click', () => {
             saveAction();
             this.modified = true;
-            span.innerText = formatValue();
-            div.parentElement?.replaceChildren(span);
+            pre.innerText = formatValue();
+            div.parentElement?.replaceChildren(pre);
         });
         // Cancel
         const btnCancel = document.createElement('button');
@@ -858,13 +858,13 @@ export class Studio {
         btnCancel.addEventListener('click', () => {
             if (cancelAction()) return;
             // Close the edit control
-            div.parentElement?.replaceChildren(span);
+            div.parentElement?.replaceChildren(pre);
         });
         // Layout
         const div = document.createElement('div');
         div.classList.add('hstack');
         div.replaceChildren(input, btnSave, btnCancel);
-        return span;
+        return pre;
     }
 
     private editNumber(value: number, options: InputTextOptions, saveValue: (value: number) => void) {
