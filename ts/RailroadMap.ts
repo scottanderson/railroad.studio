@@ -690,6 +690,7 @@ export class RailroadMap {
 
     private renderPlayer(player: Player) {
         if (!player.name) return;
+        if (!player.location) return;
         const x = Math.round(player.location.x);
         const y = Math.round(player.location.y);
         return this.layers.players

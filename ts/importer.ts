@@ -199,7 +199,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         if (!playerLocation || !playerMoney || !playerName || !playerXp) {
             throw new Error('Some player values are missing');
         }
-        enforceEqualLengths([playerName, playerLocation, playerMoney, playerXp]);
+        enforceEqualLengths([playerName, playerMoney, playerXp]);
         if (playerId && playerId.length !== playerName.length) {
             console.log('Warning: playerId array does not match other player arrays', playerId, playerName);
         }
@@ -210,7 +210,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             const player: Player = {
                 id: optionalIndex(playerId, i),
                 name: playerName[i],
-                location: playerLocation[i],
+                location: optionalIndex(playerLocation, i),
                 money: playerMoney[i],
                 rotation: optionalIndex(playerRotation, i),
                 xp: playerXp[i],

@@ -803,7 +803,10 @@ export class Studio {
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
-            td.appendChild(this.editVector(player.location, (location) => player.location = location));
+            if (player.location) {
+                const setPlayerLocation = (location: Vector): Vector => player.location = location;
+                td.appendChild(this.editVector(player.location, setPlayerLocation));
+            }
             tr.appendChild(td);
             // Rotation
             if (player.rotation) {

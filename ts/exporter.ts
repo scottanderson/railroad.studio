@@ -272,7 +272,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                     railroad.players.map((p) => p.id));
                 break;
             case 'playerlocationarray':
-                vectorArrays[propertyName] = railroad.players.map((p) => p.location);
+                vectorArrays[propertyName] = removeUndefinedTail(
+                    railroad.players.map((p) => p.location));
                 break;
             case 'playermoneyarray':
                 floatArrays[propertyName] = railroad.players.map((p) => p.money);

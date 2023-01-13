@@ -131,7 +131,7 @@ export function industryName(type: IndustryType): string {
 export interface Player {
     id?: GvasString;
     name: GvasString;
-    location: Vector;
+    location?: Vector;
     rotation?: number;
     money: number;
     xp: number;
