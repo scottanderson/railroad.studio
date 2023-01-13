@@ -965,6 +965,7 @@ export class RailroadMap {
                 makePath(this.layers.groundworks, ['grade']);
                 makeGradeText();
                 break;
+            case 'rail_914_switch_cross_45':
             case 'rail_914_switch_cross_90':
                 makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
                 // TODO: Render the cross
