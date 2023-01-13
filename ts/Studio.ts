@@ -241,6 +241,8 @@ export class Studio {
         const txtTreeBrush = document.createTextNode(' Tree Brush ');
         btnTreeBrush.classList.add('btn', 'btn-secondary');
         btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
+        btnTreeBrush.setAttribute('data-bs-toggle', 'tooltip');
+        btnTreeBrush.title = '[LMB] Plant trees\n[RMB] Cut trees\n[MMB] Pan\n[Scroll wheel] Change brush size';
         btnTreeBrush.addEventListener('click', () => {
             const toolEnabled = this.map.toggleTreeBrush();
             if (toolEnabled) {
