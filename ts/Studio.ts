@@ -651,7 +651,7 @@ export class Studio {
             tbody.appendChild(tr);
             // Type
             let td = document.createElement('td');
-            td.innerText = String(frame.type);
+            td.innerText = frame.type ? frameDefinitions[frame.type].name : '';
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
