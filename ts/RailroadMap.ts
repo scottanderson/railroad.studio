@@ -1058,8 +1058,9 @@ export class RailroadMap {
 
     private renderTurntable(turntable: Turntable) {
         const radians = (turntable.rotator.yaw - 90) * Math.PI / 180;
-        const dx = 1250 * Math.cos(radians);
-        const dy = 1250 * Math.sin(radians);
+        const radius = turntable.type === 1 ? 1250 : 1600;
+        const dx = radius * Math.cos(radians);
+        const dy = radius * Math.sin(radians);
         const x = Math.round(turntable.location.x);
         const y = Math.round(turntable.location.y);
         const cx = Math.round(turntable.location.x + (dx * 0.5));
@@ -1067,7 +1068,7 @@ export class RailroadMap {
         const x1 = Math.round(turntable.location.x + dx);
         const y1 = Math.round(turntable.location.y + dy);
         const c = this.layers.turntables
-            .circle(1250)
+            .circle(radius)
             .center(cx, cy)
             .addClass('turntable');
         const l = this.layers.turntables
