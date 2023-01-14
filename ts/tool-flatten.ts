@@ -65,7 +65,7 @@ export function calculateGrade(controlPoints: Vector[]): Grade[] {
     });
 }
 
-export function calculateSteepestGrade(spline: SplineTrack): number {
+export function calculateSteepestGrade(spline: SplineTrack): {percentage: number, t: number} {
     const controlPoints: Vector[] = [];
     const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
     const {z0, z1, z2, z3} = hermiteToBezierZ(spline);
@@ -84,5 +84,7 @@ export function calculateSteepestGrade(spline: SplineTrack): number {
             steepestIndex = i;
         }
     }
-    return grades[steepestIndex].grade;
+    const percentage = grades[steepestIndex].grade;
+    const t = steepestIndex / samples;
+    return {percentage, t};
 }

@@ -290,6 +290,10 @@
   opacity: 0.9;
 }
 
+.grade-text-0 { fill: red; }
+.grade-text-1 { fill: orangered; }
+.grade-text-2 { fill: orange; }
+
 .radius-text-0 { fill: red; }
 .radius-text-1 { fill: orange; }
 .radius-text-2 { fill: yellowgreen; }

@@ -933,11 +933,14 @@ export class RailroadMap {
             });
         };
         const makeGradeText: () => void = () => {
-            const percentage = calculateSteepestGrade(spline);
+            const {percentage, t} = calculateSteepestGrade(spline);
             if (percentage === 0) return;
-            const fixed = percentage.toFixed(4);
-            if (fixed === '0.0000') return;
-            return makeText(fixed + '%');
+            const fixed = percentage.toFixed(2);
+            if (fixed === '0.00') return;
+            const thresholds = [6, 5, 4];
+            const index = thresholds.findIndex((t) => percentage > t);
+            const c = (index === -1) ? 'grade-text' : `grade-text-${index}`;
+            return makeText(fixed + '%', t, c);
         };
         const makeRadiusText: () => void = () => {
             const {radius, t} = cubicBezierMinRadius(p0, p1, p2, p3);
