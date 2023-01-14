@@ -142,6 +142,8 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     window.studio = new Studio(filename, railroad, header, content);
+                    document.title = filename + ' - Railroad Studio';
+                    console.log(railroad);
                     resolve();
                 }), 10);
             }), 10);

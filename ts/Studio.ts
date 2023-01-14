@@ -533,8 +533,6 @@ export class Studio {
             .map((l) => l.listener)
             .filter((item): item is (() => void) => !!item)
             .forEach((l) => l());
-        document.title = this.filename + ' - Railroad Studio';
-        console.log(railroad);
         // Version warning
         const saveGameVersionNumber = Number(railroad.saveGame.version);
         const showSaveVersionWarning =
