@@ -44,9 +44,12 @@ export function hermiteToBezier(spline: SplineTrack) {
 export function cubicBezier(t: number, a: number, b: number, c: number, d: number) {
     const t2 = t * t;
     const t3 = t2 * t;
+    const a3 = 3 * a;
+    const b3 = 3 * b;
+    const c3 = 3 * c;
+    const b6 = b3 + b3;
     return a +
-        (-a * 3 + t * (3 * a - a * t)) * t +
-        (3 * b + t * (-6 * b + b * 3 * t)) * t +
-        (c * 3 - c * 3 * t) * t2 +
-        d * t3;
+        (b3 - a3) * t +
+        (a3 - b6 + c3) * t2 +
+        (-a + b3 - c3 + d) * t3;
 }
