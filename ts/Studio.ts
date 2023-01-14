@@ -94,6 +94,10 @@ export class Studio {
                 name: 'Grade %',
             },
             {
+                key: 'radius',
+                name: 'Curve radius',
+            },
+            {
                 key: 'groundworks',
                 name: 'Groundwork and Bridges',
             },

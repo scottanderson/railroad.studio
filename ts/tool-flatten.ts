@@ -1,7 +1,7 @@
 import {Vector} from './Gvas';
 import {Spline, SplineTrack} from './Railroad';
 import {findLastIndex, fp32} from './util';
-import {cubicBezier, hermiteToBezier} from './util-bezier';
+import {cubicBezier, hermiteToBezier, hermiteToBezierZ} from './util-bezier';
 
 interface Grade {
     length: number;
@@ -68,10 +68,7 @@ export function calculateGrade(controlPoints: Vector[]): Grade[] {
 export function calculateSteepestGrade(spline: SplineTrack): number {
     const controlPoints: Vector[] = [];
     const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
-    const z0 = spline.startPoint.z;
-    const z3 = spline.endPoint.z;
-    const z1 = z0 + spline.startTangent.z / 3;
-    const z2 = z3 - spline.endTangent.z / 3;
+    const {z0, z1, z2, z3} = hermiteToBezierZ(spline);
     const samples = 10;
     for (let i = 0; i <= samples; i++) {
         const t = i / samples;

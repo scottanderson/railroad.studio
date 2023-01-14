@@ -290,8 +290,14 @@
   opacity: 0.9;
 }
 
+.radius-text-0 { fill: red; }
+.radius-text-1 { fill: orange; }
+.radius-text-2 { fill: yellowgreen; }
+.radius-text-3 { fill: green; }
+
 .dark .frame-text,
 .dark .grade-text,
+.dark .radius-text,
 .dark .player {
   fill: white;
 }

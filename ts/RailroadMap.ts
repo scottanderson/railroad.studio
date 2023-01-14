@@ -14,7 +14,7 @@ import {frameDefinitions, FrameDefinition, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {cubicBezier, hermiteToBezier} from './util-bezier';
+import {cubicBezier3, cubicBezierMinRadius, hermiteToBezier, hermiteToBezierZ} from './util-bezier';
 
 enum MapToolMode {
     pan_zoom,
@@ -46,6 +46,7 @@ export interface MapLayers {
     groundworksHidden: G;
     industries: G;
     players: G;
+    radius: G;
     tracks: G;
     tracksHidden: G;
     trees: G;
@@ -64,6 +65,7 @@ interface MapLayerVisibility {
     groundworksHidden: boolean;
     industries: boolean;
     players: boolean;
+    radius: boolean;
     tracks: boolean;
     tracksHidden: boolean;
     trees: boolean;
@@ -319,6 +321,7 @@ export class RailroadMap {
                 groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
                 industries: Boolean(parsed?.layerVisibility?.industries),
                 players: Boolean(parsed?.layerVisibility?.players),
+                radius: defaultTrue(parsed?.layerVisibility?.radius),
                 tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
                 trees: false,
@@ -356,6 +359,7 @@ export class RailroadMap {
             groundworks,
             groundworksHidden,
             grades,
+            radius,
             industries,
             turntables,
             tracks,
@@ -367,6 +371,7 @@ export class RailroadMap {
             trees,
             brush,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -395,6 +400,7 @@ export class RailroadMap {
             groundworksHidden: groundworksHidden,
             industries: industries,
             players: players,
+            radius: radius,
             tracks: tracks,
             tracksHidden: tracksHidden,
             trees: trees,
@@ -892,6 +898,12 @@ export class RailroadMap {
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
         const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
+        const {z0, z1, z2, z3} = hermiteToBezierZ(spline);
+        const [p0, p1, p2, p3] = [
+            {x: x0, y: y0, z: z0},
+            {x: x1, y: y1, z: z1},
+            {x: x2, y: y2, z: z2},
+            {x: x3, y: y3, z: z3}];
         const trackPath = ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3];
         const makePath: (group: G, classes: string[]) => void = (group, classes) => {
             const path = group.path(trackPath);
@@ -927,22 +939,27 @@ export class RailroadMap {
             if (fixed === '0.0000') return;
             return makeText(fixed + '%');
         };
-        const makeText = (str: string) => {
-            const calculatePoint: (t: number) => Point = (t) => ({
-                x: cubicBezier(t, x0, x1, x2, x3),
-                y: cubicBezier(t, y0, y1, y2, y3),
-            });
-            const startPoint = calculatePoint(0.49);
-            const endPoint = calculatePoint(0.51);
+        const makeRadiusText: () => void = () => {
+            const {radius, t} = cubicBezierMinRadius(p0, p1, p2, p3);
+            if (radius > 1000_00) return;
+            const thresholds = [30_00, 50_00, 70_00, 90_00];
+            const index = thresholds.findIndex((t) => radius < t);
+            const c = (index === -1) ? 'radius-text' : `radius-text-${index}`;
+            const text = (radius / 100).toFixed(0) + 'm';
+            return makeText(text, t, c, this.layers.radius);
+        };
+        const makeText = (str: string, t = 0.5, c = 'grade-text', l = this.layers.grades) => {
+            const startPoint = cubicBezier3(t - 0.01, p0, p1, p2, p3);
+            const endPoint = cubicBezier3(t + 0.01, p0, p1, p2, p3);
             const heading = vectorHeading(startPoint, endPoint);
             const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
             const {x, y} = roundMidpoint2D(startPoint, endPoint);
-            const text = this.layers.grades
+            const text = l
                 .text((block) => block
                     .text(str)
                     .dx(300))
                 .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
-                .addClass('grade-text');
+                .addClass(c);
             elements.push(text);
         };
         switch (spline.type) {
@@ -954,6 +971,7 @@ export class RailroadMap {
             case 'rail_914':
                 makePath(this.layers.tracks, ['rail']);
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_bumper':
                 makePath(this.layers.groundworks, ['bumper']);
@@ -964,6 +982,7 @@ export class RailroadMap {
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['grade']);
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_switch_cross_45':
             case 'rail_914_switch_cross_90':
@@ -985,21 +1004,25 @@ export class RailroadMap {
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['wooden-bridge']); // TODO: Give this a different style
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_trestle_steel_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['steel-bridge']);
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_trestle_wood_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['wooden-bridge']);
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_wall_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['stone-wall']);
                 makeGradeText();
+                makeRadiusText();
                 break;
             case 'rail_914_wall_01_norail':
                 makePath(this.layers.groundworks, ['stone-wall']);
