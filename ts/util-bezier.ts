@@ -63,7 +63,17 @@ export function cubicBezier(t: number, a: number, b: number, c: number, d: numbe
         (-a + b3 - c3 + d) * t3;
 }
 
-function cubicBezierDerivative(t: number, a: number, b: number, c: number, d: number) {
+/**
+ * Computes the tangent vector of a cubic Bezier curve at a given position.
+ *
+ * @param {number} t - The position along the curve to evaluate.
+ * @param {number} a - The first control point of the curve.
+ * @param {number} b - The second control point of the curve.
+ * @param {number} c - The third control point of the curve.
+ * @param {number} d - The fourth control point of the curve.
+ * @return {Vector} The tangent vector of the curve at the given position.
+ */
+function cubicBezierTangent(t: number, a: number, b: number, c: number, d: number) {
     const t2 = t * t;
     const a3 = 3 * a;
     const b3 = 3 * b;
@@ -74,7 +84,17 @@ function cubicBezierDerivative(t: number, a: number, b: number, c: number, d: nu
         3 * (-a + b3 - c3 + d) * t2;
 }
 
-function cubicBezierSecondDerivative(t: number, a: number, b: number, c: number, d: number) {
+/**
+ * Computes the acceleration of a cubic Bezier curve at a given position.
+ *
+ * @param {number} t - The position along the curve to evaluate.
+ * @param {Vector} a - The first control point of the curve.
+ * @param {Vector} b - The second control point of the curve.
+ * @param {Vector} c - The third control point of the curve.
+ * @param {Vector} d - The fourth control point of the curve.
+ * @return {Vector} The acceleration of the curve at the given position.
+ */
+function cubicBezierAcceleration(t: number, a: number, b: number, c: number, d: number) {
     const a3 = 3 * a;
     const b3 = 3 * b;
     const c3 = 3 * c;
@@ -83,31 +103,84 @@ function cubicBezierSecondDerivative(t: number, a: number, b: number, c: number,
         6 * (-a + b3 - c3 + d) * t;
 }
 
-const call3d = (
+/**
+ * A utility function to apply a scalar function to the x, y and z properties of a vector.
+ *
+ * @param {function} fn - The scalar function to be applied.
+ * @param {number} t - The parameter for the scalar function.
+ * @param {Vector} a - The first vector to be passed to the scalar function.
+ * @param {Vector} b - The second vector to be passed to the scalar function.
+ * @param {Vector} c - The third vector to be passed to the scalar function.
+ * @param {Vector} d - The fourth vector to be passed to the scalar function.
+ * @return {Vector} The output of the scalar function for the x, y and z properties of the input vectors.
+ */
+const scalar3 = (
     fn: (t: number, a: number, b: number, c: number, d: number) => number,
     t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector => ({
     x: fn(t, a.x, b.x, c.x, d.x),
     y: fn(t, a.y, b.y, c.y, d.y),
     z: fn(t, a.z, b.z, c.z, d.z)});
 
+/**
+ * Computes the 3D vector of a point on a cubic Bezier curve at a given position.
+ *
+ * @param {number} t - The position along the curve to evaluate.
+ * @param {Vector} a - The first control point of the curve.
+ * @param {Vector} b - The second control point of the curve.
+ * @param {Vector} c - The third control point of the curve.
+ * @param {Vector} d - The fourth control point of the curve.
+ * @return {Vector} The 3D vector of the point on the curve at the given position.
+ */
 export const cubicBezier3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    call3d(cubicBezier, t, a, b, c, d);
+    scalar3(cubicBezier, t, a, b, c, d);
 
-const cubicBezierDerivative3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    call3d(cubicBezierDerivative, t, a, b, c, d);
+const cubicBezierTangent3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
+    scalar3(cubicBezierTangent, t, a, b, c, d);
 
-const cubicBezierSecondDerivative3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    call3d(cubicBezierSecondDerivative, t, a, b, c, d);
+const cubicBezierAcceleration3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
+    scalar3(cubicBezierAcceleration, t, a, b, c, d);
 
+/**
+ * Computes the radius of the osculating circle of a cubic Bezier curve at a
+ * given position. The osculating circle is a theoretical circle that is tangent
+ * to the curve at the given position and whose radius represents the curvature
+ * of the curve at that point. A smaller radius indicates a tighter curve while
+ * a larger radius indicates a flatter curve. This function takes in the four
+ * control points of a cubic Bezier curve a, b, c, d, and a parameter t that
+ * determines the position of the point on the curve for which to compute the
+ * radius. The position t is a value between 0 and 1, where 0 corresponds to the
+ * start of the curve and 1 corresponds to the end.
+ *
+ * @param {number} t - The position along the curve for which to compute the radius.
+ * @param {Vector} a - The first control point of the curve.
+ * @param {Vector} b - The second control point of the curve.
+ * @param {Vector} c - The third control point of the curve.
+ * @param {Vector} d - The fourth control point of the curve.
+ * @return {number} The radius of the osculating circle in centimeters.
+*/
 export function cubicBezierRadius(t: number, a: Vector, b: Vector, c: Vector, d: Vector): number {
-    const tangent = cubicBezierDerivative3(t, a, b, c, d);
-    const derivativeTangent = cubicBezierSecondDerivative3(t, a, b, c, d);
+    const tangent = cubicBezierTangent3(t, a, b, c, d);
+    const acceleration = cubicBezierAcceleration3(t, a, b, c, d);
     const sumSquares = (v: Vector) => v.x * v.x + v.y * v.y + v.z * v.z;
     const numerator = Math.pow(sumSquares(tangent), 1.5);
-    const denominator = sumSquares(derivativeTangent);
+    const denominator = sumSquares(acceleration);
     return numerator / denominator;
 }
 
+/**
+ * Computes the minimum radius of the osculating circle of a cubic Bezier curve,
+ * given the curve's four control points a, b, c, d. The function will evaluate
+ * smallest radius found. The radius of the osculating circle is a measure of
+ * the curvature of the curve at a given point. A smaller radius indicates a
+ * the radius at multiple positions on the curve between 0 and 1 and return the
+ * tighter curvature and a larger radius indicates a more gradual curvature.
+ *
+ * @param {Vector} a - The first control point of the curve.
+ * @param {Vector} b - The second control point of the curve.
+ * @param {Vector} c - The third control point of the curve.
+ * @param {Vector} d - The fourth control point of the curve.
+ * @return {number} The minimum radius of the osculating circle of the curve at all positions between 0 and 1.
+ */
 export function cubicBezierMinRadius(a: Vector, b: Vector, c: Vector, d: Vector) {
     let minRadius = Infinity;
     let minRadiusT = 0;
