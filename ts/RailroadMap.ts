@@ -125,7 +125,7 @@ export class RailroadMap {
         if (options.pan && options.zoom) {
             try {
                 this.panZoom.zoom(options.zoom);
-                this.panZoom.pan(options.pan);
+                this.panTo(options.pan);
             } catch (e) {
                 console.log(e);
             }
@@ -145,6 +145,14 @@ export class RailroadMap {
         const x = (point.x * sizes.realZoom) + (sizes.width / 2);
         const y = (point.y * sizes.realZoom) + (sizes.height / 2);
         this.panZoom.pan({x, y});
+    }
+
+    panFrom(): SvgPanZoom.Point {
+        const sizes = this.panZoom.getSizes();
+        const pan = this.panZoom.getPan();
+        const x = (pan.x - (sizes.width / 2)) / sizes.realZoom;
+        const y = (pan.y - (sizes.height / 2)) / sizes.realZoom;
+        return {x, y};
     }
 
     refresh() {
@@ -339,7 +347,7 @@ export class RailroadMap {
     writeOptions() {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const options: MapOptions = {
-            pan: this.panZoom.getPan(),
+            pan: this.panFrom(),
             zoom: this.panZoom.getZoom(),
             layerVisibility: this.layerVisibility,
             mergeLimits: this.mergeLimits,
