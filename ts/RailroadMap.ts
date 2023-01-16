@@ -10,7 +10,7 @@ import {gvasToString, Vector} from './Gvas';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
-import {frameDefinitions, FrameDefinition, cargoLimits} from './frames';
+import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -621,14 +621,12 @@ export class RailroadMap {
             return [];
         }
         const definition = frameDefinitions[frame.type];
-        const degrees = Math.round(normalizeAngle(180 + frame.rotation.yaw));
-        const x = Math.round(frame.location.x);
-        const y = Math.round(frame.location.y);
+        const transform = makeTransform(frame.location.x, frame.location.y, 180 + frame.rotation.yaw);
         // Frame outline
         const f = this.layers.frames
             .rect(definition.length, 300)
             .center(0, 0)
-            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
+            .attr('transform', transform)
             .addClass('frame')
             .addClass(frame.type);
         if (frame.state.brakeValue > 0) {
@@ -657,29 +655,12 @@ export class RailroadMap {
             .words(tooltipText);
         elements.push(title);
         // Frame text (number)
-        const text = this.renderFrameText(
-            frame,
-            definition,
-            x, y,
-            degrees,
-            Math.round(45 - definition.length / 2), 90);
-        if (text) elements.push(text);
-        return elements;
-    }
-
-    private renderFrameText(
-        frame: Frame,
-        definition: FrameDefinition,
-        x: number,
-        y: number,
-        r: number,
-        dx: number,
-        dy: number) {
+        const dx = Math.round(45 - definition.length / 2);
         const frameText = frame.number;
         if (frameText) {
             const text = this.layers.frameNumbers
                 .text(gvasToString(frameText))
-                .attr('transform', `translate(${x} ${y}) rotate(${r}) translate(${dx} ${dy})`)
+                .attr('transform', `${transform} translate(${dx} 90)`)
                 .addClass('frame-text');
             if (definition.engine) {
                 text.addClass('engine');
@@ -687,43 +668,35 @@ export class RailroadMap {
             if (definition.tender) {
                 text.addClass('tender');
             }
-            return text;
+            elements.push(text);
         }
+        return elements;
     }
 
     private renderIndustry(industry: Industry): Element {
         const industryName = IndustryType[industry.type] || `Unknown industry ${industry.type}`;
-        const x = Math.round(industry.location.x);
-        const y = Math.round(industry.location.y);
-        const heading = industry.rotation.yaw;
-        const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
         return this.layers.industries
             .text((block) => block.text(industryName))
-            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
+            .attr('transform', makeTransformF(industry.location, industry.rotation.yaw))
             .addClass('grade-text');
     }
 
     private renderPlayer(player: Player) {
         if (!player.name) return;
         if (!player.location) return;
-        const x = Math.round(player.location.x);
-        const y = Math.round(player.location.y);
         return this.layers.players
             .text(player.name)
-            .attr('transform', `translate(${x} ${y}) rotate(180)`)
+            .attr('transform', makeTransform(player.location.x, player.location.y, 180))
             .addClass('player');
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {
-        const degrees = Math.round(normalizeAngle(sw.rotation.yaw + yawOffset));
-        const x = Math.round(sw.location.x);
-        const y = Math.round(sw.location.y);
         return this.layers.tracks
             .path([
                 ['m', 0, 0],
                 ['v', 1888],
             ])
-            .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
+            .attr('transform', makeTransform(sw.location.x, sw.location.y, sw.rotation.yaw + yawOffset))
             .addClass('switch-leg');
     }
 
@@ -801,14 +774,12 @@ export class RailroadMap {
         spline.controlPoints.forEach((point, i) => {
             const start = Math.max(i - 1, 0);
             const adjacentVisible = spline.segmentsVisible.slice(start, i + 1).filter(Boolean).length;
-            const degrees = normalizeAngle(splineHeading(spline, i) - 90).toFixed(1);
+            const degrees = splineHeading(spline, i) - 90;
             let rect;
             if (isRail) {
                 const r = 192;
                 const h = r * Math.sin(30 * Math.PI / 180);
                 const l = r * Math.cos(30 * Math.PI / 180);
-                const x = Math.round(point.x);
-                const y = Math.round(point.y);
                 rect = this.layers.controlPoints
                     .polygon([
                         [0, r],
@@ -818,7 +789,7 @@ export class RailroadMap {
                         [-64, -h],
                         [-l, -h],
                     ])
-                    .attr('transform', `translate(${x} ${y}) rotate(${degrees})`);
+                    .attr('transform', makeTransform(point.x, point.y, degrees));
             } else {
                 const x = Math.round(point.x - 150);
                 const y = Math.round(point.y - 150);
@@ -876,16 +847,13 @@ export class RailroadMap {
                 if (!spline.segmentsVisible[i]) continue;
                 const percentage = c[i].grade;
                 if (percentage === 0) continue;
-                const heading = vectorHeading(spline.controlPoints[i], spline.controlPoints[i + 1]);
-                const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
-                const {x, y} = roundMidpoint2D(cp1, cp0);
                 const text = this.layers.grades
                     .text((block) => block
                         .text(percentage.toFixed(4) + '%')
                         .dx(300))
-                    .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
+                    .attr('transform', makeTransformT(cp0, cp1))
                     .addClass('grade-text');
                 elements.push(text);
             }
@@ -960,14 +928,11 @@ export class RailroadMap {
         const makeText = (str: string, t = 0.5, c = 'grade-text', l = this.layers.grades) => {
             const startPoint = cubicBezier3(t - 0.01, p0, p1, p2, p3);
             const endPoint = cubicBezier3(t + 0.01, p0, p1, p2, p3);
-            const heading = vectorHeading(startPoint, endPoint);
-            const degrees = Math.round(heading > 0 ? heading + 90 : heading - 90);
-            const {x, y} = roundMidpoint2D(startPoint, endPoint);
             const text = l
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', `translate(${x} ${y}) rotate(${degrees})`)
+                .attr('transform', makeTransformT(startPoint, endPoint))
                 .addClass(c);
             elements.push(text);
         };
@@ -1244,12 +1209,6 @@ function treeBucket(tree: Vector) {
     return `trees_${bucketX}_${bucketY}`;
 }
 
-function roundMidpoint2D(cp1: Point, cp0: Point): Point {
-    const x = Math.round((cp1.x + cp0.x) / 2);
-    const y = Math.round((cp1.y + cp0.y) / 2);
-    return {x, y};
-}
-
 function switchSecondLegLocal(spline: SplineTrack): HermiteCurve {
     switch (spline.type) {
         case 'rail_914_switch_cross_45':
@@ -1300,4 +1259,23 @@ function switchSecondLegWorld(spline: SplineTrack): HermiteCurve {
         startTangent: rotateVector(startTangent, spline.rotation),
         endTangent: rotateVector(endTangent, spline.rotation),
     };
+}
+
+function makeTransform(inx: number, iny: number, yaw: number) {
+    const x = Math.round(inx);
+    const y = Math.round(iny);
+    const degrees = Math.round(normalizeAngle(yaw));
+    return `translate(${x} ${y}) rotate(${degrees})`;
+}
+
+function makeTransformF(location: Point, heading: number) {
+    const degrees = heading > 0 ? heading + 90 : heading - 90;
+    return makeTransform(location.x, location.y, degrees);
+}
+
+function makeTransformT(startPoint: Vector, endPoint: Vector) {
+    const x = Math.round((startPoint.x + endPoint.x) / 2);
+    const y = Math.round((startPoint.y + endPoint.y) / 2);
+    const heading = vectorHeading(startPoint, endPoint);
+    return makeTransformF({x, y}, heading);
 }
