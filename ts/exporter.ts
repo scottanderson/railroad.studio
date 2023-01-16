@@ -1,7 +1,9 @@
 /* global BlobPart */
 // eslint-disable-next-line max-len
-import {CustomData, EngineVersion, Gvas, GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
+import {CustomData, EngineVersion, Gvas, GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
 import {Railroad} from './Railroad';
+import {Rotator} from './Rotator';
+import {Vector} from './Vector';
 import {stringToText} from './util';
 
 const exportKeys = [

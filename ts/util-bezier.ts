@@ -1,4 +1,4 @@
-import {Vector} from './Gvas';
+import {Vector} from './Vector';
 
 export type HermiteCurve = {
     endPoint: Vector;

@@ -1,5 +1,5 @@
-import {Vector} from './Gvas';
 import {Spline, SplineTrack} from './Railroad';
+import {Vector} from './Vector';
 import {findLastIndex, fp32} from './util';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 

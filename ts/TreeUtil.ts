@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-len
 import {Industry, IndustryType, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
-import {Vector} from './Gvas';
+import {Vector} from './Vector';
 import {handleError} from './index';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 

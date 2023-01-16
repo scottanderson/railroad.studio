@@ -1,5 +1,6 @@
-// eslint-disable-next-line max-len
-import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat, Rotator, Vector} from './Gvas';
+import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
+import {Rotator} from './Rotator';
+import {Vector} from './Vector';
 
 /**
  * Parses a GVAS file stored in an ArrayBuffer and returns an object with the

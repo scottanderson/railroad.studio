@@ -1,5 +1,5 @@
-import {Vector} from './Gvas';
 import {Spline} from './Railroad';
+import {Vector} from './Vector';
 import {splineHeading} from './splines';
 
 export function parallelSpline(spline: Spline, offset: number): [Spline, Spline] {

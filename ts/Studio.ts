@@ -1,4 +1,6 @@
-import {GvasString, gvasToString, Rotator, Vector} from './Gvas';
+import {GvasString, gvasToString} from './Gvas';
+import {Vector} from './Vector';
+import {Rotator} from './Rotator';
 import {industryName, IndustryType, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';

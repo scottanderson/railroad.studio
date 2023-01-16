@@ -1,4 +1,6 @@
-import {GvasHeader, GvasMap, GvasString, GvasTypes, Rotator, Vector} from './Gvas';
+import {GvasHeader, GvasMap, GvasString, GvasTypes} from './Gvas';
+import {Rotator} from './Rotator';
+import {Vector} from './Vector';
 
 /**
  * A simplified save state that can be modified in Railroad Studio.

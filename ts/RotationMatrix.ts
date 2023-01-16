@@ -1,8 +1,9 @@
-import {Rotator, Vector} from './Gvas';
+import {Rotator} from './Rotator';
+import {Vector} from './Vector';
 
 const RADIANS_PER_DEGREE = Math.PI / 180;
 
-type RotationMatrix = {
+export type RotationMatrix = {
     forward: Vector,
     right: Vector,
     up: Vector,
@@ -24,19 +25,6 @@ type RotationMatrix = {
 export function dotProduct(v1: Vector, v2: Vector): number {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
-
-/**
- * Calculates the sum of two vectors by adding their corresponding x, y and z values.
- *
- * @param {Vector} a - The first vector to be added.
- * @param {Vector} b - The second vector to be added.
- * @return {Vector} The sum of the two input vectors.
- */
-export const vectorSum = (a: Vector, b: Vector): Vector => ({
-    x: a.x + b.x,
-    y: a.y + b.y,
-    z: a.z + b.z,
-});
 
 /**
  * Computes a rotation matrix from a given rotator.

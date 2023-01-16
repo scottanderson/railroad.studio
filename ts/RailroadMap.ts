@@ -6,7 +6,8 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
-import {gvasToString, Vector} from './Gvas';
+import {gvasToString} from './Gvas';
+import {Vector} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -15,7 +16,7 @@ import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
 import {cubicBezier3, cubicBezierMinRadius, HermiteCurve, hermiteToBezier} from './util-bezier';
-import {rotateVector, vectorSum} from './util-vector';
+import {rotateVector, vectorSum} from './RotationMatrix';
 
 enum MapToolMode {
     pan_zoom,

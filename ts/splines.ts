@@ -1,6 +1,6 @@
-import {Vector} from './Gvas';
 import {Railroad, Spline, SplineType} from './Railroad';
 import {Point} from './TreeUtil';
+import {Vector} from './Vector';
 import {findLastIndex} from './util';
 
 export type MergeLimits = {
