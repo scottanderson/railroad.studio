@@ -2,7 +2,7 @@
 import {Industry, IndustryType, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Vector} from './Gvas';
 import {handleError} from './index';
-import {cubicBezier, hermiteToBezier} from './util-bezier';
+import {cubicBezier3, hermiteToBezier} from './util-bezier';
 
 type Callback<T> = (value: T) => void;
 
@@ -197,19 +197,16 @@ function splineTrackFilter(spline: SplineTrack, tree: Vector): boolean {
     const limit = 4_50; // 4.5m
     const limit2 = limit * limit;
     const samples = 10;
-    const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
-    let px = NaN;
-    let py = NaN;
+    const bezier = hermiteToBezier(spline);
+    let pp = {x: NaN, y: NaN};
     for (let i = 0; i <= samples; i++) {
         const t = i / samples;
-        const x = cubicBezier(t, x0, x1, x2, x3);
-        const y = cubicBezier(t, y0, y1, y2, y3);
+        const p = cubicBezier3(t, bezier);
         if (i > 0) {
-            const d2 = distToSegment2(tree, {x: px, y: py}, {x, y});
+            const d2 = distToSegment2(tree, pp, p);
             if (d2 < limit2) return true;
         }
-        px = x;
-        py = y;
+        pp = p;
     }
     return false;
 }

@@ -7,13 +7,29 @@ export type HermiteCurve = {
     startTangent: Vector;
 };
 
-export function hermiteToBezier(spline: HermiteCurve) {
-    const x0 = spline.startPoint.x;
-    const y0 = spline.startPoint.y;
-    const z0 = spline.startPoint.z;
-    const x3 = spline.endPoint.x;
-    const y3 = spline.endPoint.y;
-    const z3 = spline.endPoint.z;
+export type BezierCurve = [Vector, Vector, Vector, Vector];
+
+/**
+ * Converts a Hermite curve to a Bezier curve.
+ *
+ * Hermite curves are defined by their start and end points, as well as their
+ * start and end tangents. Bezier curves, on the other hand, are defined by four
+ * control points. This function takes in a Hermite curve, extracts the start
+ * and end points and tangents, and uses them to calculate the four control
+ * points of the equivalent Bezier curve.
+ *
+ * The conversion process involves dividing the start and end tangents by 3,
+ * and then adding and subtracting the resulting values from the start and end
+ * points, respectively. This results in four control points that can be used
+ * to evaluate a Bezier curve that has the same shape as the input Hermite
+ * curve.
+ *
+ * @param {HermiteCurve} spline - The Hermite curve to convert to a Bezier curve.
+ * @return {BezierCurve} The equivalent Bezier curve.
+ */
+export function hermiteToBezier(spline: HermiteCurve): BezierCurve {
+    const {x: x0, y: y0, z: z0} = spline.startPoint;
+    const {x: x3, y: y3, z: z3} = spline.endPoint;
     // Convert hermite to bezier form
     const x1 = x0 + spline.startTangent.x / 3;
     const y1 = y0 + spline.startTangent.y / 3;
@@ -21,7 +37,9 @@ export function hermiteToBezier(spline: HermiteCurve) {
     const x2 = x3 - spline.endTangent.x / 3;
     const y2 = y3 - spline.endTangent.y / 3;
     const z2 = z3 - spline.endTangent.z / 3;
-    return {x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3};
+    const b = {x: x1, y: y1, z: z1};
+    const c = {x: x2, y: y2, z: z2};
+    return [spline.startPoint, b, c, spline.endPoint];
 }
 
 /**
@@ -110,37 +128,31 @@ function cubicBezierAcceleration(t: number, a: number, b: number, c: number, d: 
  *
  * @param {function} fn - The scalar function to be applied.
  * @param {number} t - The parameter for the scalar function.
- * @param {Vector} a - The first vector to be passed to the scalar function.
- * @param {Vector} b - The second vector to be passed to the scalar function.
- * @param {Vector} c - The third vector to be passed to the scalar function.
- * @param {Vector} d - The fourth vector to be passed to the scalar function.
+ * @param {BezierCurve} bezier - The four vectors to be passed to the scalar function.
  * @return {Vector} The output of the scalar function for the x, y and z properties of the input vectors.
  */
 const scalar3 = (
     fn: (t: number, a: number, b: number, c: number, d: number) => number,
-    t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector => ({
-    x: fn(t, a.x, b.x, c.x, d.x),
-    y: fn(t, a.y, b.y, c.y, d.y),
-    z: fn(t, a.z, b.z, c.z, d.z)});
+    t: number, bezier: BezierCurve): Vector => ({
+    x: fn(t, bezier[0].x, bezier[1].x, bezier[2].x, bezier[3].x),
+    y: fn(t, bezier[0].y, bezier[1].y, bezier[2].y, bezier[3].y),
+    z: fn(t, bezier[0].z, bezier[1].z, bezier[2].z, bezier[3].z)});
 
 /**
  * Computes the 3D vector of a point on a cubic Bezier curve at a given position.
  *
  * @param {number} t - The position along the curve to evaluate.
- * @param {Vector} a - The first control point of the curve.
- * @param {Vector} b - The second control point of the curve.
- * @param {Vector} c - The third control point of the curve.
- * @param {Vector} d - The fourth control point of the curve.
+ * @param {BezierCurve} bezier - The four control points of the curve.
  * @return {Vector} The 3D vector of the point on the curve at the given position.
  */
-export const cubicBezier3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    scalar3(cubicBezier, t, a, b, c, d);
+export const cubicBezier3 = (t: number, bezier: BezierCurve): Vector =>
+    scalar3(cubicBezier, t, bezier);
 
-const cubicBezierTangent3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    scalar3(cubicBezierTangent, t, a, b, c, d);
+const cubicBezierTangent3 = (t: number, bezier: BezierCurve): Vector =>
+    scalar3(cubicBezierTangent, t, bezier);
 
-const cubicBezierAcceleration3 = (t: number, a: Vector, b: Vector, c: Vector, d: Vector): Vector =>
-    scalar3(cubicBezierAcceleration, t, a, b, c, d);
+const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector =>
+    scalar3(cubicBezierAcceleration, t, bezier);
 
 /**
  * Computes the radius of the osculating circle of a cubic Bezier curve at a
@@ -154,15 +166,12 @@ const cubicBezierAcceleration3 = (t: number, a: Vector, b: Vector, c: Vector, d:
  * start of the curve and 1 corresponds to the end.
  *
  * @param {number} t - The position along the curve for which to compute the radius.
- * @param {Vector} a - The first control point of the curve.
- * @param {Vector} b - The second control point of the curve.
- * @param {Vector} c - The third control point of the curve.
- * @param {Vector} d - The fourth control point of the curve.
+ * @param {BezierCurve} bezier - The four control points of the curve.
  * @return {number} The radius of the osculating circle in centimeters.
 */
-export function cubicBezierRadius(t: number, a: Vector, b: Vector, c: Vector, d: Vector): number {
-    const tangent = cubicBezierTangent3(t, a, b, c, d);
-    const acceleration = cubicBezierAcceleration3(t, a, b, c, d);
+export function cubicBezierRadius(t: number, bezier: BezierCurve): number {
+    const tangent = cubicBezierTangent3(t, bezier);
+    const acceleration = cubicBezierAcceleration3(t, bezier);
     const sumSquares = (v: Vector) => v.x * v.x + v.y * v.y + v.z * v.z;
     const numerator = Math.pow(sumSquares(tangent), 1.5);
     const denominator = sumSquares(acceleration);
@@ -177,17 +186,14 @@ export function cubicBezierRadius(t: number, a: Vector, b: Vector, c: Vector, d:
  * the radius at multiple positions on the curve between 0 and 1 and return the
  * tighter curvature and a larger radius indicates a more gradual curvature.
  *
- * @param {Vector} a - The first control point of the curve.
- * @param {Vector} b - The second control point of the curve.
- * @param {Vector} c - The third control point of the curve.
- * @param {Vector} d - The fourth control point of the curve.
+ * @param {BezierCurve} curve - The four control points of the curve.
  * @return {number} The minimum radius of the osculating circle of the curve at all positions between 0 and 1.
  */
-export function cubicBezierMinRadius(a: Vector, b: Vector, c: Vector, d: Vector) {
+export function cubicBezierMinRadius(curve: BezierCurve) {
     let minRadius = Infinity;
     let minRadiusT = 0;
     for (let t = 0; t <= 1; t += 0.01) {
-        const radius = cubicBezierRadius(t, a, b, c, d);
+        const radius = cubicBezierRadius(t, curve);
         if (radius < minRadius) {
             minRadius = radius;
             minRadiusT = t;

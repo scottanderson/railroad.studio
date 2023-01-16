@@ -1,7 +1,7 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Circle, Element, G, Matrix, Path, PathArrayAlias, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
@@ -874,22 +874,14 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
-        const hermiteToBezierPath = (curve: HermiteCurve): [Vector, Vector, Vector, Vector, PathArrayAlias] => {
-            const {x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3} = hermiteToBezier(curve);
-            return [
-                {x: x0, y: y0, z: z0},
-                {x: x1, y: y1, z: z1},
-                {x: x2, y: y2, z: z2},
-                {x: x3, y: y3, z: z3},
-                ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3]];
-        };
         const makePath = (group: G, classes: string[], curve: HermiteCurve = spline) => {
-            const [p0, p1, p2, p3, trackPath] = hermiteToBezierPath(curve);
+            const [a, b, c, d] = hermiteToBezier(curve);
+            const trackPath = ['M', a.x, a.y, 'C', b.x, b.y, c.x, c.y, d.x, d.y];
             const path = group.path(trackPath);
             path.on('click', () => this.onClickSplineTrack(spline, path, elements));
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
-            [p0, p1, p2, p3].forEach((point, i, a) => {
+            [a, b, c, d].forEach((point, i, a) => {
                 if (i === 3) return;
                 const x = Math.round(point.x);
                 const y = Math.round(point.y);
@@ -917,7 +909,7 @@ export class RailroadMap {
             return makeText(fixed + '%', t, c);
         };
         const makeRadiusText = () => {
-            const {radius, t} = cubicBezierMinRadius(p0, p1, p2, p3);
+            const {radius, t} = cubicBezierMinRadius(hermite);
             if (radius > 150_00) return;
             const thresholds = [30_00, 50_00, 70_00, 90_00];
             const index = thresholds.findIndex((t) => radius < t);
@@ -926,8 +918,8 @@ export class RailroadMap {
             return makeText(text, t, c, this.layers.radius);
         };
         const makeText = (str: string, t = 0.5, c = 'grade-text', l = this.layers.grades) => {
-            const startPoint = cubicBezier3(t - 0.01, p0, p1, p2, p3);
-            const endPoint = cubicBezier3(t + 0.01, p0, p1, p2, p3);
+            const startPoint = cubicBezier3(t - 0.01, hermite);
+            const endPoint = cubicBezier3(t + 0.01, hermite);
             const text = l
                 .text((block) => block
                     .text(str)
@@ -936,7 +928,7 @@ export class RailroadMap {
                 .addClass(c);
             elements.push(text);
         };
-        const [p0, p1, p2, p3] = hermiteToBezierPath(spline);
+        const hermite = hermiteToBezier(spline);
         switch (spline.type) {
             case 'ballast_h01':
             case 'ballast_h05':
