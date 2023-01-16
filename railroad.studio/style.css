@@ -43,7 +43,7 @@
 
 .rail {
   stroke: black;
-  stroke-width: 128;
+  stroke-width: 92;
 }
 
 .dark .rail {
@@ -108,7 +108,7 @@
 .stone-wall,
 .wooden-bridge,
 .steel-bridge {
-  stroke-width: 500;
+  stroke-width: 300;
 }
 
 .rail:hover,
@@ -140,7 +140,7 @@
 
 .switch-leg.aligned {
   stroke: black;
-  stroke-width: 128;
+  stroke-width: 92;
 }
 
 .dark .switch-leg.aligned {
@@ -149,7 +149,7 @@
 
 .switch-leg.not-aligned {
   stroke: red;
-  stroke-width: 128;
+  stroke-width: 92;
   opacity: 0.5;
 }
 
@@ -172,7 +172,7 @@
 .control-line-1,
 .control-line-2 {
   fill: none;
-  stroke-width: 64;
+  stroke-width: 32;
 }
 .control-line-0 { stroke: red; }
 .control-line-1 { stroke: blue; }
@@ -188,7 +188,7 @@
 }
 
 .frame {
-  rx: 128;
+  rx: 92;
   stroke-width: 32;
   stroke: black;
 }

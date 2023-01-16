@@ -1,7 +1,7 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Circle, Element, G, Matrix, Path, PathArrayAlias, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {Studio} from './Studio';
@@ -14,7 +14,8 @@ import {frameDefinitions, FrameDefinition, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {cubicBezier3, cubicBezierMinRadius, hermiteToBezier, hermiteToBezierZ} from './util-bezier';
+import {cubicBezier3, cubicBezierMinRadius, HermiteCurve, hermiteToBezier} from './util-bezier';
+import {rotateVector, vectorSum} from './util-vector';
 
 enum MapToolMode {
     pan_zoom,
@@ -905,32 +906,29 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
-        const {x0, y0, x1, y1, x2, y2, x3, y3} = hermiteToBezier(spline);
-        const {z0, z1, z2, z3} = hermiteToBezierZ(spline);
-        const [p0, p1, p2, p3] = [
-            {x: x0, y: y0, z: z0},
-            {x: x1, y: y1, z: z1},
-            {x: x2, y: y2, z: z2},
-            {x: x3, y: y3, z: z3}];
-        const trackPath = ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3];
-        const makePath: (group: G, classes: string[]) => void = (group, classes) => {
+        const hermiteToBezierPath = (curve: HermiteCurve): [Vector, Vector, Vector, Vector, PathArrayAlias] => {
+            const {x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3} = hermiteToBezier(curve);
+            return [
+                {x: x0, y: y0, z: z0},
+                {x: x1, y: y1, z: z1},
+                {x: x2, y: y2, z: z2},
+                {x: x3, y: y3, z: z3},
+                ['M', x0, y0, 'C', x1, y1, x2, y2, x3, y3]];
+        };
+        const makePath = (group: G, classes: string[], curve: HermiteCurve = spline) => {
+            const [p0, p1, p2, p3, trackPath] = hermiteToBezierPath(curve);
             const path = group.path(trackPath);
             path.on('click', () => this.onClickSplineTrack(spline, path, elements));
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
-            [
-                {x: x0, y: y0},
-                {x: x1, y: y1},
-                {x: x2, y: y2},
-                {x: x3, y: y3},
-            ].forEach((point, i, a) => {
+            [p0, p1, p2, p3].forEach((point, i, a) => {
                 if (i === 3) return;
                 const x = Math.round(point.x);
                 const y = Math.round(point.y);
                 const x1 = Math.round(a[i + 1].x);
                 const y1 = Math.round(a[i + 1].y);
                 const cp = this.layers.controlPoints
-                    .circle(192)
+                    .circle(96)
                     .center(x, y)
                     .addClass(`control-point-${i}`);
                 elements.push(cp);
@@ -950,7 +948,7 @@ export class RailroadMap {
             const c = (index === -1) ? 'grade-text' : `grade-text-${index}`;
             return makeText(fixed + '%', t, c);
         };
-        const makeRadiusText: () => void = () => {
+        const makeRadiusText = () => {
             const {radius, t} = cubicBezierMinRadius(p0, p1, p2, p3);
             if (radius > 150_00) return;
             const thresholds = [30_00, 50_00, 70_00, 90_00];
@@ -973,6 +971,7 @@ export class RailroadMap {
                 .addClass(c);
             elements.push(text);
         };
+        const [p0, p1, p2, p3] = hermiteToBezierPath(spline);
         switch (spline.type) {
             case 'ballast_h01':
             case 'ballast_h05':
@@ -997,9 +996,6 @@ export class RailroadMap {
                 break;
             case 'rail_914_switch_cross_45':
             case 'rail_914_switch_cross_90':
-                makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
-                // TODO: Render the cross
-                break;
             case 'rail_914_switch_left':
             case 'rail_914_switch_left_mirror':
             case 'rail_914_switch_left_mirror_noballast':
@@ -1008,9 +1004,21 @@ export class RailroadMap {
             case 'rail_914_switch_right_mirror':
             case 'rail_914_switch_right_mirror_noballast':
             case 'rail_914_switch_right_noballast':
-                makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
-                // TODO: Render the other switch leg
+            {
+                const secondLeg = switchSecondLegWorld(spline);
+                if (spline.switchState === 0) {
+                    makePath(this.layers.tracks, ['switch-leg', 'not-aligned'], secondLeg);
+                    makePath(this.layers.tracks, ['switch-leg', 'aligned']);
+                } else {
+                    makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
+                    makePath(this.layers.tracks, ['switch-leg', 'aligned'], secondLeg);
+                }
+                if (!spline.type.endsWith('_noballast')) {
+                    makePath(this.layers.groundworks, ['grade']);
+                    makePath(this.layers.groundworks, ['grade'], secondLeg);
+                }
                 break;
+            }
             case 'rail_914_trestle_pile_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['wooden-bridge']); // TODO: Give this a different style
@@ -1240,4 +1248,56 @@ function roundMidpoint2D(cp1: Point, cp0: Point): Point {
     const x = Math.round((cp1.x + cp0.x) / 2);
     const y = Math.round((cp1.y + cp0.y) / 2);
     return {x, y};
+}
+
+function switchSecondLegLocal(spline: SplineTrack): HermiteCurve {
+    switch (spline.type) {
+        case 'rail_914_switch_cross_45':
+            return {
+                startPoint: {x: 87.9, y: 212.1, z: 0},
+                startTangent: {x: 424.2, y: -424.2, z: 0},
+                endPoint: {x: 512.1, y: -212.1, z: 0},
+                endTangent: {x: 424.2, y: -424.2, z: 0},
+            };
+        case 'rail_914_switch_cross_90':
+            return {
+                startPoint: {x: 191.2, y: -191.2, z: 0},
+                startTangent: {x: 0, y: 382.4, z: 0},
+                endPoint: {x: 191.2, y: 191.2, z: 0},
+                endTangent: {x: 0, y: 382.4, z: 0},
+            };
+        case 'rail_914_switch_left':
+        case 'rail_914_switch_left_mirror':
+        case 'rail_914_switch_left_mirror_noballast':
+        case 'rail_914_switch_left_noballast':
+            return {
+                startPoint: {x: 0, y: 0, z: 0},
+                startTangent: {x: 1879.3, y: 0, z: 0},
+                endPoint: {x: 1879.3, y: 0, z: 0},
+                endTangent: {x: 1879.3, y: 0, z: 0},
+            };
+        case 'rail_914_switch_right':
+        case 'rail_914_switch_right_mirror':
+        case 'rail_914_switch_right_mirror_noballast':
+        case 'rail_914_switch_right_noballast':
+            return {
+                startPoint: {x: 0, y: 0, z: 0},
+                startTangent: {x: 2153.67, y: 0, z: 0},
+                endPoint: {x: 1863.4, y: 184.8, z: 0},
+                endTangent: {x: 2125.36, y: 348.04, z: 0},
+            };
+        default:
+            throw new Error(`Unknown switch type ${spline.type}`);
+    }
+}
+
+function switchSecondLegWorld(spline: SplineTrack): HermiteCurve {
+    const {startPoint, endPoint, startTangent, endTangent} = switchSecondLegLocal(spline);
+    // Convert local coordinate space to world coordinate
+    return {
+        startPoint: vectorSum(spline.location, rotateVector(startPoint, spline.rotation)),
+        endPoint: vectorSum(spline.location, rotateVector(endPoint, spline.rotation)),
+        startTangent: rotateVector(startTangent, spline.rotation),
+        endTangent: rotateVector(endTangent, spline.rotation),
+    };
 }

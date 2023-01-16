@@ -1,25 +1,27 @@
-import {SplineTrack} from './Railroad';
 import {Vector} from './Gvas';
 
-export function hermiteToBezier(spline: SplineTrack) {
+export type HermiteCurve = {
+    endPoint: Vector;
+    endTangent: Vector;
+    startPoint: Vector;
+    startTangent: Vector;
+};
+
+export function hermiteToBezier(spline: HermiteCurve) {
     const x0 = spline.startPoint.x;
     const y0 = spline.startPoint.y;
+    const z0 = spline.startPoint.z;
     const x3 = spline.endPoint.x;
     const y3 = spline.endPoint.y;
+    const z3 = spline.endPoint.z;
     // Convert hermite to bezier form
     const x1 = x0 + spline.startTangent.x / 3;
     const y1 = y0 + spline.startTangent.y / 3;
+    const z1 = z0 + spline.startTangent.z / 3;
     const x2 = x3 - spline.endTangent.x / 3;
     const y2 = y3 - spline.endTangent.y / 3;
-    return {x0, y0, x1, y1, x2, y2, x3, y3};
-}
-
-export function hermiteToBezierZ(spline: SplineTrack) {
-    const z0 = spline.startPoint.z;
-    const z3 = spline.endPoint.z;
-    const z1 = z0 + spline.startTangent.z / 3;
     const z2 = z3 - spline.endTangent.z / 3;
-    return {z0, z1, z2, z3};
+    return {x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3};
 }
 
 /**
