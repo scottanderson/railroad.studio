@@ -949,7 +949,11 @@ export class RailroadMap {
                 makeRadiusText();
                 break;
             case 'rail_914_bumper':
-                makePath(this.layers.groundworks, ['bumper']);
+                makePath(this.layers.tracks, ['rail']);
+                elements.push(this.layers.groundworks
+                    .rect(1, 1)
+                    .attr('transform', makeTransform(spline.endPoint.x, spline.endPoint.y, spline.rotation.yaw))
+                    .addClass('bumper'));
                 break;
             case 'rail_914_h01':
             case 'rail_914_h05':
