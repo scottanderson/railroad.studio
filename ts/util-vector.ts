@@ -47,6 +47,12 @@ export const vectorSum = (a: Vector, b: Vector): Vector => ({
  * the corresponding forward, right, and up vectors that make up the rotation
  * matrix.
  *
+ * The rotator's pitch, yaw, and roll values are converted to radians and
+ * trigonometric functions such as cosine and sine are used to calculate the
+ * forward, right, and up vectors. The pitch rotation is around the right axis
+ * (Y-axis), yaw rotation is around the up axis (Z-axis), and roll rotation is
+ * around the forward axis (X-axis).
+ *
  * @param {Rotator} rotator - The rotator used to calculate the rotation matrix.
  * @return {RotationMatrix} The rotation matrix that corresponds to the given rotator.
  */
@@ -79,6 +85,19 @@ export function getRotationMatrix(rotator: Rotator): RotationMatrix {
     };
 }
 
+/**
+ * Rotates a given vector using a given rotator.
+ *
+ * This function uses the pitch, yaw, and roll values of the rotator to create a
+ * rotation matrix. The vector is then transformed using the forward, right, and
+ * up vectors of the matrix. The dot product of the vector and each of these
+ * vectors is calculated and the resulting values are used as the x, y, and z
+ * coordinates of the rotated vector.
+ *
+ * @param {Vector} vector - The vector to rotate.
+ * @param {Rotator} rotator - The rotator to use for the rotation.
+ * @return {Vector} The rotated vector.
+ */
 export function rotateVector(vector: Vector, rotator: Rotator): Vector {
     const {forward, right, up} = getRotationMatrix(rotator);
     const x = dotProduct(vector, forward);
