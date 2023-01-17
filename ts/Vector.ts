@@ -30,3 +30,48 @@ export const vectorSum = (a: Vector, b: Vector): Vector => ({
     y: a.y + b.y,
     z: a.z + b.z,
 });
+
+export const vectorProduct = (a: Vector, b: number): Vector => ({
+    x: a.x * b,
+    y: a.y * b,
+    z: a.z * b,
+});
+
+export function vectorLengthSquared(v: Vector) {
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+export function vectorLength(v: Vector) {
+    return Math.sqrt(vectorLengthSquared(v));
+}
+
+export const normalizeVector = (v: Vector, length = 1) => {
+    const s = length / vectorLength(v);
+    return {
+        x: v.x * s,
+        y: v.y * s,
+        z: v.z * s,
+    };
+};
+
+/**
+ * Computes the dot product of two vectors.
+ *
+ * The dot product of two vectors is a scalar value that represents the cosine
+ * of the angle between the two vectors. It can also be interpreted as the
+ * projection of one vector onto the other, or the product of the magnitudes of
+ * the vectors and the cosine of the angle between them. In 2D space, it is
+ * equivalent to the area of a trapezoid formed by the two vectors.
+ *
+ * @param {Vector} v1 - The first vector.
+ * @param {Vector} v2 - The second vector.
+ * @return {number} The dot product of the two vectors.
+ */
+export const dotProduct = (v1: Vector, v2: Vector): number =>
+    v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+
+export const crossProduct = (a: Vector, b: Vector): Vector => ({
+    x: a.y * b.z - a.z * b.y,
+    y: a.z * b.x - a.x * b.z,
+    z: a.x * b.y - a.y * b.x,
+});

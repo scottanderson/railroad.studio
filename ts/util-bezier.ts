@@ -148,10 +148,10 @@ const scalar3 = (
 export const cubicBezier3 = (t: number, bezier: BezierCurve): Vector =>
     scalar3(cubicBezier, t, bezier);
 
-const cubicBezierTangent3 = (t: number, bezier: BezierCurve): Vector =>
+export const cubicBezierTangent3 = (t: number, bezier: BezierCurve): Vector =>
     scalar3(cubicBezierTangent, t, bezier);
 
-const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector =>
+export const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector =>
     scalar3(cubicBezierAcceleration, t, bezier);
 
 /**

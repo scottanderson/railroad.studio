@@ -4,10 +4,11 @@ import * as svgPanZoom from 'svg-pan-zoom';
 import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
+import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {gvasToString} from './Gvas';
-import {Vector, vectorSum} from './Vector';
+import {Vector, crossProduct, normalizeVector, vectorProduct, vectorSum} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -15,8 +16,15 @@ import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {cubicBezier3, cubicBezierMinRadius, HermiteCurve, hermiteToBezier} from './util-bezier';
-import {rotateVector} from './RotationMatrix';
+import {
+    BezierCurve,
+    HermiteCurve,
+    cubicBezier3,
+    cubicBezierAcceleration3,
+    cubicBezierMinRadius,
+    cubicBezierTangent3,
+    hermiteToBezier,
+} from './util-bezier';
 
 enum MapToolMode {
     pan_zoom,
@@ -910,17 +918,41 @@ export class RailroadMap {
             return makeText(fixed + '%', t, c);
         };
         const makeRadiusText = () => {
-            const {radius, t} = cubicBezierMinRadius(hermite);
-            if (radius > 150_00) return;
+            const {radius, t} = cubicBezierMinRadius(bezier);
+            if (radius > 120_00) return;
+            const {center, location} = osculatingCircle(t, bezier, radius);
             const thresholds = [30_00, 50_00, 70_00, 90_00];
             const index = thresholds.findIndex((t) => radius < t);
-            const c = (index === -1) ? 'radius-text' : `radius-text-${index}`;
+            const classSuffix = (index === -1) ? '' : `-${index}`;
+            // Circle
+            const circle = this.layers.radius
+                .circle(radius * 2)
+                .center(center.x, center.y)
+                .addClass('hidden')
+                .addClass('radius' + classSuffix);
+            elements.push(circle);
+            // Line
+            const line = this.layers.radius
+                .line(center.x, center.y, location.x, location.y)
+                .addClass('hidden')
+                .addClass('radius' + classSuffix);
+            elements.push(line);
+            // Text
+            const c = 'radius-text' + classSuffix;
             const text = (radius / 100).toFixed(0) + 'm';
-            return makeText(text, t, c, this.layers.radius);
+            return makeText(text, t, c, this.layers.radius)
+                .on('mouseover', () => {
+                    circle.removeClass('hidden');
+                    line.removeClass('hidden');
+                })
+                .on('mouseout', () => {
+                    circle.addClass('hidden');
+                    line.addClass('hidden');
+                });
         };
         const makeText = (str: string, t = 0.5, c = 'grade-text', l = this.layers.grades) => {
-            const startPoint = cubicBezier3(t - 0.01, hermite);
-            const endPoint = cubicBezier3(t + 0.01, hermite);
+            const startPoint = cubicBezier3(t - 0.01, bezier);
+            const endPoint = cubicBezier3(t + 0.01, bezier);
             const text = l
                 .text((block) => block
                     .text(str)
@@ -928,8 +960,9 @@ export class RailroadMap {
                 .attr('transform', makeTransformT(startPoint, endPoint))
                 .addClass(c);
             elements.push(text);
+            return text;
         };
-        const hermite = hermiteToBezier(spline);
+        const bezier = hermiteToBezier(spline);
         switch (spline.type) {
             case 'ballast_h01':
             case 'ballast_h05':
@@ -1168,6 +1201,19 @@ export class RailroadMap {
     }
 }
 
+function osculatingCircle(t: number, bezier: BezierCurve, radius: number) {
+    const location = cubicBezier3(t, bezier);
+    const acceleration = cubicBezierAcceleration3(t, bezier);
+    const forward = cubicBezierTangent3(t, bezier);
+    const cross = crossProduct(forward, acceleration);
+    const left = (cross.x + cross.y + cross.z) > 0;
+    const up = {x: 0, y: 0, z: 1}; // These splines do not roll, so up is always +Z
+    const right = crossProduct(forward, up);
+    const osculating = normalizeVector(right, left ? -radius : radius);
+    const center = vectorSum(location, osculating);
+    return {center, location};
+}
+
 function cargoText(frame: Frame) {
     if (!frame.type) return null;
     if (!frame.state.freightType) return null;
@@ -1271,8 +1317,7 @@ function makeTransformF(location: Point, heading: number) {
 }
 
 function makeTransformT(startPoint: Vector, endPoint: Vector) {
-    const x = Math.round((startPoint.x + endPoint.x) / 2);
-    const y = Math.round((startPoint.y + endPoint.y) / 2);
+    const midPoint = vectorProduct(vectorSum(startPoint, endPoint), 0.5);
     const heading = vectorHeading(startPoint, endPoint);
-    return makeTransformF({x, y}, heading);
+    return makeTransformF(midPoint, heading);
 }
