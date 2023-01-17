@@ -57,6 +57,7 @@ export interface MapLayers {
     industries: G;
     players: G;
     radius: G;
+    radiusSwitch: G;
     tracks: G;
     tracksHidden: G;
     trees: G;
@@ -76,6 +77,7 @@ interface MapLayerVisibility {
     industries: boolean;
     players: boolean;
     radius: boolean;
+    radiusSwitch: boolean;
     tracks: boolean;
     tracksHidden: boolean;
     trees: boolean;
@@ -340,6 +342,7 @@ export class RailroadMap {
                 industries: Boolean(parsed?.layerVisibility?.industries),
                 players: Boolean(parsed?.layerVisibility?.players),
                 radius: defaultTrue(parsed?.layerVisibility?.radius),
+                radiusSwitch: Boolean(parsed?.layerVisibility?.radiusSwitch),
                 tracks: defaultTrue(parsed?.layerVisibility?.tracks),
                 tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
                 trees: false,
@@ -385,10 +388,13 @@ export class RailroadMap {
             frameNumbers,
             grades,
             radius,
+            radiusSwitch,
             players,
             trees,
             brush,
         ] = [
+            group.group(),
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -419,6 +425,7 @@ export class RailroadMap {
             industries: industries,
             players: players,
             radius: radius,
+            radiusSwitch: radiusSwitch,
             tracks: tracks,
             tracksHidden: tracksHidden,
             trees: trees,
@@ -883,14 +890,14 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
-        const makePath = (group: G, classes: string[], curve: HermiteCurve = spline) => {
-            const [a, b, c, d] = hermiteToBezier(curve);
+        const makePath = (group: G, classes: string[], curve: BezierCurve = bezier) => {
+            const [a, b, c, d] = curve;
             const trackPath = ['M', a.x, a.y, 'C', b.x, b.y, c.x, c.y, d.x, d.y];
             const path = group.path(trackPath);
             path.on('click', () => this.onClickSplineTrack(spline, path, elements));
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
-            [a, b, c, d].forEach((point, i, a) => {
+            curve.forEach((point, i, a) => {
                 if (i === 3) return;
                 const x = Math.round(point.x);
                 const y = Math.round(point.y);
@@ -917,22 +924,22 @@ export class RailroadMap {
             const c = (index === -1) ? 'grade-text' : `grade-text-${index}`;
             return makeText(fixed + '%', t, c);
         };
-        const makeRadiusText = () => {
-            const {radius, t} = cubicBezierMinRadius(bezier);
+        const makeRadiusText = (curve: BezierCurve = bezier, l = this.layers.radius) => {
+            const {radius, t} = cubicBezierMinRadius(curve);
             if (radius > 120_00) return;
-            const {center, location} = osculatingCircle(t, bezier, radius);
+            const {center, location} = osculatingCircle(t, curve, radius);
             const thresholds = [30_00, 50_00, 70_00, 90_00];
             const index = thresholds.findIndex((t) => radius < t);
             const classSuffix = (index === -1) ? '' : `-${index}`;
             // Circle
-            const circle = this.layers.radius
+            const circle = l
                 .circle(radius * 2)
                 .center(center.x, center.y)
                 .addClass('hidden')
                 .addClass('radius' + classSuffix);
             elements.push(circle);
             // Line
-            const line = this.layers.radius
+            const line = l
                 .line(center.x, center.y, location.x, location.y)
                 .addClass('hidden')
                 .addClass('radius' + classSuffix);
@@ -940,7 +947,7 @@ export class RailroadMap {
             // Text
             const c = 'radius-text' + classSuffix;
             const text = (radius / 100).toFixed(0) + 'm';
-            return makeText(text, t, c, this.layers.radius)
+            return makeText(text, t, c, l)
                 .on('mouseover', () => {
                     circle.removeClass('hidden');
                     line.removeClass('hidden');
@@ -1012,6 +1019,8 @@ export class RailroadMap {
                     makePath(this.layers.groundworks, ['grade']);
                     makePath(this.layers.groundworks, ['grade'], secondLeg);
                 }
+                makeRadiusText(bezier, this.layers.radiusSwitch);
+                makeRadiusText(secondLeg, this.layers.radiusSwitch);
                 break;
             }
             case 'rail_914_trestle_pile_01':
@@ -1201,6 +1210,24 @@ export class RailroadMap {
     }
 }
 
+/**
+ * Computes the location and center of the osculating circle of a cubic Bezier
+ * curve at a given position. The osculating circle is a theoretical circle that
+ * is tangent to the curve at the given position and whose radius represents the
+ * curvature of the curve at that point. This function takes in the four control
+ * points of a cubic Bezier curve a, b, c, d, a parameter t that determines the
+ * position of the point on the curve for which to compute the osculating
+ * circle, and a radius value. The position t is a value between 0 and 1, where
+ * 0 corresponds to the start of the curve and 1 corresponds to the end. The
+ * function returns an object containing the location of the point on the curve
+ * and the center of the osculating circle.
+ *
+ * @param {number} t - The position along the curve for which to compute the osculating circle.
+ * @param {BezierCurve} bezier - The four control points of the curve.
+ * @param {number} radius - The radius of the osculating circle.
+ * @return {OsculatingCircle} An object containing the location of the point on
+ * the curve and the center of the osculating circle.
+ */
 function osculatingCircle(t: number, bezier: BezierCurve, radius: number) {
     const location = cubicBezier3(t, bezier);
     const acceleration = cubicBezierAcceleration3(t, bezier);
@@ -1293,15 +1320,16 @@ function switchSecondLegLocal(spline: SplineTrack): HermiteCurve {
     }
 }
 
-function switchSecondLegWorld(spline: SplineTrack): HermiteCurve {
+function switchSecondLegWorld(spline: SplineTrack): BezierCurve {
     const {startPoint, endPoint, startTangent, endTangent} = switchSecondLegLocal(spline);
     // Convert local coordinate space to world coordinate
-    return {
+    const world = {
         startPoint: vectorSum(spline.location, rotateVector(startPoint, spline.rotation)),
         endPoint: vectorSum(spline.location, rotateVector(endPoint, spline.rotation)),
         startTangent: rotateVector(startTangent, spline.rotation),
         endTangent: rotateVector(endTangent, spline.rotation),
     };
+    return hermiteToBezier(world);
 }
 
 function makeTransform(inx: number, iny: number, yaw: number) {

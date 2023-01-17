@@ -100,6 +100,10 @@ export class Studio {
                 name: 'Curve radius',
             },
             {
+                key: 'radiusSwitch',
+                name: 'Switch turnout radius',
+            },
+            {
                 key: 'groundworks',
                 name: 'Groundwork and Bridges',
             },
