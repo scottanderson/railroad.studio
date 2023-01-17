@@ -8,7 +8,15 @@ import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {gvasToString} from './Gvas';
-import {Vector, crossProduct, normalizeVector, vectorProduct, vectorSum} from './Vector';
+import {
+    Vector,
+    angleBetween,
+    crossProduct,
+    distance,
+    normalizeVector,
+    scaleVector,
+    vectorSum,
+} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -32,6 +40,7 @@ enum MapToolMode {
     flatten_spline,
     tree_brush,
     parallel,
+    circularize,
 }
 
 interface MapOptions {
@@ -1186,6 +1195,16 @@ export class RailroadMap {
                 this.setMapModified();
                 elements.forEach((element) => element.remove());
                 break;
+            case MapToolMode.circularize:
+            {
+                const curve = optimizeCircularCurvature(spline);
+                spline.startTangent = curve.startTangent;
+                spline.endTangent = curve.endTangent;
+                this.setMapModified();
+                elements.forEach((element) => element.remove());
+                this.renderSplineTrack(spline);
+                break;
+            }
         }
     }
 
@@ -1345,7 +1364,27 @@ function makeTransformF(location: Point, heading: number) {
 }
 
 function makeTransformT(startPoint: Vector, endPoint: Vector) {
-    const midPoint = vectorProduct(vectorSum(startPoint, endPoint), 0.5);
+    const midPoint = scaleVector(vectorSum(startPoint, endPoint), 0.5);
     const heading = vectorHeading(startPoint, endPoint);
     return makeTransformF(midPoint, heading);
+}
+
+/**
+ * Takes a Hermite curve and optimizes the circular curvature by adjusting the
+ * start and end tangents to match the radius of the osculating circle. The
+ * function calculates the angle between the start and end tangents, uses it to
+ * calculate the radius of the osculating circle, and then adjusts the length of
+ * the start and end tangents to match the radius.
+ *
+ * @param {HermiteCurve} hermiteCurve - The Hermite curve to optimize.
+ * @return {HermiteCurve} A new Hermite curve with optimized circular curvature.
+ */
+function optimizeCircularCurvature(hermiteCurve: HermiteCurve): HermiteCurve {
+    const {startPoint, endPoint, startTangent, endTangent} = hermiteCurve;
+    const angle = angleBetween(startTangent, endTangent);
+    const radius = distance(startPoint, endPoint) / (2 * Math.sin(angle / 2));
+    const arcLength = radius * angle;
+    const newStartTangent = normalizeVector(startTangent, arcLength);
+    const newEndTangent = normalizeVector(endTangent, arcLength);
+    return {startPoint, endPoint, startTangent: newStartTangent, endTangent: newEndTangent};
 }

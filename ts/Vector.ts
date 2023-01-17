@@ -31,28 +31,29 @@ export const vectorSum = (a: Vector, b: Vector): Vector => ({
     z: a.z + b.z,
 });
 
-export const vectorProduct = (a: Vector, b: number): Vector => ({
+export const vectorDifference = (a: Vector, b: Vector): Vector => ({
+    x: a.x - b.x,
+    y: a.y - b.y,
+    z: a.z - b.z,
+});
+
+export const scaleVector = (a: Vector, b: number): Vector => ({
     x: a.x * b,
     y: a.y * b,
     z: a.z * b,
 });
 
-export function vectorLengthSquared(v: Vector) {
-    return v.x * v.x + v.y * v.y + v.z * v.z;
-}
+export const vectorLengthSquared = (v: Vector) =>
+    v.x * v.x + v.y * v.y + v.z * v.z;
 
-export function vectorLength(v: Vector) {
-    return Math.sqrt(vectorLengthSquared(v));
-}
+export const vectorLength = (v: Vector) =>
+    Math.sqrt(vectorLengthSquared(v));
 
-export const normalizeVector = (v: Vector, length = 1) => {
-    const s = length / vectorLength(v);
-    return {
-        x: v.x * s,
-        y: v.y * s,
-        z: v.z * s,
-    };
-};
+export const normalizeVector = (v: Vector, length = 1) =>
+    scaleVector(v, length / vectorLength(v));
+
+export const distance = (startPoint: Vector, endPoint: Vector) =>
+    vectorLength(vectorDifference(startPoint, endPoint));
 
 /**
  * Computes the dot product of two vectors.
@@ -75,3 +76,10 @@ export const crossProduct = (a: Vector, b: Vector): Vector => ({
     y: a.z * b.x - a.x * b.z,
     z: a.x * b.y - a.y * b.x,
 });
+
+export function angleBetween(a: Vector, b: Vector) {
+    const product = dotProduct(a, b);
+    const aLength = vectorLength(a);
+    const bLength = vectorLength(b);
+    return Math.acos(product / (aLength * bLength));
+}
