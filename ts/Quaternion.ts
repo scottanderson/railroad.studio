@@ -1,5 +1,5 @@
 import {RotationMatrix} from './RotationMatrix';
-import {Rotator} from './Rotator';
+import {degreesToRadians, Rotator} from './Rotator';
 
 /**
  * A quaternion is a mathematical object that extends the concept of complex
@@ -15,12 +15,10 @@ export interface Quaternion {
     z: number;
 }
 
-const RADIANS_PER_DEGREE = Math.PI / 180;
-
 export function fromRotator(rotator: Rotator): Quaternion {
-    const pitch = -rotator.pitch * RADIANS_PER_DEGREE * 0.5;
-    const roll = -rotator.roll * RADIANS_PER_DEGREE * 0.5;
-    const yaw = -rotator.yaw * RADIANS_PER_DEGREE * 0.5;
+    const pitch = degreesToRadians(rotator.pitch) * -0.5;
+    const roll = degreesToRadians(rotator.roll) * -0.5;
+    const yaw = degreesToRadians(rotator.yaw) * -0.5;
     const sinPitch = Math.sin(pitch);
     const cosPitch = Math.cos(pitch);
     const sinYaw = Math.sin(yaw);

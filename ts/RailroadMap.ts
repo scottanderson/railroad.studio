@@ -26,6 +26,7 @@ import {
     hermiteToBezier,
 } from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
+import {degreesToRadians} from './Rotator';
 
 enum MapToolMode {
     pan_zoom,
@@ -829,8 +830,9 @@ export class RailroadMap {
             let rect;
             if (isRail) {
                 const r = 192;
-                const h = r * Math.sin(30 * Math.PI / 180);
-                const l = r * Math.cos(30 * Math.PI / 180);
+                const radians = degreesToRadians(30);
+                const h = r * Math.sin(radians);
+                const l = r * Math.cos(radians);
                 rect = this.layers.controlPoints
                     .polygon([
                         [0, r],
@@ -1138,7 +1140,7 @@ export class RailroadMap {
     }
 
     private renderTurntable(turntable: Turntable) {
-        const radians = (turntable.rotator.yaw - 90) * Math.PI / 180;
+        const radians = degreesToRadians(turntable.rotator.yaw - 90);
         const radius = turntable.type === 1 ? 1250 : 1600;
         const dx = radius * Math.cos(radians);
         const dy = radius * Math.sin(radians);

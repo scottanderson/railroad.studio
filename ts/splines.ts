@@ -2,6 +2,7 @@ import {Railroad, Spline, SplineType} from './Railroad';
 import {Point} from './TreeUtil';
 import {Vector} from './Vector';
 import {findLastIndex} from './util';
+import {degreesToRadians, radiansToDegrees} from './Rotator';
 
 export type MergeLimits = {
     /** Bearing limit for merging control points (degrees). */
@@ -474,15 +475,28 @@ export function splineInclination(spline: Spline, i: number): number {
 
 /**
  * Calculates the circular mean of any number of angles.
+ *
+ * @see https://en.wikipedia.org/wiki/Circular_mean
  * @param {number[]} args - an array of angles to average (in degrees)
  * @return {number} the circular mean of angles (in degrees)
  */
 function circularMean(...args: number[]): number {
-    // https://en.wikipedia.org/wiki/Circular_mean
-    const rads = args.map((d) => d * Math.PI / 180);
+    const rads = args.map(degreesToRadians);
+    const r = circularMeanRadians(rads);
+    return radiansToDegrees(r);
+}
+
+/**
+ * Calculates the circular mean of any number of angles.
+ *
+ * @see https://en.wikipedia.org/wiki/Circular_mean
+ * @param {number[]} rads - an array of angles to average (in radians)
+ * @return {number} the circular mean of angles (in radians)
+ */
+function circularMeanRadians(rads: number[]) {
     const x = rads.map(Math.sin).reduce((a, e) => a + e, 0);
     const y = rads.map(Math.cos).reduce((a, e) => a + e, 0);
-    return Math.atan2(x, y) * 180 / Math.PI;
+    return Math.atan2(x, y);
 }
 
 /**

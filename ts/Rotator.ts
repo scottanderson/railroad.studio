@@ -17,3 +17,12 @@ export interface Rotator {
      */
     roll: number;
 }
+
+const RADIANS_PER_DEGREE = Math.PI / 180;
+const DEGREES_PER_RADIAN = 180 / Math.PI;
+
+export const degreesToRadians = (degrees: number) =>
+    degrees * RADIANS_PER_DEGREE;
+
+export const radiansToDegrees = (radians: number) =>
+    radians * DEGREES_PER_RADIAN;
