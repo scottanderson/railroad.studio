@@ -8,15 +8,7 @@ import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {gvasToString} from './Gvas';
-import {
-    Vector,
-    angleBetween,
-    crossProduct,
-    distance,
-    normalizeVector,
-    scaleVector,
-    vectorSum,
-} from './Vector';
+import {Vector, crossProduct, normalizeVector, scaleVector, vectorSum, distanceSquared} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -33,6 +25,7 @@ import {
     cubicBezierTangent3,
     hermiteToBezier,
 } from './util-bezier';
+import {circularizeCurve} from './tool-circularize';
 
 enum MapToolMode {
     pan_zoom,
@@ -216,6 +209,39 @@ export class RailroadMap {
             .then(() => this.renderSplineTracks())
             .then(() => this.renderTrees())
             .catch(handleError);
+    }
+
+    toggleCircularizeTool(): boolean {
+        if (this.toolMode === MapToolMode.circularize) {
+            // Disable circularize tool
+            this.toolMode = MapToolMode.pan_zoom;
+            this.panZoom.enableDblClickZoom();
+            // Hide the control points layer
+            if (this.layerVisibility.controlPoints) {
+                this.toggleLayerVisibility('controlPoints');
+            }
+            // Don't hide the radius layer
+            // if (this.layerVisibility.radius) {
+            //     this.toggleLayerVisibility('radius');
+            // }
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow delete tool while another tool is active
+            return false;
+        } else {
+            // Enable circularize tool
+            this.toolMode = MapToolMode.circularize;
+            this.panZoom.disableDblClickZoom();
+            // Show the control points layer
+            if (!this.layerVisibility.controlPoints) {
+                this.toggleLayerVisibility('controlPoints');
+            }
+            // Show the radius layer
+            if (!this.layerVisibility.radius) {
+                this.toggleLayerVisibility('radius');
+            }
+            return true;
+        }
     }
 
     toggleDeleteTool(): boolean {
@@ -1197,7 +1223,23 @@ export class RailroadMap {
                 break;
             case MapToolMode.circularize:
             {
-                const curve = optimizeCircularCurvature(spline);
+                if (!spline.type || spline.type.includes('switch') || spline.type.includes('bumper')) {
+                    console.log(`Ignoring ${spline.type}`);
+                    return;
+                }
+                const curve = circularizeCurve(spline);
+                const before = cubicBezierMinRadius(hermiteToBezier(spline)).radius / 100;
+                const after = cubicBezierMinRadius(hermiteToBezier(curve)).radius / 100;
+                if (distanceSquared(curve.startTangent, spline.startTangent) === 0 &&
+                    distanceSquared(curve.endTangent, spline.endTangent) === 0) {
+                    console.log(`Spline already circularized, radius: ${before.toFixed(2)}m`);
+                    return;
+                }
+                if (before > after) {
+                    console.log(`Abort. Radius before: ${before.toFixed(2)}m, radius after: ${after.toFixed(2)}m`);
+                    return;
+                }
+                console.log(`Radius before: ${before.toFixed(2)}m, radius after: ${after.toFixed(2)}m`);
                 spline.startTangent = curve.startTangent;
                 spline.endTangent = curve.endTangent;
                 this.setMapModified();
@@ -1367,24 +1409,4 @@ function makeTransformT(startPoint: Vector, endPoint: Vector) {
     const midPoint = scaleVector(vectorSum(startPoint, endPoint), 0.5);
     const heading = vectorHeading(startPoint, endPoint);
     return makeTransformF(midPoint, heading);
-}
-
-/**
- * Takes a Hermite curve and optimizes the circular curvature by adjusting the
- * start and end tangents to match the radius of the osculating circle. The
- * function calculates the angle between the start and end tangents, uses it to
- * calculate the radius of the osculating circle, and then adjusts the length of
- * the start and end tangents to match the radius.
- *
- * @param {HermiteCurve} hermiteCurve - The Hermite curve to optimize.
- * @return {HermiteCurve} A new Hermite curve with optimized circular curvature.
- */
-function optimizeCircularCurvature(hermiteCurve: HermiteCurve): HermiteCurve {
-    const {startPoint, endPoint, startTangent, endTangent} = hermiteCurve;
-    const angle = angleBetween(startTangent, endTangent);
-    const radius = distance(startPoint, endPoint) / (2 * Math.sin(angle / 2));
-    const arcLength = radius * angle;
-    const newStartTangent = normalizeVector(startTangent, arcLength);
-    const newEndTangent = normalizeVector(endTangent, arcLength);
-    return {startPoint, endPoint, startTangent: newStartTangent, endTangent: newEndTangent};
 }

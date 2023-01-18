@@ -55,6 +55,9 @@ export const normalizeVector = (v: Vector, length = 1) =>
 export const distance = (startPoint: Vector, endPoint: Vector) =>
     vectorLength(vectorDifference(startPoint, endPoint));
 
+export const distanceSquared = (startPoint: Vector, endPoint: Vector) =>
+    vectorLengthSquared(vectorDifference(startPoint, endPoint));
+
 /**
  * Computes the dot product of two vectors.
  *
@@ -81,5 +84,7 @@ export function angleBetween(a: Vector, b: Vector) {
     const product = dotProduct(a, b);
     const aLength = vectorLength(a);
     const bLength = vectorLength(b);
-    return Math.acos(product / (aLength * bLength));
+    const x = product / (aLength * bLength);
+    const clamped = Math.max(Math.min(x, 1), -1);
+    return Math.acos(clamped);
 }

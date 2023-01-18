@@ -1,4 +1,5 @@
 import {GvasString, GvasText} from './Gvas';
+import {Vector} from './Vector';
 
 const RRO_TEXT_GUID = '56F8D27149CC5E2D12103BBEBFCA9097';
 
@@ -11,6 +12,15 @@ export function fp32(n: number): number {
     const float = new Float32Array(1);
     float[0] = n;
     return float[0];
+}
+
+export function fp32v(v: Vector): Vector {
+    const float = new Float32Array(3);
+    float[0] = v.x;
+    float[1] = v.y;
+    float[2] = v.z;
+    const [x, y, z] = float;
+    return {x, y, z};
 }
 
 export function stringToText(str: GvasString): GvasText {

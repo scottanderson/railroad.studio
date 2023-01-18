@@ -311,6 +311,22 @@ export class Studio {
                 btnParallelSpline.classList.add('btn-secondary');
             }
         });
+        // Circularize spline tool
+        const btnCircularizeSpline = document.createElement('button');
+        const imgCircularizeSpline = this.bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
+        const txtCircularizeSpline = document.createTextNode(' Circularize Spline Tool ');
+        btnCircularizeSpline.classList.add('btn', 'btn-secondary');
+        btnCircularizeSpline.replaceChildren(imgCircularizeSpline, txtCircularizeSpline);
+        btnCircularizeSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleCircularizeTool();
+            if (toolEnabled) {
+                btnCircularizeSpline.classList.add('active', 'btn-danger');
+                btnCircularizeSpline.classList.remove('btn-secondary');
+            } else {
+                btnCircularizeSpline.classList.remove('active', 'btn-danger');
+                btnCircularizeSpline.classList.add('btn-secondary');
+            }
+        });
         // Minimize segment count
         const btnMinimizeSegments = document.createElement('button');
         const imgMinimizeSegments = this.bootstrapIcon('bi-binoculars', 'Minimize segment count');
@@ -444,22 +460,20 @@ export class Studio {
             grpTrees,
             btnTreeBrush,
             btnDelete,
-            btnFlattenSpline,
-            btnParallelSpline,
-            grpMinimizeSegments,
         );
-        if (railroad.splines.length === 0) {
-            // Disable tools that only work for old splines
-            mapButtons.replaceChildren(
-                grpLayers,
-                grpFrameList,
-                grpTrees,
-                btnTreeBrush,
-                btnDelete,
-                // btnFlattenSpline,
-                // btnParallelSpline,
-                // grpMinimizeSegments,
-            );
+        if (railroad.splines.length > 0) {
+            // Enable tools that only work for old splines
+            [
+                btnFlattenSpline,
+                btnParallelSpline,
+                grpMinimizeSegments,
+            ].forEach((e) => mapButtons.appendChild(e));
+        }
+        if (railroad.splineTracks.length > 0) {
+            // Enable tools that only work for new splines
+            [
+                btnCircularizeSpline,
+            ].forEach((e) => mapButtons.appendChild(e));
         }
         // Frames
         const btnFrames = document.createElement('button');
