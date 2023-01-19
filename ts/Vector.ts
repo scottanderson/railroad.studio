@@ -88,3 +88,20 @@ export function angleBetween(a: Vector, b: Vector) {
     const clamped = Math.max(Math.min(x, 1), -1);
     return Math.acos(clamped);
 }
+
+/**
+ * Given two lines defined by a point and a vector, this function finds the
+ * point where the two lines are closest to each other. This point is also known
+ * as the point of closest approach.
+ * @param {Vector} p0 - A point on the first line.
+ * @param {Vector} t0 - The vector defining the direction of the first line.
+ * @param {Vector} p1 - A point on the second line.
+ * @param {Vector} t1 - The vector defining the direction of the second line.
+ * @return {Vector} The point of closest approach between the two lines.
+*/
+export function closestApproach(p0: Vector, t0: Vector, p1: Vector, t1: Vector): Vector {
+    const a = vectorDifference(t1, t0);
+    const b = vectorDifference(p0, p1);
+    const t = dotProduct(a, b) / dotProduct(a, a);
+    return vectorSum(p0, scaleVector(t0, t));
+}

@@ -1,4 +1,4 @@
-import {Vector} from './Vector';
+import {Vector, closestApproach, crossProduct, distance, normalizeVector} from './Vector';
 
 export type HermiteCurve = {
     endPoint: Vector;
@@ -154,28 +154,50 @@ export const cubicBezierTangent3 = (t: number, bezier: BezierCurve): Vector =>
 export const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector =>
     scalar3(cubicBezierAcceleration, t, bezier);
 
+type CubicBezierRadiusResult = {
+    center: Vector,
+    location: Vector,
+    radius: number,
+    t: number,
+};
+
 /**
- * Computes the radius of the osculating circle of a cubic Bezier curve at a
- * given position. The osculating circle is a theoretical circle that is tangent
- * to the curve at the given position and whose radius represents the curvature
- * of the curve at that point. A smaller radius indicates a tighter curve while
- * a larger radius indicates a flatter curve. This function takes in the four
- * control points of a cubic Bezier curve a, b, c, d, and a parameter t that
- * determines the position of the point on the curve for which to compute the
- * radius. The position t is a value between 0 and 1, where 0 corresponds to the
- * start of the curve and 1 corresponds to the end.
+ * Calculates the radius of the osculating circle of a cubic Bezier curve at a
+ * given position. The osculating circle is a circle that is tangent to the
+ * curve at that position and best approximates the curvature of the curve at
+ * that position.
  *
- * @param {number} t - The position along the curve for which to compute the radius.
- * @param {BezierCurve} bezier - The four control points of the curve.
- * @return {number} The radius of the osculating circle in centimeters.
-*/
-export function cubicBezierRadius(t: number, bezier: BezierCurve): number {
-    const tangent = cubicBezierTangent3(t, bezier);
-    const acceleration = cubicBezierAcceleration3(t, bezier);
-    const sumSquares = (v: Vector) => v.x * v.x + v.y * v.y + v.z * v.z;
-    const numerator = Math.pow(sumSquares(tangent), 1.5);
-    const denominator = sumSquares(acceleration);
-    return numerator / denominator;
+ * This function uses a finite difference method to calculate the radius of the
+ * osculating circle. It samples two points on the curve, separated by a small
+ * offset, and uses the distance between them to approximate the radius.
+ *
+ * The function calculates the center of the osculating circle by using the
+ * {@link closestApproach} function to find the point of closest approach
+ * between two lines. It then uses the center point to calculate the radius.
+ *
+ * @param {number} t - The position along the curve to evaluate.
+ * @param {BezierCurve} bezier - The Bezier curve to calculate the radius for.
+ * @param {number} [offset=0.0000001] - The offset used to sample two points on the curve.
+ * @return {CubicBezierRadiusResult} The radius of the osculating circle.
+ */
+export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.0000001): CubicBezierRadiusResult {
+    // Sample two points on the curve
+    const location = cubicBezier3(t, bezier);
+    const location1 = cubicBezier3(t + offset, bezier);
+    // Calculate the forward vectors
+    const forward = normalizeVector(cubicBezierTangent3(t, bezier));
+    const forward1 = normalizeVector(cubicBezierTangent3(t + offset, bezier));
+    // These splines do not roll, so up is always +Z
+    const up = {x: 0, y: 0, z: 1};
+    // Calculate the right vectors
+    const right = crossProduct(forward, up);
+    const right1 = crossProduct(forward1, up);
+    // Calculate the center of the circle
+    const center = closestApproach(location, right, location1, right1);
+    // Calculate the radius of the circle
+    const hasNaN = [center.x, center.y, center.z].some(isNaN);
+    const radius = hasNaN ? Infinity : distance(center, location);
+    return {center, location, radius, t};
 }
 
 /**
@@ -187,17 +209,16 @@ export function cubicBezierRadius(t: number, bezier: BezierCurve): number {
  * tighter curvature and a larger radius indicates a more gradual curvature.
  *
  * @param {BezierCurve} curve - The four control points of the curve.
- * @return {number} The minimum radius of the osculating circle of the curve at all positions between 0 and 1.
+ * @return {CubicBezierRadiusResult} The minimum radius of the osculating circle
+ * of the curve at all positions between 0 and 1.
  */
-export function cubicBezierMinRadius(curve: BezierCurve) {
-    let minRadius = Infinity;
-    let minRadiusT = 0;
+export function cubicBezierMinRadius(curve: BezierCurve): CubicBezierRadiusResult {
+    let result = cubicBezierRadius(0, curve);
     for (let t = 0; t <= 1; t += 0.01) {
         const radius = cubicBezierRadius(t, curve);
-        if (radius < minRadius) {
-            minRadius = radius;
-            minRadiusT = t;
+        if (radius.radius < result.radius) {
+            result = radius;
         }
     }
-    return {radius: minRadius, t: minRadiusT};
+    return result;
 }

@@ -8,7 +8,7 @@ import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {gvasToString} from './Gvas';
-import {Vector, crossProduct, normalizeVector, scaleVector, vectorSum, distanceSquared} from './Vector';
+import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
@@ -16,15 +16,7 @@ import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {
-    BezierCurve,
-    HermiteCurve,
-    cubicBezier3,
-    cubicBezierAcceleration3,
-    cubicBezierMinRadius,
-    cubicBezierTangent3,
-    hermiteToBezier,
-} from './util-bezier';
+import {BezierCurve, HermiteCurve, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
 
@@ -962,9 +954,8 @@ export class RailroadMap {
             return makeText(fixed + '%', t, c);
         };
         const makeRadiusText = (curve: BezierCurve = bezier, l = this.layers.radius) => {
-            const {radius, t} = cubicBezierMinRadius(curve);
+            const {center, location, radius, t} = cubicBezierMinRadius(curve);
             if (radius > 120_00) return;
-            const {center, location} = osculatingCircle(t, curve, radius);
             const thresholds = [30_00, 50_00, 70_00, 90_00];
             const index = thresholds.findIndex((t) => radius < t);
             const classSuffix = (index === -1) ? '' : `-${index}`;
@@ -1271,37 +1262,6 @@ export class RailroadMap {
                 break;
         }
     }
-}
-
-/**
- * Computes the location and center of the osculating circle of a cubic Bezier
- * curve at a given position. The osculating circle is a theoretical circle that
- * is tangent to the curve at the given position and whose radius represents the
- * curvature of the curve at that point. This function takes in the four control
- * points of a cubic Bezier curve a, b, c, d, a parameter t that determines the
- * position of the point on the curve for which to compute the osculating
- * circle, and a radius value. The position t is a value between 0 and 1, where
- * 0 corresponds to the start of the curve and 1 corresponds to the end. The
- * function returns an object containing the location of the point on the curve
- * and the center of the osculating circle.
- *
- * @param {number} t - The position along the curve for which to compute the osculating circle.
- * @param {BezierCurve} bezier - The four control points of the curve.
- * @param {number} radius - The radius of the osculating circle.
- * @return {OsculatingCircle} An object containing the location of the point on
- * the curve and the center of the osculating circle.
- */
-function osculatingCircle(t: number, bezier: BezierCurve, radius: number) {
-    const location = cubicBezier3(t, bezier);
-    const acceleration = cubicBezierAcceleration3(t, bezier);
-    const forward = cubicBezierTangent3(t, bezier);
-    const cross = crossProduct(forward, acceleration);
-    const left = (cross.x + cross.y + cross.z) > 0;
-    const up = {x: 0, y: 0, z: 1}; // These splines do not roll, so up is always +Z
-    const right = crossProduct(forward, up);
-    const osculating = normalizeVector(right, left ? -radius : radius);
-    const center = vectorSum(location, osculating);
-    return {center, location};
 }
 
 function cargoText(frame: Frame) {
