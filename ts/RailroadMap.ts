@@ -209,10 +209,6 @@ export class RailroadMap {
             // Disable circularize tool
             this.toolMode = MapToolMode.pan_zoom;
             this.panZoom.enableDblClickZoom();
-            // Hide the control points layer
-            if (this.layerVisibility.controlPoints) {
-                this.toggleLayerVisibility('controlPoints');
-            }
             // Don't hide the radius layer
             // if (this.layerVisibility.radius) {
             //     this.toggleLayerVisibility('radius');
@@ -225,10 +221,6 @@ export class RailroadMap {
             // Enable circularize tool
             this.toolMode = MapToolMode.circularize;
             this.panZoom.disableDblClickZoom();
-            // Show the control points layer
-            if (!this.layerVisibility.controlPoints) {
-                this.toggleLayerVisibility('controlPoints');
-            }
             // Show the radius layer
             if (!this.layerVisibility.radius) {
                 this.toggleLayerVisibility('radius');
