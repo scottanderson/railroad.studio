@@ -154,7 +154,7 @@ export const cubicBezierTangent3 = (t: number, bezier: BezierCurve): Vector =>
 export const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector =>
     scalar3(cubicBezierAcceleration, t, bezier);
 
-type CubicBezierRadiusResult = {
+type OsculatingCircle = {
     center: Vector,
     location: Vector,
     radius: number,
@@ -178,9 +178,9 @@ type CubicBezierRadiusResult = {
  * @param {number} t - The position along the curve to evaluate.
  * @param {BezierCurve} bezier - The Bezier curve to calculate the radius for.
  * @param {number} [offset=0.0000001] - The offset used to sample two points on the curve.
- * @return {CubicBezierRadiusResult} The radius of the osculating circle.
+ * @return {OsculatingCircle} An object describing the osculating circle.
  */
-export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.0000001): CubicBezierRadiusResult {
+export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.0000001): OsculatingCircle {
     // Sample two points on the curve
     const location = cubicBezier3(t, bezier);
     const location1 = cubicBezier3(t + offset, bezier);
@@ -209,10 +209,10 @@ export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.000
  * tighter curvature and a larger radius indicates a more gradual curvature.
  *
  * @param {BezierCurve} curve - The four control points of the curve.
- * @return {CubicBezierRadiusResult} The minimum radius of the osculating circle
+ * @return {OsculatingCircle} The minimum radius of the osculating circle
  * of the curve at all positions between 0 and 1.
  */
-export function cubicBezierMinRadius(curve: BezierCurve): CubicBezierRadiusResult {
+export function cubicBezierMinRadius(curve: BezierCurve): OsculatingCircle {
     let result = cubicBezierRadius(0, curve);
     for (let t = 0; t <= 1; t += 0.01) {
         const radius = cubicBezierRadius(t, curve);

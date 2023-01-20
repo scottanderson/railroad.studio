@@ -1,5 +1,5 @@
 import {
-    angleBetween,
+    angleBetweenVectors,
     distance,
     normalizeVector,
 } from './Vector';
@@ -33,9 +33,15 @@ import {fp32v} from './util';
  */
 export function circularizeCurve(hermite: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = hermite;
-    const angle = angleBetween(startTangent, endTangent);
-    const radius = distance(startPoint, endPoint) / (2 * Math.sin(angle / 2));
-    const tangentLength = (angle === 0) ? distance(startPoint, endPoint) : radius * angle;
+    // Calculate the angle between the start and end tangent.
+    const angle = angleBetweenVectors(startTangent, endTangent);
+    // Calculate the straight-line length between the control points
+    const length = distance(startPoint, endPoint);
+    // Calculate the radius geometrically
+    const radius = length / (2 * Math.sin(angle / 2));
+    // Zero angle implies a straight line, otherwise calculate the circular arc length
+    const tangentLength = (angle === 0) ? length : radius * angle;
+    // Set the length of the new tangents. Preserve the input direction.
     const newStartTangent = fp32v(normalizeVector(startTangent, tangentLength));
     const newEndTangent = fp32v(normalizeVector(endTangent, tangentLength));
     return {startPoint, endPoint, startTangent: newStartTangent, endTangent: newEndTangent};

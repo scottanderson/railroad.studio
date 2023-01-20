@@ -80,7 +80,26 @@ export const crossProduct = (a: Vector, b: Vector): Vector => ({
     z: a.x * b.y - a.y * b.x,
 });
 
-export function angleBetween(a: Vector, b: Vector) {
+/**
+ * Calculates the angle between two vectors.
+ *
+ * The angle between two vectors is a value that represents the degree of
+ * similarity or dissimilarity between the vectors. It can be used to
+ * determine the orientation of one vector relative to another, or to
+ * compare the magnitudes of the vectors and the cosine of the angle
+ * between them.
+ *
+ * The angle between two vectors is the angle formed by the two vectors when
+ * they are placed tail-to-tail. It is calculated from the identity
+ * `a · b = |a| * |b| * cos(θ)`, where `a` and `b` are the two vectors,
+ * `|a|` and `|b|` are the magnitudes of the vectors, and `θ` is the angle
+ * between the vectors.
+ *
+ * @param {Vector} a - The first vector.
+ * @param {Vector} b - The second vector.
+ * @return {number} The angle `θ` between the two vectors in radians.
+ */
+export function angleBetweenVectors(a: Vector, b: Vector) {
     const product = dotProduct(a, b);
     const aLength = vectorLength(a);
     const bLength = vectorLength(b);
