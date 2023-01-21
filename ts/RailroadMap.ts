@@ -181,6 +181,8 @@ export class RailroadMap {
         this.layers.controlPoints.node.replaceChildren();
         this.layers.groundworks.node.replaceChildren();
         this.layers.groundworksHidden.node.replaceChildren();
+        this.layers.radius.node.replaceChildren();
+        this.layers.radiusSwitch.node.replaceChildren();
         this.layers.tracks.node.replaceChildren();
         this.layers.tracksHidden.node.replaceChildren();
         this.renderSwitches();
