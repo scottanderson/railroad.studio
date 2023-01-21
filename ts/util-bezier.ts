@@ -209,12 +209,15 @@ export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.000
  * tighter curvature and a larger radius indicates a more gradual curvature.
  *
  * @param {BezierCurve} curve - The four control points of the curve.
+ * @param {number} steps - The number of samples to take.
  * @return {OsculatingCircle} The minimum radius of the osculating circle
  * of the curve at all positions between 0 and 1.
  */
-export function cubicBezierMinRadius(curve: BezierCurve): OsculatingCircle {
+export function cubicBezierMinRadius(curve: BezierCurve, steps = 100): OsculatingCircle {
     let result = cubicBezierRadius(0, curve);
-    for (let t = 0; t <= 1; t += 0.01) {
+    const stepSize = 1 / steps;
+    // Check every 0.01 from 0.005 to 0.995
+    for (let t = stepSize / 2; t < 1; t += stepSize) {
         const radius = cubicBezierRadius(t, curve);
         if (radius.radius < result.radius) {
             result = radius;

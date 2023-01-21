@@ -1208,23 +1208,32 @@ export class RailroadMap {
                 break;
             case MapToolMode.circularize:
             {
+                const formatDistance = (cm: number) => {
+                    if (cm < 100 && cm > -100) return `${cm.toFixed(0)}cm`;
+                    const m = cm / 100;
+                    if (m < 1000 && m > -1000) return `${m.toFixed(2)}m`;
+                    const km = m / 1000;
+                    return `${km.toFixed(2)}km`;
+                };
                 if (!spline.type || spline.type.includes('switch') || spline.type.includes('bumper')) {
-                    console.log(`Ignoring ${spline.type}`);
+                    this.setTitle(`Ignoring ${spline.type}`);
                     return;
                 }
                 const curve = circularizeCurve(spline);
-                const before = cubicBezierMinRadius(hermiteToBezier(spline)).radius / 100;
-                const after = cubicBezierMinRadius(hermiteToBezier(curve)).radius / 100;
+                const before = cubicBezierMinRadius(hermiteToBezier(spline)).radius;
+                const after = cubicBezierMinRadius(hermiteToBezier(curve)).radius;
+                const beforeFmt = formatDistance(before);
+                const afterFmt = formatDistance(after);
                 if (distanceSquared(curve.startTangent, spline.startTangent) === 0 &&
                     distanceSquared(curve.endTangent, spline.endTangent) === 0) {
-                    console.log(`Spline already circularized, radius: ${before.toFixed(2)}m`);
+                    this.setTitle(`Spline already circularized, radius: ${beforeFmt}`);
                     return;
                 }
                 if (before > after) {
-                    console.log(`Abort. Radius before: ${before.toFixed(2)}m, radius after: ${after.toFixed(2)}m`);
+                    this.setTitle(`Abort. Radius before: ${beforeFmt}, radius after: ${afterFmt}`);
                     return;
                 }
-                console.log(`Radius before: ${before.toFixed(2)}m, radius after: ${after.toFixed(2)}m`);
+                this.setTitle(`Radius before: ${beforeFmt}, radius after: ${afterFmt}`);
                 spline.startTangent = curve.startTangent;
                 spline.endTangent = curve.endTangent;
                 this.setMapModified();
