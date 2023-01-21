@@ -913,11 +913,12 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
+        const clickHandler = () => this.onClickSplineTrack(spline, elements);
         const makePath = (group: G, classes: string[], curve: BezierCurve = bezier) => {
             const [a, b, c, d] = curve;
             const trackPath = ['M', a.x, a.y, 'C', b.x, b.y, c.x, c.y, d.x, d.y];
             const path = group.path(trackPath);
-            path.on('click', () => this.onClickSplineTrack(spline, path, elements));
+            path.on('click', clickHandler);
             classes.forEach((c) => path.addClass(c));
             elements.push(path);
             curve.forEach((point, i, a) => {
@@ -929,10 +930,12 @@ export class RailroadMap {
                 const cp = this.layers.controlPoints
                     .circle(96)
                     .center(x, y)
+                    .on('click', clickHandler)
                     .addClass(`control-point-${i}`);
                 elements.push(cp);
                 const line = this.layers.controlPoints
                     .line(x, y, x1, y1)
+                    .on('click', clickHandler)
                     .addClass(`control-line-${i}`);
                 elements.push(line);
             });
@@ -987,6 +990,7 @@ export class RailroadMap {
                     .text(str)
                     .dx(300))
                 .attr('transform', makeTransformT(startPoint, endPoint))
+                .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
             return text;
@@ -1198,7 +1202,7 @@ export class RailroadMap {
         }
     }
 
-    private onClickSplineTrack(spline: SplineTrack, path: Path, elements: Element[]) {
+    private onClickSplineTrack(spline: SplineTrack, elements: Element[]) {
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
                 console.log(spline);
