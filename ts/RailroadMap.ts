@@ -889,12 +889,13 @@ export class RailroadMap {
                 if (percentage === 0) continue;
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
+                const className = gradeTextClass(percentage);
                 const text = this.layers.grades
                     .text((block) => block
                         .text(percentage.toFixed(4) + '%')
                         .dx(300))
                     .attr('transform', makeTransformT(cp0, cp1))
-                    .addClass('grade-text');
+                    .addClass(className);
                 elements.push(text);
             }
         }
@@ -946,9 +947,7 @@ export class RailroadMap {
             if (percentage === 0) return;
             const fixed = percentage.toFixed(1);
             if (fixed === '0.0') return;
-            const thresholds = [6, 5, 4];
-            const index = thresholds.findIndex((t) => percentage > t);
-            const c = (index === -1) ? 'grade-text' : `grade-text-${index}`;
+            const c = gradeTextClass(percentage);
             return makeText(fixed + '%', t, c);
         };
         const makeRadiusText = (curve: BezierCurve = bezier, l = this.layers.radius) => {
@@ -1270,6 +1269,12 @@ export class RailroadMap {
                 break;
         }
     }
+}
+
+function gradeTextClass(percentage: number) {
+    if (percentage < 2) return 'grade-text';
+    const index = Math.min(7, Math.floor(percentage));
+    return `grade-text-${index}`;
 }
 
 function cargoText(frame: Frame) {
