@@ -1,13 +1,7 @@
-import {Spline, SplineTrack} from './Railroad';
+import {calculateGrade} from './Grade';
+import {Spline} from './Railroad';
 import {Vector} from './Vector';
 import {findLastIndex, fp32} from './util';
-import {cubicBezier3, hermiteToBezier} from './util-bezier';
-
-interface Grade {
-    length: number;
-    height: number;
-    grade: number;
-}
 
 export function flattenSpline(spline: Spline): Vector[] {
     // Find first and last visible segments
@@ -38,8 +32,8 @@ function flattenSegments(controlPoints: Vector[], start: number, end: number): V
         };
     }
     const after = calculateGrade(result);
-    const maxGradeBefore = gradeIncluded.reduce((a, d) => Math.max(a, d.grade), 0);
-    const maxGradeAfter = after.reduce((a, d) => Math.max(a, d.grade), 0);
+    const maxGradeBefore = 100 * gradeIncluded.reduce((a, d) => Math.max(a, d.grade), 0);
+    const maxGradeAfter = 100 * after.reduce((a, d) => Math.max(a, d.grade), 0);
     if (maxGradeBefore !== maxGradeAfter) {
         const a = start > 0 ? start : '';
         const b = end < before.length ? end + '/' + before.length : '';
@@ -51,37 +45,4 @@ function flattenSegments(controlPoints: Vector[], start: number, end: number): V
     return result;
 }
 
-export function calculateGrade(controlPoints: Vector[]): Grade[] {
-    return controlPoints.slice(0, controlPoints.length - 1).map((cp, i) => {
-        const dx = controlPoints[i + 1].x - cp.x;
-        const dy = controlPoints[i + 1].y - cp.y;
-        const height = controlPoints[i + 1].z - cp.z;
-        const length = Math.sqrt((dx * dx) + (dy * dy));
-        return {
-            length: length,
-            height: height,
-            grade: 100 * Math.abs(height) / length,
-        };
-    });
-}
 
-export function calculateSteepestGrade(spline: SplineTrack): {percentage: number, t: number} {
-    const controlPoints: Vector[] = [];
-    const bezier = hermiteToBezier(spline);
-    const samples = 10;
-    for (let i = 0; i <= samples; i++) {
-        const t = i / samples;
-        const p = cubicBezier3(t, bezier);
-        controlPoints.push(p);
-    }
-    const grades = calculateGrade(controlPoints);
-    let steepestIndex = 0;
-    for (let i = 1; i < samples; i++) {
-        if (grades[i].grade > grades[steepestIndex].grade) {
-            steepestIndex = i;
-        }
-    }
-    const percentage = grades[steepestIndex].grade;
-    const t = steepestIndex / samples;
-    return {percentage, t};
-}

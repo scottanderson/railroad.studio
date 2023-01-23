@@ -7,11 +7,12 @@ import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, Sp
 import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
+import {calculateGrade, calculateSteepestGrade} from './Grade';
 import {gvasToString} from './Gvas';
 import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
 import {bezierCommand, svgPath} from './bezier';
 import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
-import {calculateGrade, calculateSteepestGrade, flattenSpline} from './tool-flatten';
+import {flattenSpline} from './tool-flatten';
 import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
@@ -884,7 +885,7 @@ export class RailroadMap {
             const c = calculateGrade(spline.controlPoints);
             for (let i = 0; i < spline.segmentsVisible.length; i++) {
                 if (!spline.segmentsVisible[i]) continue;
-                const percentage = c[i].grade;
+                const percentage = 100 * c[i].grade;
                 if (percentage === 0) continue;
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
