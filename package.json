@@ -1,7 +1,13 @@
 {
+    "name": "Railroad Studio",
+    "version": "1.0.0",
+    "repository": {
+        "url": "git+https://github.com/scottanderson/railroad.studio.git"
+    },
     "scripts": {
         "build": "webpack --mode=development",
         "watch": "webpack --mode=development --watch",
+        "start": "webpack server --mode=development",
         "build:prod": "webpack --mode=production",
         "sync": "aws s3 sync railroad.studio s3://railroad.studio"
     },
@@ -14,6 +20,7 @@
         "svg-pan-zoom": "^3.6.1",
         "ts-loader": "^9.2.8",
         "typescript": "^4.6.2",
-        "webpack-cli": "^5.0.1"
+        "webpack-cli": "^5.0.1",
+        "webpack-dev-server": "^4.11.1"
     }
 }
