@@ -12,15 +12,13 @@ The build script uses the node package manager `npm` to manage build dependencie
 Once installed, run `npm install` to install the necessary node package dependencies.
 
 ### Building
-Run `npm run build` to execute the linter and compile the source code. When making changes to the code, it can be useful to run the compiler in watch mode with `npm run watch` to rebuild source files automatically.
-
-Some features, such as cutting trees, may require loading the page through a bespoke HTTP server. To do this, run `npm start` to start the webpack-dev-server, and then navigate to [http://localhost:8080/](http://localhost:8080/) to perform testing.
+Run `npm start` to start the webpack-dev-server.
 
 ### Testing
-After building, `open railroad.studio/index.html` to launch the page.
+Navigate to [http://localhost:8080/](http://localhost:8080/) to perform testing.
 
 ### Debugging
-The typescript compiler creates a `studio.js.map` file that web browsers use to natively display typescript-mapped source code and stack traces.
+Source mappings are created, so you can use the web browser's native debugger.
 
 ### Releasing
 To generate a minified `studio.js` for release, run `npm run build:prod`.
