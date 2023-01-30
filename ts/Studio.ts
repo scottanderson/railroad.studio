@@ -6,6 +6,7 @@ import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, frameDefinitions} from './frames';
+import {exportImage as exportImage} from './util-export-image';
 
 interface InputTextOptions {
     max?: string;
@@ -519,6 +520,14 @@ export class Studio {
             content.replaceChildren(table);
             this.splineTracks(table);
         });
+        // Export Image
+        const btnExportImg = document.createElement('button');
+        const imgExportImg = this.bootstrapIcon('bi-file-image', 'Export Image');
+        btnExportImg.appendChild(imgExportImg);
+        btnExportImg.classList.add('btn', 'btn-secondary');
+        btnExportImg.addEventListener('click', () => {
+            exportImage(this);
+        });
         // Export
         const btnDownload = document.createElement('button');
         const imgDownload = this.bootstrapIcon('bi-download', 'Download');
@@ -543,7 +552,16 @@ export class Studio {
         btnDark.addEventListener('click', function() {
             eval('darkmode.toggleDarkMode();');
         });
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnSplineTracks, btnDownload, btnDark);
+        buttons.replaceChildren(
+            btnMap,
+            btnFrames,
+            btnIndustries,
+            btnPlayers,
+            btnSplineTracks,
+            btnExportImg,
+            btnDownload,
+            btnDark,
+        );
         // Studio controls
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
