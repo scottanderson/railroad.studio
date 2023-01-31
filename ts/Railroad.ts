@@ -35,37 +35,63 @@ export interface Frame {
     number: GvasString;
     rotation: Rotator;
     type: GvasString;
-    state: {
-        boilerFireTemp: number;
-        boilerFuelAmount: number;
-        boilerPressure: number;
-        boilerWaterLevel: number;
-        boilerWaterTemp: number;
-        brakeValue: number;
-        compressorAirPressure: number;
-        compressorValveValue: number;
-        couplerFrontState: boolean;
-        couplerRearState: boolean;
-        freightAmount: number;
-        freightType: GvasString;
-        generatorValveValue: number;
-        headlightFrontState: boolean;
-        headlightRearState: boolean;
-        headlightType: number;
-        markerLightsCenterState?: number;
-        markerLightsFrontLeftState: number;
-        markerLightsFrontRightState: number;
-        markerLightsRearLeftState: number;
-        markerLightsRearRightState: number;
-        paintType?: number;
-        regulatorValue: number;
-        reverserValue: number;
-        sanderAmount?: number;
-        smokestackType: number;
-        tenderFuelAmount: number;
-        tenderWaterAmount: number;
-    };
+    state: FrameState;
 }
+
+export interface FrameState {
+    boilerFireTemp: number;
+    boilerFuelAmount: number;
+    boilerPressure: number;
+    boilerWaterLevel: number;
+    boilerWaterTemp: number;
+    brakeValue: number;
+    compressorAirPressure: number;
+    compressorValveValue: number;
+    couplerFrontState: boolean;
+    couplerRearState: boolean;
+    freightAmount: number;
+    freightType: GvasString;
+    generatorValveValue: number;
+    headlightFrontState: boolean;
+    headlightRearState: boolean;
+    headlightType: number;
+    markerLightsCenterState?: number;
+    markerLightsFrontLeftState: number;
+    markerLightsFrontRightState: number;
+    markerLightsRearLeftState: number;
+    markerLightsRearRightState: number;
+    paintType?: number;
+    regulatorValue: number;
+    reverserValue: number;
+    sanderAmount?: number;
+    smokestackType: number;
+    tenderFuelAmount: number;
+    tenderWaterAmount: number;
+}
+
+export type NumericFrameStateKeys = (
+     'boilerFireTemp' |
+     'boilerFuelAmount' |
+     'boilerPressure' |
+     'boilerWaterLevel' |
+     'boilerWaterTemp' |
+     'brakeValue' |
+     'compressorAirPressure' |
+     'compressorValveValue' |
+     'generatorValveValue' |
+     'headlightType' |
+     'markerLightsCenterState' |
+     'markerLightsFrontLeftState' |
+     'markerLightsFrontRightState' |
+     'markerLightsRearLeftState' |
+     'markerLightsRearRightState' |
+     'paintType' |
+     'regulatorValue' |
+     'reverserValue' |
+     'sanderAmount' |
+     'smokestackType' |
+     'tenderFuelAmount' |
+     'tenderWaterAmount');
 
 export interface Industry {
     location: Vector;

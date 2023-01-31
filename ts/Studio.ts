@@ -1,15 +1,16 @@
 import {GvasString, gvasToString} from './Gvas';
 import {Vector} from './Vector';
 import {Rotator} from './Rotator';
-import {industryName, IndustryType, Railroad} from './Railroad';
+import {Frame, IndustryType, NumericFrameStateKeys, Railroad, industryName} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {cargoLimits, frameDefinitions} from './frames';
+import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
 
 interface InputTextOptions {
     max?: string;
     min?: string;
+    step?: string;
 }
 
 type Quadruplet<T> = [T, T, T, T];
@@ -693,11 +694,15 @@ export class Studio {
             td.appendChild(table2);
             const tbody2 = document.createElement('tbody');
             table2.appendChild(tbody2);
-            const addStat = (title: string, input: Node) => {
+            const addStat = (text: string, input: Node, title?: string, rowClass?: string) => {
                 tr = document.createElement('tr');
+                if (rowClass) {
+                    tr.classList.add(rowClass);
+                }
                 td = document.createElement('td');
                 td.classList.add('col-2', 'text-nowrap');
-                td.innerText = title;
+                td.innerText = text;
+                if (title) td.title = title;
                 tr.appendChild(td);
                 td = document.createElement('td');
                 td.classList.add('col-auto');
@@ -711,32 +716,84 @@ export class Studio {
             // Rotation
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
             addStat('Rotation', this.editRotator(frame.rotation, setFrameRotation));
+            // Frame state
             if (frame.type && frame.type in frameDefinitions) {
-                const definition = frameDefinitions[frame.type];
-                // Water (boiler)
-                if (definition.waterBoilerMax) {
-                    const setWater = (water: number) => frame.state.boilerWaterLevel = water;
-                    const options = {min: '0', max: String(definition.waterBoilerMax)};
-                    addStat('Boiler Water', this.editNumber(frame.state.boilerWaterLevel, options, setWater));
-                }
-                // Water (tender)
-                if (definition.waterTankMax) {
-                    const setWater = (water: number) => frame.state.tenderWaterAmount = water;
-                    const options = {min: '0', max: String(definition.waterTankMax)};
-                    addStat('Tank Water', this.editNumber(frame.state.tenderWaterAmount, options, setWater));
-                }
-                // Firewood
-                if (definition.firewood) {
-                    const setFuel = (fuel: number) => frame.state.tenderFuelAmount = fuel;
-                    const options = {min: '0', max: String(definition.firewood)};
-                    addStat('Firewood', this.editNumber(frame.state.tenderFuelAmount, options, setFuel));
-                }
-                // Sand
-                if (definition.sandLevelMax) {
-                    const setSand = (sand: number) => frame.state.sanderAmount = sand;
-                    const options = {min: '0', max: String(definition.sandLevelMax)};
-                    addStat('Sand', this.editNumber(frame.state.sanderAmount || 0, options, setSand));
-                }
+                const {max, min} = frameDefinitions[frame.type];
+                const editNumericState = (frame: Frame, key: NumericFrameStateKeys) => {
+                    if (typeof frame.state[key] === 'undefined') return;
+                    const meta = frameStateMetadata[key];
+                    if (!meta) return;
+                    const maxValue = (max ? max[key] : undefined) || 0;
+                    const minValue = (min ? min[key] : undefined) || 0;
+                    const value = Number(frame.state[key]);
+                    if (value === minValue && value === maxValue) return;
+                    if (value === 0 && minValue === 1) return;
+                    let c: string | undefined = undefined;
+                    let tooltip: string = key;
+                    if (value < minValue || value > maxValue) {
+                        c = 'table-danger';
+                        tooltip = `Expected ${key} to in range [${minValue}, ${maxValue}]`;
+                    }
+                    const options: InputTextOptions = {
+                        min: String(minValue),
+                        max: String(maxValue),
+                        step: meta.step ? String(meta.step) : undefined,
+                    };
+                    const displayValue = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
+                    const saveValue = (value: number) => frame.state[key] = value;
+                    const formatValue = (value: number) => {
+                        let result = displayValue(value);
+                        if (value !== maxValue && maxValue !== 1) {
+                            result += ` / ${maxValue}`;
+                        }
+                        if (meta.unit) {
+                            result += ` ${meta.unit}`;
+                        }
+                        if (meta.type === 'slider') {
+                            const percent = 100 * value / maxValue;
+                            const display = displayValue(percent).padStart(6) + '%';
+                            result = maxValue === 1 || maxValue === 100 ? display : `${display} (${result})`;
+                        }
+                        return result;
+                    };
+                    let form: Node;
+                    if (!meta.type) {
+                        form = this.editNumber(value, options, saveValue, formatValue);
+                    } else if (meta.type === 'slider') {
+                        form = this.editSlider(value, options, saveValue, formatValue);
+                    } else {
+                        const options: string[] = meta.type;
+                        const formatNumber = (n: number) => options[n];
+                        form = this.editDropdown(value, options, saveValue, formatNumber);
+                    }
+                    addStat(meta.name, form, tooltip, c);
+                };
+                // Configuration
+                editNumericState(frame, 'headlightType');
+                editNumericState(frame, 'paintType');
+                editNumericState(frame, 'smokestackType');
+                // Cab controls
+                editNumericState(frame, 'regulatorValue');
+                editNumericState(frame, 'reverserValue');
+                editNumericState(frame, 'brakeValue');
+                editNumericState(frame, 'generatorValveValue');
+                editNumericState(frame, 'compressorValveValue');
+                // Physical state
+                editNumericState(frame, 'boilerFireTemp');
+                editNumericState(frame, 'boilerFuelAmount');
+                editNumericState(frame, 'boilerPressure');
+                editNumericState(frame, 'boilerWaterLevel');
+                editNumericState(frame, 'boilerWaterTemp');
+                editNumericState(frame, 'compressorAirPressure');
+                editNumericState(frame, 'sanderAmount');
+                editNumericState(frame, 'tenderFuelAmount');
+                editNumericState(frame, 'tenderWaterAmount');
+                // Marker lights
+                editNumericState(frame, 'markerLightsCenterState');
+                editNumericState(frame, 'markerLightsFrontLeftState');
+                editNumericState(frame, 'markerLightsFrontRightState');
+                editNumericState(frame, 'markerLightsRearLeftState');
+                editNumericState(frame, 'markerLightsRearRightState');
             }
             // Freight
             const freightType = frame.state.freightType;
@@ -887,16 +944,54 @@ export class Studio {
         return pre;
     }
 
-    private editNumber(value: number, options: InputTextOptions, saveValue: (value: number) => void) {
-        const formatValue = () => {
+    private editNumber(
+        value: number,
+        options: InputTextOptions,
+        saveValue: (value: number) => void,
+        customFormatValue?: (value: number) => string,
+    ) {
+        const formatValue = customFormatValue ? () => customFormatValue(value) : () => {
             const num = Number.isInteger(value) ? String(value) : value.toFixed(2);
             return options.max ? `${num} / ${options.max}` : num;
         };
         const input = document.createElement('input');
         input.type = 'number';
+        input.classList.add('form-control');
         if (options.max) input.max = options.max;
         if (options.min) input.min = options.min;
+        if (options.step) input.step = options.step;
         input.pattern = '[0-9]+';
+        input.value = String(value);
+        const onSaveValue = () => {
+            value = Number(input.value);
+            saveValue(value);
+        };
+        const onCancel = () => {
+            if (Number(input.value) !== value) {
+                // Restore the original value
+                input.value = String(value);
+                return true;
+            }
+            // Close the edit control
+            return false;
+        };
+        return this.saveContext(input, onSaveValue, onCancel, formatValue);
+    }
+
+    private editSlider(
+        value: number,
+        options: InputTextOptions,
+        saveValue: (value: number) => void,
+        customFormatValue: (value: number) => string,
+    ) {
+        const formatValue = () => customFormatValue(value);
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.classList.add('form-range');
+        if (options.max) input.max = options.max;
+        if (options.min) input.min = options.min;
+        if (options.step) input.step = options.step;
+        // input.pattern = '[0-9]+';
         input.value = String(value);
         const onSaveValue = () => {
             value = Number(input.value);
@@ -1036,29 +1131,42 @@ export class Studio {
     }
 
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
-        const select = document.createElement('select');
+        const options: {[key: string]: string} = {};
         for (let i = 1; i < 17; i++) {
             if (i === 15) continue;
+            options[String(i)] = industryName(i);
+        }
+        return this.editDropdown(type, options, saveValue, industryName);
+    }
+
+    private editDropdown(
+        value: number,
+        options: {[key: number]: string},
+        saveValue: (value: number) => void,
+        formatNumber: (value: number) => string,
+    ): Node {
+        const select = document.createElement('select');
+        for (const [i, text] of Object.entries(options)) {
             const option = document.createElement('option');
-            option.value = String(i);
-            option.innerText = industryName(i);
+            option.value = i;
+            option.innerText = text;
             select.appendChild(option);
         }
-        select.value = String(type);
+        select.value = String(value);
         const onSave = () => {
-            type = Number(select.value);
-            saveValue(type);
+            value = Number(select.value);
+            saveValue(value);
         };
         const onCancel = () => {
-            if (Number(select.value) !== type) {
+            if (Number(select.value) !== value) {
                 // Restore the original value
-                select.value = String(type);
+                select.value = String(value);
                 return true;
             }
             // Close the edit control
             return false;
         };
-        const formatValue = () => industryName(type);
+        const formatValue = () => formatNumber(value);
         return this.saveContext(select, onSave, onCancel, formatValue);
     }
 }
