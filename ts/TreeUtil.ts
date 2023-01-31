@@ -2,6 +2,7 @@
 import {Industry, IndustryType, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Vector} from './Vector';
 import {handleError} from './index';
+import {clamp} from './math';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 
 type Callback<T> = (value: T) => void;
@@ -123,7 +124,7 @@ function distToSegment2(p: Point, v: Point, w: Point) {
     const l2 = dist2(v, w);
     if (l2 === 0) return dist2(p, v);
     const t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-    const n = Math.max(0, Math.min(1, t));
+    const n = clamp(t, 0, 1);
     const x = v.x + n * (w.x - v.x);
     const y = v.y + n * (w.y - v.y);
     return dist2(p, {x: x, y: y});

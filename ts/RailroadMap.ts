@@ -20,6 +20,7 @@ import {asyncForEach} from './util-async';
 import {BezierCurve, HermiteCurve, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
+import {clamp} from './math';
 
 enum MapToolMode {
     pan_zoom,
@@ -495,10 +496,9 @@ export class RailroadMap {
             const rightLimit = sizes.width - gutterWidth - (sizes.viewBox.x * sizes.realZoom);
             const topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight;
             const bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom);
-            return {
-                x: Math.max(leftLimit, Math.min(rightLimit, newPan.x)),
-                y: Math.max(topLimit, Math.min(bottomLimit, newPan.y)),
-            };
+            const x = clamp(newPan.x, leftLimit, rightLimit);
+            const y = clamp(newPan.y, topLimit, bottomLimit);
+            return {x, y};
         };
 
         let timeoutId = 0;
@@ -630,7 +630,7 @@ export class RailroadMap {
                                     // Scroll up, expand brush
                                     radius *= 1.2;
                                 }
-                                radius = Math.max(10_00, Math.min(100_00, radius));
+                                radius = clamp(radius, 10_00, 100_00);
                                 this.brush.radius(radius);
                             }
                         },

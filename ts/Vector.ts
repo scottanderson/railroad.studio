@@ -1,3 +1,5 @@
+import {clamp} from './math';
+
 /**
  * A Vector struct from Unreal Engine.
  *
@@ -104,7 +106,7 @@ export function angleBetweenVectors(a: Vector, b: Vector) {
     const aLength = vectorLength(a);
     const bLength = vectorLength(b);
     const x = product / (aLength * bLength);
-    const clamped = Math.max(Math.min(x, 1), -1);
+    const clamped = clamp(x, -1, 1);
     return Math.acos(clamped);
 }
 
