@@ -991,7 +991,6 @@ export class Studio {
         if (options.max) input.max = options.max;
         if (options.min) input.min = options.min;
         if (options.step) input.step = options.step;
-        // input.pattern = '[0-9]+';
         input.value = String(value);
         const onSaveValue = () => {
             value = Number(input.value);
