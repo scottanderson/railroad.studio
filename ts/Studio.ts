@@ -799,7 +799,7 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['ID', 'Name', 'Money', 'XP', 'Location']) {
+        for (const columnHeader of ['Steam ID', 'Name', 'Money', 'XP', 'Location']) {
             const th = document.createElement('th');
             th.innerText = columnHeader;
             tr.appendChild(th);
