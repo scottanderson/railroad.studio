@@ -465,7 +465,7 @@ export class RailroadMap {
 
     private renderBackground(): Element {
         return this.layers.background
-            .image('/attachments/949906083625975868/1009629576529449000/RRO_Pine_Valley_topo_map.png')
+            .image('RRO_Pine_Valley_topo_map.png')
             .attr('transform', 'matrix(-116.75,0,0,-116.75,233700,231900)');
     }
 

@@ -25,7 +25,7 @@ export class TreeUtil {
 
     private fetchTrees() {
         // Tree list created by Aikawa#2539 and Sharidan#4609
-        const url = '/attachments/953456918834343976/963223327965585498/AllTrees.dat';
+        const url = 'AllTrees.dat';
         fetch(url)
             .then((response) => {
                 if (!response.ok) {
