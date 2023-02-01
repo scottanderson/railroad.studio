@@ -568,6 +568,16 @@ export class Studio {
             headerElement.insertBefore(headerWarning, studioControls);
             // headerElement.replaceChildren(header, headerWarning, studioControls);
         }
+        // Print world information
+        const printWorldInfo = (id: string | null, action: string) => {
+            if (!id) return;
+            const player = railroad.players.find((p) => id.startsWith(p.id + '_'));
+            if (!player) return;
+            const time = id.substring(id.indexOf('_') + 1);
+            console.log(`World ${action} by ${player.name} on ${time}`);
+        };
+        printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
+        printWorldInfo(railroad.saveGame.uniqueId, 'saved');
     }
 
     setTitle(title: string) {
