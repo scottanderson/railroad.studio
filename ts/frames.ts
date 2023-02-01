@@ -342,6 +342,8 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
         max: {
             brakeValue: 1,
             headlightType: 3,
+            markerLightsRearLeftState: 3,
+            markerLightsRearRightState: 3,
             paintType: 5,
             smokestackType: 1,
             tenderFuelAmount: 1428,
@@ -399,6 +401,8 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
         max: {
             brakeValue: 1,
             headlightType: 1,
+            markerLightsRearLeftState: 3,
+            markerLightsRearRightState: 3,
             paintType: 1,
             smokestackType: 1,
             tenderFuelAmount: 499,
@@ -885,6 +889,10 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
             boilerWaterTemp: 110,
             brakeValue: 1,
             headlightType: 1,
+            markerLightsFrontLeftState: 3,
+            markerLightsFrontRightState: 3,
+            markerLightsRearLeftState: 3,
+            markerLightsRearRightState: 3,
             paintType: 13,
             smokestackType: 1,
             tenderFuelAmount: 25,
