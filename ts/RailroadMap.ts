@@ -1204,7 +1204,14 @@ export class RailroadMap {
     private onClickSplineTrack(spline: SplineTrack, elements: Element[]) {
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
-                console.log(spline);
+                {
+                    const index = this.railroad.splineTracks
+                        .map((v) => JSON.stringify(v))
+                        .indexOf(JSON.stringify(spline));
+                    const steepest = calculateSteepestGrade(spline);
+                    const sharpest = cubicBezierMinRadius(hermiteToBezier(spline));
+                    console.log({index, sharpest, spline, steepest});
+                }
                 break;
             case MapToolMode.delete:
                 this.railroad.splineTracks = this.railroad.splineTracks.filter((s) => s !== spline);
