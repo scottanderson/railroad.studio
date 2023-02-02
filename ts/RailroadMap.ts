@@ -3,7 +3,8 @@ import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
-import {Frame, Industry, IndustryType, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
+import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
+import {IndustryType} from './IndustryType';
 import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';

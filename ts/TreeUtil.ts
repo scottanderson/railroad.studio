@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-len
-import {Industry, IndustryType, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
+import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
+import {IndustryType} from './IndustryType';
 import {Vector} from './Vector';
 import {handleError} from './index';
 import {clamp} from './math';

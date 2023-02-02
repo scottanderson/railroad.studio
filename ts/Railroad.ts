@@ -1,4 +1,5 @@
 import {GvasHeader, GvasMap, GvasString, GvasTypes} from './Gvas';
+import {IndustryType} from './IndustryType';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 
@@ -99,61 +100,6 @@ export interface Industry {
     inputs: [number, number, number, number];
     outputs: [number, number, number, number];
     type: IndustryType;
-}
-
-export enum IndustryType {
-    logging_camp = 1,
-    sawmill = 2,
-    smelter = 3,
-    ironworks = 4,
-    oil_field = 5,
-    refinery = 6,
-    coal_mine = 7,
-    iron_mine = 8,
-    freight_depot = 9,
-    firewood_camp = 10,
-    engine_house_lightblue = 11,
-    engine_house_gold = 12,
-    engine_house_red = 13,
-    engine_house_brown = 14,
-    telegraph_office = 16,
-}
-
-export function industryName(type: IndustryType): string {
-    switch (type) {
-        case IndustryType.logging_camp:
-            return 'Logging Camp';
-        case IndustryType.sawmill:
-            return 'Sawmill';
-        case IndustryType.smelter:
-            return 'Smelter';
-        case IndustryType.ironworks:
-            return 'Ironworks';
-        case IndustryType.oil_field:
-            return 'Oil Field';
-        case IndustryType.refinery:
-            return 'Refinery';
-        case IndustryType.coal_mine:
-            return 'Coal Mine';
-        case IndustryType.iron_mine:
-            return 'Iron Mine';
-        case IndustryType.freight_depot:
-            return 'Freight Depot';
-        case IndustryType.firewood_camp:
-            return 'Firewood Camp';
-        case IndustryType.engine_house_lightblue:
-            return 'Engine House (Blue)';
-        case IndustryType.engine_house_gold:
-            return 'Engine House (Gold)';
-        case IndustryType.engine_house_red:
-            return 'Engine House (Red)';
-        case IndustryType.engine_house_brown:
-            return 'Engine House (Brown)';
-        case IndustryType.telegraph_office:
-            return 'Telegraph Office';
-        default:
-            throw new Error(`Unknown industry ${type}`);
-    }
 }
 
 export interface Player {

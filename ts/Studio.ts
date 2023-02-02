@@ -1,8 +1,9 @@
 import {GvasString, gvasToString} from './Gvas';
-import {Vector} from './Vector';
-import {Rotator} from './Rotator';
-import {Frame, IndustryType, NumericFrameStateKeys, Railroad, industryName} from './Railroad';
+import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
+import {Frame, NumericFrameStateKeys, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
+import {Rotator} from './Rotator';
+import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
@@ -843,12 +844,14 @@ export class Studio {
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
-            td.appendChild(this.editIndustryProducts('Input', industry.inputs, setIndustryInputs));
+            const inputLabels = industryProductInputLabels(industry.type);
+            td.appendChild(this.editIndustryProducts('Input', inputLabels, industry.inputs, setIndustryInputs));
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
-            td.appendChild(this.editIndustryProducts('Output', industry.outputs, setIndustryOutputs));
+            const outputLabels = industryProductOutputLabels(industry.type);
+            td.appendChild(this.editIndustryProducts('Output', outputLabels, industry.outputs, setIndustryOutputs));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
@@ -1099,7 +1102,8 @@ export class Studio {
 
     private editIndustryProducts(
         type: string,
-        values: number[],
+        labels: [string, string, string, string],
+        values: [number, number, number, number],
         saveValue: (value: number[]) => void,
     ): Node {
         const display = (value: number[]) => {
@@ -1107,7 +1111,6 @@ export class Studio {
             if (value.every(zeroPredicate)) return '[Empty]';
             return String(value).replace(/(,0)+$/g, '');
         };
-        const labels = values.map((_, i) => `${type} ${i + 1}`);
         return this.editNumbers(labels, values, display, saveValue, {min: '0'});
     }
 
