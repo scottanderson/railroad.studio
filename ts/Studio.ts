@@ -1027,11 +1027,22 @@ export class Studio {
     private editString(value: GvasString, saveValue: (value: GvasString) => void) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.value = 'Null';
+        checkbox.title = 'Null';
         checkbox.checked = (value === null);
+        let tempValue = value || '';
+        checkbox.addEventListener('click', () => {
+            input.disabled = checkbox.checked;
+            if (checkbox.checked) {
+                tempValue = input.value;
+                input.value = 'null';
+            } else {
+                input.value = tempValue;
+            }
+        });
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = value || '';
+        input.disabled = (value === null);
+        input.value = (value === null) ? 'null' : value;
         const onSave = () => {
             value = checkbox.checked ? null : input.value;
             saveValue(value);
@@ -1040,8 +1051,9 @@ export class Studio {
             const newValue = checkbox.checked ? null : input.value;
             if (newValue !== value) {
                 // Restore the original value
-                checkbox.checked = (value === null);
-                input.value = value || '';
+                input.disabled = checkbox.checked = (value === null);
+                input.value = (value === null) ? 'null' : value;
+                tempValue = value || '';
                 return true;
             }
             // Close the edit control
