@@ -119,6 +119,8 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
             smokestackType: 1,
         },
         max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 50,
             boilerPressure: 120,
             boilerWaterLevel: 500,
             boilerWaterTemp: 110,
@@ -555,8 +557,10 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
             brakeValue: 1,
             headlightType: 1,
             paintType: 1,
+            regulatorValue: 1,
             reverserValue: 1,
             smokestackType: 1,
+            tenderFuelAmount: 20,
         },
     },
     [FrameTypes.HEISLER]: {
@@ -884,6 +888,8 @@ export const frameDefinitions: { [key: string]: FrameDefinition } = {
             smokestackType: 1,
         },
         max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 50,
             boilerPressure: 120,
             boilerWaterLevel: 500,
             boilerWaterTemp: 110,

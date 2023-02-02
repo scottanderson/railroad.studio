@@ -762,7 +762,10 @@ export class Studio {
                         if (meta.type === 'slider') {
                             const percent = 100 * value / maxValue;
                             const display = displayValue(percent).padStart(6) + '%';
-                            result = maxValue === 1 || maxValue === 100 ? display : `${display} (${result})`;
+                            if (!meta.unit && (maxValue === 1 || maxValue === 100)) {
+                                return display;
+                            }
+                            return `${display} (${result})`;
                         }
                         return result;
                     };
