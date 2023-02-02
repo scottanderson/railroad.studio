@@ -42,7 +42,7 @@ export class Studio {
         buttons.classList.add('hstack', 'gap-2');
         // Map
         const btnMap = document.createElement('button');
-        btnMap.innerText = 'Map';
+        btnMap.textContent = 'Map';
         btnMap.classList.add('btn', 'btn-secondary');
         const mapDiv = document.createElement('div');
         btnMap.addEventListener('click', () => {
@@ -414,7 +414,7 @@ export class Studio {
             const btnDefaults = document.createElement('button');
             btnDefaults.type = 'button';
             btnDefaults.classList.add('btn', 'btn-warning');
-            btnDefaults.innerText = 'Load defaults';
+            btnDefaults.textContent = 'Load defaults';
             btnDefaults.addEventListener('click', () => {
                 inputBearing.value = '10';
                 inputInclination.value = '2.5';
@@ -425,10 +425,10 @@ export class Studio {
                 const cfgLabel = document.createElement('label');
                 cfgLabel.setAttribute('for', cfgInput.id);
                 cfgLabel.classList.add('form-label');
-                cfgLabel.innerText = label;
+                cfgLabel.textContent = label;
                 const cfgText = document.createElement('div');
                 cfgText.classList.add('form-text');
-                cfgText.innerText = text;
+                cfgText.textContent = text;
                 const frmDivOne = document.createElement('div');
                 frmDivOne.classList.add('mb-3');
                 frmDivOne.replaceChildren(cfgLabel, cfgInput, cfgText);
@@ -564,7 +564,7 @@ export class Studio {
             const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested.`;
             console.log(warning);
             const headerWarning = document.createElement('h4');
-            headerWarning.innerText = warning;
+            headerWarning.textContent = warning;
             headerWarning.classList.add('text-warning');
             headerElement.insertBefore(headerWarning, studioControls);
             // headerElement.replaceChildren(header, headerWarning, studioControls);
@@ -604,7 +604,7 @@ export class Studio {
             'Type',
         ]) {
             const th = document.createElement('th');
-            th.innerText = columnHeader;
+            th.textContent = columnHeader;
             tr.appendChild(th);
         }
         const tbody = document.createElement('tbody');
@@ -616,7 +616,7 @@ export class Studio {
             tbody.appendChild(tr);
             // ID
             let td = document.createElement('td');
-            td.innerText = String(idx);
+            td.textContent = String(idx);
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
@@ -675,7 +675,7 @@ export class Studio {
         ['Type', 'Name', 'Number', 'State'].forEach((columnHeader, i) => {
             const th = document.createElement('th');
             th.classList.add((i < 3) ? 'col-1' : 'col-auto');
-            th.innerText = columnHeader;
+            th.textContent = columnHeader;
             tr.appendChild(th);
         });
         const tbody = document.createElement('tbody');
@@ -685,7 +685,7 @@ export class Studio {
             tbody.appendChild(tr);
             // Type
             let td = document.createElement('td');
-            td.innerText = frame.type ? frameDefinitions[frame.type].name : '';
+            td.textContent = frame.type ? frameDefinitions[frame.type].name : '';
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
@@ -712,7 +712,7 @@ export class Studio {
                 }
                 td = document.createElement('td');
                 td.classList.add('col-2', 'text-nowrap');
-                td.innerText = text;
+                td.textContent = text;
                 if (title) td.title = title;
                 tr.appendChild(td);
                 td = document.createElement('td');
@@ -828,7 +828,7 @@ export class Studio {
         thead.appendChild(tr);
         for (const columnHeader of ['Industry Type', 'Inputs', 'Outputs', 'Location', 'Rotation']) {
             const th = document.createElement('th');
-            th.innerText = columnHeader;
+            th.textContent = columnHeader;
             tr.appendChild(th);
         }
         const tbody = document.createElement('tbody');
@@ -874,7 +874,7 @@ export class Studio {
         thead.appendChild(tr);
         for (const columnHeader of ['Steam ID', 'Name', 'Money', 'XP', 'Location']) {
             const th = document.createElement('th');
-            th.innerText = columnHeader;
+            th.textContent = columnHeader;
             tr.appendChild(th);
         }
         const tbody = document.createElement('tbody');
@@ -884,11 +884,11 @@ export class Studio {
             tbody.appendChild(tr);
             // ID
             let td = document.createElement('td');
-            td.innerText = String(player.id);
+            td.textContent = String(player.id);
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
-            td.innerText = String(player.name);
+            td.textContent = String(player.name);
             tr.appendChild(td);
             // Money
             td = document.createElement('td');
@@ -930,7 +930,7 @@ export class Studio {
         formatValue: () => string,
     ): Node {
         const pre = document.createElement('pre');
-        pre.innerText = formatValue();
+        pre.textContent = formatValue();
         pre.addEventListener('click', () => {
             pre.parentElement?.replaceChildren(div);
         });
@@ -941,7 +941,7 @@ export class Studio {
         btnSave.addEventListener('click', () => {
             saveAction();
             this.modified = true;
-            pre.innerText = formatValue();
+            pre.textContent = formatValue();
             div.parentElement?.replaceChildren(pre);
         });
         // Cancel
@@ -1080,7 +1080,7 @@ export class Studio {
             const div = document.createElement('div');
             div.classList.add('form-floating', 'mb-3');
             const label = document.createElement('label');
-            label.innerText = labels[i];
+            label.textContent = labels[i];
             div.replaceChildren(input, label);
             vstack.appendChild(div);
         });
@@ -1164,7 +1164,7 @@ export class Studio {
         for (const [i, text] of Object.entries(options)) {
             const option = document.createElement('option');
             option.value = i;
-            option.innerText = text;
+            option.textContent = text;
             select.appendChild(option);
         }
         select.value = String(value);
