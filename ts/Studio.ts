@@ -515,11 +515,37 @@ export class Studio {
         btnSplineTracks.textContent = 'Spline Tracks';
         btnSplineTracks.classList.add('btn', 'btn-secondary');
         btnSplineTracks.addEventListener('click', () => {
+            const pageSize = 100;
+            const numPages = Math.ceil(railroad.splineTracks.length / pageSize);
+            const splineTrackNav = document.createElement('nav');
+            const ul = document.createElement('ul');
+            ul.classList.add('pagination');
+            for (let i = 0; i < numPages; i++) {
+                const li = document.createElement('li');
+                li.classList.add('page-item');
+                const a = document.createElement('a');
+                a.classList.add('page-link');
+                a.addEventListener('click', () => {
+                    table.replaceChildren();
+                    this.splineTracks(table, first, last);
+                });
+                const first = i * pageSize;
+                const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
+                a.textContent = `${i + 1}`;
+                a.title = `${first}-${last}`;
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+            splineTrackNav.appendChild(ul);
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
+            if (numPages > 1) {
+                studioControls.appendChild(splineTrackNav);
+            }
             content.replaceChildren(table);
-            this.splineTracks(table);
+            const last = Math.min(railroad.splineTracks.length, pageSize) - 1;
+            this.splineTracks(table, 0, last);
         });
         // Export
         const btnDownload = document.createElement('button');
@@ -585,7 +611,7 @@ export class Studio {
         this.header.textContent = title + ' - ' + this.filename;
     }
 
-    private splineTracks(table: HTMLTableElement): void {
+    private splineTracks(table: HTMLTableElement, first: number, last: number): void {
         this.setTitle('Spline Tracks');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -609,8 +635,7 @@ export class Studio {
         }
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
-        const trackCount = this.railroad.splineTracks.length;
-        for (let idx = 0; idx < trackCount; idx++) {
+        for (let idx = first; idx <= last; idx++) {
             const track = this.railroad.splineTracks[idx];
             tr = document.createElement('tr');
             tbody.appendChild(tr);
