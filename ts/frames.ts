@@ -1,4 +1,4 @@
-import {NumericFrameStateKeys} from './Railroad';
+import {NumericFrameState} from './Railroad';
 
 export enum FrameTypes {
     BALDWIN622D = '622D',
@@ -43,11 +43,11 @@ export interface FrameDefinition {
     number_length: number;
     number_lines: number;
     tender: boolean;
-    min?: {[key in NumericFrameStateKeys]?: number};
-    max?: {[key in NumericFrameStateKeys]?: number};
+    min?: Partial<Record<keyof NumericFrameState, number>>;
+    max?: Partial<Record<keyof NumericFrameState, number>>;
 }
 
-export const frameDefinitions: { [key: string]: FrameDefinition } = {
+export const frameDefinitions: Record<string, FrameDefinition> = {
     [FrameTypes.BALDWIN622D]: {
         engine: true,
         freight: false,
@@ -913,7 +913,7 @@ interface FrameStateMetadata {
     step?: number;
 }
 
-export const frameStateMetadata: {[key in NumericFrameStateKeys]: FrameStateMetadata} = {
+export const frameStateMetadata: Record<keyof NumericFrameState, FrameStateMetadata> = {
     boilerFireTemp: {
         name: 'Boiler Fire Temperature',
         type: 'slider',
@@ -1013,7 +1013,7 @@ export const frameStateMetadata: {[key in NumericFrameStateKeys]: FrameStateMeta
     },
 };
 
-export const cargoLimits: { [key: string]: { [key: string]: number } } = {
+export const cargoLimits: Record<string, Record<string, number>> = {
     boxcar: {
         crate_tools: 32,
     },

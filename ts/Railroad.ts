@@ -39,7 +39,16 @@ export interface Frame {
     state: FrameState;
 }
 
-export interface FrameState {
+export interface FrameState extends NumericFrameState {
+    couplerFrontState: boolean;
+    couplerRearState: boolean;
+    freightAmount: number;
+    freightType: GvasString;
+    headlightFrontState: boolean;
+    headlightRearState: boolean;
+}
+
+export interface NumericFrameState {
     boilerFireTemp: number;
     boilerFuelAmount: number;
     boilerPressure: number;
@@ -48,13 +57,7 @@ export interface FrameState {
     brakeValue: number;
     compressorAirPressure: number;
     compressorValveValue: number;
-    couplerFrontState: boolean;
-    couplerRearState: boolean;
-    freightAmount: number;
-    freightType: GvasString;
     generatorValveValue: number;
-    headlightFrontState: boolean;
-    headlightRearState: boolean;
     headlightType: number;
     markerLightsCenterState?: number;
     markerLightsFrontLeftState: number;
@@ -69,30 +72,6 @@ export interface FrameState {
     tenderFuelAmount: number;
     tenderWaterAmount: number;
 }
-
-export type NumericFrameStateKeys = (
-     'boilerFireTemp' |
-     'boilerFuelAmount' |
-     'boilerPressure' |
-     'boilerWaterLevel' |
-     'boilerWaterTemp' |
-     'brakeValue' |
-     'compressorAirPressure' |
-     'compressorValveValue' |
-     'generatorValveValue' |
-     'headlightType' |
-     'markerLightsCenterState' |
-     'markerLightsFrontLeftState' |
-     'markerLightsFrontRightState' |
-     'markerLightsRearLeftState' |
-     'markerLightsRearRightState' |
-     'paintType' |
-     'regulatorValue' |
-     'reverserValue' |
-     'sanderAmount' |
-     'smokestackType' |
-     'tenderFuelAmount' |
-     'tenderWaterAmount');
 
 export interface Industry {
     location: Vector;

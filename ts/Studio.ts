@@ -1,6 +1,6 @@
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
-import {Frame, NumericFrameStateKeys, Railroad} from './Railroad';
+import {Frame, NumericFrameState, Railroad} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -755,7 +755,7 @@ export class Studio {
             // Frame state
             if (frame.type && frame.type in frameDefinitions) {
                 const {max, min} = frameDefinitions[frame.type];
-                const editNumericState = (frame: Frame, key: NumericFrameStateKeys) => {
+                const editNumericState = (frame: Frame, key: keyof NumericFrameState) => {
                     if (typeof frame.state[key] === 'undefined') return;
                     const meta = frameStateMetadata[key];
                     if (!meta) return;
@@ -869,13 +869,13 @@ export class Studio {
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
-            const inputLabels = industryProductInputLabels(industry.type);
+            const inputLabels = industryProductInputLabels[industry.type];
             td.appendChild(this.editIndustryProducts('Input', inputLabels, industry.inputs, setIndustryInputs));
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
-            const outputLabels = industryProductOutputLabels(industry.type);
+            const outputLabels = industryProductOutputLabels[industry.type];
             td.appendChild(this.editIndustryProducts('Output', outputLabels, industry.outputs, setIndustryOutputs));
             tr.appendChild(td);
             // Location
@@ -1168,13 +1168,13 @@ export class Studio {
         const encode = (v: Vector): number[] => [v.x, v.y, v.z];
         const decode = (t: number[]): Vector => ({x: t[0], y: t[1], z: t[2]});
         const display = (t: number[]) => {
-            const z0 = t[0] === 0;
-            const z1 = t[1] === 0;
-            const z2 = t[2] === 0;
-            if (z0 && z1 && z2) return '{0,0,0}';
-            if (z1 && z2) return (t[0] > 0) ? `X+${t[0].toFixed(2)}` : `X${t[0].toFixed(2)}`;
-            if (z0 && z2) return (t[1] > 0) ? `Y+${t[1].toFixed(2)}` : `Y${t[1].toFixed(2)}`;
-            if (z0 && z1) return (t[2] > 0) ? `Z+${t[2].toFixed(2)}` : `Z${t[2].toFixed(2)}`;
+            const xZero = t[0] === 0;
+            const yZero = t[1] === 0;
+            const zZero = t[2] === 0;
+            if (xZero && yZero && zZero) return '0';
+            if (yZero && zZero) return (t[0] > 0) ? `X+${t[0].toFixed(2)}` : `X${t[0].toFixed(2)}`;
+            if (xZero && zZero) return (t[1] > 0) ? `Y+${t[1].toFixed(2)}` : `Y${t[1].toFixed(2)}`;
+            if (xZero && yZero) return (t[2] > 0) ? `Z+${t[2].toFixed(2)}` : `Z${t[2].toFixed(2)}`;
             if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]}}`;
             return '[Vector]';
         };
@@ -1184,11 +1184,14 @@ export class Studio {
 
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
         const options: {[key: string]: string} = {};
-        for (let i = 1; i < 17; i++) {
-            if (i === 15) continue;
-            options[String(i)] = industryName(i);
+        for (const key in IndustryType) {
+            if (!isNaN(Number(key))) continue;
+            const i = Number(IndustryType[key]);
+            if (isNaN(i)) continue;
+            options[String(i)] = industryName[i as IndustryType];
         }
-        return this.editDropdown(type, options, saveValue, industryName);
+        const display = (i: number) => i in IndustryType ? industryName[i as IndustryType] : String(i);
+        return this.editDropdown(type, options, saveValue, display);
     }
 
     private editDropdown(
