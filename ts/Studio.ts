@@ -955,6 +955,7 @@ export class Studio {
         formatValue: () => string,
     ): Node {
         const pre = document.createElement('pre');
+        pre.classList.add('m-0');
         pre.textContent = formatValue();
         pre.addEventListener('click', () => {
             pre.parentElement?.replaceChildren(div);
