@@ -5,7 +5,6 @@ import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgd
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {IndustryType} from './IndustryType';
-import {rotateVector} from './RotationMatrix';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -18,10 +17,12 @@ import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {BezierCurve, HermiteCurve, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {BezierCurve, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
 import {clamp} from './math';
+import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
+import {localToWorld} from './Transform';
 
 enum MapToolMode {
     pan_zoom,
@@ -1322,56 +1323,10 @@ function treeBucket(tree: Vector) {
     return `trees_${bucketX}_${bucketY}`;
 }
 
-function switchSecondLegLocal(spline: SplineTrack): HermiteCurve {
-    switch (spline.type) {
-        case 'rail_914_switch_cross_45':
-            return {
-                startPoint: {x: 87.9, y: 212.1, z: 0},
-                startTangent: {x: 424.2, y: -424.2, z: 0},
-                endPoint: {x: 512.1, y: -212.1, z: 0},
-                endTangent: {x: 424.2, y: -424.2, z: 0},
-            };
-        case 'rail_914_switch_cross_90':
-            return {
-                startPoint: {x: 191.2, y: -191.2, z: 0},
-                startTangent: {x: 0, y: 382.4, z: 0},
-                endPoint: {x: 191.2, y: 191.2, z: 0},
-                endTangent: {x: 0, y: 382.4, z: 0},
-            };
-        case 'rail_914_switch_left':
-        case 'rail_914_switch_left_mirror':
-        case 'rail_914_switch_left_mirror_noballast':
-        case 'rail_914_switch_left_noballast':
-            return {
-                startPoint: {x: 0, y: 0, z: 0},
-                startTangent: {x: 1879.3, y: 0, z: 0},
-                endPoint: {x: 1879.3, y: 0, z: 0},
-                endTangent: {x: 1879.3, y: 0, z: 0},
-            };
-        case 'rail_914_switch_right':
-        case 'rail_914_switch_right_mirror':
-        case 'rail_914_switch_right_mirror_noballast':
-        case 'rail_914_switch_right_noballast':
-            return {
-                startPoint: {x: 0, y: 0, z: 0},
-                startTangent: {x: 2153.67, y: 0, z: 0},
-                endPoint: {x: 1863.4, y: 184.8, z: 0},
-                endTangent: {x: 2125.36, y: 348.04, z: 0},
-            };
-        default:
-            throw new Error(`Unknown switch type ${spline.type}`);
-    }
-}
-
 function switchSecondLegWorld(spline: SplineTrack): BezierCurve {
-    const {startPoint, endPoint, startTangent, endTangent} = switchSecondLegLocal(spline);
-    // Convert local coordinate space to world coordinate
-    const world = {
-        startPoint: vectorSum(spline.location, rotateVector(startPoint, spline.rotation)),
-        endPoint: vectorSum(spline.location, rotateVector(endPoint, spline.rotation)),
-        startTangent: rotateVector(startTangent, spline.rotation),
-        endTangent: rotateVector(endTangent, spline.rotation),
-    };
+    const secondLeg = switchSecondLeg[spline.type as SplineTrackType];
+    if (!secondLeg) throw new Error(`Missing second leg for ${spline.type}`);
+    const world = localToWorld(spline, secondLeg);
     return hermiteToBezier(world);
 }
 
