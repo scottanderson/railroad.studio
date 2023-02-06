@@ -109,7 +109,7 @@ export class RailroadMap {
     private mergeLimits: MergeLimits;
 
     constructor(studio: Studio, element: HTMLElement) {
-        this.setMapModified = () => studio.modified = true;
+        this.setMapModified = () => studio.setMapModified();
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
         this.treeUtil = new TreeUtil(this.railroad, (before, after) => {

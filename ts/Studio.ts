@@ -27,10 +27,11 @@ const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
 export class Studio {
     filename: string;
     railroad: Railroad;
-    modified: boolean;
+    private modified: boolean;
     map: RailroadMap;
     header: HTMLHeadingElement;
     originalSegmentCount: number;
+    btnDownload: HTMLButtonElement;
 
     constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
         this.filename = filename;
@@ -351,7 +352,7 @@ export class Studio {
                 this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
                 btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
             }
-            this.modified = true;
+            this.setMapModified();
             this.map.refreshSplines().then(() => {
                 if (segmentCountAfter < this.originalSegmentCount) {
                     this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
@@ -568,6 +569,7 @@ export class Studio {
         // Export
         const btnDownload = document.createElement('button');
         const imgDownload = this.bootstrapIcon('bi-download', 'Download');
+        this.btnDownload = btnDownload;
         btnDownload.appendChild(imgDownload);
         btnDownload.classList.add('btn', 'btn-secondary');
         btnDownload.addEventListener('click', () => {
@@ -623,6 +625,11 @@ export class Studio {
         };
         printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
         printWorldInfo(railroad.saveGame.uniqueId, 'saved');
+    }
+
+    setMapModified() {
+        this.modified = true;
+        this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
     }
 
     setTitle(title: string) {
@@ -986,7 +993,7 @@ export class Studio {
         btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
         btnSave.addEventListener('click', () => {
             saveAction();
-            this.modified = true;
+            this.setMapModified();
             pre.textContent = formatValue();
             div.parentElement?.replaceChildren(pre);
         });
