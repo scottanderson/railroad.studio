@@ -8,6 +8,7 @@ import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
 import {clamp} from './math';
+import {SplineTrackType} from './SplineTrackType';
 
 interface InputTextOptions {
     max?: string;
@@ -702,8 +703,8 @@ export class Studio {
             tr.appendChild(td);
             // Type
             td = document.createElement('td');
-            const setTrackType = (type: GvasString) => track.type = type;
-            td.replaceChildren(this.editString(track.type, setTrackType));
+            const setTrackType = (type: SplineTrackType) => track.type = type;
+            td.replaceChildren(this.editTrackType(track.type as SplineTrackType, setTrackType));
             tr.appendChild(td);
         }
     }
@@ -818,9 +819,11 @@ export class Studio {
                     } else if (meta.type === 'slider') {
                         form = this.editSlider(value, options, saveValue, formatValue);
                     } else {
-                        const options: string[] = meta.type;
-                        const formatNumber = (n: number) => options[n];
-                        form = this.editDropdown(value, options, saveValue, formatNumber);
+                        const options = meta.type;
+                        const formatValue = (value: string) => options[Number(value)];
+                        const saveString = (value: string) => saveValue(Number(value));
+                        const optionDict = Object.fromEntries(Object.entries(meta.type));
+                        form = this.editDropdown(String(value), optionDict, saveString, formatValue);
                     }
                     addStat(meta.name, form, tooltip, c);
                 };
@@ -1208,38 +1211,46 @@ export class Studio {
             if (isNaN(i)) continue;
             options[String(i)] = industryName[i as IndustryType];
         }
-        const display = (i: number) => i in IndustryType ? industryName[i as IndustryType] : String(i);
-        return this.editDropdown(type, options, saveValue, display);
+        const display = (value: string) => industryName[Number(value) as IndustryType];
+        const save = (value: string) => saveValue(Number(value) as IndustryType);
+        return this.editDropdown(String(type), options, save, display);
+    }
+
+    private editTrackType(type: SplineTrackType, saveValue: (value: SplineTrackType) => any): Node {
+        const options = Object.fromEntries(
+            Object.values(SplineTrackType)
+                .map((v) => [v, v]));
+        const save = (value: string) => saveValue(value as SplineTrackType);
+        return this.editDropdown(type, options, save);
     }
 
     private editDropdown(
-        value: number,
-        options: {[key: number]: string},
-        saveValue: (value: number) => void,
-        formatNumber: (value: number) => string,
+        value: string,
+        options: Record<string, string>,
+        saveValue: (value: string) => any,
+        formatValue: (value: string) => string = String,
     ): Node {
         const select = document.createElement('select');
-        for (const [i, text] of Object.entries(options)) {
+        for (const [value, text] of Object.entries(options)) {
             const option = document.createElement('option');
-            option.value = i;
+            option.value = value;
             option.textContent = text;
             select.appendChild(option);
         }
         select.value = String(value);
         const onSave = () => {
-            value = Number(select.value);
+            value = select.value;
             saveValue(value);
         };
         const onCancel = () => {
-            if (Number(select.value) !== value) {
+            if (select.value !== value) {
                 // Restore the original value
-                select.value = String(value);
+                select.value = value;
                 return true;
             }
             // Close the edit control
             return false;
         };
-        const formatValue = () => formatNumber(value);
-        return this.saveContext(select, onSave, onCancel, formatValue);
+        return this.saveContext(select, onSave, onCancel, () => formatValue(value));
     }
 }
