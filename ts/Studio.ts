@@ -7,6 +7,7 @@ import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
+import {clamp} from './math';
 
 interface InputTextOptions {
     max?: string;
@@ -514,28 +515,42 @@ export class Studio {
         const btnSplineTracks = document.createElement('button');
         btnSplineTracks.textContent = 'Spline Tracks';
         btnSplineTracks.classList.add('btn', 'btn-secondary');
-        btnSplineTracks.addEventListener('click', () => {
-            const pageSize = 100;
+        let currentPage = 0;
+        const resetSplineTrackPage = () => {
+            const pageSize = 20;
             const numPages = Math.ceil(railroad.splineTracks.length / pageSize);
+            currentPage = clamp(currentPage, 0, numPages - 1);
             const splineTrackNav = document.createElement('nav');
             const ul = document.createElement('ul');
             ul.classList.add('pagination');
-            for (let i = 0; i < numPages; i++) {
+            const page = (i: number, text?: string) =>{
                 const li = document.createElement('li');
                 li.classList.add('page-item');
+                if (i === currentPage && !text) {
+                    li.classList.add('active');
+                } else if (i < 0 || i >= numPages) {
+                    li.classList.add('disabled');
+                }
                 const a = document.createElement('a');
-                a.classList.add('page-link');
+                a.classList.add('page-link', 'user-select-none');
                 a.addEventListener('click', () => {
-                    table.replaceChildren();
-                    this.splineTracks(table, first, last);
+                    currentPage = i;
+                    resetSplineTrackPage();
                 });
                 const first = i * pageSize;
                 const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
-                a.textContent = `${i + 1}`;
+                a.textContent = text || `${i + 1}`;
                 a.title = `${first}-${last}`;
                 li.appendChild(a);
                 ul.appendChild(li);
-            }
+            };
+            page(0, 'First');
+            page(currentPage - 1, 'Prev');
+            const start = Math.max(0, currentPage - 2);
+            const end = Math.min(numPages, start + 5);
+            for (let i = start; i < end; i++) page(i);
+            page(currentPage + 1, 'Next');
+            page(numPages - 1, 'Last');
             splineTrackNav.appendChild(ul);
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
@@ -544,9 +559,11 @@ export class Studio {
                 studioControls.appendChild(splineTrackNav);
             }
             content.replaceChildren(table);
-            const last = Math.min(railroad.splineTracks.length, pageSize) - 1;
-            this.splineTracks(table, 0, last);
-        });
+            const first = pageSize * currentPage;
+            const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
+            this.splineTracks(table, first, last);
+        };
+        btnSplineTracks.addEventListener('click', resetSplineTrackPage);
         // Export
         const btnDownload = document.createElement('button');
         const imgDownload = this.bootstrapIcon('bi-download', 'Download');
