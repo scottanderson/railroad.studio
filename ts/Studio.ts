@@ -1,3 +1,4 @@
+import {calculateGrade, calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
 import {Frame, NumericFrameState, Railroad} from './Railroad';
@@ -9,6 +10,7 @@ import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
 import {clamp} from './math';
 import {SplineTrackType} from './SplineTrackType';
+import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 
 interface InputTextOptions {
     max?: string;
@@ -628,11 +630,45 @@ export class Studio {
         };
         printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
         printWorldInfo(railroad.saveGame.uniqueId, 'saved');
+        this.logRadiusGrade();
     }
 
     setMapModified() {
         this.modified = true;
         this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
+        this.logRadiusGrade();
+    }
+
+    private lastLoggedRadius = Infinity;
+    private lastLoggedGrade = 0;
+    private logRadiusGrade() {
+        const splines = this.railroad.splineTracks
+            .filter((spline) => spline.type && !spline.type.includes('switch') && !spline.type.includes('bumper'));
+        const minRadius = splines
+            .map(hermiteToBezier)
+            .map(cubicBezierMinRadius)
+            .map((osculating) => osculating.radius)
+            .reduce((p, c) => Math.min(p, c), Infinity);
+        if (minRadius !== this.lastLoggedRadius) {
+            const text = (minRadius / 100).toFixed(2) + 'm';
+            console.log(`Minimum radius: ${text}`);
+            this.lastLoggedRadius = minRadius;
+        }
+        const maxGrade = Math.max(
+            this.railroad.splines
+                .map((spline) => spline.controlPoints)
+                .map((spline) => calculateGrade(spline)
+                    .map((g) => g.grade * 100)
+                    .reduce((p, c) => Math.max(p, c), 0))
+                .reduce((p, c) => Math.max(p, c), 0),
+            splines
+                .map((spline) => calculateSteepestGrade(spline))
+                .map((g) => g.percentage)
+                .reduce((p, c) => Math.max(p, c), 0));
+        if (maxGrade !== this.lastLoggedGrade) {
+            console.log(`Maximum grade: ${maxGrade.toFixed(2)}%`);
+            this.lastLoggedGrade = maxGrade;
+        }
     }
 
     setTitle(title: string) {
