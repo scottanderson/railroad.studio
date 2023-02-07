@@ -11,29 +11,17 @@ import {
 import {fp32v} from './util';
 
 /**
- * Takes a Hermite curve and optimizes the curvature by adjusting the start and
- * end tangents to match the radius of the osculating circle at that point. The
- * function calculates the angle between the start and end tangents, uses it to
- * calculate the radius of the osculating circle, and normalizes the length of
- * the new start and end tangents to the arc-length of the ideal circular arc.
+ * Given a Hermite curve, returns a new Hermite curve that represents a circular
+ * shape that is tangent to the given curve at its start and end points.
  *
- * The angle between the start and end tangents is calculated using the
- * angleBetween() function from the Vector module, which returns the angle
- * in radians between two vectors. The radius of the osculating circle is
- * calculated by dividing the distance between the start and end points by
- * twice the sine of half the angle between the start and end tangents. This
- * formula is based on the principle that the radius of the osculating circle
- * is equal to the distance between the two points on the curve divided by the
- * sine of the angle between the tangents.
+ * This function optimizes the tangent length of a curve, ensuring that it is as
+ * circular as possible. It does this by using the idea that a circular curve
+ * has equal tangent lengths at all points and using the golden section search
+ * method to search for the optimal tangent length.
  *
- * The new start and end tangents are then normalized to the arc-length of the
- * ideal circular arc, which is equal to the radius of the osculating circle
- * multiplied by the angle between the start and end tangents. This ensures
- * that the new tangents have the same length as the ideal circular arc and
- * that the new Hermite curve has the same curvature as the osculating circle.
- *
- * @param {HermiteCurve} hermite - The Hermite curve to optimize.
- * @return {HermiteCurve} A new Hermite curve with optimized curvature.
+ * @param {HermiteCurve} hermite - The Hermite curve to be circularized.
+ * @return {HermiteCurve} A new Hermite curve that represents a circular shape
+ * tangent to the given curve at its start and end points.
  */
 export function circularizeCurve(hermite: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = hermite;

@@ -27,11 +27,11 @@ export interface Vector {
  * @param {Vector} b - The second vector to be added.
  * @return {Vector} The sum of the two input vectors.
  */
-export const vectorSum = (a: Vector, b: Vector): Vector => ({
+export const vectorSum = (...args: Vector[]): Vector => args.reduce((a, b) => ({
     x: a.x + b.x,
     y: a.y + b.y,
     z: a.z + b.z,
-});
+}));
 
 export const vectorDifference = (a: Vector, b: Vector): Vector => ({
     x: a.x - b.x,
@@ -46,7 +46,7 @@ export const scaleVector = (a: Vector, b: number): Vector => ({
 });
 
 export const vectorLengthSquared = (v: Vector) =>
-    v.x * v.x + v.y * v.y + v.z * v.z;
+    dotProduct(v, v);
 
 export const vectorLength = (v: Vector) =>
     Math.sqrt(vectorLengthSquared(v));
@@ -81,6 +81,30 @@ export const crossProduct = (a: Vector, b: Vector): Vector => ({
     y: a.z * b.x - a.x * b.z,
     z: a.x * b.y - a.y * b.x,
 });
+
+/**
+ * Projects a vector onto another vector.
+ *
+ * @see {@link https://en.wikipedia.org/wiki/Vector_projection}
+ *
+ * @param {Vector} a - The vector to project.
+ * @param {Vector} b - The vector to project onto.
+ * @return {Vector} The projected vector.
+ */
+export const projectVector = (a: Vector, b: Vector): Vector =>
+    scaleVector(b, dotProduct(a, b) / vectorLengthSquared(b));
+
+/**
+ * Rejects a vector from another vector.
+ *
+ * @see {@link https://en.wikipedia.org/wiki/Vector_projection}
+ *
+ * @param {Vector} a - The vector to reject.
+ * @param {Vector} b - The vector to reject from.
+ * @return {Vector} The rejected vector.
+*/
+export const rejectVector = (a: Vector, b: Vector): Vector =>
+    vectorDifference(a, projectVector(a, b));
 
 /**
  * Calculates the angle between two vectors.
@@ -121,8 +145,9 @@ export function angleBetweenVectors(a: Vector, b: Vector) {
  * @return {Vector} The point of closest approach between the two lines.
 */
 export function closestApproach(p0: Vector, t0: Vector, p1: Vector, t1: Vector): Vector {
-    const a = vectorDifference(t1, t0);
-    const b = vectorDifference(p0, p1);
-    const t = dotProduct(a, b) / dotProduct(a, a);
-    return vectorSum(p0, scaleVector(t0, t));
+    const direction = vectorDifference(p0, p1);
+    const rejection = rejectVector(direction, t1);
+    const distanceToLinePos = vectorLength(rejection) / dotProduct(t0, normalizeVector(rejection));
+    const closestApproach = vectorDifference(p0, scaleVector(t0, distanceToLinePos));
+    return closestApproach;
 }

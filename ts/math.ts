@@ -7,7 +7,7 @@
  * @return {number} The interpolated value.
  */
 export const lerp = (a: number, b: number, alpha: number) =>
-    a * (1 - alpha) + b * alpha;
+    a + (b - a) * alpha;
 
 /**
  * Clamps a value between a minimum and maximum range.
