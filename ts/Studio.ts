@@ -18,7 +18,7 @@ interface InputTextOptions {
 
 type Quadruplet<T> = [T, T, T, T];
 
-const OLDEST_TESTED_SAVE_GAME_VERSION = 220127;
+const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
 
 /**
@@ -591,7 +591,10 @@ export class Studio {
         btnDark.addEventListener('click', function() {
             eval('darkmode.toggleDarkMode();');
         });
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnSplineTracks, btnDownload, btnDark);
+        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
+        if (railroad.splineTracks.length > 0) {
+            buttons.insertBefore(btnSplineTracks, btnDownload);
+        }
         // Studio controls
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
