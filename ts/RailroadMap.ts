@@ -17,10 +17,10 @@ import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {BezierCurve, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {BezierCurve, cubicBezier, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
-import {clamp} from './math';
+import {clamp, lerp} from './math';
 import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
 import {localToWorld} from './Transform';
 
@@ -136,7 +136,7 @@ export class RailroadMap {
         if (options.pan && options.zoom) {
             try {
                 this.panZoom.zoom(options.zoom);
-                this.panTo(options.pan);
+                this.panTo(options.pan, 0);
             } catch (e) {
                 console.log(e);
             }
@@ -151,11 +151,35 @@ export class RailroadMap {
         return this.treeUtil;
     }
 
-    panTo(point: {x: number, y: number}) {
+    private animationInterval = 0;
+    panTo(point: SvgPanZoom.Point, animationTime = 1000) {
         const sizes = this.panZoom.getSizes();
         const x = (point.x * sizes.realZoom) + (sizes.width / 2);
         const y = (point.y * sizes.realZoom) + (sizes.height / 2);
-        this.panZoom.pan({x, y});
+        if (animationTime < 1) {
+            this.panZoom.pan({x, y});
+            return;
+        }
+        const start = this.panZoom.getPan();
+        const animationStepTime = 15; // one frame per 30 ms
+        const animationSteps = Math.ceil(animationTime / animationStepTime);
+        let animationStep = 0;
+        if (this.animationInterval) clearInterval(this.animationInterval);
+        this.animationInterval = window.setInterval(() => {
+            if (animationStep < animationSteps) {
+                const t = animationStep++ / (animationSteps - 1);
+                const a = cubicBezier(t, 0, 0, 1, 1); // Ease in and out
+                // console.log({animationStep, animationSteps, t, a});
+                this.panZoom.pan({
+                    x: lerp(start.x, x, a),
+                    y: lerp(start.y, y, a),
+                });
+            } else {
+                // Cancel interval
+                clearInterval(this.animationInterval);
+                this.animationInterval = 0;
+            }
+        }, animationStepTime);
     }
 
     panFrom(): SvgPanZoom.Point {
