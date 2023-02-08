@@ -1,6 +1,7 @@
 import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
+import {HotkeyManager} from './HotkeyManager';
 import {IndustryType, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
 import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
@@ -19,6 +20,7 @@ import {
     editTrackType,
     editVector,
 } from './StudioEditor';
+import {UndoHistory} from './UndoHistory';
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
@@ -53,6 +55,7 @@ export class Studio {
     private readonly header: HTMLHeadingElement;
     private readonly map: RailroadMap;
     private readonly originalSegmentCount: number;
+    private readonly undoManager: UndoHistory;
     readonly railroad: Railroad;
 
     constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
@@ -61,6 +64,14 @@ export class Studio {
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
         this.logRadiusGrade();
+        // Register hotkeys
+        const hotkey = HotkeyManager.getInstance();
+        this.undoManager = new UndoHistory();
+        const undoCommand = {name: 'Undo', action: () => this.undoManager.undo()};
+        const redoCommand = {name: 'Redo', action: () => this.undoManager.redo()};
+        hotkey.register('ctrl z', undoCommand);
+        hotkey.register('ctrl y', redoCommand);
+        hotkey.register('ctrl shift z', redoCommand);
         // Set up the DOM
         const header = document.createElement('h2');
         this.header = header;
