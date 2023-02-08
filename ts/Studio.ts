@@ -1114,12 +1114,21 @@ export class Studio {
             if (Number(input.value) !== value) {
                 // Restore the original value
                 input.value = String(value);
+                updatePreview();
                 return true;
             }
             // Close the edit control
             return false;
         };
-        return this.saveContext(input, onSaveValue, onCancel, formatValue);
+        const preview = document.createElement('pre');
+        preview.classList.add('mb-0');
+        preview.textContent = formatValue();
+        const updatePreview = () => preview.textContent = customFormatValue(Number(input.value));
+        input.addEventListener('input', updatePreview);
+        const form = document.createElement('form');
+        form.classList.add('form-group', 'w-100');
+        form.replaceChildren(preview, input);
+        return this.saveContext(form, onSaveValue, onCancel, formatValue);
     }
 
     private editString(value: GvasString, saveValue: (value: GvasString) => void) {
