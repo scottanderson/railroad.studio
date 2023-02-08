@@ -635,8 +635,13 @@ export class Studio {
     }
 
     setMapModified() {
-        this.modified = true;
-        this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
+        if (!this.modified) {
+            this.modified = true;
+            this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
+            document.title = this.filename + '* - Railroad Studio';
+            const onBeforeUnload = (e: BeforeUnloadEvent) => e.returnValue = 'Changes you made may not be saved.';
+            window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
+        }
         this.logRadiusGrade();
     }
 
