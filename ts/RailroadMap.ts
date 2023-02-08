@@ -1,7 +1,7 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Circle, Element, G, Matrix, Path, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {ArrayXY, Circle, Element, G, Matrix, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {IndustryType} from './IndustryType';
@@ -121,7 +121,7 @@ export class RailroadMap {
                 this.setTitle(`Replanted ${before - after} trees`);
             }
             this.layers.trees.node.replaceChildren();
-            this.renderTrees();
+            return this.renderTrees();
         });
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
@@ -180,7 +180,10 @@ export class RailroadMap {
         }
     }
 
-    refreshSplines(): Promise<void> {
+    private renderLock = false;
+    async refreshSplines(): Promise<void> {
+        if (this.renderLock) new Error('Map is already rendering');
+        this.renderLock = true;
         this.layers.grades.node.replaceChildren();
         this.layers.controlPoints.node.replaceChildren();
         this.layers.groundworks.node.replaceChildren();
@@ -190,12 +193,14 @@ export class RailroadMap {
         this.layers.tracks.node.replaceChildren();
         this.layers.tracksHidden.node.replaceChildren();
         this.renderSwitches();
-        return this.renderSplines()
-            .then(() => this.renderSplineTracks())
-            .catch(handleError);
+        await this.renderSplines();
+        await this.renderSplineTracks();
+        this.renderLock = false;
     }
 
-    private render(): Promise<void> {
+    private async render(): Promise<void> {
+        if (this.renderLock) throw new Error('Map is already rendering');
+        this.renderLock = true;
         this.renderBackground();
         this.renderBorder();
         this.renderBrush();
@@ -204,10 +209,10 @@ export class RailroadMap {
         this.railroad.players.forEach(this.renderPlayer, this);
         this.railroad.turntables.forEach(this.renderTurntable, this);
         this.renderSwitches();
-        return this.renderSplines()
-            .then(() => this.renderSplineTracks())
-            .then(() => this.renderTrees())
-            .catch(handleError);
+        await this.renderSplines();
+        await this.renderSplineTracks();
+        await this.renderTrees();
+        this.renderLock = false;
     }
 
     toggleCircularizeTool(): boolean {
@@ -554,7 +559,7 @@ export class RailroadMap {
                                 this.railroad.removedVegetationAssets =
                                     this.railroad.removedVegetationAssets.concat(cut);
                                 return this.renderTreeArray(cut);
-                            }).finally(() => {
+                            }).catch(handleError).finally(() => {
                                 treeBrushAsync = false;
                             });
                         } else {
@@ -839,7 +844,7 @@ export class RailroadMap {
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
             }
             rect
-                .on('click', () => this.onClickControlPoint(point))
+                .on('click', () => this.onClickSpline(spline, elements))
                 .addClass(`control-point-${adjacentVisible}`);
             elements.push(rect);
         });
@@ -853,7 +858,7 @@ export class RailroadMap {
             const rect = g
                 .path(d)
                 .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
-                .on('click', () => this.onClickSpline(spline, rect, elements));
+                .on('click', () => this.onClickSpline(spline, elements));
             if (invisPass) rect.addClass('hidden');
             switch (spline.type) {
                 case SplineType.rail:
@@ -1153,15 +1158,8 @@ export class RailroadMap {
         return elements;
     }
 
-    private onClickControlPoint(point: Vector): void {
-        switch (this.toolMode) {
-            case MapToolMode.pan_zoom:
-                console.log(point);
-                break;
-        }
-    }
-
-    private onClickSpline(spline: Spline, rect: Path, elements: Element[]) {
+    private onClickSpline(spline: Spline, elements: Element[]) {
+        if (this.renderLock) return;
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
                 console.log(spline);
@@ -1204,6 +1202,7 @@ export class RailroadMap {
     }
 
     private onClickSplineTrack(spline: SplineTrack, elements: Element[]) {
+        if (this.renderLock) return;
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
                 {
@@ -1259,6 +1258,7 @@ export class RailroadMap {
     }
 
     private onClickSwitch(sw: Switch, elements: Element[]) {
+        if (this.renderLock) return;
         switch (this.toolMode) {
             case MapToolMode.delete:
                 this.railroad.switches = this.railroad.switches.filter((s) => s !== sw);
@@ -1269,6 +1269,7 @@ export class RailroadMap {
     }
 
     private onClickTurntable(turntable: Turntable, elements: Element[]) {
+        if (this.renderLock) return;
         switch (this.toolMode) {
             case MapToolMode.delete:
                 this.railroad.turntables = this.railroad.turntables.filter((t) => t !== turntable);

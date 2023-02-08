@@ -11,6 +11,7 @@ import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
 import {clamp} from './math';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
+import {handleError} from './index';
 
 interface InputTextOptions {
     max?: string;
@@ -233,15 +234,15 @@ export class Studio {
         }[] = [
             {
                 name: 'Cut All Trees (increases save file size)',
-                onClick: () => this.map.getTreeUtil().cutAll(),
+                onClick: () => this.map.getTreeUtil().cutAll().catch(handleError),
             },
             {
                 name: 'Replant all trees (dangerous!)',
-                onClick: () => this.map.getTreeUtil().replantAll(),
+                onClick: () => this.map.getTreeUtil().replantAll().catch(handleError),
             },
             {
                 name: 'Smart replant',
-                onClick: () => this.map.getTreeUtil().smartReplant(),
+                onClick: () => this.map.getTreeUtil().smartReplant().catch(handleError),
             },
         ];
         lstTrees.replaceChildren(...treeActions.map((action) => {
