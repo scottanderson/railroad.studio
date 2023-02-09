@@ -12,6 +12,7 @@ import {clamp} from './math';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
+import {toggleDarkMode} from './themes';
 
 interface InputTextOptions {
     max?: string;
@@ -591,9 +592,7 @@ export class Studio {
         const btnDark = document.createElement('button');
         btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(this.bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
-        btnDark.addEventListener('click', function() {
-            eval('darkmode.toggleDarkMode();');
-        });
+        btnDark.addEventListener('click', toggleDarkMode);
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
         if (railroad.splineTracks.length > 0) {
             buttons.insertBefore(btnSplineTracks, btnDownload);
@@ -1053,7 +1052,7 @@ export class Studio {
         });
         // Layout
         const div = document.createElement('div');
-        div.classList.add('hstack');
+        div.classList.add('hstack', 'gap-2');
         div.replaceChildren(input, btnSave, btnCancel);
         return pre;
     }
@@ -1197,7 +1196,7 @@ export class Studio {
             input.pattern = '[0-9]+';
             input.classList.add('form-control');
             const div = document.createElement('div');
-            div.classList.add('form-floating', 'mb-3');
+            div.classList.add('form-floating', 'mt-1', 'mb-1');
             const label = document.createElement('label');
             label.textContent = labels[i];
             div.replaceChildren(input, label);
@@ -1292,6 +1291,7 @@ export class Studio {
         formatValue: (value: string) => string = String,
     ): Node {
         const select = document.createElement('select');
+        select.classList.add('form-select');
         for (const [value, text] of Object.entries(options)) {
             const option = document.createElement('option');
             option.value = value;

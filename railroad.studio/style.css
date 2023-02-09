@@ -1,3 +1,65 @@
+:root {
+  --duration: 0.5s;
+  --animation: ease;
+  --stroke: black;
+  --stroke-inverted: white;
+  --spline-hover: red;
+  --rail-hidden: blue;
+  --rail-deck: burlywood;
+  --rail-deck-hidden: green;
+  --grade: sienna;
+  --stone-wall: darkgray;
+  --wooden-bridge: goldenrod;
+  --steel-bridge: steelblue;
+  --switch-leg-not-aligned: red;
+  --diamond: yellow;
+  --control-point-primary: red;
+  --control-point-secondary: blue;
+  --control-point-tertiary: green;
+  --tree: green;
+  --tree-border: darkgreen;
+  --brakes-applied: red;
+  --engine: purple;
+  --tender: black;
+  --caboose: lightpink;
+  --waycar: gold;
+  --boxcar: #66f081;
+  --boxcar-loaded: #36cc00;
+  --flatcar-cordwood: #fdbf77;
+  --flatcar-cordwood-loaded: orange;
+  --flatcar-hopper: #a7a7a9;
+  --flatcar-hopper-loaded: black;
+  --flatcar-logs: #f99a9a;
+  --flatcar-logs-loaded: red;
+  --flatcar-stakes: #fdbf77;
+  --flatcar-stakes-loaded: #f38a12;
+  --flatcar-tanker: #9090f9;
+  --flatcar-tanker-loaded: blue;
+  --handcar: white;
+  --spice-verde: green;
+  --spice-lime: yellowgreen;
+  --spice-lemon: #dd0;
+  --spice-mild: orange;
+  --spice-piquante: orangered;
+  --spice-caliente: red;
+}
+
+[data-bs-theme=dark] {
+  --stroke: white;
+  --stroke-inverted: black;
+  --rail-deck: brown;
+  --grade: darkkhaki;
+  --wooden-bridge: lightgoldenrodyellow;
+  --switch-leg-not-aligned: cyan;
+  --control-point-primary: magenta;
+  --control-point-secondary: cyan;
+  --control-point-tertiary: yellow;
+}
+
+body {
+  transition: background-color var(--duration) var(--animation);
+}
+
 .studio-controls {
   position: absolute;
   z-index: 10;
@@ -13,22 +75,17 @@
   z-index: 1;
 }
 
-.brush
-{
-  fill:green;
-  stroke:green;
+.brush {
+  fill: var(--tree);
+  stroke: var(--tree-border);
   stroke-width: 100;
   fill-opacity: .2;
 }
 
 .map-border {
-  stroke: black;
+  stroke: var(--stroke);
   fill: none;
   stroke-width: 500;
-}
-
-.dark .map-border {
-  stroke: white;
 }
 
 .rail,
@@ -42,12 +99,8 @@
 }
 
 .rail {
-  stroke: black;
+  stroke: var(--stroke);
   stroke-width: 92;
-}
-
-.dark .rail {
-  stroke: white;
 }
 
 .radius-0,
@@ -56,75 +109,57 @@
 .radius-3,
 .radius {
   fill: none;
-  stroke: black;
+  stroke: var(--stroke);
   stroke-width: 32;
 }
-.dark .radius { stroke: white; }
 
-.radius-0 { stroke: red; }
-.radius-1 { stroke: orange; }
-.radius-2 { stroke: yellowgreen; }
-.radius-3 { stroke: green; }
+.radius-0 { stroke: var(--spice-caliente); }
+.radius-1 { stroke: var(--spice-mild); }
+.radius-2 { stroke: var(--spice-lime); }
+.radius-3 { stroke: var(--spice-verde); }
 
 .radius-0.hidden,
 .radius-1.hidden,
 .radius-2.hidden,
 .radius-3.hidden,
 .radius.hidden { stroke: none; }
-.dark .radius.hidden { stroke: none; }
 
 .rail.hidden {
-  stroke: blue;
+  stroke: var(--rail-hidden);
   stroke-width: 200;
   opacity: 0.5;
 }
 
 .rail-deck {
-  stroke: brown;
+  stroke: var(--rail-deck);
   stroke-width: 256;
 }
 
-.dark .rail-deck {
-  stroke: burlywood;
-}
-
 .rail-deck.hidden {
-  stroke: green;
+  stroke: var(--rail-deck-hidden);
   stroke-width: 350;
   opacity: 0.5;
 }
 
 .grade {
-  stroke: sienna;
-}
-
-.dark .grade {
-  stroke: darkkhaki;
+  stroke: var(--grade);
 }
 
 .bumper {
-  stroke: black;
+  stroke: var(--stroke);
   stroke-width: 200;
 }
 
-.dark .bumper {
-  stroke: white;
-}
-
 .stone-wall {
-  stroke: darkgray;
+  stroke: var(--stone-wall);
 }
 
 .wooden-bridge {
-  stroke: goldenrod;
-}
-
-.dark .wooden-bridge {
-  stroke: lightgoldenrodyellow;
+  stroke: var(--wooden-bridge);
 }
 
 .steel-bridge {
-  stroke: slateblue;
+  stroke: var(--steel-bridge);
 }
 
 .grade,
@@ -141,7 +176,7 @@
 .wooden-bridge:hover,
 .steel-bridge:hover {
   opacity: 0.8;
-  stroke: red;
+  stroke: var(--spline-hover);
 }
 
 .grade.hidden,
@@ -162,34 +197,23 @@
 }
 
 .switch-leg.aligned {
-  stroke: black;
+  stroke: var(--stroke);
   stroke-width: 92;
 }
 
-.dark .switch-leg.aligned {
-  stroke: white;
-}
-
 .switch-leg.not-aligned {
-  stroke: red;
+  stroke: var(--switch-leg-not-aligned);
   stroke-width: 92;
   opacity: 0.5;
 }
 
-.dark path.switch-leg.not-aligned {
-  stroke: cyan;
-}
-
 .diamond {
-  fill: yellow;
+  fill: var(--diamond);
 }
 
-.control-point-0 { fill: red; }
-.control-point-1 { fill: blue; }
-.control-point-2 { fill: green; }
-.dark .control-point-0 { fill: magenta; }
-.dark .control-point-1 { fill: cyan; }
-.dark .control-point-2 { fill: yellow; }
+.control-point-0 { fill: var(--control-point-primary); }
+.control-point-1 { fill: var(--control-point-secondary); }
+.control-point-2 { fill: var(--control-point-tertiary); }
 
 .control-line-0,
 .control-line-1,
@@ -197,12 +221,9 @@
   fill: none;
   stroke-width: 32;
 }
-.control-line-0 { stroke: red; }
-.control-line-1 { stroke: blue; }
-.control-line-2 { stroke: green; }
-.dark .control-line-0 { stroke: magenta; }
-.dark .control-line-1 { stroke: cyan; }
-.dark .control-line-2 { stroke: yellow; }
+.control-line-0 { stroke: var(--control-point-primary); }
+.control-line-1 { stroke: var(--control-point-secondary); }
+.control-line-2 { stroke: var(--control-point-tertiary); }
 
 .control-point-0:hover,
 .control-point-1:hover,
@@ -213,11 +234,7 @@
 .frame {
   rx: 92;
   stroke-width: 32;
-  stroke: black;
-}
-
-.dark .frame {
-  stroke: white;
+  stroke: var(--stroke);
 }
 
 .frame:hover {
@@ -225,72 +242,70 @@
 }
 
 .frame.brakes-applied {
-  stroke: red;
+  stroke: var(--brakes-applied);
 }
 
 .frame.engine {
-  fill: purple;
+  fill: var(--engine);
 }
 
 .frame.tender {
-  fill: black;
+  fill: var(--tender);
 }
 
-.frame.caboose,
-.frame.waycar {
-  fill: lightpink;
-}
+.frame.caboose{ fill: var(--caboose); }
+.frame.waycar { fill: var(--waycar); }
 
 .frame.boxcar {
-  fill: #66f081;
+  fill: var(--boxcar);
 }
 
 .frame.boxcar.cargo-loaded {
-  fill: #36cc00;
+  fill: var(--boxcar-loaded);
 }
 
 .frame.flatcar_cordwood {
-  fill: #fdbf77;
+  fill: var(--flatcar-cordwood);
 }
 
 .frame.flatcar_cordwood.cargo-loaded {
-  fill: orange;
+  fill: var(--flatcar-cordwood-loaded);
 }
 
 .frame.flatcar_hopper {
-  fill: #a7a7a9;
+  fill: var(--flatcar-hopper);
 }
 
 .frame.flatcar_hopper.cargo-loaded {
-  fill: black;
+  fill: var(--flatcar-hopper-loaded);
 }
 
 .frame.flatcar_logs {
-  fill: #f99a9a;
+  fill: var(--flatcar-logs);
 }
 
 .frame.flatcar_logs.cargo-loaded {
-  fill: red;
+  fill: var(--flatcar-logs-loaded);
 }
 
 .frame.flatcar_stakes {
-  fill: #fdbf77;
+  fill: var(--flatcar-stakes);
 }
 
 .frame.flatcar_stakes.cargo-loaded {
-  fill: #f38a12;
+  fill: var(--flatcar-stakes-loaded);
 }
 
 .frame.flatcar_tanker {
-  fill: #9090f9;
+  fill: var(--flatcar-tanker);
 }
 
 .frame.flatcar_tanker.cargo-loaded {
-  fill: blue;
+  fill: var(--flatcar-tanker-loaded);
 }
 
 .frame.handcar {
-  fill: white;
+  fill: var(--handcar);
 }
 
 .frame-text {
@@ -313,43 +328,42 @@
   opacity: 0.9;
 }
 
-.grade-text-2 { fill: green; }
-.grade-text-3 { fill: yellowgreen; }
-.grade-text-4 { fill: #dd0; }
-.grade-text-5 { fill: orange; }
-.grade-text-6 { fill: orangered; }
-.grade-text-7 { fill: red; }
+.grade-text-2 { fill: var(--spice-verde); }
+.grade-text-3 { fill: var(--spice-lime); }
+.grade-text-4 { fill: var(--spice-lemon); }
+.grade-text-5 { fill: var(--spice-mild); }
+.grade-text-6 { fill: var(--spice-piquante); }
+.grade-text-7 { fill: var(--spice-caliente); }
 
-.radius-text-0 { fill: red; }
-.radius-text-1 { fill: orange; }
-.radius-text-2 { fill: yellowgreen; }
-.radius-text-3 { fill: green; }
+.radius-text-0 { fill: var(--spice-caliente); }
+.radius-text-1 { fill: var(--spice-mild); }
+.radius-text-2 { fill: var(--spice-lime); }
+.radius-text-3 { fill: var(--spice-verde); }
 
-.dark .frame-text,
-.dark .grade-text,
-.dark .radius-text,
-.dark .player {
-  fill: white;
+.frame-text,
+.grade-text,
+.radius-text,
+.player {
+  fill: var(--stroke);
 }
 
-.dark image {
+image {
+  transition: filter var(--duration) var(--animation);
+}
+
+[data-bs-theme=dark] image {
   --webkit-filter: invert(100%);
   filter: invert(100%);
 }
 
 .tree {
-  fill: green;
-  stroke: darkgreen;
+  fill: var(--tree);
+  stroke: var(--tree-border);
   stroke-width: 50;
 }
 
 .turntable {
-  stroke: black;
+  stroke: var(--stroke);
   stroke-width: 20;
-  fill: white;
-}
-
-.dark .turntable {
-  stroke: white;
-  fill: black;
+  fill: var(--stroke-inverted);
 }

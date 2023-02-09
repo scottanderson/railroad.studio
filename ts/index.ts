@@ -1,11 +1,15 @@
 import {Studio} from './Studio';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
+import {activateTheme} from './themes';
 
 // Expose `window.studio` in the global context for advanced users to inspect or modify application state.
 interface StudioWindow extends Window { studio: Studio; }
 // eslint-disable-next-line no-redeclare
 declare let window: StudioWindow;
+
+// Set up dark mode before doing anything else
+activateTheme();
 
 // Main app entry point
 window.onload = () => {

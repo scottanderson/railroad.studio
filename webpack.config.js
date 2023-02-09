@@ -10,7 +10,7 @@ module.exports = {
                 secure: false,
             },
         },
-        static: './railroad.studio',
+        static: path.resolve(__dirname, 'railroad.studio'),
     },
     entry: './ts/index.ts',
     module: {
