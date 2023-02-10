@@ -847,7 +847,7 @@ export class RailroadMap {
             const degrees = splineHeading(spline, i) - 90;
             let rect;
             if (isRail) {
-                const r = 192;
+                const r = 92;
                 const radians = degreesToRadians(30);
                 const h = r * Math.sin(radians);
                 const l = r * Math.cos(radians);
@@ -862,11 +862,11 @@ export class RailroadMap {
                     ])
                     .attr('transform', makeTransform(point.x, point.y, degrees));
             } else {
-                const x = Math.round(point.x - 150);
-                const y = Math.round(point.y - 150);
+                const x = Math.round(point.x - 50);
+                const y = Math.round(point.y - 50);
                 rect = this.layers.controlPoints
-                    .rect(300, 300)
-                    .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
+                    .rect(100, 100)
+                    .attr('transform', `translate(${x} ${y}) rotate(${degrees} 50 50)`);
             }
             rect
                 .on('click', clickHandler)
