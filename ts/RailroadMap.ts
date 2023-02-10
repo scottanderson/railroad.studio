@@ -1,7 +1,7 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {ArrayXY, Circle, Element, G, Matrix, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {Circle, Element, G, Matrix, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
 import {IndustryType} from './IndustryType';
@@ -10,8 +10,7 @@ import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
 import {gvasToString} from './Gvas';
 import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
-import {bezierCommand, svgPath} from './bezier';
-import {delta2, MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
+import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
 import {frameDefinitions, cargoLimits} from './frames';
 import {handleError} from './index';
@@ -23,6 +22,7 @@ import {degreesToRadians} from './Rotator';
 import {clamp, lerp} from './math';
 import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
 import {localToWorld} from './Transform';
+import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 
 enum MapToolMode {
     pan_zoom,
@@ -839,6 +839,7 @@ export class RailroadMap {
     private renderSpline(spline: Spline) {
         const elements: Element[] = [];
         const isRail = spline.type === SplineType.rail || spline.type === SplineType.rail_deck;
+        const clickHandler = () => this.onClickSpline(spline, elements);
         // Control points
         spline.controlPoints.forEach((point, i) => {
             const start = Math.max(i - 1, 0);
@@ -868,21 +869,30 @@ export class RailroadMap {
                     .attr('transform', `translate(${x} ${y}) rotate(${degrees} 150 150)`);
             }
             rect
-                .on('click', () => this.onClickSpline(spline, elements))
+                .on('click', clickHandler)
                 .addClass(`control-point-${adjacentVisible}`);
             elements.push(rect);
         });
+        // Calculate spline paths
         const splineGroup = isRail ? this.layers.tracks : this.layers.groundworks;
         const hiddenGroup = isRail ? this.layers.tracksHidden : this.layers.groundworksHidden;
-        const points: ArrayXY[] = spline.controlPoints.map((cp) => [Math.round(cp.x), Math.round(cp.y)]);
-        const d = svgPath(points, bezierCommand);
-        // Splines
+        const pathAccumulator: [PathCommand[], PathCommand[]] = [[], []];
+        spline.segmentsVisible.forEach((visible, i, arr) => {
+            const acc = pathAccumulator[visible ? 0 : 1];
+            const [a, b, c, d] = catmullRomToBezier(spline, i);
+            if (acc.length === 0 || arr[i - 1] !== visible) {
+                acc.push(['M', Math.round(a.x), Math.round(a.y)]);
+            }
+            acc.push(['C', b.x, b.y, c.x, c.y, d.x, d.y]);
+        });
+        // Render spline paths
         for (const invisPass of [true, false]) {
+            const d = pathAccumulator[invisPass ? 1 : 0];
+            if (d.length === 0) continue;
             const g = invisPass ? hiddenGroup : splineGroup;
             const rect = g
                 .path(d)
-                .attr('stroke-dasharray', splineToDashArray(spline, invisPass))
-                .on('click', () => this.onClickSpline(spline, elements));
+                .on('click', clickHandler);
             if (invisPass) rect.addClass('hidden');
             switch (spline.type) {
                 case SplineType.rail:
@@ -910,6 +920,17 @@ export class RailroadMap {
             }
             elements.push(rect);
         }
+        const makeText = (cp0: Vector, cp1: Vector, str: string, c = 'grade-text', l = this.layers.grades) => {
+            const text = l
+                .text((block) => block
+                    .text(str)
+                    .dx(300))
+                .attr('transform', makeTransformT(cp0, cp1))
+                .on('click', clickHandler)
+                .addClass(c);
+            elements.push(text);
+            return text;
+        };
         // Grade
         if (isRail) {
             const c = calculateGrade(spline.controlPoints);
@@ -920,14 +941,56 @@ export class RailroadMap {
                 const cp0 = spline.controlPoints[i];
                 const cp1 = spline.controlPoints[i + 1];
                 const className = gradeTextClass(percentage);
-                const text = this.layers.grades
-                    .text((block) => block
-                        .text(percentage.toFixed(4) + '%')
-                        .dx(300))
-                    .attr('transform', makeTransformT(cp0, cp1))
-                    .addClass(className);
-                elements.push(text);
+                const str = percentage.toFixed(4) + '%';
+                makeText(cp0, cp1, str, className);
             }
+        }
+        // Curvature
+        const renderCurvature = (curvature: {
+            center: Vector,
+            location: Vector,
+            radius: number,
+            t: number,
+            i: number,
+        }) => {
+            const {center, location, radius, t, i} = curvature;
+            const l = this.layers.radius;
+            if (radius > 120_00) return elements;
+            const bezier = catmullRomToBezier(spline, i);
+            const cp0 = cubicBezier3(t - 0.01, bezier);
+            const cp1 = cubicBezier3(t + 0.01, bezier);
+            const thresholds = [30_00, 50_00, 70_00, 90_00];
+            const index = thresholds.findIndex((t) => radius < t);
+            const classSuffix = (index === -1) ? '' : `-${index}`;
+            // Circle
+            const circle = l
+                .circle(radius * 2)
+                .center(center.x, center.y)
+                .addClass('hidden')
+                .addClass('radius' + classSuffix);
+            elements.push(circle);
+            // Line
+            const line = l
+                .line(center.x, center.y, location.x, location.y)
+                .addClass('hidden')
+                .addClass('radius' + classSuffix);
+            elements.push(line);
+            // Text
+            const c = 'radius-text' + classSuffix;
+            const text = (radius / 100).toFixed(0) + 'm';
+            makeText(cp0, cp1, text, c, this.layers.radius)
+                .on('mouseover', () => {
+                    circle.removeClass('hidden');
+                    line.removeClass('hidden');
+                })
+                .on('mouseout', () => {
+                    circle.addClass('hidden');
+                    line.addClass('hidden');
+                });
+        };
+        if (isRail) {
+            catmullRomMinRadius(spline)
+                .forEach(renderCurvature);
         }
         return elements;
     }
@@ -1317,29 +1380,6 @@ function cargoText(frame: Frame) {
     if (!(frame.state.freightType in cargoLimits[frame.type])) return null;
     const limit = cargoLimits[frame.type][frame.state.freightType];
     return `${frame.state.freightType} [${frame.state.freightAmount} / ${limit}]`;
-}
-
-function splineToDashArray(spline: Spline, invert: boolean): string | null {
-    let ret: string[] | undefined;
-    let dashlen = 0;
-    for (let s = 0; s < spline.segmentsVisible.length; s++) {
-        const previousSegmentVisible = (s > 0) && spline.segmentsVisible[s - 1];
-        const segmentLength = Math.sqrt(delta2(spline.controlPoints[s], spline.controlPoints[s + 1]));
-        if (previousSegmentVisible !== spline.segmentsVisible[s]) {
-            if (!ret) {
-                ret = previousSegmentVisible === invert ? ['0'] : [];
-            }
-            ret.push(String(Math.round(dashlen)));
-            dashlen = segmentLength;
-        } else {
-            dashlen += segmentLength;
-        }
-    }
-    if (!ret) return invert ? null : String(Math.round(dashlen));
-    if (dashlen > 0) {
-        ret.push(String(Math.round(dashlen)));
-    }
-    return ret.join(',');
 }
 
 function treeBucket(tree: Vector) {
