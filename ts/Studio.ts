@@ -198,7 +198,7 @@ export class Studio {
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
         const categories: (keyof FrameDefinition)[] = ['engine', 'tender', 'freight'];
-        lstFrameList.replaceChildren(...railroad.frames.sort((a, b) => {
+        lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
             if (!a.type) return b.type ? 1 : 0;
             if (!b.type) return -1;
             const ad = frameDefinitions[a.type];
