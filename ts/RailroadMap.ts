@@ -879,9 +879,13 @@ export class RailroadMap {
         const pathAccumulator: [PathCommand[], PathCommand[]] = [[], []];
         spline.segmentsVisible.forEach((visible, i, arr) => {
             const acc = pathAccumulator[visible ? 0 : 1];
-            const [a, b, c, d] = catmullRomToBezier(spline, i);
+            const [a, b, c, d] = catmullRomToBezier(spline, i)
+                .map((v) => ({
+                    x: Math.round(v.x),
+                    y: Math.round(v.y),
+                }));
             if (acc.length === 0 || arr[i - 1] !== visible) {
-                acc.push(['M', Math.round(a.x), Math.round(a.y)]);
+                acc.push(['M', a.x, a.y]);
             }
             acc.push(['C', b.x, b.y, c.x, c.y, d.x, d.y]);
         });
@@ -1010,7 +1014,11 @@ export class RailroadMap {
         const elements: Element[] = [];
         const clickHandler = () => this.onClickSplineTrack(spline, elements);
         const makePath = (group: G, classes: string[], curve: BezierCurve = bezier) => {
-            const [a, b, c, d] = curve;
+            const [a, b, c, d] = curve
+                .map((v) => ({
+                    x: Math.round(v.x),
+                    y: Math.round(v.y),
+                }));
             const trackPath = ['M', a.x, a.y, 'C', b.x, b.y, c.x, c.y, d.x, d.y];
             const path = group.path(trackPath);
             path.on('click', clickHandler);
