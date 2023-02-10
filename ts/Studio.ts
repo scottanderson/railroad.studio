@@ -1,7 +1,7 @@
-import {calculateGrade, calculateSteepestGrade} from './Grade';
+import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
-import {Frame, NumericFrameState, Railroad} from './Railroad';
+import {Frame, NumericFrameState, Railroad, SplineType} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -13,6 +13,7 @@ import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
 import {toggleDarkMode} from './themes';
+import {catmullRomToHermite} from './util-catmullrom';
 
 interface InputTextOptions {
     max?: string;
@@ -647,11 +648,30 @@ export class Studio {
     private lastLoggedRadius = Infinity;
     private lastLoggedGrade = 0;
     private logRadiusGrade() {
-        const splines = this.railroad.splineTracks
-            .filter((spline) => spline.type && !spline.type.includes('switch') && !spline.type.includes('bumper'));
-        const minRadius = splines
+        const catmullRomTracks = this.railroad.splines.filter((spline) =>
+            spline.type === SplineType.rail ||
+            spline.type === SplineType.rail_deck);
+        // Convert Catmull-Rom track splines to hermite curves
+        const fromCatmullRom = catmullRomTracks
+            .flatMap((spline) => spline.segmentsVisible
+                .flatMap((vis, i) => vis ? [catmullRomToHermite(spline, i)] : []));
+        // Combine with Hermite track splines
+        const hermiteTracks = fromCatmullRom.concat(
+            this.railroad.splineTracks
+                .filter((spline) =>
+                    spline.type &&
+                    spline.type.startsWith('rail_') &&
+                    !spline.type.includes('switch') &&
+                    !spline.type.includes('bumper'))
+                .map((spline) => {
+                    const {startPoint, startTangent, endPoint, endTangent} = spline;
+                    return {startPoint, startTangent, endPoint, endTangent};
+                }),
+        );
+        // Calculate minimum radius
+        const minRadius = hermiteTracks
             .map(hermiteToBezier)
-            .map(cubicBezierMinRadius)
+            .map((b) => cubicBezierMinRadius(b))
             .map((osculating) => osculating.radius)
             .reduce((p, c) => Math.min(p, c), Infinity);
         if (minRadius !== this.lastLoggedRadius) {
@@ -659,17 +679,11 @@ export class Studio {
             console.log(`Minimum radius: ${text}`);
             this.lastLoggedRadius = minRadius;
         }
-        const maxGrade = Math.max(
-            this.railroad.splines
-                .map((spline) => spline.controlPoints)
-                .map((spline) => calculateGrade(spline)
-                    .map((g) => g.grade * 100)
-                    .reduce((p, c) => Math.max(p, c), 0))
-                .reduce((p, c) => Math.max(p, c), 0),
-            splines
-                .map((spline) => calculateSteepestGrade(spline))
-                .map((g) => g.percentage)
-                .reduce((p, c) => Math.max(p, c), 0));
+        // Calculate maximum grade
+        const maxGrade = hermiteTracks
+            .map((hermite) => calculateSteepestGrade(hermite))
+            .map((g) => g.percentage)
+            .reduce((p, c) => Math.max(p, c), 0);
         if (maxGrade !== this.lastLoggedGrade) {
             console.log(`Maximum grade: ${maxGrade.toFixed(2)}%`);
             this.lastLoggedGrade = maxGrade;
