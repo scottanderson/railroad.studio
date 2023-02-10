@@ -7,7 +7,7 @@ import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {cargoLimits, frameDefinitions, frameStateMetadata} from './frames';
+import {cargoLimits, FrameDefinition, frameDefinitions, frameStateMetadata} from './frames';
 import {clamp} from './math';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
@@ -197,7 +197,17 @@ export class Studio {
         grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        lstFrameList.replaceChildren(...railroad.frames.map((frame) => {
+        const categories: (keyof FrameDefinition)[] = ['engine', 'tender', 'freight'];
+        lstFrameList.replaceChildren(...railroad.frames.sort((a, b) => {
+            if (!a.type) return b.type ? 1 : 0;
+            if (!b.type) return -1;
+            const ad = frameDefinitions[a.type];
+            const bd = frameDefinitions[b.type];
+            if (ad.engine !== bd.engine) return ad.engine ? -1 : 1;
+            if (ad.tender !== bd.tender) return ad.tender ? -1 : 1;
+            if (ad.freight !== bd.freight) return ad.freight ? -1 : 1;
+            return 0;
+        }).flatMap((frame, i, a) => {
             const btnFrame = document.createElement('button');
             const imgFrame = document.createElement('i');
             const text =
@@ -212,6 +222,18 @@ export class Studio {
                 // Center vewport on frame location
                 this.map.panTo(frame.location);
             });
+            const prevFrame = i > 0 ? a[i - 1] : undefined;
+            if (prevFrame && frame.type && prevFrame.type) {
+                const prevFrameDef = frameDefinitions[prevFrame.type];
+                const frameDef = frameDefinitions[frame.type];
+                if (categories.some((key) => prevFrameDef[key] !== frameDef[key])) {
+                    const li = document.createElement('li');
+                    const hr = document.createElement('hr');
+                    hr.classList.add('dropdown-divider');
+                    li.appendChild(hr);
+                    return [li, btnFrame];
+                }
+            }
             return btnFrame;
         }));
         // Trees dropdown
