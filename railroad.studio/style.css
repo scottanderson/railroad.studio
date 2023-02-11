@@ -21,8 +21,10 @@
   --brakes-applied: red;
   --engine: purple;
   --tender: black;
-  --caboose: lightpink;
+  --handcar: #ff80ff;
+  --caboose: #ff9999;
   --waycar: gold;
+  --plow: gold;
   --boxcar: #66f081;
   --boxcar-loaded: #36cc00;
   --flatcar-cordwood: #fdbf77;
@@ -35,7 +37,6 @@
   --flatcar-stakes-loaded: #f38a12;
   --flatcar-tanker: #9090f9;
   --flatcar-tanker-loaded: blue;
-  --handcar: white;
   --spice-verde: green;
   --spice-lime: yellowgreen;
   --spice-lemon: #dd0;
@@ -251,68 +252,23 @@ body {
   stroke: var(--brakes-applied);
 }
 
-.frame.engine {
-  fill: var(--engine);
-}
-
-.frame.tender {
-  fill: var(--tender);
-}
-
-.frame.caboose{ fill: var(--caboose); }
+.frame.engine { fill: var(--engine); }
+.frame.tender { fill: var(--tender); }
+.frame.caboose { fill: var(--caboose); }
 .frame.waycar { fill: var(--waycar); }
-
-.frame.boxcar {
-  fill: var(--boxcar);
-}
-
-.frame.boxcar.cargo-loaded {
-  fill: var(--boxcar-loaded);
-}
-
-.frame.flatcar_cordwood {
-  fill: var(--flatcar-cordwood);
-}
-
-.frame.flatcar_cordwood.cargo-loaded {
-  fill: var(--flatcar-cordwood-loaded);
-}
-
-.frame.flatcar_hopper {
-  fill: var(--flatcar-hopper);
-}
-
-.frame.flatcar_hopper.cargo-loaded {
-  fill: var(--flatcar-hopper-loaded);
-}
-
-.frame.flatcar_logs {
-  fill: var(--flatcar-logs);
-}
-
-.frame.flatcar_logs.cargo-loaded {
-  fill: var(--flatcar-logs-loaded);
-}
-
-.frame.flatcar_stakes {
-  fill: var(--flatcar-stakes);
-}
-
-.frame.flatcar_stakes.cargo-loaded {
-  fill: var(--flatcar-stakes-loaded);
-}
-
-.frame.flatcar_tanker {
-  fill: var(--flatcar-tanker);
-}
-
-.frame.flatcar_tanker.cargo-loaded {
-  fill: var(--flatcar-tanker-loaded);
-}
-
-.frame.handcar {
-  fill: var(--handcar);
-}
+.frame.boxcar { fill: var(--boxcar); }
+.frame.boxcar.cargo-loaded { fill: var(--boxcar-loaded); }
+.frame.flatcar_cordwood { fill: var(--flatcar-cordwood); }
+.frame.flatcar_cordwood.cargo-loaded { fill: var(--flatcar-cordwood-loaded); }
+.frame.flatcar_hopper { fill: var(--flatcar-hopper); }
+.frame.flatcar_hopper.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
+.frame.flatcar_logs { fill: var(--flatcar-logs); }
+.frame.flatcar_logs.cargo-loaded { fill: var(--flatcar-logs-loaded); }
+.frame.flatcar_stakes { fill: var(--flatcar-stakes); }
+.frame.flatcar_stakes.cargo-loaded { fill: var(--flatcar-stakes-loaded); }
+.frame.flatcar_tanker { fill: var(--flatcar-tanker); }
+.frame.flatcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
+.frame.plow { fill: var(--plow); }
 
 .frame-text {
   font-size: 50%;
