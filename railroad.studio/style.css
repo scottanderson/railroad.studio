@@ -75,6 +75,12 @@ body {
   z-index: 1;
 }
 
+.locator {
+  stroke: var(--spice-caliente);
+  fill: none;
+  stroke-width: 100;
+}
+
 .brush {
   fill: var(--tree);
   stroke: var(--tree-border);

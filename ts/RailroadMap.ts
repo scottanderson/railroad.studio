@@ -54,6 +54,7 @@ export interface MapLayers {
     groundworks: G;
     groundworksHidden: G;
     industries: G;
+    locator: G;
     players: G;
     radius: G;
     radiusSwitch: G;
@@ -63,25 +64,7 @@ export interface MapLayers {
     turntables: G;
 }
 
-interface MapLayerVisibility {
-    background: boolean;
-    border: boolean;
-    brush: boolean;
-    controlPoints: boolean;
-    frameNumbers: boolean;
-    frames: boolean;
-    grades: boolean;
-    groundworks: boolean;
-    groundworksHidden: boolean;
-    industries: boolean;
-    players: boolean;
-    radius: boolean;
-    radiusSwitch: boolean;
-    tracks: boolean;
-    tracksHidden: boolean;
-    trees: boolean;
-    turntables: boolean;
-}
+interface MapLayerVisibility extends Record<keyof MapLayers, boolean> {}
 
 /**
  * The RailroadMap class is used to create a visual representation of a Railroad
@@ -105,6 +88,7 @@ export class RailroadMap {
     private setMapModified: () => void;
     private setTitle: (title: string) => void;
     private brush: Circle | undefined;
+    private locator: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
     private mergeLimits: MergeLimits;
 
@@ -180,6 +164,21 @@ export class RailroadMap {
                 this.animationInterval = 0;
             }
         }, animationStepTime);
+        // Animate the locator
+        if (this.locator) {
+            const {x, y} = this.panFrom();
+            const startRadius = 100_00;
+            const endRadius = 1_00;
+            this.layers.locator.show();
+            this.locator
+                .show()
+                .center(x, y)
+                .attr('r', startRadius)
+                .animate()
+                .center(point.x, point.y)
+                .attr('r', String(endRadius))
+                .after(() => this.layers.locator.hide());
+        }
     }
 
     panFrom(): SvgPanZoom.Point {
@@ -228,6 +227,10 @@ export class RailroadMap {
         this.renderBackground();
         this.renderBorder();
         this.renderBrush();
+        this.locator = this.layers.locator
+            .circle()
+            .addClass('locator')
+            .hide();
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
@@ -395,6 +398,7 @@ export class RailroadMap {
                 groundworks: defaultTrue(parsed?.layerVisibility?.groundworks),
                 groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
                 industries: Boolean(parsed?.layerVisibility?.industries),
+                locator: false,
                 players: Boolean(parsed?.layerVisibility?.players),
                 radius: defaultTrue(parsed?.layerVisibility?.radius),
                 radiusSwitch: Boolean(parsed?.layerVisibility?.radiusSwitch),
@@ -447,7 +451,9 @@ export class RailroadMap {
             players,
             trees,
             brush,
+            locator,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -468,23 +474,24 @@ export class RailroadMap {
             group.group(),
         ];
         const layers: MapLayers = {
-            background: background,
-            border: border,
-            brush: brush,
-            controlPoints: controlPoints,
-            frameNumbers: frameNumbers,
-            frames: frames,
-            grades: grades,
-            groundworks: groundworks,
-            groundworksHidden: groundworksHidden,
-            industries: industries,
-            players: players,
-            radius: radius,
-            radiusSwitch: radiusSwitch,
-            tracks: tracks,
-            tracksHidden: tracksHidden,
-            trees: trees,
-            turntables: turntables,
+            background,
+            border,
+            brush,
+            controlPoints,
+            frameNumbers,
+            frames,
+            grades,
+            groundworks,
+            groundworksHidden,
+            industries,
+            locator,
+            players,
+            radius,
+            radiusSwitch,
+            tracks,
+            tracksHidden,
+            trees,
+            turntables,
         };
         const entries = Object.entries(layers) as [keyof MapLayers, G][];
         entries.forEach(([key, group]) => {
