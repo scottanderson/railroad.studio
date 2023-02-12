@@ -1146,9 +1146,14 @@ export class Studio {
             saveValue(value);
         };
         const onCancel = () => {
-            if (Number(input.value) !== value) {
+            const inputValue = Number(input.value);
+            if (inputValue !== value) {
                 // Restore the original value
                 input.value = String(value);
+                if (inputValue === Number(input.value)) {
+                    // The slider was already as close as possible to the original value. Close the edit control
+                    return false;
+                }
                 updatePreview();
                 return true;
             }
