@@ -217,7 +217,6 @@ export class RailroadMap {
         this.layers.tracksHidden.node.replaceChildren();
         this.renderSwitches();
         await this.renderSplines();
-        await this.renderSplineTracks();
         this.renderLock = false;
     }
 
@@ -237,7 +236,6 @@ export class RailroadMap {
         this.railroad.turntables.forEach(this.renderTurntable, this);
         this.renderSwitches();
         await this.renderSplines();
-        await this.renderSplineTracks();
         await this.renderTrees();
         this.renderLock = false;
     }
@@ -833,8 +831,12 @@ export class RailroadMap {
     }
 
     private renderSplines() {
-        return asyncForEach(this.railroad.splines, (spline) => {
-            this.renderSpline(spline);
+        const splines = (this.railroad.splines as (Spline | SplineTrack)[])
+            .concat(this.railroad.splineTracks);
+        return asyncForEach(splines, (spline) => {
+            return 'controlPoints' in spline ?
+                this.renderSpline(spline) :
+                this.renderSplineTrack(spline);
         }, (r, t) => {
             const pct = 100 * (1 - (r / t));
             this.setTitle(`Reticulating splines... ${pct.toFixed(1)}%`);
@@ -1004,17 +1006,6 @@ export class RailroadMap {
                 .forEach(renderCurvature);
         }
         return elements;
-    }
-
-    private renderSplineTracks(): Promise<void> {
-        return asyncForEach(this.railroad.splineTracks, (spline) => {
-            this.renderSplineTrack(spline);
-        }, (r, t) => {
-            const pct = 100 * (1 - (r / t));
-            this.setTitle(`Reticulating spline tracks... ${pct.toFixed(1)}%`);
-        }, () => {
-            this.setTitle('Map');
-        }).promise;
     }
 
     private renderSplineTrack(spline: SplineTrack) {
