@@ -16,8 +16,10 @@
   --control-point-primary: red;
   --control-point-secondary: blue;
   --control-point-tertiary: green;
-  --tree: green;
+  --tree: forestgreen;
   --tree-border: darkgreen;
+  --tree-cut: burlywood;
+  --tree-cut-border: saddlebrown;
   --brakes-applied: red;
   --engine: purple;
   --tender: black;
@@ -322,6 +324,11 @@ image {
   fill: var(--tree);
   stroke: var(--tree-border);
   stroke-width: 50;
+}
+
+.tree.cut {
+  fill: var(--tree-cut);
+  stroke: var(--tree-cut-border);
 }
 
 .turntable {

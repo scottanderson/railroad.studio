@@ -16,43 +16,57 @@ export interface AsyncForEachResult<T> {
 type AsyncProgressUpdate = (remaining: number, total: number) => void;
 
 /**
- * Performs an asynchronous for-each loop over an array of elements, `a`, and calls a function `func` on each element.
+ * Performs an asynchronous for-each loop over an array of elements, `a`, and
+ * calls a function `func` on each element.
  *
- * The loop is implemented using a Promise that schedules itself to perform work in batches, pausing and rescheduling
- * itself after 200ms. This allows the browser to perform updates such as rendering changes to the user interface.
+ * The loop is implemented using a Promise that schedules itself to perform work
+ * in batches, pausing and rescheduling itself after `timeLimit`ms. This allows
+ * the browser to perform updates such as rendering changes to the user
+ * interface.
  *
- * An optional progress update function `updateFunc` can be provided to be called after each batch of work with the
- * `remaining` number of elements and the `total` number of elements as arguments.
+ * An optional progress update function `updateFunc` can be provided to be
+ * called after each batch of work with the `remaining` number of elements and
+ * the `total` number of elements as arguments.
  *
- * An optional completion function `thenClause` can also be provided to be called when the loop has finished.
+ * An optional completion function `thenClause` can also be provided to be
+ * called when the loop has finished.
  * @param {T[]} a - The array of elements to loop over
  * @param {function(e: T): void} func - The function to be called on each element
- * @param {AsyncProgressUpdate} updateFunc - An optional function to be called after each batch of work with the
- * remaining number of elements and the total number of elements as arguments
- * @param {function(): void} thenClause - An optional function to be called when the loop has completed
- * @return {AsyncForEachResult<T>} - An object with a property `promise` that resolves when the loop has completed and
- * a function `appender` to add more elements to the array and continue the loop
+ * @param {AsyncProgressUpdate} updateFunc - An optional function to be called
+ * after each batch of work with the remaining number of elements and the total
+ * number of elements as arguments
+ * @param {function(): void} thenClause - An optional function to be called when
+ * the loop has completed
+ * @param {number} [timeLimit=15] - An optional time limit in milliseconds.
+ * Defaults to 15ms.
+ * @param {number} [firstUpdate=200] - An optional time limit for the first
+ * batch of work. Defaults to 200ms.
+ * @return {AsyncForEachResult<T>} - An object with a property `promise` that
+ * resolves when the loop has completed and a function `appender` to add more
+ * elements to the array and continue the loop
  */
 export function asyncForEach<T>(
     a: T[],
     func: (e: T) => void,
     updateFunc?: AsyncProgressUpdate,
-    thenClause?: () => void): AsyncForEachResult<T> {
+    thenClause?: () => void,
+    timeLimit = 15,
+    firstUpdate = 200,
+): AsyncForEachResult<T> {
     const promise = () => new Promise<void>((resolve, reject) => {
-        let updateTime = 0;
+        let updateTime = performance.now() + firstUpdate;
         const fun = () => {
             try {
+                updateTime = Math.max(updateTime, performance.now() + timeLimit);
                 while (remaining.length > 0) {
                     const e = remaining.shift();
                     if (!e) continue;
                     func(e);
-                    const now = performance.now();
-                    if (now - updateTime > 200) {
-                        updateTime = now;
+                    if (performance.now() > updateTime && remaining.length > 0) {
                         if (updateFunc) {
                             updateFunc(remaining.length, total);
                         }
-                        setTimeout(fun, 1);
+                        setTimeout(fun, 0);
                         return;
                     }
                 }
@@ -61,7 +75,7 @@ export function asyncForEach<T>(
                 reject(e);
             }
         };
-        setTimeout(fun, 1);
+        setTimeout(fun, 0);
     }).then(thenClause);
     let remaining = a.concat();
     let total = remaining.length;

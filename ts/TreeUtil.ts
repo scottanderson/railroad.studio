@@ -6,7 +6,9 @@ import {handleError} from './index';
 import {clamp} from './math';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 
-type Callback<T> = (value: T) => void;
+type Callback<T> = (value: T) => any;
+
+type OnTreesChangedCallback = (before: number, after: number, trees: Vector[]) => Promise<any>;
 
 export interface Point {
     x: number;
@@ -17,9 +19,9 @@ export class TreeUtil {
     private railroad: Railroad;
     private trees?: Vector[];
     private treePromises: [Callback<Vector[]>, Callback<any>][] = [];
-    private onTreesChanged: (before: number, after: number) => Promise<void>;
+    private onTreesChanged: OnTreesChangedCallback;
 
-    constructor(railroad: Railroad, onTreesChanged: (before: number, after: number) => Promise<void>) {
+    constructor(railroad: Railroad, onTreesChanged: OnTreesChangedCallback) {
         this.railroad = railroad;
         this.onTreesChanged = onTreesChanged;
     }
@@ -62,27 +64,28 @@ export class TreeUtil {
         }
     }
 
-    cutAll() {
-        return this.allTrees()
-            .then((trees) => {
-                const before = this.railroad.removedVegetationAssets.length;
-                this.railroad.removedVegetationAssets = trees;
-                return this.onTreesChanged(before, trees.length);
-            });
+    async cutAll() {
+        const trees = await this.allTrees();
+        const before = this.railroad.removedVegetationAssets.length;
+        this.railroad.removedVegetationAssets = trees;
+        return this.onTreesChanged(before, trees.length, trees);
     }
 
     replantAll() {
         const before = this.railroad.removedVegetationAssets.length;
+        const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
-        return this.onTreesChanged(before, 0);
+        return this.onTreesChanged(before, 0, treesBefore);
     }
 
     smartReplant() {
         const before = this.railroad.removedVegetationAssets.length;
+        const removed = this.railroad.removedVegetationAssets
+            .filter(this.treeFilter, this);
         this.railroad.removedVegetationAssets = this.railroad.removedVegetationAssets
             .filter((tree) => !this.treeFilter(tree));
         const after = this.railroad.removedVegetationAssets.length;
-        return this.onTreesChanged(before, after);
+        return this.onTreesChanged(before, after, removed);
     }
 
     treeFilter(tree: Vector) {

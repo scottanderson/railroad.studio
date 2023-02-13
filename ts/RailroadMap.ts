@@ -96,7 +96,7 @@ export class RailroadMap {
         this.setMapModified = () => studio.setMapModified();
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
-        this.treeUtil = new TreeUtil(this.railroad, (before, after) => {
+        this.treeUtil = new TreeUtil(this.railroad, (before, after, changed) => {
             if (before === after) {
                 this.setTitle(`No change, ${after} cut trees`);
             } else if (before < after) {
@@ -104,8 +104,7 @@ export class RailroadMap {
             } else {
                 this.setTitle(`Replanted ${before - after} trees`);
             }
-            this.layers.trees.node.replaceChildren();
-            return this.renderTrees();
+            return this.renderTreeArray(changed);
         });
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
@@ -602,17 +601,7 @@ export class RailroadMap {
                             this.railroad.removedVegetationAssets = retained;
                             // console.log(`Planted ${planted.length} trees`);
                             this.setMapModified();
-                            const removedXY = planted.map((v) => [Math.round(v.x), Math.round(v.y)]);
-                            const isRemoved = (e: Element) => -1 !== removedXY.findIndex(
-                                (t) => Math.round(e.cx()) === t[0] && Math.round(e.cy()) === t[1]);
-                            const buckets = planted.map(treeBucket)
-                                .filter((value, index, self) => self.indexOf(value) === index);
-                            const plantedElements = this.layers.trees
-                                .children()
-                                .filter((e) => buckets.includes(e.id()))
-                                .flatMap((e) => e.children())
-                                .filter(isRemoved);
-                            plantedElements.forEach((e) => e.remove());
+                            return this.renderTreeArray(planted);
                         }
                     };
                     // Initialize mouse event listeners
@@ -1194,10 +1183,8 @@ export class RailroadMap {
         if (this.remainingTreesAppender) {
             return this.remainingTreesAppender(trees);
         }
-        const {appender, promise} = asyncForEach(trees.concat(), (t) => {
-            if (this.treeUtil.treeFilter(t)) {
-                this.renderTree(t);
-            }
+        const {appender, promise} = asyncForEach(trees, (t) => {
+            this.renderTree(t);
         }, (r, t) => {
             const pct = 100 * (1 - (r / t));
             this.setTitle(`Rendering trees... ${pct.toFixed(1)}%`);
@@ -1212,6 +1199,10 @@ export class RailroadMap {
         const x = Math.round(tree.x);
         const y = Math.round(tree.y);
         const id = treeBucket(tree);
+        const isCut = (tree: Vector) => -1 !== this.railroad.removedVegetationAssets.findIndex(
+            (t) => t.x === tree.x && t.y === tree.y);
+        const cut = isCut(tree);
+        const expectCut = !this.treeUtil.treeFilter(tree);
         const element = document.getElementById(id);
         let group: G;
         if (!element) {
@@ -1221,9 +1212,20 @@ export class RailroadMap {
         } else {
             group = new G(element as unknown as SVGGElement);
         }
+        const treeElement = element?.querySelector(`circle.tree[cx="${x}"][cy="${y}"]`);
+        if (treeElement) {
+            if (cut === expectCut) {
+                treeElement.parentElement?.removeChild(treeElement);
+                return;
+            }
+            treeElement.classList[cut ? 'add' : 'remove']('cut');
+            return treeElement;
+        }
+        if (cut === expectCut) return;
         return group
-            .circle(5_00)
+            .circle(3_00)
             .center(x, y)
+            .addClass(cut ? 'cut' : 'uncut')
             .addClass('tree');
     }
 
