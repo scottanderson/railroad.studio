@@ -39,7 +39,6 @@ interface MapOptions {
         y: number;
     };
     zoom: number;
-    layerVisibility: MapLayerVisibility;
     mergeLimits: MergeLimits;
 }
 
@@ -66,6 +65,27 @@ export interface MapLayers {
 
 interface MapLayerVisibility extends Record<keyof MapLayers, boolean> {}
 
+const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
+    background: true,
+    border: true,
+    brush: false,
+    controlPoints: false,
+    frameNumbers: false,
+    frames: false,
+    grades: false,
+    groundworks: true,
+    groundworksHidden: false,
+    industries: true,
+    locator: false,
+    players: false,
+    radius: false,
+    radiusSwitch: false,
+    tracks: true,
+    tracksHidden: false,
+    trees: false,
+    turntables: true,
+};
+
 /**
  * The RailroadMap class is used to create a visual representation of a Railroad
  * object on a web page and provide tools for interacting with it. It can render
@@ -84,7 +104,7 @@ export class RailroadMap {
     private panZoom: SvgPanZoom.Instance;
     private toolMode: MapToolMode;
     private layers: MapLayers;
-    private layerVisibility: MapLayerVisibility;
+    private layerVisibility = DEFAULT_LAYER_VISIBILITY;
     private setMapModified: () => void;
     private setTitle: (title: string) => void;
     private brush: Circle | undefined;
@@ -108,7 +128,6 @@ export class RailroadMap {
         });
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
-        this.layerVisibility = options.layerVisibility;
         this.mergeLimits = options.mergeLimits;
         this.svg = new Svg()
             .addClass('map-svg')
@@ -376,7 +395,6 @@ export class RailroadMap {
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
-        const defaultTrue = (option: any) => typeof option === 'undefined' || Boolean(option);
         const defaultNumber = (option: any, n: number) => typeof option === 'undefined' ? n : Number(option);
         return {
             pan: {
@@ -384,26 +402,6 @@ export class RailroadMap {
                 y: Number(parsed?.pan?.y || 0),
             },
             zoom: Number(parsed?.zoom || 1),
-            layerVisibility: {
-                background: defaultTrue(parsed?.layerVisibility?.background),
-                border: defaultTrue(parsed?.layerVisibility?.border),
-                brush: false,
-                controlPoints: Boolean(parsed?.layerVisibility?.controlPoints),
-                frameNumbers: defaultTrue(parsed?.layerVisibility?.frameNumbers),
-                frames: defaultTrue(parsed?.layerVisibility?.frames),
-                grades: Boolean(parsed?.layerVisibility?.grades),
-                groundworks: defaultTrue(parsed?.layerVisibility?.groundworks),
-                groundworksHidden: Boolean(parsed?.layerVisibility?.groundworksHidden),
-                industries: Boolean(parsed?.layerVisibility?.industries),
-                locator: false,
-                players: Boolean(parsed?.layerVisibility?.players),
-                radius: defaultTrue(parsed?.layerVisibility?.radius),
-                radiusSwitch: Boolean(parsed?.layerVisibility?.radiusSwitch),
-                tracks: defaultTrue(parsed?.layerVisibility?.tracks),
-                tracksHidden: Boolean(parsed?.layerVisibility?.tracksHidden),
-                trees: false,
-                turntables: defaultTrue(parsed?.layerVisibility?.turntables),
-            },
             mergeLimits: {
                 bearing: defaultNumber(parsed?.mergeLimits?.bearing, 10),
                 inclination: defaultNumber(parsed?.mergeLimits?.inclination, 2.5),
@@ -418,7 +416,6 @@ export class RailroadMap {
         const options: MapOptions = {
             pan: this.panFrom(),
             zoom: this.panZoom.getZoom(),
-            layerVisibility: this.layerVisibility,
             mergeLimits: this.mergeLimits,
         };
         localStorage.setItem(key, JSON.stringify(options));
