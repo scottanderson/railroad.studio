@@ -124,6 +124,7 @@ export class RailroadMap {
             } else {
                 this.setTitle(`Replanted ${before - after} trees`);
             }
+            if (!this.remainingTreesAppender) return Promise.resolve();
             return this.renderTreeArray(changed);
         });
         this.toolMode = MapToolMode.pan_zoom;
