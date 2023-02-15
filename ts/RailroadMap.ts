@@ -116,7 +116,7 @@ export class RailroadMap {
         this.setMapModified = () => studio.setMapModified();
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
-        this.treeUtil = new TreeUtil(this.railroad, (before, after, changed) => {
+        this.treeUtil = new TreeUtil(studio, (before, after, changed) => {
             if (before === after) {
                 this.setTitle(`No change, ${after} cut trees`);
             } else if (before < after) {

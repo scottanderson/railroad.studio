@@ -1,6 +1,7 @@
+import {IndustryType} from './IndustryType';
 // eslint-disable-next-line max-len
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
-import {IndustryType} from './IndustryType';
+import {Studio} from './Studio';
 import {Vector} from './Vector';
 import {handleError} from './index';
 import {clamp} from './math';
@@ -16,14 +17,16 @@ export interface Point {
 }
 
 export class TreeUtil {
-    private railroad: Railroad;
+    private readonly railroad: Railroad;
     private trees?: Vector[];
     private treePromises: [Callback<Vector[]>, Callback<any>][] = [];
-    private onTreesChanged: OnTreesChangedCallback;
+    private readonly onTreesChanged;
+    private readonly setMapModified;
 
-    constructor(railroad: Railroad, onTreesChanged: OnTreesChangedCallback) {
-        this.railroad = railroad;
+    constructor(studio: Studio, onTreesChanged: OnTreesChangedCallback) {
+        this.railroad = studio.railroad;
         this.onTreesChanged = onTreesChanged;
+        this.setMapModified = () => studio.setMapModified();
     }
 
     private fetchTrees() {
@@ -68,13 +71,16 @@ export class TreeUtil {
         const trees = await this.allTrees();
         const before = this.railroad.removedVegetationAssets.length;
         this.railroad.removedVegetationAssets = trees;
+        this.setMapModified();
         return this.onTreesChanged(before, trees.length, trees);
     }
 
     replantAll() {
         const before = this.railroad.removedVegetationAssets.length;
+        if (before === 0) return Promise.resolve();
         const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
+        this.setMapModified();
         return this.onTreesChanged(before, 0, treesBefore);
     }
 
@@ -85,6 +91,8 @@ export class TreeUtil {
         this.railroad.removedVegetationAssets = this.railroad.removedVegetationAssets
             .filter((tree) => !this.treeFilter(tree));
         const after = this.railroad.removedVegetationAssets.length;
+        if (before === after) return Promise.resolve();
+        this.setMapModified();
         return this.onTreesChanged(before, after, removed);
     }
 

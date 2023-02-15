@@ -30,13 +30,13 @@ const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
  * Web UI for editing a Railroad object.
  */
 export class Studio {
-    filename: string;
-    railroad: Railroad;
     private modified: boolean;
-    map: RailroadMap;
-    header: HTMLHeadingElement;
-    originalSegmentCount: number;
-    btnDownload: HTMLButtonElement;
+    private readonly btnDownload: HTMLButtonElement;
+    private readonly filename: string;
+    private readonly header: HTMLHeadingElement;
+    private readonly map: RailroadMap;
+    private readonly originalSegmentCount: number;
+    readonly railroad: Railroad;
 
     constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
         this.filename = filename;
