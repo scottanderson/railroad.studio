@@ -1158,6 +1158,11 @@ export class RailroadMap {
                 makeGradeText();
                 makeRadiusText();
                 break;
+            case 'rail_914_tunnel':
+                makePath(this.layers.groundworks, ['tunnel']);
+                makeGradeText();
+                makeRadiusText();
+                break;
             case 'rail_914_wall_01':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['stone-wall']);

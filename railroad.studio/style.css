@@ -9,6 +9,7 @@
   --rail-deck-hidden: green;
   --grade: sienna;
   --stone-wall: darkgray;
+  --tunnel: #333333;
   --wooden-bridge: goldenrod;
   --steel-bridge: steelblue;
   --switch-leg-not-aligned: red;
@@ -102,6 +103,7 @@ body {
 .bumper,
 .grade,
 .stone-wall,
+.tunnel,
 .wooden-bridge,
 .steel-bridge {
   fill: none;
@@ -163,6 +165,10 @@ body {
   stroke: var(--stone-wall);
 }
 
+.tunnel {
+  stroke: var(--tunnel);
+}
+
 .wooden-bridge {
   stroke: var(--wooden-bridge);
 }
@@ -173,6 +179,7 @@ body {
 
 .grade,
 .stone-wall,
+.tunnel,
 .wooden-bridge,
 .steel-bridge {
   stroke-width: 400;
@@ -182,6 +189,7 @@ body {
 .rail-deck:hover,
 .grade:hover,
 .stone-wall:hover,
+.tunnel:hover,
 .wooden-bridge:hover,
 .steel-bridge:hover {
   opacity: 0.8;
@@ -278,17 +286,6 @@ body {
 .frame-text.engine,
 .frame-text.tender {
   fill: white;
-}
-
-.xray .rail,
-.xray .rail-deck,
-.xray .grade,
-.xray .stone-wall,
-.xray .wooden-bridge,
-.xray .steel-bridge,
-.xray .switch-leg.aligned,
-.xray .diamond {
-  opacity: 0.9;
 }
 
 .grade-text-2 { fill: var(--spice-verde); }

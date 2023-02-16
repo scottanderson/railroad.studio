@@ -22,6 +22,7 @@ export enum SplineTrackType {
     RAIL_914_TRESTLE_PILE_01 = 'rail_914_trestle_pile_01',
     RAIL_914_TRESTLE_STEEL_01 = 'rail_914_trestle_steel_01',
     RAIL_914_TRESTLE_WOOD_01 = 'rail_914_trestle_wood_01',
+    RAIL_914_TUNNEL = 'rail_914_tunnel',
     RAIL_914_WALL_01 = 'rail_914_wall_01',
     RAIL_914_WALL_01_NORAIL = 'rail_914_wall_01_norail',
 }
