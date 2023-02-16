@@ -1,15 +1,16 @@
 import {IndustryType} from './IndustryType';
-// eslint-disable-next-line max-len
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
 import {Vector} from './Vector';
+import {VectorSet} from './VectorSet';
 import {handleError} from './index';
 import {clamp} from './math';
+import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 
 type Callback<T> = (value: T) => any;
 
-type OnTreesChangedCallback = (before: number, after: number, trees: Vector[]) => Promise<any>;
+type OnTreesChangedCallback = (before: number, after: number, trees: Vector[], dryrun?: boolean) => Promise<any>;
 
 export interface Point {
     x: number;
@@ -22,11 +23,13 @@ export class TreeUtil {
     private treePromises: [Callback<Vector[]>, Callback<any>][] = [];
     private readonly onTreesChanged;
     private readonly setMapModified;
+    private readonly setTitle;
 
     constructor(studio: Studio, onTreesChanged: OnTreesChangedCallback) {
         this.railroad = studio.railroad;
         this.onTreesChanged = onTreesChanged;
         this.setMapModified = () => studio.setMapModified();
+        this.setTitle = (title: string) => studio.setTitle(title);
     }
 
     private fetchTrees() {
@@ -75,25 +78,53 @@ export class TreeUtil {
         return this.onTreesChanged(before, trees.length, trees);
     }
 
-    replantAll() {
+    async plantAll() {
         const before = this.railroad.removedVegetationAssets.length;
-        if (before === 0) return Promise.resolve();
+        if (before === 0) return;
         const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
         this.setMapModified();
         return this.onTreesChanged(before, 0, treesBefore);
     }
 
-    smartReplant() {
+    async smartCut(renderFunc?: (trees: Vector[]) => void, dryrun = false) {
+        const cutSet = new VectorSet(this.railroad.removedVegetationAssets);
+        const before = cutSet.size();
+        const predicate = (tree: Vector) => !cutSet.has(tree) && !this.treeFilter(tree);
+        const updateFunc = (r: number, t: number): void => {
+            const pct = 100 * (1 - (r / t));
+            this.setTitle(`${dryrun ? 'Surveying' : 'Cutting'} trees ${pct.toFixed(1)}%...`);
+        };
+        const allTrees = await this.allTrees();
+        const smartCut = await asyncFilter(allTrees, predicate, undefined, updateFunc, renderFunc);
+        const result = this.railroad.removedVegetationAssets.concat(smartCut);
+        const after = result.length;
+        if (!dryrun) {
+            this.setMapModified();
+            this.railroad.removedVegetationAssets = result;
+        }
+        return this.onTreesChanged(before, after, smartCut, dryrun);
+    }
+
+    async smartPlant(dryrun = false) {
         const before = this.railroad.removedVegetationAssets.length;
-        const removed = this.railroad.removedVegetationAssets
-            .filter(this.treeFilter, this);
-        this.railroad.removedVegetationAssets = this.railroad.removedVegetationAssets
-            .filter((tree) => !this.treeFilter(tree));
-        const after = this.railroad.removedVegetationAssets.length;
-        if (before === after) return Promise.resolve();
-        this.setMapModified();
-        return this.onTreesChanged(before, after, removed);
+        const updateFunc = (r: number, t: number): void => {
+            const pct = 100 * (1 - (r / t));
+            this.setTitle(`Planting trees ${pct.toFixed(1)}%...`);
+        };
+        const result = await asyncFilter(
+            this.railroad.removedVegetationAssets,
+            (tree) => !this.treeFilter(tree), undefined,
+            updateFunc,
+        );
+        const after = result.length;
+        const resultSet = new VectorSet(result);
+        const modified = this.railroad.removedVegetationAssets.filter((v) => !resultSet.has(v));
+        if (!dryrun) {
+            this.setMapModified();
+            this.railroad.removedVegetationAssets = result;
+        }
+        return this.onTreesChanged(before, after, modified, dryrun);
     }
 
     treeFilter(tree: Vector) {
@@ -210,6 +241,13 @@ function splineTrackFilter(spline: SplineTrack, tree: Vector): boolean {
     const limit2 = limit * limit;
     const samples = 10;
     const bezier = hermiteToBezier(spline);
+    const bx = bezier.map((v) => v.x);
+    const by = bezier.map((v) => v.y);
+    const fastFilter = rectFilter(
+        Math.min.apply(null, bx) - limit, Math.max.apply(null, bx) + limit,
+        Math.min.apply(null, by) - limit, Math.max.apply(null, by) + limit,
+        tree);
+    if (!fastFilter) return false;
     let pp = {x: NaN, y: NaN};
     for (let i = 0; i <= samples; i++) {
         const t = i / samples;

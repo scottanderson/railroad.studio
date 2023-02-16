@@ -116,16 +116,15 @@ export class RailroadMap {
         this.setMapModified = () => studio.setMapModified();
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
-        this.treeUtil = new TreeUtil(studio, (before, after, changed) => {
+        this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
+            if (this.remainingTreesAppender) await this.renderTreeArray(changed);
             if (before === after) {
                 this.setTitle(`No change, ${after} cut trees`);
             } else if (before < after) {
-                this.setTitle(`Cut ${after - before} trees`);
+                this.setTitle(`${dryrun ? 'Surveyed' : 'Cut'} ${after - before} trees`);
             } else {
-                this.setTitle(`Replanted ${before - after} trees`);
+                this.setTitle(`${dryrun ? 'Identified' : 'Replanted'} ${before - after} trees`);
             }
-            if (!this.remainingTreesAppender) return Promise.resolve();
-            return this.renderTreeArray(changed);
         });
         this.toolMode = MapToolMode.pan_zoom;
         const options = this.readOptions();
@@ -420,6 +419,12 @@ export class RailroadMap {
             mergeLimits: this.mergeLimits,
         };
         localStorage.setItem(key, JSON.stringify(options));
+    }
+
+    previewSmartPlant() {
+        if (!this.getLayerVisibility('trees')) this.toggleLayerVisibility('trees');
+        const render = (trees: Vector[]) => this.renderTreeArray(trees);
+        return this.getTreeUtil().smartCut(render, true);
     }
 
     private createLayers(): MapLayers {
@@ -1170,14 +1175,14 @@ export class RailroadMap {
         return elements;
     }
 
-    private renderTrees(): Promise<void> {
-        if (!this.layerVisibility.trees) return Promise.resolve();
-        if (this.remainingTreesAppender) return Promise.resolve();
-        const trees = this.railroad.removedVegetationAssets;
-        return this.renderTreeArray(trees);
+    private async renderTrees(): Promise<void> {
+        if (!this.layerVisibility.trees) return;
+        if (this.remainingTreesAppender) return;
+        await this.renderTreeArray(this.railroad.removedVegetationAssets);
     }
 
     private renderTreeArray(trees: Vector[]): Promise<void> {
+        if (trees.length === 0) return Promise.resolve();
         if (this.remainingTreesAppender) {
             return this.remainingTreesAppender(trees);
         }

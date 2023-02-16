@@ -262,12 +262,20 @@ export class Studio {
                 onClick: () => this.map.getTreeUtil().cutAll().catch(handleError),
             },
             {
-                name: 'Replant all trees (dangerous!)',
-                onClick: () => this.map.getTreeUtil().replantAll().catch(handleError),
+                name: 'Plant all trees (dangerous!)',
+                onClick: () => this.map.getTreeUtil().plantAll().catch(handleError),
             },
             {
-                name: 'Smart replant',
-                onClick: () => this.map.getTreeUtil().smartReplant().catch(handleError),
+                name: 'Smart plant trees',
+                onClick: () => this.map.getTreeUtil().smartPlant().catch(handleError),
+            },
+            {
+                name: 'Smart cut trees (preview)',
+                onClick: () => this.map.previewSmartPlant().catch(handleError),
+            },
+            {
+                name: 'Smart cut trees',
+                onClick: () => this.map.getTreeUtil().smartCut().catch(handleError),
             },
         ];
         lstTrees.replaceChildren(...treeActions.map((action) => {

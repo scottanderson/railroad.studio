@@ -81,18 +81,41 @@ export function asyncForEach<T>(
     let total = remaining.length;
     let p = promise();
     const appender = (elements: T[]) => {
-        if (remaining.length !== 0) {
-            Array.prototype.push.apply(remaining, elements);
+        if (remaining.length === 0) {
+            remaining = elements.concat();
+            total = remaining.length;
+            p = promise();
+        } else {
+            remaining = remaining.concat(elements);
             total += elements.length;
-            return p;
         }
-        remaining = elements.concat();
-        total = remaining.length;
-        p = promise();
         return p;
     };
     return {
         appender: appender,
         promise: p,
     };
+}
+
+export async function asyncFilter<T>(
+    a: T[],
+    predicate: (value: T, index: number, array: T[]) => unknown,
+    thisArg?: any,
+    updateFunc?: AsyncProgressUpdate,
+    foundFunc?: (values: T[]) => void,
+    chunkSize = 10,
+): Promise<T[]> {
+    const chunks: T[][] = [];
+    for (let i = 0; i < a.length; i += chunkSize) {
+        const chunk = a.slice(i, i + chunkSize);
+        chunks.push(chunk);
+    }
+    const result: T[] = [];
+    const {promise} = asyncForEach(chunks, (chunk) => {
+        const filteredChunk = chunk.filter(predicate, thisArg);
+        Array.prototype.push.apply(result, filteredChunk);
+        if (foundFunc) foundFunc(filteredChunk);
+    }, updateFunc);
+    await promise;
+    return result;
 }
