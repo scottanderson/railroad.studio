@@ -175,7 +175,7 @@ body {
 .stone-wall,
 .wooden-bridge,
 .steel-bridge {
-  stroke-width: 300;
+  stroke-width: 400;
 }
 
 .rail:hover,
@@ -192,7 +192,6 @@ body {
 .stone-wall.hidden,
 .wooden-bridge.hidden,
 .steel-bridge.hidden {
-  stroke-width: 400;
   opacity: 0.5;
 }
 
