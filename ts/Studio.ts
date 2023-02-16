@@ -13,6 +13,7 @@ import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
 import {toggleDarkMode} from './themes';
+import {fp32r, fp32v} from './util';
 import {catmullRomToHermite} from './util-catmullrom';
 
 interface InputTextOptions {
@@ -1057,7 +1058,7 @@ export class Studio {
 
     private saveContext(
         input: Node,
-        saveAction: () => void,
+        saveAction: () => boolean | void,
         cancelAction: () => boolean,
         formatValue: () => string,
     ): Node {
@@ -1072,9 +1073,11 @@ export class Studio {
         btnSave.classList.add('btn', 'btn-success');
         btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
         btnSave.addEventListener('click', () => {
-            saveAction();
+            const stayOpen = saveAction();
             this.setMapModified();
             pre.textContent = formatValue();
+            if (stayOpen) return;
+            // Close the edit control
             div.parentElement?.replaceChildren(pre);
         });
         // Cancel
@@ -1096,7 +1099,7 @@ export class Studio {
     private editNumber(
         value: number,
         options: InputTextOptions,
-        saveValue: (value: number) => void,
+        saveValue: (value: number) => number,
         customFormatValue?: (value: number) => string,
     ) {
         const formatValue = customFormatValue ? () => customFormatValue(value) : () => {
@@ -1113,7 +1116,8 @@ export class Studio {
         input.value = String(value);
         const onSaveValue = () => {
             value = Number(input.value);
-            saveValue(value);
+            value = saveValue(value);
+            return onCancel();
         };
         const onCancel = () => {
             if (Number(input.value) !== value) {
@@ -1130,7 +1134,7 @@ export class Studio {
     private editSlider(
         value: number,
         options: InputTextOptions,
-        saveValue: (value: number) => void,
+        saveValue: (value: number) => number,
         customFormatValue: (value: number) => string,
     ) {
         const formatValue = () => customFormatValue(value);
@@ -1143,7 +1147,8 @@ export class Studio {
         input.value = String(value);
         const onSaveValue = () => {
             value = Number(input.value);
-            saveValue(value);
+            value = saveValue(value);
+            return onCancel();
         };
         const onCancel = () => {
             const inputValue = Number(input.value);
@@ -1217,7 +1222,7 @@ export class Studio {
         labels: string[],
         value: number[],
         display: (value: number[]) => string,
-        saveValue: (value: number[]) => void,
+        saveValue: (value: number[]) => number[],
         options?: InputTextOptions,
     ) {
         const formatValue = () => display(value);
@@ -1228,11 +1233,11 @@ export class Studio {
             const input = document.createElement('input');
             inputs.push(input);
             input.type = 'number';
-            input.step = 'any';
             input.value = String(value[i]);
             if (options) {
                 if (options.min) input.min = options.min;
                 if (options.max) input.max = options.max;
+                if (options.step) input.step = options.step;
             }
             input.pattern = '[0-9]+';
             input.classList.add('form-control');
@@ -1245,10 +1250,11 @@ export class Studio {
         });
         const onSave = () => {
             value = inputs.map((i) => Number(i.value));
-            saveValue(value);
+            value = saveValue(value);
+            return onCancel();
         };
         const onCancel = () => {
-            if (!value.every((v, i) => v === Number(inputs[i].value))) {
+            if (!value.every((v, i) => String(v) === inputs[i].value)) {
                 // Restore the original values
                 inputs.forEach((input, i) => input.value = String(value[i]));
                 return true;
@@ -1263,19 +1269,23 @@ export class Studio {
         type: string,
         labels: [string, string, string, string],
         values: [number, number, number, number],
-        saveValue: (value: number[]) => void,
+        saveValue: (value: number[]) => number[],
     ): Node {
         const display = (value: number[]) => {
             const zeroPredicate = (v: number): boolean => v === 0;
             if (value.every(zeroPredicate)) return '[Empty]';
             return String(value).replace(/(,0)+$/g, '');
         };
-        return this.editNumbers(labels, values, display, saveValue, {min: '0'});
+        const options = {
+            min: '0',
+            step: '1',
+        };
+        return this.editNumbers(labels, values, display, saveValue, options);
     }
 
-    private editRotator(value: Rotator, saveValue: (value: Rotator) => void) {
+    private editRotator(value: Rotator, saveValue: (value: Rotator) => Rotator) {
         const encode = (r: Rotator): number[] => [r.roll, r.yaw, r.pitch];
-        const decode = (t: number[]): Rotator => ({roll: t[0], yaw: t[1], pitch: t[2]});
+        const decode = (t: number[]): Rotator => fp32r({roll: t[0], yaw: t[1], pitch: t[2]});
         const display = (t: number[]) => {
             if (t[0] === 0 && t[2] === 0) {
                 return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
@@ -1283,12 +1293,13 @@ export class Studio {
             return '[Rotator]';
         };
         const labels = ['roll', 'yaw', 'pitch'];
-        return this.editNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
+        const save = (t: number[]) => encode(saveValue(decode(t)));
+        return this.editNumbers(labels, encode(value), display, save);
     }
 
-    private editVector(value: Vector, saveValue: (value: Vector) => void) {
+    private editVector(value: Vector, saveValue: (value: Vector) => Vector) {
         const encode = (v: Vector): number[] => [v.x, v.y, v.z];
-        const decode = (t: number[]): Vector => ({x: t[0], y: t[1], z: t[2]});
+        const decode = (t: number[]): Vector => fp32v({x: t[0], y: t[1], z: t[2]});
         const display = (t: number[]) => {
             const xZero = t[0] === 0;
             const yZero = t[1] === 0;
@@ -1301,7 +1312,8 @@ export class Studio {
             return '[Vector]';
         };
         const labels = ['x', 'y', 'z'];
-        return this.editNumbers(labels, encode(value), display, (t) => saveValue(decode(t)));
+        const save = (t: number[]) => encode(saveValue(decode(t)));
+        return this.editNumbers(labels, encode(value), display, save);
     }
 
     private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {

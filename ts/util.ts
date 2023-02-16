@@ -1,4 +1,5 @@
 import {GvasString, GvasText} from './Gvas';
+import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 
 const RRO_TEXT_GUID = '56F8D27149CC5E2D12103BBEBFCA9097';
@@ -14,12 +15,13 @@ export function fp32(n: number): number {
     return float[0];
 }
 
+export function fp32r(r: Rotator): Rotator {
+    const [roll, pitch, yaw] = new Float32Array([r.roll, r.pitch, r.yaw]);
+    return {roll, pitch, yaw};
+}
+
 export function fp32v(v: Vector): Vector {
-    const float = new Float32Array(3);
-    float[0] = v.x;
-    float[1] = v.y;
-    float[2] = v.z;
-    const [x, y, z] = float;
+    const [x, y, z] = new Float32Array([v.x, v.y, v.z]);
     return {x, y, z};
 }
 
