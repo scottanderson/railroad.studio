@@ -98,19 +98,19 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
  * and manipulate SVG elements.
  */
 export class RailroadMap {
-    private railroad: Railroad;
-    private treeUtil: TreeUtil;
-    private svg: Svg;
+    private readonly railroad: Railroad;
+    private readonly treeUtil: TreeUtil;
+    private readonly svg: Svg;
     private panZoom: SvgPanZoom.Instance;
     private toolMode: MapToolMode;
     private layers: MapLayers;
-    private layerVisibility = DEFAULT_LAYER_VISIBILITY;
-    private setMapModified: () => void;
-    private setTitle: (title: string) => void;
-    private brush: Circle | undefined;
-    private locator: Circle | undefined;
+    private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
+    private readonly setMapModified: () => void;
+    private readonly setTitle: (title: string) => void;
+    private brush?: Circle;
+    private locator?: Circle;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
-    private mergeLimits: MergeLimits;
+    private readonly mergeLimits: MergeLimits;
 
     constructor(studio: Studio, element: HTMLElement) {
         this.setMapModified = () => studio.setMapModified();

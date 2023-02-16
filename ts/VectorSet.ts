@@ -1,7 +1,7 @@
 import {Vector} from './Vector';
 
 export class VectorSet {
-    private vectors: Set<string>;
+    private readonly vectors: Set<string>;
 
     constructor(vectors: Vector[]) {
         this.vectors = new Set(vectors.map(vectorToString));
