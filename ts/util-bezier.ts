@@ -215,9 +215,8 @@ export function cubicBezierRadius(t: number, bezier: BezierCurve, offset = 0.000
  */
 export function cubicBezierMinRadius(curve: BezierCurve, steps = 100): OsculatingCircle {
     let result = cubicBezierRadius(0, curve);
-    const stepSize = 1 / steps;
-    // Check every 0.01 from 0.005 to 0.995
-    for (let t = stepSize / 2; t < 1; t += stepSize) {
+    for (let step = 0; step <= steps; step++) {
+        const t = step / steps;
         const radius = cubicBezierRadius(t, curve);
         if (radius.radius < result.radius) {
             result = radius;
