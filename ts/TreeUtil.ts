@@ -1,12 +1,13 @@
 import {IndustryType} from './IndustryType';
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
-import {Vector} from './Vector';
+import {Vector, vectorSum} from './Vector';
 import {VectorSet} from './VectorSet';
 import {handleError} from './index';
 import {clamp} from './math';
 import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
+import {rotateVector} from './RotationMatrix';
 
 type Callback<T> = (value: T) => any;
 
@@ -172,6 +173,10 @@ function distToSegment2(p: Point, v: Point, w: Point) {
     return dist2(p, {x: x, y: y});
 }
 
+function pillFilter(tree: Vector, p0: Vector, p1: any, limit: number): boolean {
+    return distToSegment2(tree, p0, p1) < limit ** 2;
+}
+
 export function radiusFilter(obstacle: Point, tree: Point, radius: number): boolean {
     return dist2(obstacle, tree) <= radius * radius;
 }
@@ -206,7 +211,13 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
         case IndustryType.engine_house_gold:
         case IndustryType.engine_house_red:
         case IndustryType.engine_house_brown:
-            return radiusFilter(industry.location, tree, 15_00); // 15m
+        {
+            const p0local = {x: 500, y: 0, z: 0};
+            const p1local = {x: 1500, y: 0, z: 0};
+            const p0 = vectorSum(industry.location, rotateVector(p0local, industry.rotation));
+            const p1 = vectorSum(industry.location, rotateVector(p1local, industry.rotation));
+            return pillFilter(tree, p0, p1, 10_00);
+        }
         case IndustryType.telegraph_office:
             return radiusFilter(industry.location, tree, 10_00); // 10m
         default:
