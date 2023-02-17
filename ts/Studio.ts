@@ -127,6 +127,10 @@ export class Studio {
                 name: 'Industries',
             },
             {
+                key: 'gizmo',
+                name: 'Industry measurement tool',
+            },
+            {
                 key: 'players',
                 name: 'Players',
             },

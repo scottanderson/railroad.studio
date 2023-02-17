@@ -1,5 +1,5 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
-import {circle, combine, polyRect, polyRectRel, rect, rotatedRect} from './util-path';
+import {arrow, circle, combine, polyRect, polyRectRel, rect, rotatedRect} from './util-path';
 
 export enum IndustryType {
     logging_camp = 1,
@@ -77,6 +77,12 @@ export const industryProductOutputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.engine_house_red]: output1234,
     [IndustryType.engine_house_brown]: output1234,
     [IndustryType.telegraph_office]: output1234,
+};
+
+export const gizmoSvgPaths = {
+    'x': arrow(true),
+    'y': arrow(false),
+    'z': circle(0, 0, 100),
 };
 
 const engineHouse = {

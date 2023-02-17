@@ -1,10 +1,10 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {Circle, Element, G, Matrix, PathArrayAlias, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {Circle, Element, G, Line, Matrix, PathArrayAlias, PathCommand, Svg, Text} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
-import {industryName, industrySvgPaths, IndustryType} from './IndustryType';
+import {gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -50,6 +50,7 @@ export interface MapLayers {
     controlPoints: G;
     frameNumbers: G;
     frames: G;
+    gizmo: G;
     grades: G;
     groundworks: G;
     groundworksHidden: G;
@@ -73,6 +74,7 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     controlPoints: false,
     frameNumbers: false,
     frames: false,
+    gizmo: false,
     grades: false,
     groundworks: true,
     groundworksHidden: false,
@@ -205,6 +207,23 @@ export class RailroadMap {
         const pan = this.panZoom.getPan();
         const x = (pan.x - (sizes.width / 2)) / sizes.realZoom;
         const y = (pan.y - (sizes.height / 2)) / sizes.realZoom;
+        return {x, y};
+    }
+
+    mouseWorldLocation(me: MouseEvent) {
+        const ctm = this.svg.node.getScreenCTM();
+        if (!ctm) throw new Error('Missing CTM');
+        return this.layers.trees
+            .point(me.clientX, me.clientY)
+            .transformO(new Matrix(ctm.inverse()));
+    }
+
+    mouseLocalLocation(me: MouseEvent, element: Element) {
+        const ctm = this.svg.node.getScreenCTM();
+        if (!ctm) throw new Error('Missing CTM');
+        const {x, y} = element
+            .point(me.clientX, me.clientY)
+            .transformO(new Matrix(ctm.inverse()));
         return {x, y};
     }
 
@@ -449,11 +468,13 @@ export class RailroadMap {
             grades,
             radius,
             radiusSwitch,
+            gizmo,
             players,
             trees,
             brush,
             locator,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -481,6 +502,7 @@ export class RailroadMap {
             controlPoints,
             frameNumbers,
             frames,
+            gizmo,
             grades,
             groundworks,
             groundworksHidden,
@@ -629,13 +651,8 @@ export class RailroadMap {
                         },
                         mousemove: (e) => {
                             if (this.brush) {
-                                const ctm = this.svg.node.getScreenCTM();
-                                if (!ctm) throw new Error('Missing CTM');
-                                const me = e as MouseEvent;
-                                const point = this.layers.trees
-                                    .point(me.clientX, me.clientY)
-                                    .transform(new Matrix(ctm.inverse()));
-                                this.brush.center(point.x, point.y);
+                                const {x, y} = this.mouseWorldLocation(e as MouseEvent);
+                                this.brush.center(x, y);
                                 if (this.toolMode === MapToolMode.tree_brush && mouseDown && mouseButton !== 1) {
                                     // Cut or replant
                                     treeBrush();
@@ -740,18 +757,108 @@ export class RailroadMap {
         return elements;
     }
 
+    private gizmoDebugLine?: Line;
+    private gizmoDebugText?: Text;
     private renderIndustry(industry: Industry) {
         const paths = Object.entries(industrySvgPaths[industry.type] || {});
         const groupClass = industry.type in IndustryType ? IndustryType[industry.type] : 'unknown';
         const tooltipText = industry.type in industryName ? industryName[industry.type] : `Unknown ${industry.type}`;
+        const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()
-            .attr('transform', makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw))
+            .attr('transform', industryTransform)
             .addClass('industry')
             .addClass(groupClass);
         g.element('title').words(tooltipText);
-        paths.forEach(([className, path]: [string, PathArrayAlias]) => g.path(path).addClass(className));
-        return g;
+        const renderPath = (g: G) => ([className, path]: [string, PathArrayAlias]) => g.path(path).addClass(className);
+        paths.forEach(renderPath(g));
+        const gizmoG = this.layers.gizmo
+            .group()
+            .attr('transform', industryTransform)
+            .addClass('gizmo')
+            .addClass(groupClass);
+        const gizmoPaths = Object.entries(gizmoSvgPaths);
+        gizmoPaths.forEach(renderPath(gizmoG));
+        const gizmoDirection = (e: Event) => {
+            const {target} = e;
+            if (!(target instanceof SVGPathElement)) return 'none';
+            if (target.classList.contains('x')) return 'x';
+            if (target.classList.contains('y')) return 'y';
+            if (target.classList.contains('z')) return 'z';
+            return 'none';
+        };
+        const gridSize = 50;
+        let capture = false;
+        let captureDirection: 'x' | 'y' | 'z' | 'none' = 'none';
+        gizmoG
+            .on('pointerdown', (evt) => {
+                const e = evt as PointerEvent;
+                if (this.toolMode !== MapToolMode.pan_zoom) return;
+                const direction = gizmoDirection(e);
+                switch (direction) {
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                        gizmoG.node.setPointerCapture(e.pointerId);
+                        capture = true;
+                        captureDirection = direction;
+                        this.panZoom
+                            .disablePan()
+                            .disableDblClickZoom();
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
+                }
+            })
+            .on('pointerup', (e) => {
+                if (!capture) return;
+                e.preventDefault();
+                e.stopPropagation();
+                switch (captureDirection) {
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                        // TODO: Implement gizmo behavior
+                        break;
+                }
+                capture = false;
+                captureDirection = 'none';
+                this.panZoom
+                    .enablePan()
+                    .enableDblClickZoom();
+                let {x, y} = this.mouseLocalLocation(e as PointerEvent, gizmoG);
+                // Snap to grid
+                x = Math.round(x / gridSize) * gridSize;
+                y = Math.round(y / gridSize) * gridSize;
+                console.log([x, y]);
+                // Remove the gizmo controls
+                if (this.gizmoDebugLine) {
+                    this.gizmoDebugLine.remove();
+                    this.gizmoDebugLine = undefined;
+                }
+                if (this.gizmoDebugText) {
+                    this.gizmoDebugText.remove();
+                    this.gizmoDebugText = undefined;
+                }
+            })
+            .on('pointermove', (e) => {
+                if (!capture) return;
+                e.preventDefault();
+                e.stopPropagation();
+                let {x, y} = this.mouseLocalLocation(e as PointerEvent, gizmoG);
+                // Snap to grid
+                x = Math.round(x / gridSize) * gridSize;
+                y = Math.round(y / gridSize) * gridSize;
+                // Update the gizmo
+                if (this.gizmoDebugLine) this.gizmoDebugLine.remove();
+                if (this.gizmoDebugText) this.gizmoDebugText.remove();
+                this.gizmoDebugLine = gizmoG.line().addClass('ruler');
+                this.gizmoDebugText = gizmoG.text(`[${x}, ${y}]`)
+                    .attr('transform', `translate(${x} ${y}) rotate(90)`)
+                    .addClass('frame-text');
+                this.gizmoDebugLine.plot(0, 0, x, y);
+            });
+        return [g, gizmoG];
     }
 
     private renderPlayer(player: Player) {

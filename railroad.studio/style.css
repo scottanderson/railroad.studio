@@ -52,12 +52,12 @@
   --platform-stroke: purple;
   --pond-fill: #66f;
   --pond-stroke: darkblue;
-  --firewood-camp: orange;
+  --firewood-camp: #c00;
   --engine-house-lightblue: #66f;
   --engine-house-gold: #ff9;
   --engine-house-red: #f66;
   --engine-house-brown: #633;
-  --telegraph-office: orange;
+  --telegraph-office: #fc0;
 }
 
 [data-bs-theme=dark] {
@@ -327,10 +327,11 @@ body {
   fill: var(--stroke);
 }
 
-.industry line,
+.gizmo line,
+.gizmo path,
 .industry path {
-  stroke-width: 10;
   stroke: var(--stroke);
+  stroke-width: 20;
 }
 
 .industry .building {
@@ -354,6 +355,15 @@ body {
 .industry.engine_house_red .building { fill: var(--engine-house-red); }
 .industry.engine_house_brown .building { fill: var(--engine-house-brown); }
 .industry.telegraph_office .building { fill: var(--telegraph-office); }
+
+.gizmo .x { fill: var(--engine-house-red); }
+.gizmo .y { fill: var(--boxcar); }
+.gizmo .z { fill: var(--engine-house-lightblue); }
+
+.gizmo path:hover { fill: var(--stroke); }
+.gizmo .x:hover { stroke: var(--engine-house-red); }
+.gizmo .y:hover { stroke: var(--boxcar); }
+.gizmo .z:hover { stroke: var(--engine-house-lightblue); }
 
 image {
   transition: filter var(--duration) var(--animation);

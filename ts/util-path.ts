@@ -86,5 +86,28 @@ export const polyRect = (x: number, y: number, ...legs: number[]): PathCommand[]
     return result;
 };
 
+export const arrow = (xDirection: boolean, stemWidth = 100, arrowLength = 1000): PathCommand[] => {
+    const arrowHeadWidth = stemWidth * 2;
+    const arrowHeadLength = Math.round(Math.sqrt(3 * (arrowHeadWidth ** 2)) / 2);
+    const stemLength = arrowLength - arrowHeadLength;
+    const halfStemWidth = stemWidth / 2;
+    const halfHeadWidth = arrowHeadWidth / 2;
+    const f = xDirection ? 'V' : 'H';
+    const r = xDirection ? 'H' : 'V';
+    return [
+        xDirection ?
+            ['M', arrowLength, 0] :
+            ['M', 0, arrowLength],
+        xDirection ?
+            ['L', stemLength, halfHeadWidth] :
+            ['L', halfHeadWidth, stemLength],
+        [f, halfStemWidth],
+        [r, 0],
+        [f, -halfStemWidth],
+        [r, stemLength],
+        [f, -halfHeadWidth],
+        ['Z']];
+};
+
 export const combine = (...commands: PathCommand[][]): PathCommand[] =>
     commands.flatMap((v) => v);
