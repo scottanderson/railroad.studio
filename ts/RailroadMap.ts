@@ -1,10 +1,10 @@
 /* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
-import {Circle, Element, G, Matrix, PathCommand, Svg} from '@svgdotjs/svg.js';
+import {Circle, Element, G, Matrix, PathArrayAlias, PathCommand, Svg} from '@svgdotjs/svg.js';
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
-import {IndustryType} from './IndustryType';
+import {industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -739,12 +739,18 @@ export class RailroadMap {
         return elements;
     }
 
-    private renderIndustry(industry: Industry): Element {
-        const industryName = IndustryType[industry.type] || `Unknown industry ${industry.type}`;
-        return this.layers.industries
-            .text((block) => block.text(industryName))
-            .attr('transform', makeTransformF(industry.location, industry.rotation.yaw))
-            .addClass('grade-text');
+    private renderIndustry(industry: Industry) {
+        const paths = Object.entries(industrySvgPaths[industry.type] || {});
+        const groupClass = industry.type in IndustryType ? IndustryType[industry.type] : 'unknown';
+        const tooltipText = industry.type in industryName ? industryName[industry.type] : `Unknown ${industry.type}`;
+        const g = this.layers.industries
+            .group()
+            .attr('transform', makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw))
+            .addClass('industry')
+            .addClass(groupClass);
+        g.element('title').words(tooltipText);
+        paths.forEach(([className, path]: [string, PathArrayAlias]) => g.path(path).addClass(className));
+        return g;
     }
 
     private renderPlayer(player: Player) {

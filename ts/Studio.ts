@@ -1330,9 +1330,9 @@ export class Studio {
             if (!isNaN(Number(key))) continue;
             const i = Number(IndustryType[key]);
             if (isNaN(i)) continue;
-            options[String(i)] = industryName[i as IndustryType];
+            options[String(i)] = industryName[i as IndustryType] || 'Unknown';
         }
-        const display = (value: string) => industryName[Number(value) as IndustryType];
+        const display = (value: string) => industryName[Number(value) as IndustryType] || 'Unknown';
         const save = (value: string) => saveValue(Number(value) as IndustryType);
         return this.editDropdown(String(type), options, save, display);
     }
