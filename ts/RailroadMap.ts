@@ -23,6 +23,7 @@ import {clamp, lerp} from './math';
 import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
 import {localToWorld} from './Transform';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
+import {rect} from './util-path';
 
 enum MapToolMode {
     pan_zoom,
@@ -1097,7 +1098,7 @@ export class RailroadMap {
             case 'ballast_h01':
             case 'ballast_h05':
             case 'ballast_h10':
-                makePath(this.layers.groundworks, ['grade']);
+                makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
                 break;
             case 'rail_914':
                 makePath(this.layers.tracks, ['rail']);
@@ -1106,8 +1107,8 @@ export class RailroadMap {
                 break;
             case 'rail_914_bumper':
                 makePath(this.layers.tracks, ['rail']);
-                elements.push(this.layers.groundworks
-                    .rect(1, 1)
+                elements.push(this.layers.tracks
+                    .path(rect(-90, -90, 180, 180))
                     .attr('transform', makeTransform(spline.endPoint.x, spline.endPoint.y, spline.rotation.yaw))
                     .addClass('bumper'));
                 break;
@@ -1115,7 +1116,7 @@ export class RailroadMap {
             case 'rail_914_h05':
             case 'rail_914_h10':
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['grade']);
+                makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
                 makeGradeText();
                 makeRadiusText();
                 break;

@@ -175,8 +175,7 @@ body {
 }
 
 .bumper {
-  stroke: var(--stroke);
-  stroke-width: 200;
+  fill: var(--engine-house-red);
 }
 
 .stone-wall {
@@ -202,6 +201,9 @@ body {
 .steel-bridge {
   stroke-width: 400;
 }
+
+.grade.h05 { stroke-width: 1200; }
+.grade.h10 { stroke-width: 2000; }
 
 .rail:hover,
 .rail-deck:hover,
