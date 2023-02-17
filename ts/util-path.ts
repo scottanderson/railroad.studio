@@ -13,8 +13,8 @@ export const rotatedRect = (x: number, y: number, width: number, height: number,
     const cos = Math.cos(theta);
     const sin = Math.sin(theta);
     const lineToPoint = (lx: number, ly: number): PathCommand => ['L',
-        x + lx * cos - ly * sin,
-        y + lx * sin + ly * cos];
+        Math.round(x + lx * cos - ly * sin),
+        Math.round(y + lx * sin + ly * cos)];
     return [
         ['M', x, y],
         lineToPoint(width, 0),
