@@ -44,6 +44,23 @@ export class Studio {
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
+        // Print world information
+        const printWorldInfo = (id: string | null, action: string) => {
+            if (!id) return;
+            const player = railroad.players.find((p) => id.startsWith(p.id + '_'));
+            if (!player) return;
+            const time = id.substring(id.indexOf('_') + 1);
+            console.log(`World ${action} by ${player.name} on ${time}`);
+            return player.name;
+        };
+        printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
+        const playerName = printWorldInfo(railroad.saveGame.uniqueId, 'saved');
+        const simplify = (s: string) => s.toLowerCase().replace(/[\s-]/g, '');
+        if (playerName && !simplify(filename).startsWith(simplify(playerName))) {
+            this.filename = `${playerName.replace(/[\s]/g, '')}-${filename}`;
+        }
+        this.logRadiusGrade();
+        // Set up the DOM
         const header = document.createElement('h2');
         this.header = header;
         header.textContent = 'Loaded ' + this.filename;
@@ -621,7 +638,7 @@ export class Studio {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = this.modified ? 'modified-' + this.filename : this.filename;
+            a.download = this.exportFileName();
             document.body.append(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -659,17 +676,18 @@ export class Studio {
             headerElement.insertBefore(headerWarning, studioControls);
             // headerElement.replaceChildren(header, headerWarning, studioControls);
         }
-        // Print world information
-        const printWorldInfo = (id: string | null, action: string) => {
-            if (!id) return;
-            const player = railroad.players.find((p) => id.startsWith(p.id + '_'));
-            if (!player) return;
-            const time = id.substring(id.indexOf('_') + 1);
-            console.log(`World ${action} by ${player.name} on ${time}`);
-        };
-        printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
-        printWorldInfo(railroad.saveGame.uniqueId, 'saved');
-        this.logRadiusGrade();
+    }
+
+    private exportFileName() {
+        const fileExtension = this.filename.match(/(\.[^.]+)?$/)?.[1];
+        if (!fileExtension) {
+            if (this.modified) return this.filename + '-modified.sav';
+            return this.filename + '.sav';
+        } else {
+            if (!this.modified) return this.filename;
+            const beforeDot = this.filename.substring(0, this.filename.length - fileExtension.length);
+            return `${beforeDot}-modified${fileExtension}`;
+        }
     }
 
     setMapModified() {
