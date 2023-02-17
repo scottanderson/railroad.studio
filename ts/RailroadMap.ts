@@ -964,7 +964,7 @@ export class RailroadMap {
             const bezier = catmullRomToBezier(spline, i);
             const cp0 = cubicBezier3(t - 0.01, bezier);
             const cp1 = cubicBezier3(t + 0.01, bezier);
-            const thresholds = [30_00, 50_00, 70_00, 90_00];
+            const thresholds = [25_00, 30_00, 40_00, 50_00];
             const index = thresholds.findIndex((t) => radius < t);
             const classSuffix = (index === -1) ? '' : `-${index}`;
             // Circle
@@ -1044,7 +1044,7 @@ export class RailroadMap {
         const makeRadiusText = (curve: BezierCurve = bezier, l = this.layers.radius) => {
             const {center, location, radius, t} = cubicBezierMinRadius(curve);
             if (radius > 120_00) return;
-            const thresholds = [30_00, 50_00, 70_00, 90_00];
+            const thresholds = [25_00, 30_00, 40_00, 50_00];
             const index = thresholds.findIndex((t) => radius < t);
             const classSuffix = (index === -1) ? '' : `-${index}`;
             // Circle
