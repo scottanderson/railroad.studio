@@ -9,7 +9,7 @@
   --rail-deck-hidden: green;
   --grade: sienna;
   --stone-wall: darkgray;
-  --tunnel: #333333;
+  --tunnel: #333;
   --wooden-bridge: goldenrod;
   --steel-bridge: steelblue;
   --switch-leg-not-aligned: red;
@@ -24,39 +24,39 @@
   --brakes-applied: red;
   --engine: purple;
   --tender: black;
-  --handcar: #ff80ff;
-  --caboose: #ff9999;
+  --handcar: #f9f;
+  --caboose: #f99;
   --waycar: gold;
   --plow: gold;
-  --boxcar: #66f081;
-  --boxcar-loaded: #36cc00;
-  --flatcar-cordwood: #fdbf77;
+  --boxcar: #6f9;
+  --boxcar-loaded: #3c0;
+  --flatcar-cordwood: #fc6;
   --flatcar-cordwood-loaded: orange;
-  --flatcar-hopper: #a7a7a9;
+  --flatcar-hopper: #999;
   --flatcar-hopper-loaded: black;
-  --flatcar-logs: #f99a9a;
+  --flatcar-logs: #f99;
   --flatcar-logs-loaded: red;
-  --flatcar-stakes: #fdbf77;
-  --flatcar-stakes-loaded: #f38a12;
-  --flatcar-tanker: #9090f9;
+  --flatcar-stakes: #fc6;
+  --flatcar-stakes-loaded: #f90;
+  --flatcar-tanker: #99f;
   --flatcar-tanker-loaded: blue;
   --spice-verde: green;
-  --spice-lime: yellowgreen;
+  --spice-lime: #690;
   --spice-lemon: #dd0;
   --spice-mild: orange;
   --spice-piquante: orangered;
   --spice-caliente: red;
-  --building-fill: #333333;
+  --building-fill: #333;
   --building-stroke: black;
   --platform-fill: plum;
   --platform-stroke: purple;
-  --pond-fill: #6666ff;
+  --pond-fill: #66f;
   --pond-stroke: darkblue;
   --firewood-camp: orange;
-  --engine-house-lightblue: #6666ff;
-  --engine-house-gold: #ffff99;
-  --engine-house-red: #ff6666;
-  --engine-house-brown: #663333;
+  --engine-house-lightblue: #66f;
+  --engine-house-gold: #ff9;
+  --engine-house-red: #f66;
+  --engine-house-brown: #633;
   --telegraph-office: orange;
 }
 
@@ -70,12 +70,12 @@
   --control-point-primary: magenta;
   --control-point-secondary: cyan;
   --control-point-tertiary: yellow;
-  --building-fill: #666666;
-  --building-stroke: #999999;
+  --building-fill: #666;
+  --building-stroke: #999;
   --platform-fill: purple;
   --platform-stroke: plum;
   --pond-fill: darkblue;
-  --pond-stroke: #6666ff;
+  --pond-stroke: #66f;
 }
 
 body {
