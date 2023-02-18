@@ -1,7 +1,7 @@
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
-import {Frame, NumericFrameState, Railroad, SplineType} from './Railroad';
+import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -21,8 +21,6 @@ interface InputTextOptions {
     min?: string;
     step?: string;
 }
-
-type Quadruplet<T> = [T, T, T, T];
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
@@ -1300,8 +1298,8 @@ export class Studio {
 
     private editIndustryProducts(
         type: string,
-        labels: [string, string, string, string],
-        values: [number, number, number, number],
+        labels: Quadruplet<string>,
+        values: Quadruplet<number>,
         saveValue: (value: number[]) => number[],
     ): Node {
         const display = (value: number[]) => {

@@ -73,11 +73,13 @@ export interface NumericFrameState {
     tenderWaterAmount: number;
 }
 
+export type Quadruplet<T> = [T, T, T, T];
+
 export interface Industry {
     location: Vector;
     rotation: Rotator;
-    inputs: [number, number, number, number];
-    outputs: [number, number, number, number];
+    inputs: Quadruplet<number>;
+    outputs: Quadruplet<number>;
     type: IndustryType;
 }
 
