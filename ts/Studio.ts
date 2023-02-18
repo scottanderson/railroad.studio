@@ -134,8 +134,12 @@ export class Studio {
                 name: 'Switch turnout radius',
             },
             {
+                key: 'bridges',
+                name: 'Bridges and Walls',
+            },
+            {
                 key: 'groundworks',
-                name: 'Groundwork and Bridges',
+                name: 'Fill',
             },
             {
                 key: 'groundworksHidden',

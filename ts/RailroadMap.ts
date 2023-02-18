@@ -47,6 +47,7 @@ interface MapOptions {
 export interface MapLayers {
     background: G;
     border: G;
+    bridges: G,
     brush: G;
     controlPoints: G;
     frameNumbers: G;
@@ -71,6 +72,7 @@ interface MapLayerVisibility extends Record<keyof MapLayers, boolean> {}
 const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     background: true,
     border: true,
+    bridges: true,
     brush: false,
     controlPoints: false,
     frameNumbers: false,
@@ -461,6 +463,7 @@ export class RailroadMap {
             groundworksHidden,
             industries,
             turntables,
+            bridges,
             tracks,
             tracksHidden,
             controlPoints,
@@ -495,10 +498,12 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
+            group.group(),
         ];
         const layers: MapLayers = {
             background,
             border,
+            bridges,
             brush,
             controlPoints,
             frameNumbers,
@@ -946,6 +951,8 @@ export class RailroadMap {
     private renderSpline(spline: Spline) {
         const elements: Element[] = [];
         const isRail = spline.type === SplineType.rail || spline.type === SplineType.rail_deck;
+        const isGrade = spline.type === SplineType.constant_grade || spline.type === SplineType.variable_grade;
+        const isBridge = !isRail && !isGrade;
         const clickHandler = () => this.onClickSpline(spline, elements);
         // Control points
         spline.controlPoints.forEach((point, i) => {
@@ -981,7 +988,7 @@ export class RailroadMap {
             elements.push(rect);
         });
         // Calculate spline paths
-        const splineGroup = isRail ? this.layers.tracks : this.layers.groundworks;
+        const splineGroup = isRail ? this.layers.tracks : isBridge ? this.layers.bridges : this.layers.groundworks;
         const hiddenGroup = isRail ? this.layers.tracksHidden : this.layers.groundworksHidden;
         const pathAccumulator: [PathCommand[], PathCommand[]] = [[], []];
         spline.segmentsVisible.forEach((visible, i, arr) => {
@@ -1248,35 +1255,35 @@ export class RailroadMap {
             }
             case 'rail_914_trestle_pile_01':
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['wooden-bridge']); // TODO: Give this a different style
+                makePath(this.layers.bridges, [`pile-bridge-${spline.paintStyle}`]);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_trestle_steel_01':
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['steel-bridge']);
+                makePath(this.layers.bridges, ['steel-bridge']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_trestle_wood_01':
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['wooden-bridge']);
+                makePath(this.layers.bridges, ['wooden-bridge']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_tunnel':
-                makePath(this.layers.groundworks, ['tunnel']);
+                makePath(this.layers.bridges, ['tunnel']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_wall_01':
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['stone-wall']);
+                makePath(this.layers.bridges, ['stone-wall']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_wall_01_norail':
-                makePath(this.layers.groundworks, ['stone-wall']);
+                makePath(this.layers.bridges, ['stone-wall']);
                 makeGradeText();
                 break;
             default:

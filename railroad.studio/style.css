@@ -10,6 +10,11 @@
   --grade: sienna;
   --stone-wall: darkgray;
   --tunnel: #333;
+  --pile-bridge-new: #c96;
+  --pile-bridge-fireproof-red: #c33;
+  --pile-bridge-drgw: #633;
+  --pile-bridge-creosote: #633;
+  --pile-bridge-old: #669;
   --wooden-bridge: goldenrod;
   --steel-bridge: steelblue;
   --switch-leg-not-aligned: red;
@@ -122,6 +127,11 @@ body {
 .grade,
 .stone-wall,
 .tunnel,
+.pile-bridge-1,
+.pile-bridge-2,
+.pile-bridge-3,
+.pile-bridge-4,
+.pile-bridge-5,
 .wooden-bridge,
 .steel-bridge {
   fill: none;
@@ -186,6 +196,26 @@ body {
   stroke: var(--tunnel);
 }
 
+.pile-bridge-1 {
+  stroke: var(--pile-bridge-new);
+}
+
+.pile-bridge-2 {
+  stroke: var(--pile-bridge-fireproof-red);
+}
+
+.pile-bridge-3 {
+  stroke: var(--pile-bridge-drgw);
+}
+
+.pile-bridge-4 {
+  stroke: var(--pile-bridge-creosote);
+}
+
+.pile-bridge-5 {
+  stroke: var(--pile-bridge-old);
+}
+
 .wooden-bridge {
   stroke: var(--wooden-bridge);
 }
@@ -197,11 +227,17 @@ body {
 .grade,
 .stone-wall,
 .tunnel,
+.pile-bridge-1,
+.pile-bridge-2,
+.pile-bridge-3,
+.pile-bridge-4,
+.pile-bridge-5,
 .wooden-bridge,
 .steel-bridge {
   stroke-width: 400;
 }
 
+.grade { stroke-linecap: round; }
 .grade.h05 { stroke-width: 1200; }
 .grade.h10 { stroke-width: 2000; }
 
@@ -210,6 +246,11 @@ body {
 .grade:hover,
 .stone-wall:hover,
 .tunnel:hover,
+.pile-bridge-1:hover,
+.pile-bridge-2:hover,
+.pile-bridge-3:hover,
+.pile-bridge-4:hover,
+.pile-bridge-5:hover,
 .wooden-bridge:hover,
 .steel-bridge:hover {
   opacity: 0.8;
