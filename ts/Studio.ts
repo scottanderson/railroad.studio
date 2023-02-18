@@ -674,12 +674,13 @@ export class Studio {
     }
 
     private exportFileName() {
+        const appendModified = this.modified && !this.filename.match(/modified/);
         const fileExtension = this.filename.match(/(\.[^.]+)?$/)?.[1];
         if (!fileExtension) {
-            if (this.modified) return this.filename + '-modified.sav';
+            if (appendModified) return this.filename + '-modified.sav';
             return this.filename + '.sav';
         } else {
-            if (!this.modified) return this.filename;
+            if (!appendModified) return this.filename;
             const beforeDot = this.filename.substring(0, this.filename.length - fileExtension.length);
             return `${beforeDot}-modified${fileExtension}`;
         }
