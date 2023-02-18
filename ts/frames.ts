@@ -36,6 +36,7 @@ export enum FrameTypes {
 export interface FrameDefinition {
     engine: boolean;
     freight: boolean;
+    handcar?: boolean;
     length: number;
     name: string;
     name_length: number;
@@ -536,8 +537,9 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         },
     },
     [FrameTypes.HANDCAR]: {
-        engine: true,
+        engine: false,
         freight: false,
+        handcar: true,
         length: 220.2,
         name: 'Handcar',
         name_length: 18,

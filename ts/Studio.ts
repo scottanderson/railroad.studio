@@ -217,16 +217,13 @@ export class Studio {
         grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        const categories: (keyof FrameDefinition)[] = ['engine', 'tender', 'freight'];
+        const categories: (keyof FrameDefinition)[] = ['engine', 'handcar', 'tender', 'freight'];
         lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
             if (!a.type) return b.type ? 1 : 0;
             if (!b.type) return -1;
             const ad = frameDefinitions[a.type];
             const bd = frameDefinitions[b.type];
-            if (ad.engine !== bd.engine) return ad.engine ? -1 : 1;
-            if (ad.tender !== bd.tender) return ad.tender ? -1 : 1;
-            if (ad.freight !== bd.freight) return ad.freight ? -1 : 1;
-            return 0;
+            return categories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
         }).flatMap((frame, i, a) => {
             const btnFrame = document.createElement('button');
             const imgFrame = document.createElement('i');
