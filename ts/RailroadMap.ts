@@ -24,6 +24,7 @@ import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
 import {localToWorld} from './Transform';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
+import {GizmoDirection, gizmoDirection} from './Gizmo';
 
 enum MapToolMode {
     pan_zoom,
@@ -775,21 +776,12 @@ export class RailroadMap {
         const gizmoG = this.layers.gizmo
             .group()
             .attr('transform', industryTransform)
-            .addClass('gizmo')
-            .addClass(groupClass);
+            .addClass('gizmo');
         const gizmoPaths = Object.entries(gizmoSvgPaths);
         gizmoPaths.forEach(renderPath(gizmoG));
-        const gizmoDirection = (e: Event) => {
-            const {target} = e;
-            if (!(target instanceof SVGPathElement)) return 'none';
-            if (target.classList.contains('x')) return 'x';
-            if (target.classList.contains('y')) return 'y';
-            if (target.classList.contains('z')) return 'z';
-            return 'none';
-        };
         const gridSize = 50;
         let capture = false;
-        let captureDirection: 'x' | 'y' | 'z' | 'none' = 'none';
+        let captureDirection: GizmoDirection = 'none';
         gizmoG
             .on('pointerdown', (evt) => {
                 const e = evt as PointerEvent;
