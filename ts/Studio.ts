@@ -86,6 +86,10 @@ export class Studio {
         btnLayers.setAttribute('data-bs-auto-close', 'outside');
         btnLayers.setAttribute('data-bs-toggle', 'dropdown');
         btnLayers.replaceChildren(imgLayers, txtLayers);
+        btnLayers.addEventListener('click', () => {
+            // Update layer toggle state
+            layers.forEach((l) => l.listener ? l.listener() : undefined);
+        });
         const lstLayers = document.createElement('ul');
         lstLayers.classList.add('dropdown-menu');
         const grpLayers = document.createElement('div');
