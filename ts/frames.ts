@@ -283,7 +283,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         },
         max: {
             brakeValue: 1,
-            headlightType: 2,
+            headlightType: 1,
             markerLightsRearLeftState: 3,
             markerLightsRearRightState: 3,
             paintType: 1,
@@ -344,7 +344,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         },
         max: {
             brakeValue: 1,
-            headlightType: 3,
+            headlightType: 1,
             markerLightsRearLeftState: 3,
             markerLightsRearRightState: 3,
             paintType: 5,
@@ -669,7 +669,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         },
         max: {
             brakeValue: 1,
-            headlightType: 2,
+            headlightType: 1,
             paintType: 2,
             smokestackType: 1,
             tenderFuelAmount: 470,
@@ -724,7 +724,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         },
         max: {
             brakeValue: 1,
-            headlightType: 3,
+            headlightType: 1,
             paintType: 1,
             smokestackType: 1,
             tenderFuelAmount: 854,
