@@ -1,3 +1,4 @@
+import {Railroad} from './Railroad';
 import {Studio} from './Studio';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
@@ -145,6 +146,9 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                 const railroad = gvasToRailroad(gvas);
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
+                    // Loaded successfully, prefix filename with player save name
+                    filename = updateFilename(railroad, filename);
+                    // Initialize the Studio UI
                     window.studio = new Studio(filename, railroad, header, content);
                     document.title = filename + ' - Railroad Studio';
                     console.log(railroad);
@@ -153,6 +157,23 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
             }), 10);
         }), 10);
     });
+}
+
+function updateFilename(railroad: Railroad, filename: string) {
+    const findPlayerName = (id: string | null, action: string) => {
+        if (!id) return;
+        const player = railroad.players.find((p) => id.startsWith(p.id + '_'));
+        if (!player) return;
+        const time = id.substring(id.indexOf('_') + 1);
+        console.log(`World ${action} by ${player.name} on ${time}`);
+        return player.name;
+    };
+    findPlayerName(railroad.saveGame.uniqueWorldId, 'created');
+    const playerName = findPlayerName(railroad.saveGame.uniqueId, 'saved');
+    if (!playerName) return filename;
+    const simplify = (s: string) => s.toLowerCase().replace(/[\s-_]/g, '');
+    if (simplify(filename).includes(simplify(playerName))) return filename;
+    return `${playerName.replace(/[\s-_]/g, '')}-${filename}`;
 }
 
 /**

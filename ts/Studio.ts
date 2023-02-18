@@ -42,21 +42,6 @@ export class Studio {
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
-        // Print world information
-        const printWorldInfo = (id: string | null, action: string) => {
-            if (!id) return;
-            const player = railroad.players.find((p) => id.startsWith(p.id + '_'));
-            if (!player) return;
-            const time = id.substring(id.indexOf('_') + 1);
-            console.log(`World ${action} by ${player.name} on ${time}`);
-            return player.name;
-        };
-        printWorldInfo(railroad.saveGame.uniqueWorldId, 'created');
-        const playerName = printWorldInfo(railroad.saveGame.uniqueId, 'saved');
-        const simplify = (s: string) => s.toLowerCase().replace(/[\s-]/g, '');
-        if (playerName && !simplify(filename).startsWith(simplify(playerName))) {
-            this.filename = `${playerName.replace(/[\s]/g, '')}-${filename}`;
-        }
         this.logRadiusGrade();
         // Set up the DOM
         const header = document.createElement('h2');
