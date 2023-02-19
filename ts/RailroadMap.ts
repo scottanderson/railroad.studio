@@ -248,8 +248,9 @@ export class RailroadMap {
     async refreshSplines(): Promise<void> {
         if (this.renderLock) new Error('Map is already rendering');
         this.renderLock = true;
-        this.layers.grades.node.replaceChildren();
+        this.layers.bridges.node.replaceChildren();
         this.layers.controlPoints.node.replaceChildren();
+        this.layers.grades.node.replaceChildren();
         this.layers.groundworks.node.replaceChildren();
         this.layers.groundworksHidden.node.replaceChildren();
         this.layers.radius.node.replaceChildren();
