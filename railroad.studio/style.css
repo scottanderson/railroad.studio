@@ -273,14 +273,14 @@ body {
   opacity: 0.8;
 }
 
-.switch-leg.aligned {
+.switch-leg {
+  fill: none;
   stroke: var(--stroke);
   stroke-width: 92;
 }
 
 .switch-leg.not-aligned {
   stroke: var(--switch-leg-not-aligned);
-  stroke-width: 92;
   opacity: 0.5;
 }
 

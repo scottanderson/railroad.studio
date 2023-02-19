@@ -8,6 +8,13 @@ export const rect = (x: number, y: number, width: number, height: number): PathC
     ['H', x],
     ['Z']];
 
+export const rectAbs = (x0: number, y0: number, x1: number, y1: number): PathCommand[] => [
+    ['M', x0, y0],
+    ['H', x1],
+    ['V', y1],
+    ['H', x0],
+    ['Z']];
+
 export const rotatedRect = (x: number, y: number, width: number, height: number, direction: number): PathCommand[] => {
     const theta = degreesToRadians(direction);
     const cos = Math.cos(theta);

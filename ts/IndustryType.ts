@@ -1,5 +1,5 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
-import {arrow, circle, combine, polyRect, polyRectRel, rect, rotatedRect} from './util-path';
+import {arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
 
 export enum IndustryType {
     logging_camp = 1,
@@ -223,12 +223,10 @@ export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlia
         ),
     },
     [IndustryType.freight_depot]: {
-        'platform': polyRectRel(2200, -1000,
-            -5500, 300,
-            1000, 1650),
-        'building': polyRectRel(2100, -900,
-            0, 1750,
-            -4300, -1750),
+        'platform': polyRect(2200, -1000,
+            -3300, -700,
+            -2300, 1000),
+        'building': rectAbs(2100, -900, -2200, 900),
     },
     [IndustryType.firewood_camp]: {
         'building': rect(150, 1000, 950, -1700),
