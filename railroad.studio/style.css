@@ -46,8 +46,8 @@
   --flatcar-tanker: #99f;
   --flatcar-tanker-loaded: blue;
   --spice-verde: green;
-  --spice-lime: #690;
-  --spice-lemon: #dd0;
+  --spice-lime: #70a800;
+  --spice-lemon: #d6d600;
   --spice-mild: orange;
   --spice-piquante: orangered;
   --spice-caliente: red;
@@ -69,8 +69,7 @@
   --stroke: white;
   --stroke-inverted: black;
   --rail-deck: brown;
-  --grade: darkkhaki;
-  --wooden-bridge: lightgoldenrodyellow;
+  --wooden-bridge: #fc3;
   --switch-leg-not-aligned: cyan;
   --control-point-primary: magenta;
   --control-point-secondary: cyan;
