@@ -103,10 +103,6 @@ export class Studio {
                 name: 'Frames',
             },
             {
-                key: 'frameNumbers',
-                name: 'Frame Numbers',
-            },
-            {
                 key: 'grades',
                 name: 'Grade %',
             },
@@ -233,7 +229,6 @@ export class Studio {
                 this.map.panTo(frame.location);
                 // Show frames
                 if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
-                if (!this.map.getLayerVisibility('frameNumbers')) this.map.toggleLayerVisibility('frameNumbers');
             });
             const prevFrame = i > 0 ? a[i - 1] : undefined;
             if (prevFrame && frame.type && prevFrame.type) {

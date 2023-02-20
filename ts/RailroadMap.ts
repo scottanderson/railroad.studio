@@ -50,7 +50,6 @@ export interface MapLayers {
     bridges: G,
     brush: G;
     controlPoints: G;
-    frameNumbers: G;
     frames: G;
     gizmo: G;
     grades: G;
@@ -75,8 +74,7 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     bridges: true,
     brush: false,
     controlPoints: false,
-    frameNumbers: false,
-    frames: false,
+    frames: true,
     gizmo: false,
     grades: false,
     groundworks: true,
@@ -469,7 +467,6 @@ export class RailroadMap {
             tracksHidden,
             controlPoints,
             frames,
-            frameNumbers,
             grades,
             radius,
             radiusSwitch,
@@ -499,7 +496,6 @@ export class RailroadMap {
             group.group(),
             group.group(),
             group.group(),
-            group.group(),
         ];
         const layers: MapLayers = {
             background,
@@ -507,7 +503,6 @@ export class RailroadMap {
             bridges,
             brush,
             controlPoints,
-            frameNumbers,
             frames,
             gizmo,
             grades,
@@ -705,16 +700,16 @@ export class RailroadMap {
         });
     }
 
-    private renderFrame(frame: Frame): Element[] {
-        const elements: Element[] = [];
+    private renderFrame(frame: Frame) {
         if (!frame.type || !(frame.type in frameDefinitions)) {
             console.log(`Unknown frame type ${frame.type}`);
-            return [];
+            return;
         }
         const definition = frameDefinitions[frame.type];
         const transform = makeTransform(frame.location.x, frame.location.y, 180 + frame.rotation.yaw);
+        const g = this.layers.frames.group();
         // Frame outline
-        const f = this.layers.frames
+        const f = g
             .rect(definition.length, 300)
             .center(0, 0)
             .attr('transform', transform)
@@ -732,7 +727,6 @@ export class RailroadMap {
         if (definition.tender) {
             f.addClass('tender');
         }
-        elements.push(f);
         // Tooltip
         const tooltipText = [
             definition.name,
@@ -742,14 +736,13 @@ export class RailroadMap {
             .filter((e) => Boolean(e))
             .map(gvasToString)
             .join('\n');
-        const title = f.element('title')
+        f.element('title')
             .words(tooltipText);
-        elements.push(title);
         // Frame text (number)
         const dx = Math.round(45 - definition.length / 2);
         const frameText = frame.number;
         if (frameText) {
-            const text = this.layers.frameNumbers
+            const text = g
                 .text(gvasToString(frameText))
                 .attr('transform', `${transform} translate(${dx} 90)`)
                 .addClass('frame-text');
@@ -759,9 +752,8 @@ export class RailroadMap {
             if (definition.tender) {
                 text.addClass('tender');
             }
-            elements.push(text);
         }
-        return elements;
+        return g;
     }
 
     private gizmoDebugLine?: Line;
