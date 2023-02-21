@@ -39,21 +39,19 @@ export function catmullRomMinRadius(spline: CatmullRomSpline): CatmullRomOsculat
         const result = {center, location, radius, t, i};
         return result;
     };
-    const results: CatmullRomOsculatingCircle[] = [];
-    Object.entries(spline.segmentsVisible)
+    return Object.entries(spline.segmentsVisible)
         .filter(([, b]) => b)
         .map((entry) => Number(entry[0]))
         .map(getSegmentResult)
         .filter((result, i, a) => {
             const first = (i === 0);
             const last = (i + 1 === a.length);
-            // const prevResult = first ? undefined : a[i - 1];
-            // const last = (i + 1 === a.length);
+            // Only include local minima
             if (!last && result.radius < a[i + 1].radius) {
-                results.push(result);
+                return true;
             } else if (last && !first && result.radius < a[i - 1].radius) {
-                results.push(result);
+                return true;
             }
+            return false;
         });
-    return results;
 }
