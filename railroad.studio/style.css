@@ -307,6 +307,10 @@ body {
   opacity: 0.5;
 }
 
+.map-svg g#frames g text {
+  pointer-events: none;
+}
+
 .frame {
   rx: 92;
   stroke-width: 32;
