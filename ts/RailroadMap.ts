@@ -706,13 +706,12 @@ export class RailroadMap {
             return;
         }
         const definition = frameDefinitions[frame.type];
-        const transform = makeTransform(frame.location.x, frame.location.y, 180 + frame.rotation.yaw);
-        const g = this.layers.frames.group();
+        const g = this.layers.frames.group()
+            .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
         const f = g
             .rect(definition.length, 300)
             .center(0, 0)
-            .attr('transform', transform)
             .addClass('frame')
             .addClass(frame.type);
         if (frame.state.brakeValue > 0) {
@@ -744,7 +743,7 @@ export class RailroadMap {
         if (frameText) {
             const text = g
                 .text(gvasToString(frameText))
-                .attr('transform', `${transform} translate(${dx} 90)`)
+                .attr('transform', `rotate(180) translate(${dx} 90)`)
                 .addClass('frame-text');
             if (definition.engine) {
                 text.addClass('engine');
