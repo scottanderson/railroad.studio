@@ -1237,7 +1237,7 @@ export class RailroadMap {
                     makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
                     makePath(this.layers.tracks, ['switch-leg', 'aligned'], secondLeg);
                 }
-                if (!spline.type.endsWith('_noballast')) {
+                if (!(spline.type.endsWith('_noballast') || spline.type.includes('_cross_'))) {
                     makePath(this.layers.groundworks, ['grade']);
                     makePath(this.layers.groundworks, ['grade'], secondLeg);
                 }
