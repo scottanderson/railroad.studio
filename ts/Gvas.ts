@@ -6,17 +6,17 @@ import {Vector} from './Vector';
  */
 export interface Gvas {
     _order: string[];
-    _types: GvasMap<GvasTypes>;
+    _types: Record<string, GvasTypes>;
     _header: GvasHeader;
-    boolArrays: GvasMap<boolean[]>;
-    floatArrays: GvasMap<number[]>;
-    floats: GvasMap<number>;
-    intArrays: GvasMap<number[]>;
-    stringArrays: GvasMap<GvasString[]>;
-    strings: GvasMap<GvasString>;
-    vectorArrays: GvasMap<Vector[]>;
-    rotatorArrays: GvasMap<Rotator[]>;
-    textArrays: GvasMap<GvasText[]>;
+    boolArrays: Record<string, boolean[]>;
+    floatArrays: Record<string, number[]>;
+    floats: Record<string, number>;
+    intArrays: Record<string, number[]>;
+    stringArrays: Record<string, GvasString[]>;
+    strings: Record<string, GvasString>;
+    vectorArrays: Record<string, Vector[]>;
+    rotatorArrays: Record<string, Rotator[]>;
+    textArrays: Record<string, GvasText[]>;
 }
 
 export type GvasTypes =
@@ -30,10 +30,6 @@ export type GvasTypes =
     | ['ArrayProperty', 'StructProperty', 'Rotator']
     | ['ArrayProperty', 'StructProperty', 'Vector']
     | ['ArrayProperty', 'TextProperty'];
-
-export type GvasMap<V> = {
-    [key: string]: V;
-};
 
 export type GvasString = string | null;
 

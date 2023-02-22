@@ -1,4 +1,4 @@
-import {GvasHeader, GvasMap, GvasString, GvasTypes} from './Gvas';
+import {GvasHeader, GvasString, GvasTypes} from './Gvas';
 import {IndustryType} from './IndustryType';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -11,7 +11,7 @@ import {Vector} from './Vector';
 export interface Railroad {
     _header: GvasHeader;
     _order: string[];
-    _types: GvasMap<GvasTypes>;
+    _types: Record<string, GvasTypes>;
     frames: Frame[];
     industries: Industry[];
     players: Player[];

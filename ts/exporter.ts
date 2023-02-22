@@ -1,6 +1,5 @@
 /* global BlobPart */
-// eslint-disable-next-line max-len
-import {CustomData, EngineVersion, Gvas, GvasHeader, GvasMap, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
+import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
 import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -132,15 +131,15 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         splineSegmentVisibility = splineSegmentVisibility.concat(spline.segmentsVisible);
         splineVisibilityEnd[idx] = splineSegmentVisibility.length - 1;
     }
-    const boolArrays: GvasMap<boolean[]> = {};
-    const floatArrays: GvasMap<number[]> = {};
-    const floats: GvasMap<number> = {};
-    const intArrays: GvasMap<number[]> = {};
-    const stringArrays: GvasMap<GvasString[]> = {};
-    const strings: GvasMap<GvasString> = {};
-    const rotatorArrays: GvasMap<Rotator[]> = {};
-    const vectorArrays: GvasMap<Vector[]> = {};
-    const textArrays: GvasMap<GvasText[]> = {};
+    const boolArrays: Record<string, boolean[]> = {};
+    const floatArrays: Record<string, number[]> = {};
+    const floats: Record<string, number> = {};
+    const intArrays: Record<string, number[]> = {};
+    const stringArrays: Record<string, GvasString[]> = {};
+    const strings: Record<string, GvasString> = {};
+    const rotatorArrays: Record<string, Rotator[]> = {};
+    const vectorArrays: Record<string, Vector[]> = {};
+    const textArrays: Record<string, GvasText[]> = {};
     const orderLowerCase = railroad._order.map((s) => s.toLowerCase());
     // Add missing keys to railroad._order
     for (const propertyName of exportKeys) {
@@ -150,7 +149,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             railroad._types[propertyName] = propertyType(lowerCase);
         }
     }
-    // Fill in the GvasMaps, preserving property name capitalization
+    // Fill in the properties, preserving name capitalization
     for (const propertyName of railroad._order) {
         switch (propertyName.toLowerCase()) {
             case 'boilerfiretemparray':

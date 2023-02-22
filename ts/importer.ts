@@ -1,4 +1,4 @@
-import {Gvas, GvasMap} from './Gvas';
+import {Gvas} from './Gvas';
 // eslint-disable-next-line max-len
 import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {textToString} from './util';
@@ -458,12 +458,12 @@ function optionalIndex<T>(arr: T[] | null, i: number): (T | undefined) {
 }
 
 /**
- * Read a case-insensitive key from a GvasMap
- * @param {GvasMap<T>} map
+ * Read a case-insensitive key from a dictionary
+ * @param {Record<string, T>} map
  * @param {string} key
  * @return {T} Returns the map entry, or null.
  */
-function optionalMap<T>(map: GvasMap<T>, key: string): T | null {
+function optionalMap<T>(map: Record<string, T>, key: string): T | null {
     if (key in map) return map[key];
     const lowerKey = key.toLowerCase();
     const matchingKeys = Object.keys(map).filter((k) => k.toLowerCase() === lowerKey);
