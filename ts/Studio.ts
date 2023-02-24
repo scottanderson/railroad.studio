@@ -1,6 +1,7 @@
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
+import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
@@ -8,7 +9,6 @@ import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {cargoLimits, FrameDefinition, frameDefinitions, frameStateMetadata} from './frames';
-import {clamp} from './math';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
@@ -527,13 +527,29 @@ export class Studio {
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
         btnFrames.classList.add('btn', 'btn-secondary');
-        btnFrames.addEventListener('click', () => {
+        let framePage = 0;
+        const resetFramePage = () => {
+            const pageSize = 20;
+            const onPage = (page: number) => {
+                framePage = page;
+                resetFramePage();
+            };
+            const framesNav = createPager(framePage, railroad.frames.length, onPage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            table.classList.add('table', 'table-striped', 'mb-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
-            this.frames(table);
-        });
+            if (framesNav) {
+                framesNav.classList.add('mt-5');
+                content.replaceChildren(framesNav, table);
+            } else {
+                table.classList.add('mt-5');
+                content.replaceChildren(table);
+            }
+            const first = pageSize * framePage;
+            const last = Math.min(railroad.frames.length, first + pageSize) - 1;
+            this.frames(table, first, last);
+        };
+        btnFrames.addEventListener('click', resetFramePage);
         // Industries
         const btnIndustries = document.createElement('button');
         btnIndustries.textContent = 'Industries';
@@ -560,51 +576,25 @@ export class Studio {
         const btnSplineTracks = document.createElement('button');
         btnSplineTracks.textContent = 'Spline Tracks';
         btnSplineTracks.classList.add('btn', 'btn-secondary');
-        let currentPage = 0;
+        let splineTrackPage = 0;
         const resetSplineTrackPage = () => {
             const pageSize = 20;
-            const numPages = Math.ceil(railroad.splineTracks.length / pageSize);
-            currentPage = clamp(currentPage, 0, numPages - 1);
-            const splineTrackNav = document.createElement('nav');
-            const ul = document.createElement('ul');
-            ul.classList.add('pagination');
-            const page = (i: number, text?: string) =>{
-                const li = document.createElement('li');
-                li.classList.add('page-item');
-                if (i === currentPage && !text) {
-                    li.classList.add('active');
-                } else if (i < 0 || i >= numPages) {
-                    li.classList.add('disabled');
-                }
-                const a = document.createElement('a');
-                a.classList.add('page-link', 'user-select-none');
-                a.addEventListener('click', () => {
-                    currentPage = i;
-                    resetSplineTrackPage();
-                });
-                const first = i * pageSize;
-                const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
-                a.textContent = text || `${i + 1}`;
-                a.title = `${first}-${last}`;
-                li.appendChild(a);
-                ul.appendChild(li);
+            const onPage = (page: number): void => {
+                splineTrackPage = page;
+                resetSplineTrackPage();
             };
-            page(0, 'First');
-            page(currentPage - 1, 'Prev');
-            const start = Math.max(0, currentPage - 2);
-            const end = Math.min(numPages, start + 5);
-            for (let i = start; i < end; i++) page(i);
-            page(currentPage + 1, 'Next');
-            page(numPages - 1, 'Last');
-            splineTrackNav.appendChild(ul);
+            const splineTrackNav = createPager(splineTrackPage, railroad.splineTracks.length, onPage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            table.classList.add('table', 'table-striped', 'mb-5');
             studioControls.replaceChildren(buttons);
-            if (numPages > 1) {
-                studioControls.appendChild(splineTrackNav);
+            if (splineTrackNav) {
+                splineTrackNav.classList.add('mt-5');
+                content.replaceChildren(splineTrackNav, table);
+            } else {
+                table.classList.add('mt-5');
+                content.replaceChildren(table);
             }
-            content.replaceChildren(table);
-            const first = pageSize * currentPage;
+            const first = pageSize * splineTrackPage;
             const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
             this.splineTracks(table, first, last);
         };
@@ -814,7 +804,7 @@ export class Studio {
         }
     }
 
-    private frames(table: HTMLTableElement): void {
+    private frames(table: HTMLTableElement, first: number, last: number): void {
         this.setTitle('Frames');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -828,7 +818,8 @@ export class Studio {
         });
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
-        for (const frame of this.railroad.frames) {
+        for (let idx = first; idx <= last; idx++) {
+            const frame = this.railroad.frames[idx];
             tr = document.createElement('tr');
             tbody.appendChild(tr);
             // Type
