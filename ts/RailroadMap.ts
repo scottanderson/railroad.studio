@@ -12,7 +12,7 @@ import {gvasToString} from './Gvas';
 import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
 import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
-import {frameDefinitions, cargoLimits} from './frames';
+import {frameDefinitions, cargoLimits, isFrameType} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -701,7 +701,7 @@ export class RailroadMap {
     }
 
     private renderFrame(frame: Frame) {
-        if (!frame.type || !(frame.type in frameDefinitions)) {
+        if (!isFrameType(frame.type)) {
             console.log(`Unknown frame type ${frame.type}`);
             return;
         }

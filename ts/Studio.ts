@@ -22,7 +22,7 @@ import {
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {cargoLimits, FrameCategories, frameCategories, frameDefinitions, frameStateMetadata} from './frames';
+import {cargoLimits, frameCategories, frameDefinitions, frameStateMetadata, isFrameType} from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
@@ -215,8 +215,8 @@ export class Studio {
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
         lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
-            if (!a.type) return b.type ? 1 : 0;
-            if (!b.type) return -1;
+            if (!isFrameType(a.type)) return isFrameType(b.type) ? 1 : 0;
+            if (!isFrameType(b.type)) return -1;
             const ad = frameDefinitions[a.type];
             const bd = frameDefinitions[b.type];
             return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
@@ -224,7 +224,7 @@ export class Studio {
             const btnFrame = document.createElement('button');
             const imgFrame = document.createElement('i');
             const text =
-                (frame.type ? frameDefinitions[frame.type].name + ' ' : '') +
+                (isFrameType(frame.type) ? frameDefinitions[frame.type].name + ' ' : '') +
                 (frame.number ? '#' + gvasToString(frame.number) + ' ' : '') +
                 (frame.name ? gvasToString(frame.name) : '');
             const txtFrame = document.createTextNode(` ${text} `);
@@ -238,7 +238,7 @@ export class Studio {
                 if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
             });
             const prevFrame = i > 0 ? a[i - 1] : undefined;
-            if (prevFrame && frame.type && prevFrame.type) {
+            if (prevFrame && isFrameType(frame.type) && isFrameType(prevFrame.type)) {
                 const prevFrameDef = frameDefinitions[prevFrame.type];
                 const frameDef = frameDefinitions[frame.type];
                 if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
@@ -539,8 +539,8 @@ export class Studio {
             framePage = page;
             resetFramePage();
         };
-        const frameInCategory = (f: Frame, c: FrameCategories) =>
-            f.type ? frameDefinitions[f.type][c] || false : false;
+        const frameInCategory = (f: Frame, c: typeof frameCategories[number]) =>
+            isFrameType(f.type) && (frameDefinitions[f.type][c] || false);
         const labels = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
             tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
@@ -549,10 +549,10 @@ export class Studio {
             passenger: `Passenger (${railroad.frames.filter((f) => frameInCategory(f, 'passenger')).length})`,
             mow: `Maintenance (${railroad.frames.filter((f) => frameInCategory(f, 'mow')).length})`,
         };
-        const anyInCategory = (c: FrameCategories): boolean =>
+        const anyInCategory = (c: typeof frameCategories[number]): boolean =>
             railroad.frames.some((f) => frameInCategory(f, c));
         const checked = Object.fromEntries(frameCategories.map((c) => [c, anyInCategory(c)]));
-        const onFrameFilter = (category: FrameCategories, value: boolean): void => {
+        const onFrameFilter = (category: typeof frameCategories[number], value: boolean): void => {
             checked[category] = value;
             resetFramePage();
         };
@@ -562,7 +562,7 @@ export class Studio {
         const resetFramePage = () => {
             const pageSize = 20;
             const filtered = railroad.frames.filter((f) => {
-                if (!f.type) return false;
+                if (!isFrameType(f.type)) return false;
                 const d = frameDefinitions[f.type];
                 return frameCategories.every((c) => !d[c] || checked[c]);
             });
@@ -857,7 +857,7 @@ export class Studio {
             tbody.appendChild(tr);
             // Type
             let td = document.createElement('td');
-            td.textContent = frame.type ? frameDefinitions[frame.type].name : '';
+            td.textContent = isFrameType(frame.type) ? frameDefinitions[frame.type].name : '';
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
@@ -900,7 +900,7 @@ export class Studio {
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
             addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
             // Frame state
-            if (frame.type && frame.type in frameDefinitions) {
+            if (isFrameType(frame.type)) {
                 const {max, min} = frameDefinitions[frame.type];
                 const editNumericState = (frame: Frame, key: keyof NumericFrameState) => {
                     if (typeof frame.state[key] === 'undefined') return;
