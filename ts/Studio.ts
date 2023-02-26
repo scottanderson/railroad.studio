@@ -13,6 +13,7 @@ import {cargoLimits, FrameCategories, frameCategories, frameDefinitions, frameSt
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
+import {clamp} from './math';
 import {toggleDarkMode} from './themes';
 import {fp32r, fp32v} from './util';
 import {catmullRomToHermite} from './util-catmullrom';
@@ -559,6 +560,8 @@ export class Studio {
                 const d = frameDefinitions[f.type];
                 return frameCategories.every((c) => !d[c] || checked[c]);
             });
+            const numPages = Math.ceil(filtered.length / pageSize);
+            framePage = clamp(framePage, 0, numPages - 1);
             const framesNav = createPager(framePage, filtered.length, onFramePage, pageSize);
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mb-5');

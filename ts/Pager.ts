@@ -5,6 +5,7 @@ export function createPager(
     numItems: number,
     onPageClick: (page: number) => void,
     pageSize = 20,
+    displayPages = 7,
 ) {
     const numPages = Math.ceil(numItems / pageSize);
     if (numPages <= 1) return;
@@ -35,8 +36,9 @@ export function createPager(
     };
     page(0, 'First');
     page(currentPage - 1, 'Prev');
-    const start = Math.max(0, currentPage - 2);
-    const end = Math.min(numPages, start + 5);
+    const first = Math.max(0, currentPage - Math.floor(displayPages / 2));
+    const end = Math.min(numPages, first + displayPages);
+    const start = Math.max(0, end - displayPages);
     for (let i = start; i < end; i++) page(i);
     page(currentPage + 1, 'Next');
     page(numPages - 1, 'Last');
