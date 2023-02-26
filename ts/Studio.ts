@@ -1,11 +1,24 @@
 import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
-import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
+import {IndustryType, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
 import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
+import {
+    InputTextOptions,
+    bootstrapIcon,
+    editDropdown,
+    editIndustryProducts,
+    editIndustryType,
+    editNumber,
+    editRotator,
+    editSlider,
+    editString,
+    editTrackType,
+    editVector,
+} from './StudioEditor';
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
@@ -15,14 +28,7 @@ import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
 import {clamp} from './math';
 import {toggleDarkMode} from './themes';
-import {fp32r, fp32v} from './util';
 import {catmullRomToHermite} from './util-catmullrom';
-
-interface InputTextOptions {
-    max?: string;
-    min?: string;
-    step?: string;
-}
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
@@ -65,7 +71,7 @@ export class Studio {
         this.map = new RailroadMap(this, mapDiv);
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
-        const imgLayers = this.bootstrapIcon('bi-layers', 'Layers Dropdown');
+        const imgLayers = bootstrapIcon('bi-layers', 'Layers Dropdown');
         const btnLayers = document.createElement('button');
         btnLayers.id = 'btnLayers';
         btnLayers.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -192,7 +198,7 @@ export class Studio {
         }));
         // Find rolling stock dropdown
         const txtFrameList = document.createTextNode(' Frames ');
-        const imgFrameList = this.bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
+        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
         const btnFrameList = document.createElement('button');
         btnFrameList.id = 'btnFrameList';
         btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -247,7 +253,7 @@ export class Studio {
         }));
         // Trees dropdown
         const txtTrees = document.createTextNode(' Trees ');
-        const imgTrees = this.bootstrapIcon('bi-tree', 'Trees Dropdown');
+        const imgTrees = bootstrapIcon('bi-tree', 'Trees Dropdown');
         const btnTrees = document.createElement('button');
         btnTrees.id = 'btnTrees';
         btnTrees.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
@@ -296,7 +302,7 @@ export class Studio {
         }));
         // Tree brush
         const btnTreeBrush = document.createElement('button');
-        const imgTreeBrush = this.bootstrapIcon('bi-tree-fill', 'Tree Brush');
+        const imgTreeBrush = bootstrapIcon('bi-tree-fill', 'Tree Brush');
         const txtTreeBrush = document.createTextNode(' Tree Brush ');
         btnTreeBrush.classList.add('btn', 'btn-secondary');
         btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
@@ -314,7 +320,7 @@ export class Studio {
         });
         // Delete tool
         const btnDelete = document.createElement('button');
-        const imgDelete = this.bootstrapIcon('bi-eraser-fill', 'Delete Tool');
+        const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
         const txtDelete = document.createTextNode(' Delete Tool ');
         btnDelete.classList.add('btn', 'btn-secondary');
         btnDelete.replaceChildren(imgDelete, txtDelete);
@@ -330,7 +336,7 @@ export class Studio {
         });
         // Flatten spline tool
         const btnFlattenSpline = document.createElement('button');
-        const imgFlattenSpline = this.bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
+        const imgFlattenSpline = bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
         const txtFlattenSpline = document.createTextNode(' Flatten Spline Tool ');
         btnFlattenSpline.classList.add('btn', 'btn-secondary');
         btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
@@ -346,7 +352,7 @@ export class Studio {
         });
         // Parallel spline tool
         const btnParallelSpline = document.createElement('button');
-        const imgParallelSpline = this.bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
+        const imgParallelSpline = bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
         const txtParallelSpline = document.createTextNode(' Parallel Spline Tool ');
         btnParallelSpline.classList.add('btn', 'btn-secondary');
         btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
@@ -362,7 +368,7 @@ export class Studio {
         });
         // Circularize spline tool
         const btnCircularizeSpline = document.createElement('button');
-        const imgCircularizeSpline = this.bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
+        const imgCircularizeSpline = bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
         const txtCircularizeSpline = document.createTextNode(' Circularize Spline Tool ');
         btnCircularizeSpline.classList.add('btn', 'btn-secondary');
         btnCircularizeSpline.replaceChildren(imgCircularizeSpline, txtCircularizeSpline);
@@ -378,7 +384,7 @@ export class Studio {
         });
         // Minimize segment count
         const btnMinimizeSegments = document.createElement('button');
-        const imgMinimizeSegments = this.bootstrapIcon('bi-binoculars', 'Minimize segment count');
+        const imgMinimizeSegments = bootstrapIcon('bi-binoculars', 'Minimize segment count');
         const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
         btnMinimizeSegments.classList.add('btn', 'btn-secondary');
         btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
@@ -628,7 +634,7 @@ export class Studio {
         btnSplineTracks.addEventListener('click', resetSplineTrackPage);
         // Export
         const btnDownload = document.createElement('button');
-        const imgDownload = this.bootstrapIcon('bi-download', 'Download');
+        const imgDownload = bootstrapIcon('bi-download', 'Download');
         this.btnDownload = btnDownload;
         btnDownload.appendChild(imgDownload);
         btnDownload.classList.add('btn', 'btn-secondary');
@@ -647,7 +653,7 @@ export class Studio {
         // Toggle dark mode
         const btnDark = document.createElement('button');
         btnDark.classList.add('btn', 'btn-secondary');
-        btnDark.appendChild(this.bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
+        btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', toggleDarkMode);
         buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
         if (railroad.splineTracks.length > 0) {
@@ -786,47 +792,47 @@ export class Studio {
             // Location
             td = document.createElement('td');
             const setTrackLocation = (location: Vector) => track.location = location;
-            td.replaceChildren(this.editVector(track.location, setTrackLocation));
+            td.replaceChildren(editVector(this, track.location, setTrackLocation));
             tr.appendChild(td);
             // Start point
             td = document.createElement('td');
             const setTrackStartPoint = (startPoint: Vector) => track.startPoint = startPoint;
-            td.replaceChildren(this.editVector(track.startPoint, setTrackStartPoint));
+            td.replaceChildren(editVector(this, track.startPoint, setTrackStartPoint));
             tr.appendChild(td);
             // End point
             td = document.createElement('td');
             const setTrackEndPoint = (endPoint: Vector) => track.endPoint = endPoint;
-            td.replaceChildren(this.editVector(track.endPoint, setTrackEndPoint));
+            td.replaceChildren(editVector(this, track.endPoint, setTrackEndPoint));
             tr.appendChild(td);
             // Start tangent
             td = document.createElement('td');
             const setTrackStartTangent = (startTangent: Vector) => track.startTangent = startTangent;
-            td.replaceChildren(this.editVector(track.startTangent, setTrackStartTangent));
+            td.replaceChildren(editVector(this, track.startTangent, setTrackStartTangent));
             tr.appendChild(td);
             // End tangent
             td = document.createElement('td');
             const setTrackEndTangent = (endTangent: Vector) => track.endTangent = endTangent;
-            td.replaceChildren(this.editVector(track.endTangent, setTrackEndTangent));
+            td.replaceChildren(editVector(this, track.endTangent, setTrackEndTangent));
             tr.appendChild(td);
             // Paint style
             td = document.createElement('td');
             const setTrackPaintStyle = (paintStyle: number) => track.paintStyle = paintStyle;
-            td.replaceChildren(this.editNumber(track.paintStyle, {min: '0'}, setTrackPaintStyle));
+            td.replaceChildren(editNumber(this, track.paintStyle, {min: '0'}, setTrackPaintStyle));
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
             const setTrackRotation = (rotation: Rotator) => track.rotation = rotation;
-            td.replaceChildren(this.editRotator(track.rotation, setTrackRotation));
+            td.replaceChildren(editRotator(this, track.rotation, setTrackRotation));
             tr.appendChild(td);
             // Switch state
             td = document.createElement('td');
             const setTrackSwitchState = (switchState: number) => track.switchState = switchState;
-            td.replaceChildren(this.editNumber(track.switchState, {min: '0'}, setTrackSwitchState));
+            td.replaceChildren(editNumber(this, track.switchState, {min: '0'}, setTrackSwitchState));
             tr.appendChild(td);
             // Type
             td = document.createElement('td');
             const setTrackType = (type: SplineTrackType) => track.type = type;
-            td.replaceChildren(this.editTrackType(track.type as SplineTrackType, setTrackType));
+            td.replaceChildren(editTrackType(this, track.type as SplineTrackType, setTrackType));
             tr.appendChild(td);
         }
     }
@@ -856,12 +862,12 @@ export class Studio {
             // Name
             td = document.createElement('td');
             const setFrameName = (name: GvasString) => frame.name = name;
-            td.appendChild(this.editString(frame.name, setFrameName));
+            td.appendChild(editString(this, frame.name, setFrameName));
             tr.appendChild(td);
             // Number
             td = document.createElement('td');
             const setFrameNumber = (frameNo: GvasString) => frame.number = frameNo;
-            td.appendChild(this.editString(frame.number, setFrameNumber));
+            td.appendChild(editString(this, frame.number, setFrameNumber));
             tr.appendChild(td);
             // State table
             td = document.createElement('td');
@@ -889,10 +895,10 @@ export class Studio {
             };
             // Location
             const setFrameLocation = (location: Vector) => frame.location = location;
-            addStat('Location', this.editVector(frame.location, setFrameLocation));
+            addStat('Location', editVector(this, frame.location, setFrameLocation));
             // Rotation
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
-            addStat('Rotation', this.editRotator(frame.rotation, setFrameRotation));
+            addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
             // Frame state
             if (frame.type && frame.type in frameDefinitions) {
                 const {max, min} = frameDefinitions[frame.type];
@@ -938,15 +944,15 @@ export class Studio {
                     };
                     let form: Node;
                     if (!meta.type) {
-                        form = this.editNumber(value, options, saveValue, formatValue);
+                        form = editNumber(this, value, options, saveValue, formatValue);
                     } else if (meta.type === 'slider') {
-                        form = this.editSlider(value, options, saveValue, formatValue);
+                        form = editSlider(this, value, options, saveValue, formatValue);
                     } else {
                         const options = meta.type;
                         const formatValue = (value: string) => options[Number(value)];
                         const saveString = (value: string) => saveValue(Number(value));
                         const optionDict = Object.fromEntries(Object.entries(meta.type));
-                        form = this.editDropdown(String(value), optionDict, saveString, formatValue);
+                        form = editDropdown(this, String(value), optionDict, saveString, formatValue);
                     }
                     addStat(meta.name, form, tooltip, c);
                 };
@@ -983,7 +989,7 @@ export class Studio {
                 const limit = cargoLimits[frame.type][freightType];
                 const setFreight = (freight: number) => frame.state.freightAmount = freight;
                 const options = {min: '0', max: String(limit)};
-                addStat(`Freight (${freightType})`, this.editNumber(frame.state.freightAmount, options, setFreight));
+                addStat(`Freight (${freightType})`, editNumber(this, frame.state.freightAmount, options, setFreight));
             }
         }
     }
@@ -1007,29 +1013,29 @@ export class Studio {
             // Industry type
             let td = document.createElement('td');
             const setIndustryType = (type: IndustryType) => industry.type = type;
-            td.replaceChildren(this.editIndustryType(industry.type, setIndustryType));
+            td.replaceChildren(editIndustryType(this, industry.type, setIndustryType));
             tr.appendChild(td);
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
             const inputLabels = industryProductInputLabels[industry.type];
-            td.appendChild(this.editIndustryProducts('Input', inputLabels, industry.inputs, setIndustryInputs));
+            td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
             const outputLabels = industryProductOutputLabels[industry.type];
-            td.appendChild(this.editIndustryProducts('Output', outputLabels, industry.outputs, setIndustryOutputs));
+            td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
             const setIndustryLocation = (location: Vector) => industry.location = location;
-            td.replaceChildren(this.editVector(industry.location, setIndustryLocation));
+            td.replaceChildren(editVector(this, industry.location, setIndustryLocation));
             tr.appendChild(td);
             // Rotation
             td = document.createElement('td');
             const setIndustryRotation = (rotation: Rotator) => industry.rotation = rotation;
-            td.replaceChildren(this.editRotator(industry.rotation, setIndustryRotation));
+            td.replaceChildren(editRotator(this, industry.rotation, setIndustryRotation));
             tr.appendChild(td);
         }
     }
@@ -1060,346 +1066,26 @@ export class Studio {
             tr.appendChild(td);
             // Money
             td = document.createElement('td');
-            td.appendChild(this.editNumber(player.money, {min: '0'}, (money) => player.money = money));
+            td.appendChild(editNumber(this, player.money, {min: '0'}, (money) => player.money = money));
             tr.appendChild(td);
             // XP
             td = document.createElement('td');
-            td.appendChild(this.editNumber(player.xp, {min: '0'}, (xp) => player.xp = xp));
+            td.appendChild(editNumber(this, player.xp, {min: '0'}, (xp) => player.xp = xp));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
             if (player.location) {
                 const setPlayerLocation = (location: Vector): Vector => player.location = location;
-                td.appendChild(this.editVector(player.location, setPlayerLocation));
+                td.appendChild(editVector(this, player.location, setPlayerLocation));
             }
             tr.appendChild(td);
             // Rotation
             if (player.rotation) {
                 td = document.createElement('td');
                 const setPlayerRotation = (r: number) => player.rotation = r;
-                td.replaceChildren(this.editNumber(player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
+                td.replaceChildren(editNumber(this, player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
                 tr.appendChild(td);
             }
         }
-    }
-
-    private bootstrapIcon(className: string, label: string) {
-        const i = document.createElement('i');
-        i.classList.add('bi', className);
-        i.setAttribute('role', 'img');
-        i.ariaLabel = label;
-        return i;
-    }
-
-    private saveContext(
-        input: Node,
-        saveAction: () => boolean | void,
-        cancelAction: () => boolean,
-        formatValue: () => string,
-    ): Node {
-        const pre = document.createElement('pre');
-        pre.classList.add('m-0');
-        pre.textContent = formatValue();
-        pre.addEventListener('click', () => {
-            pre.parentElement?.replaceChildren(div);
-        });
-        // Save
-        const btnSave = document.createElement('button');
-        btnSave.classList.add('btn', 'btn-success');
-        btnSave.appendChild(this.bootstrapIcon('bi-save', 'Save'));
-        btnSave.addEventListener('click', () => {
-            const stayOpen = saveAction();
-            this.setMapModified();
-            pre.textContent = formatValue();
-            if (stayOpen) return;
-            // Close the edit control
-            div.parentElement?.replaceChildren(pre);
-        });
-        // Cancel
-        const btnCancel = document.createElement('button');
-        btnCancel.classList.add('btn', 'btn-danger');
-        btnCancel.appendChild(this.bootstrapIcon('bi-x-circle', 'Cancel'));
-        btnCancel.addEventListener('click', () => {
-            if (cancelAction()) return;
-            // Close the edit control
-            div.parentElement?.replaceChildren(pre);
-        });
-        // Layout
-        const div = document.createElement('div');
-        div.classList.add('hstack', 'gap-2');
-        div.replaceChildren(input, btnSave, btnCancel);
-        return pre;
-    }
-
-    private editNumber(
-        value: number,
-        options: InputTextOptions,
-        saveValue: (value: number) => number,
-        customFormatValue?: (value: number) => string,
-    ) {
-        const formatValue = customFormatValue ? () => customFormatValue(value) : () => {
-            const num = Number.isInteger(value) ? String(value) : value.toFixed(2);
-            return options.max ? `${num} / ${options.max}` : num;
-        };
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.classList.add('form-control');
-        if (options.max) input.max = options.max;
-        if (options.min) input.min = options.min;
-        if (options.step) input.step = options.step;
-        input.pattern = '[0-9]+';
-        input.value = String(value);
-        const onSaveValue = () => {
-            value = Number(input.value);
-            value = saveValue(value);
-            return onCancel();
-        };
-        const onCancel = () => {
-            if (Number(input.value) !== value) {
-                // Restore the original value
-                input.value = String(value);
-                return true;
-            }
-            // Close the edit control
-            return false;
-        };
-        return this.saveContext(input, onSaveValue, onCancel, formatValue);
-    }
-
-    private editSlider(
-        value: number,
-        options: InputTextOptions,
-        saveValue: (value: number) => number,
-        customFormatValue: (value: number) => string,
-    ) {
-        const formatValue = () => customFormatValue(value);
-        const input = document.createElement('input');
-        input.type = 'range';
-        input.classList.add('form-range');
-        if (options.max) input.max = options.max;
-        if (options.min) input.min = options.min;
-        if (options.step) input.step = options.step;
-        input.value = String(value);
-        const onSaveValue = () => {
-            value = Number(input.value);
-            value = saveValue(value);
-            return onCancel();
-        };
-        const onCancel = () => {
-            const inputValue = Number(input.value);
-            if (inputValue !== value) {
-                // Restore the original value
-                input.value = String(value);
-                if (inputValue === Number(input.value)) {
-                    // The slider was already as close as possible to the original value. Close the edit control
-                    return false;
-                }
-                updatePreview();
-                return true;
-            }
-            // Close the edit control
-            return false;
-        };
-        const preview = document.createElement('pre');
-        preview.classList.add('mb-0');
-        preview.textContent = formatValue();
-        const updatePreview = () => preview.textContent = customFormatValue(Number(input.value));
-        input.addEventListener('input', updatePreview);
-        const form = document.createElement('form');
-        form.classList.add('form-group', 'w-100');
-        form.replaceChildren(preview, input);
-        return this.saveContext(form, onSaveValue, onCancel, formatValue);
-    }
-
-    private editString(value: GvasString, saveValue: (value: GvasString) => void) {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.title = 'Null';
-        checkbox.checked = (value === null);
-        let tempValue = value || '';
-        checkbox.addEventListener('click', () => {
-            input.disabled = checkbox.checked;
-            if (checkbox.checked) {
-                tempValue = input.value;
-                input.value = 'null';
-            } else {
-                input.value = tempValue;
-            }
-        });
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.disabled = (value === null);
-        input.value = (value === null) ? 'null' : value;
-        const onSave = () => {
-            value = checkbox.checked ? null : input.value;
-            saveValue(value);
-        };
-        const onCancel = () => {
-            const newValue = checkbox.checked ? null : input.value;
-            if (newValue !== value) {
-                // Restore the original value
-                input.disabled = checkbox.checked = (value === null);
-                input.value = (value === null) ? 'null' : value;
-                tempValue = value || '';
-                return true;
-            }
-            // Close the edit control
-            return false;
-        };
-        // Layout
-        const form = document.createElement('form');
-        form.replaceChildren(checkbox, input);
-        const formatValue = () => gvasToString(value);
-        return this.saveContext(form, onSave, onCancel, formatValue);
-    }
-
-    private editNumbers(
-        labels: string[],
-        value: number[],
-        display: (value: number[]) => string,
-        saveValue: (value: number[]) => number[],
-        options?: InputTextOptions,
-    ) {
-        const formatValue = () => display(value);
-        const vstack = document.createElement('div');
-        vstack.classList.add('vstack');
-        const inputs: HTMLInputElement[] = [];
-        value.forEach((v, i) => {
-            const input = document.createElement('input');
-            inputs.push(input);
-            input.type = 'number';
-            input.value = String(value[i]);
-            if (options) {
-                if (options.min) input.min = options.min;
-                if (options.max) input.max = options.max;
-                if (options.step) input.step = options.step;
-            }
-            input.pattern = '[0-9]+';
-            input.classList.add('form-control');
-            const div = document.createElement('div');
-            div.classList.add('form-floating', 'mt-1', 'mb-1');
-            const label = document.createElement('label');
-            label.textContent = labels[i];
-            div.replaceChildren(input, label);
-            vstack.appendChild(div);
-        });
-        const onSave = () => {
-            value = inputs.map((i) => Number(i.value));
-            value = saveValue(value);
-            return onCancel();
-        };
-        const onCancel = () => {
-            if (!value.every((v, i) => String(v) === inputs[i].value)) {
-                // Restore the original values
-                inputs.forEach((input, i) => input.value = String(value[i]));
-                return true;
-            }
-            // Close the edit control
-            return false;
-        };
-        return this.saveContext(vstack, onSave, onCancel, formatValue);
-    }
-
-    private editIndustryProducts(
-        type: string,
-        labels: Quadruplet<string>,
-        values: Quadruplet<number>,
-        saveValue: (value: number[]) => number[],
-    ): Node {
-        const display = (value: number[]) => {
-            const zeroPredicate = (v: number): boolean => v === 0;
-            if (value.every(zeroPredicate)) return '[Empty]';
-            return String(value).replace(/(,0)+$/g, '');
-        };
-        const options = {
-            min: '0',
-            step: '1',
-        };
-        return this.editNumbers(labels, values, display, saveValue, options);
-    }
-
-    private editRotator(value: Rotator, saveValue: (value: Rotator) => Rotator) {
-        const encode = (r: Rotator): number[] => [r.roll, r.yaw, r.pitch];
-        const decode = (t: number[]): Rotator => fp32r({roll: t[0], yaw: t[1], pitch: t[2]});
-        const display = (t: number[]) => {
-            if (t[0] === 0 && t[2] === 0) {
-                return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
-            }
-            return '[Rotator]';
-        };
-        const labels = ['roll', 'yaw', 'pitch'];
-        const save = (t: number[]) => encode(saveValue(decode(t)));
-        return this.editNumbers(labels, encode(value), display, save);
-    }
-
-    private editVector(value: Vector, saveValue: (value: Vector) => Vector) {
-        const encode = (v: Vector): number[] => [v.x, v.y, v.z];
-        const decode = (t: number[]): Vector => fp32v({x: t[0], y: t[1], z: t[2]});
-        const display = (t: number[]) => {
-            const xZero = t[0] === 0;
-            const yZero = t[1] === 0;
-            const zZero = t[2] === 0;
-            if (xZero && yZero && zZero) return '0';
-            if (yZero && zZero) return (t[0] > 0) ? `X+${t[0].toFixed(2)}` : `X${t[0].toFixed(2)}`;
-            if (xZero && zZero) return (t[1] > 0) ? `Y+${t[1].toFixed(2)}` : `Y${t[1].toFixed(2)}`;
-            if (xZero && yZero) return (t[2] > 0) ? `Z+${t[2].toFixed(2)}` : `Z${t[2].toFixed(2)}`;
-            if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]}}`;
-            return '[Vector]';
-        };
-        const labels = ['x', 'y', 'z'];
-        const save = (t: number[]) => encode(saveValue(decode(t)));
-        return this.editNumbers(labels, encode(value), display, save);
-    }
-
-    private editIndustryType(type: IndustryType, saveValue: (value: IndustryType) => void): Node {
-        const options: {[key: string]: string} = {};
-        for (const key in IndustryType) {
-            if (!isNaN(Number(key))) continue;
-            const i = Number(IndustryType[key]);
-            if (isNaN(i)) continue;
-            options[String(i)] = industryName[i as IndustryType] || 'Unknown';
-        }
-        const display = (value: string) => industryName[Number(value) as IndustryType] || 'Unknown';
-        const save = (value: string) => saveValue(Number(value) as IndustryType);
-        return this.editDropdown(String(type), options, save, display);
-    }
-
-    private editTrackType(type: SplineTrackType, saveValue: (value: SplineTrackType) => any): Node {
-        const options = Object.fromEntries(
-            Object.values(SplineTrackType)
-                .map((v) => [v, v]));
-        const save = (value: string) => saveValue(value as SplineTrackType);
-        return this.editDropdown(type, options, save);
-    }
-
-    private editDropdown(
-        value: string,
-        options: Record<string, string>,
-        saveValue: (value: string) => any,
-        formatValue: (value: string) => string = String,
-    ): Node {
-        const select = document.createElement('select');
-        select.classList.add('form-select');
-        for (const [value, text] of Object.entries(options)) {
-            const option = document.createElement('option');
-            option.value = value;
-            option.textContent = text;
-            select.appendChild(option);
-        }
-        select.value = String(value);
-        const onSave = () => {
-            value = select.value;
-            saveValue(value);
-        };
-        const onCancel = () => {
-            if (select.value !== value) {
-                // Restore the original value
-                select.value = value;
-                return true;
-            }
-            // Close the edit control
-            return false;
-        };
-        return this.saveContext(select, onSave, onCancel, () => formatValue(value));
     }
 }
