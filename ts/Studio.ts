@@ -1,3 +1,4 @@
+import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, gvasToString} from './Gvas';
 import {IndustryType, industryName, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
@@ -8,7 +9,7 @@ import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {cargoLimits, FrameDefinition, frameDefinitions, frameStateMetadata} from './frames';
+import {cargoLimits, FrameCategories, frameCategories, frameDefinitions, frameStateMetadata} from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
@@ -206,13 +207,12 @@ export class Studio {
         grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        const categories: (keyof FrameDefinition)[] = ['engine', 'handcar', 'tender', 'freight'];
         lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
             if (!a.type) return b.type ? 1 : 0;
             if (!b.type) return -1;
             const ad = frameDefinitions[a.type];
             const bd = frameDefinitions[b.type];
-            return categories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
+            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
         }).flatMap((frame, i, a) => {
             const btnFrame = document.createElement('button');
             const imgFrame = document.createElement('i');
@@ -234,7 +234,7 @@ export class Studio {
             if (prevFrame && frame.type && prevFrame.type) {
                 const prevFrameDef = frameDefinitions[prevFrame.type];
                 const frameDef = frameDefinitions[frame.type];
-                if (categories.some((key) => prevFrameDef[key] !== frameDef[key])) {
+                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
                     const li = document.createElement('li');
                     const hr = document.createElement('hr');
                     hr.classList.add('dropdown-divider');
@@ -528,26 +528,50 @@ export class Studio {
         btnFrames.textContent = 'Frames';
         btnFrames.classList.add('btn', 'btn-secondary');
         let framePage = 0;
+        const onFramePage = (page: number) => {
+            framePage = page;
+            resetFramePage();
+        };
+        const frameInCategory = (f: Frame, c: FrameCategories) =>
+            f.type ? frameDefinitions[f.type][c] || false : false;
+        const labels = {
+            engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
+            tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
+            handcar: `Handcars (${railroad.frames.filter((f) => frameInCategory(f, 'handcar')).length})`,
+            freight: `Freight (${railroad.frames.filter((f) => frameInCategory(f, 'freight')).length})`,
+            passenger: `Passenger (${railroad.frames.filter((f) => frameInCategory(f, 'passenger')).length})`,
+            mow: `Maintenance (${railroad.frames.filter((f) => frameInCategory(f, 'mow')).length})`,
+        };
+        const anyInCategory = (c: FrameCategories): boolean =>
+            railroad.frames.some((f) => frameInCategory(f, c));
+        const checked = Object.fromEntries(frameCategories.map((c) => [c, anyInCategory(c)]));
+        const onFrameFilter = (category: FrameCategories, value: boolean): void => {
+            checked[category] = value;
+            resetFramePage();
+        };
+        const categories = frameCategories.filter(anyInCategory);
+        const filterNav = createFilter(categories, labels, onFrameFilter);
+        filterNav.classList.add('mt-5');
         const resetFramePage = () => {
             const pageSize = 20;
-            const onPage = (page: number) => {
-                framePage = page;
-                resetFramePage();
-            };
-            const framesNav = createPager(framePage, railroad.frames.length, onPage, pageSize);
+            const filtered = railroad.frames.filter((f) => {
+                if (!f.type) return false;
+                const d = frameDefinitions[f.type];
+                return frameCategories.every((c) => !d[c] || checked[c]);
+            });
+            const framesNav = createPager(framePage, filtered.length, onFramePage, pageSize);
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped', 'mb-5');
             studioControls.replaceChildren(buttons);
+            const children = [];
             if (framesNav) {
-                framesNav.classList.add('mt-5');
-                content.replaceChildren(framesNav, table);
-            } else {
-                table.classList.add('mt-5');
-                content.replaceChildren(table);
+                framesNav.classList.add('mt-3');
+                children.push(framesNav);
             }
+            content.replaceChildren(filterNav, ...children, table);
             const first = pageSize * framePage;
-            const last = Math.min(railroad.frames.length, first + pageSize) - 1;
-            this.frames(table, first, last);
+            const last = Math.min(filtered.length, first + pageSize) - 1;
+            this.frames(table, first, last, filtered);
         };
         btnFrames.addEventListener('click', resetFramePage);
         // Industries
@@ -804,7 +828,7 @@ export class Studio {
         }
     }
 
-    private frames(table: HTMLTableElement, first: number, last: number): void {
+    private frames(table: HTMLTableElement, first: number, last: number, filtered: Frame[]): void {
         this.setTitle('Frames');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -819,7 +843,7 @@ export class Studio {
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
         for (let idx = first; idx <= last; idx++) {
-            const frame = this.railroad.frames[idx];
+            const frame = filtered[idx];
             tr = document.createElement('tr');
             tbody.appendChild(tr);
             // Type

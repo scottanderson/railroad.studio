@@ -33,10 +33,16 @@ export enum FrameTypes {
     WAYCAR = 'waycar',
 }
 
+export type FrameCategories = 'engine' | 'tender' | 'handcar' | 'freight' | 'passenger' | 'mow';
+
+export const frameCategories = ['engine', 'tender', 'handcar', 'freight', 'passenger', 'mow'] as const;
+
 export interface FrameDefinition {
     engine: boolean;
     freight: boolean;
     handcar?: boolean;
+    mow?: boolean;
+    passenger?: boolean;
     length: number;
     name: string;
     name_length: number;
@@ -114,6 +120,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         number_length: 12,
         number_lines: 1,
         tender: false,
+        passenger: true,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -743,6 +750,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         number_length: 4,
         number_lines: 1,
         tender: false,
+        mow: true,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -886,6 +894,7 @@ export const frameDefinitions: Record<string, FrameDefinition> = {
         number_length: 12,
         number_lines: 1,
         tender: false,
+        passenger: true,
         min: {
             headlightType: 1,
             paintType: 1,
