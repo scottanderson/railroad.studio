@@ -1,4 +1,3 @@
-/* global SvgPanZoom */
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {Circle, Element, G, Line, Matrix, PathArrayAlias, PathCommand, Svg, Text} from '@svgdotjs/svg.js';
@@ -105,7 +104,7 @@ export class RailroadMap {
     private readonly railroad: Railroad;
     private readonly treeUtil: TreeUtil;
     private readonly svg: Svg;
-    private panZoom: SvgPanZoom.Instance;
+    private panZoom: typeof svgPanZoom;
     private toolMode: MapToolMode;
     private layers: MapLayers;
     private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
@@ -158,7 +157,7 @@ export class RailroadMap {
     }
 
     private animationInterval = 0;
-    panTo(point: SvgPanZoom.Point, animationTime = 1000) {
+    panTo(point: Point, animationTime = 1000) {
         const sizes = this.panZoom.getSizes();
         const x = (point.x * sizes.realZoom) + (sizes.width / 2);
         const y = (point.y * sizes.realZoom) + (sizes.height / 2);
@@ -203,7 +202,7 @@ export class RailroadMap {
         }
     }
 
-    panFrom(): SvgPanZoom.Point {
+    panFrom(): Point {
         const sizes = this.panZoom.getSizes();
         const pan = this.panZoom.getPan();
         const x = (pan.x - (sizes.width / 2)) / sizes.realZoom;
@@ -550,7 +549,7 @@ export class RailroadMap {
     }
 
     private initPanZoom() {
-        const beforePan = (oldPan: SvgPanZoom.Point, newPan: SvgPanZoom.Point) => {
+        const beforePan = (oldPan: Point, newPan: Point) => {
             const gutterWidth = 100;
             const gutterHeight = 100;
             // Computed variables
