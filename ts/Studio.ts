@@ -557,12 +557,26 @@ export class Studio {
             resetFramePage();
         };
         const categories = frameCategories.filter(anyInCategory);
-        const filterNav = createFilter(categories, labels, onFrameFilter);
+        let frameSelect = 'all';
+        const onOption = (value: string) => {
+            frameSelect = value;
+            resetFramePage();
+        };
+        const options = Object.entries(frameDefinitions)
+            .filter(([type]) => railroad.frames.some((f) => f.type === type))
+            .map(([type, fd]) => {
+                const count = railroad.frames.filter((f) => f.type === type).length;
+                const text = count === 1 ? fd.name : `${fd.name} (${count})`;
+                return [type, text] as [string, string];
+            });
+        options.unshift(['all', 'All']);
+        const filterNav = createFilter(categories, labels, onFrameFilter, options, onOption);
         filterNav.classList.add('mt-5');
         const resetFramePage = () => {
             const pageSize = 20;
             const filtered = railroad.frames.filter((f) => {
                 if (!isFrameType(f.type)) return false;
+                if (frameSelect && frameSelect !== 'all') return (f.type === frameSelect);
                 const d = frameDefinitions[f.type];
                 return frameCategories.every((c) => !d[c] || checked[c]);
             });
