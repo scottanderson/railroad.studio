@@ -66,6 +66,7 @@ export class Studio {
             studioControls.replaceChildren(buttons, mapButtons);
             content.replaceChildren(mapDiv);
             this.setTitle('Map');
+            this.floatHeader(true);
         });
         content.replaceChildren(mapDiv);
         this.map = new RailroadMap(this, mapDiv);
@@ -592,6 +593,7 @@ export class Studio {
                 children.push(framesNav);
             }
             content.replaceChildren(filterNav, ...children, table);
+            this.floatHeader(false);
             const first = pageSize * framePage;
             const last = Math.min(filtered.length, first + pageSize) - 1;
             this.frames(table, first, last, filtered);
@@ -606,6 +608,7 @@ export class Studio {
             table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
+            this.floatHeader(false);
             this.industries(table);
         });
         // Players
@@ -617,6 +620,7 @@ export class Studio {
             table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
+            this.floatHeader(false);
             this.players(table);
         });
         // Spline Tracks
@@ -641,6 +645,7 @@ export class Studio {
                 table.classList.add('mt-5');
                 content.replaceChildren(table);
             }
+            this.floatHeader(false);
             const first = pageSize * splineTrackPage;
             const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
             this.splineTracks(table, first, last);
@@ -708,6 +713,21 @@ export class Studio {
             if (!appendModified) return this.filename;
             const beforeDot = this.filename.substring(0, this.filename.length - fileExtension.length);
             return `${beforeDot}-modified${fileExtension}`;
+        }
+    }
+
+    private floatHeader(float: boolean) {
+        const header = document.getElementById('header');
+        if (header) {
+            header.classList[float ? 'add' : 'remove']('fixed-top', 'm-3');
+        }
+        const content = document.getElementById('content');
+        if (content) {
+            if (float) {
+                content.classList.replace('pt-1', 'pt-5');
+            } else {
+                content.classList.replace('pt-5', 'pt-1');
+            }
         }
     }
 
