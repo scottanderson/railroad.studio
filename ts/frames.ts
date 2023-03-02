@@ -1054,3 +1054,18 @@ export const cargoLimits: Record<string, Record<string, number>> = {
         crudeoil: 12,
     },
 };
+
+export const cargoTypes: Record<string, string> = {
+    beam: 'Beams',
+    coal: 'Coal',
+    cordwood: 'Cordwood',
+    crate_tools: 'Tool Crates',
+    crudeoil: 'Crude Oil',
+    ironore: 'Iron Ore',
+    log: 'Logs',
+    lumber: 'Lumber',
+    oilbarrel: 'Oil Barrels',
+    rail: 'Rails',
+    rawiron: 'Raw Iron',
+    steelpipe: 'Steel Pipes',
+};

@@ -22,7 +22,7 @@ import {
 import {Vector} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {cargoLimits, frameCategories, frameDefinitions, frameStateMetadata, isFrameType} from './frames';
+import {cargoLimits, cargoTypes, frameCategories, frameDefinitions, frameStateMetadata, isFrameType} from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
 import {handleError} from './index';
@@ -915,7 +915,7 @@ export class Studio {
             addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
             // Frame state
             if (isFrameType(frame.type)) {
-                const {max, min} = frameDefinitions[frame.type];
+                const {max, min, freight} = frameDefinitions[frame.type];
                 const editNumericState = (frame: Frame, key: keyof NumericFrameState) => {
                     if (typeof frame.state[key] === 'undefined') return;
                     const meta = frameStateMetadata[key];
@@ -994,14 +994,27 @@ export class Studio {
                 editNumericState(frame, 'markerLightsFrontRightState');
                 editNumericState(frame, 'markerLightsRearLeftState');
                 editNumericState(frame, 'markerLightsRearRightState');
-            }
-            // Freight
-            const freightType = frame.state.freightType;
-            if (frame.type && freightType && freightType in cargoLimits[frame.type]) {
-                const limit = cargoLimits[frame.type][freightType];
-                const setFreight = (freight: number) => frame.state.freightAmount = freight;
-                const options = {min: '0', max: String(limit)};
-                addStat(`Freight (${freightType})`, editNumber(this, frame.state.freightAmount, options, setFreight));
+                // Freight
+                if (freight) {
+                    const freightType = frame.state.freightType || '';
+                    const limits = cargoLimits[frame.type] || {};
+                    const setAmount = (amount: number) => frame.state.freightAmount = amount;
+                    const max = (freightType in limits) ? String(limits[freightType]) : '0';
+                    const options: InputTextOptions = {min: '0', max};
+                    addStat(`Freight Amount`, editNumber(this, frame.state.freightAmount, options, setAmount));
+                    const allowedCargo = Object.keys(limits);
+                    const entries = allowedCargo.map((t) => [t, cargoTypes[t]]);
+                    entries.unshift(['', 'None']);
+                    if (freightType && !allowedCargo.includes(freightType)) {
+                        entries.unshift([freightType, freightType]);
+                    }
+                    const typeOptions = Object.fromEntries(entries);
+                    const setFreightType = (type: string) => {
+                        // TODO: Update freight amount limits
+                        return frame.state.freightType = type === '' ? null : type;
+                    };
+                    addStat(`Freight Type`, editDropdown(this, freightType, typeOptions, setFreightType));
+                }
             }
         }
     }
