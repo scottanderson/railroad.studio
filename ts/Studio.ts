@@ -962,11 +962,9 @@ export class Studio {
                     } else if (meta.type === 'slider') {
                         form = editSlider(this, value, options, saveValue, formatValue);
                     } else {
-                        const options = meta.type;
-                        const formatValue = (value: string) => options[Number(value)];
                         const saveString = (value: string) => saveValue(Number(value));
                         const optionDict = Object.fromEntries(Object.entries(meta.type));
-                        form = editDropdown(this, String(value), optionDict, saveString, formatValue);
+                        form = editDropdown(this, String(value), optionDict, saveString);
                     }
                     addStat(meta.name, form, tooltip, c);
                 };

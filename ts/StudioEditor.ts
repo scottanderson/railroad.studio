@@ -310,9 +310,8 @@ export function editIndustryType(
         if (isNaN(i)) continue;
         options[String(i)] = industryName[i as IndustryType] || 'Unknown';
     }
-    const display = (value: string) => industryName[Number(value) as IndustryType] || 'Unknown';
     const save = (value: string) => saveValue(Number(value) as IndustryType);
-    return editDropdown(studio, String(type), options, save, display);
+    return editDropdown(studio, String(type), options, save);
 }
 
 export function editTrackType(
@@ -332,7 +331,6 @@ export function editDropdown(
     value: string,
     options: Record<string, string>,
     saveValue: (value: string) => unknown,
-    formatValue: (value: string) => string = String,
 ): Node {
     const select = document.createElement('select');
     select.classList.add('form-select');
@@ -356,5 +354,6 @@ export function editDropdown(
         // Close the edit control
         return false;
     };
-    return saveContext(studio, select, onSave, onCancel, () => formatValue(value));
+    const formatValue = () => (options[value] || 'Unknown');
+    return saveContext(studio, select, onSave, onCancel, formatValue);
 }
