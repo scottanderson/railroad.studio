@@ -417,7 +417,7 @@ export class Studio {
             drpMinimizeSegments.setAttribute('aria-expanded', 'false');
             drpMinimizeSegments.setAttribute('data-bs-auto-close', 'outside');
             drpMinimizeSegments.setAttribute('data-bs-toggle', 'dropdown');
-            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => any) => {
+            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => unknown) => {
                 const cfgInput = document.createElement('input');
                 cfgInput.id = id;
                 cfgInput.min = '0';

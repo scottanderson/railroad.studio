@@ -318,7 +318,7 @@ export function editIndustryType(
 export function editTrackType(
     studio: Studio,
     type: SplineTrackType,
-    saveValue: (value: SplineTrackType) => any,
+    saveValue: (value: SplineTrackType) => unknown,
 ): Node {
     const options = Object.fromEntries(
         Object.values(SplineTrackType)
@@ -331,7 +331,7 @@ export function editDropdown(
     studio: Studio,
     value: string,
     options: Record<string, string>,
-    saveValue: (value: string) => any,
+    saveValue: (value: string) => unknown,
     formatValue: (value: string) => string = String,
 ): Node {
     const select = document.createElement('select');

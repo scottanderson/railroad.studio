@@ -9,9 +9,9 @@ import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 import {rotateVector} from './RotationMatrix';
 
-type Callback<T> = (value: T) => any;
+type Callback<T> = (value: T) => unknown;
 
-type OnTreesChangedCallback = (before: number, after: number, trees: Vector[], dryrun?: boolean) => Promise<any>;
+type OnTreesChangedCallback = (before: number, after: number, trees: Vector[], dryrun?: boolean) => Promise<unknown>;
 
 export interface Point {
     x: number;
@@ -21,7 +21,7 @@ export interface Point {
 export class TreeUtil {
     private readonly railroad: Railroad;
     private trees?: Vector[];
-    private treePromises: [Callback<Vector[]>, Callback<any>][] = [];
+    private treePromises: [Callback<Vector[]>, Callback<unknown>][] = [];
     private readonly onTreesChanged;
     private readonly setMapModified;
     private readonly setTitle;
@@ -173,7 +173,7 @@ function distToSegment2(p: Point, v: Point, w: Point) {
     return dist2(p, {x: x, y: y});
 }
 
-function pillFilter(tree: Vector, p0: Vector, p1: any, limit: number): boolean {
+function pillFilter(tree: Vector, p0: Vector, p1: Point, limit: number): boolean {
     return distToSegment2(tree, p0, p1) < limit ** 2;
 }
 

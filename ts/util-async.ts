@@ -100,7 +100,7 @@ export function asyncForEach<T>(
 export async function asyncFilter<T>(
     a: T[],
     predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any,
+    thisArg?: unknown,
     updateFunc?: AsyncProgressUpdate,
     foundFunc?: (values: T[]) => void,
     chunkSize = 10,

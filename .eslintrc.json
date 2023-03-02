@@ -15,6 +15,7 @@
     "plugins": ["@typescript-eslint"],
     "rules": {
         "@typescript-eslint/indent": ["error"],
+        "@typescript-eslint/no-explicit-any": ["error"],
         "@typescript-eslint/no-inferrable-types": ["error"],
         "@typescript-eslint/no-require-imports": ["error"],
         "@typescript-eslint/no-type-alias": ["error", {

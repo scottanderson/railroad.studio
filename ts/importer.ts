@@ -490,7 +490,7 @@ function optionalMap<T>(map: Record<string, T>, key: string): T | null {
 //     return simplified;
 // }
 
-function enforceEqualLengths(arrays: any[][]): void {
+function enforceEqualLengths(arrays: unknown[][]): void {
     if (!arrays.every((e, _i, a) => e.length === a[0].length)) {
         throw new Error(`Array lengths to not match: ${arrays.map((a) => a.length)}`);
     }

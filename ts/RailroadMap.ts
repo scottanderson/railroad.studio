@@ -416,7 +416,7 @@ export class RailroadMap {
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
-        const defaultNumber = (option: any, n: number) => typeof option === 'undefined' ? n : Number(option);
+        const defaultNumber = (option: unknown, n: number) => typeof option === 'undefined' ? n : Number(option);
         return {
             pan: {
                 x: Number(parsed?.pan?.x || 0),
@@ -553,11 +553,12 @@ export class RailroadMap {
             const gutterWidth = 100;
             const gutterHeight = 100;
             // Computed variables
-            const sizes: any = this.panZoom.getSizes();
-            const leftLimit = -((sizes.viewBox.x + sizes.viewBox.width) * sizes.realZoom) + gutterWidth;
-            const rightLimit = sizes.width - gutterWidth - (sizes.viewBox.x * sizes.realZoom);
-            const topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight;
-            const bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom);
+            const sizes = this.panZoom.getSizes();
+            const viewBox = sizes.viewBox as {x: number, y: number, width: number, height: number};
+            const leftLimit = -((viewBox.x + viewBox.width) * sizes.realZoom) + gutterWidth;
+            const rightLimit = sizes.width - gutterWidth - (viewBox.x * sizes.realZoom);
+            const topLimit = -((viewBox.y + viewBox.height) * sizes.realZoom) + gutterHeight;
+            const bottomLimit = sizes.height - gutterHeight - (viewBox.y * sizes.realZoom);
             const x = clamp(newPan.x, leftLimit, rightLimit);
             const y = clamp(newPan.y, topLimit, bottomLimit);
             return {x, y};
@@ -577,7 +578,7 @@ export class RailroadMap {
             }, [[], []]);
         }
 
-        let listeners: { [key: string]: (e: Event) => any };
+        let listeners: { [key: string]: (e: Event) => unknown };
         return svgPanZoom(this.svg.node, {
             zoomScaleSensitivity: 0.5,
             minZoom: 0.5,
