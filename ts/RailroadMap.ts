@@ -24,6 +24,7 @@ import {localToWorld} from './Transform';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
+import {unknownProperty} from './util';
 
 enum MapToolMode {
     pan_zoom,
@@ -416,18 +417,27 @@ export class RailroadMap {
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const parsed = JSON.parse(localStorage.getItem(key) || '{}');
+        const pan = unknownProperty(parsed, 'pan');
+        const x = unknownProperty(pan, 'x');
+        const y = unknownProperty(pan, 'y');
+        const zoom = unknownProperty(parsed, 'zoom');
+        const ml = unknownProperty(parsed, 'mergeLimits');
+        const bearing = unknownProperty(ml, 'bearing');
+        const inclination = unknownProperty(ml, 'inclination');
+        const horizontal = unknownProperty(ml, 'horizontal');
+        const vertical = unknownProperty(ml, 'vertical');
         const defaultNumber = (option: unknown, n: number) => typeof option === 'undefined' ? n : Number(option);
         return {
             pan: {
-                x: Number(parsed?.pan?.x || 0),
-                y: Number(parsed?.pan?.y || 0),
+                x: defaultNumber(x, 0),
+                y: defaultNumber(y, 0),
             },
-            zoom: Number(parsed?.zoom || 1),
+            zoom: defaultNumber(zoom, 1),
             mergeLimits: {
-                bearing: defaultNumber(parsed?.mergeLimits?.bearing, 10),
-                inclination: defaultNumber(parsed?.mergeLimits?.inclination, 2.5),
-                horizontal: defaultNumber(parsed?.mergeLimits?.horizontal, 10),
-                vertical: defaultNumber(parsed?.mergeLimits?.vertical, 1),
+                bearing: defaultNumber(bearing, 10),
+                inclination: defaultNumber(inclination, 2.5),
+                horizontal: defaultNumber(horizontal, 10),
+                vertical: defaultNumber(vertical, 1),
             },
         };
     }

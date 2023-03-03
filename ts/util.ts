@@ -48,7 +48,7 @@ export function textToString(value: GvasText): GvasString {
         if (value.guid !== RRO_TEXT_GUID) throw new Error(`Unexpected GUID: ${value.guid}`);
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
-            (m, i) => value.textFormat[i].values[0] || '');
+            (m, i) => value.textFormat[Number(i)].values[0] || '');
     } else {
         // Simple text
         if (0 === value.length) {
@@ -59,4 +59,12 @@ export function textToString(value: GvasText): GvasString {
         if (value[0] === null) throw new Error('Null in simple text');
         return value[0];
     }
+}
+
+export function unknownProperty(unknownObject: unknown, propertyName: string): unknown {
+    if (typeof unknownObject === 'undefined') return;
+    if (!unknownObject) return;
+    if (typeof unknownObject !== 'object') return;
+    if (!(propertyName in unknownObject)) return;
+    return (unknownObject as Record<string, unknown>)[propertyName];
 }

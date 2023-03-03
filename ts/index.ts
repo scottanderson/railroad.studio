@@ -178,14 +178,15 @@ function updateFilename(railroad: Railroad, filename: string) {
 
 /**
  * Error handler. Prints a stack trace to the contggnt div.
- * @param {Error} error
+ * @param {unknown} error
  */
-export function handleError(error: Error) {
+export function handleError(error: unknown) {
     const title = document.createElement('h2');
     const titleText = document.createTextNode('Failed to load: ' + error);
     title.appendChild(titleText);
     const pre = document.createElement('pre');
-    const preText = document.createTextNode(error.stack || '');
+    const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
+    const preText = document.createTextNode(stack || 'Stack trace not available');
     pre.appendChild(preText);
     document.getElementById('content')!.replaceChildren(title, pre);
     document.getElementById('header')!.replaceChildren();

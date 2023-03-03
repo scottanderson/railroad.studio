@@ -1023,7 +1023,7 @@ export class Studio {
                     const options: InputTextOptions = {min: '0', max};
                     addStat(`Freight Amount`, editNumber(this, frame.state.freightAmount, options, setAmount));
                     const allowedCargo = Object.keys(limits);
-                    const entries = allowedCargo.map((t) => [t, cargoTypes[t]]);
+                    const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
                     entries.unshift(['', 'None']);
                     if (freightType && !allowedCargo.includes(freightType)) {
                         entries.unshift([freightType, freightType]);
