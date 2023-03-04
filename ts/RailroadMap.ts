@@ -11,7 +11,7 @@ import {gvasToString} from './Gvas';
 import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
 import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
-import {frameDefinitions, cargoLimits, isFrameType} from './frames';
+import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -742,7 +742,7 @@ export class RailroadMap {
             frame.name,
             frame.number,
             cargoText(frame)]
-            .filter((e) => Boolean(e))
+            .filter(Boolean)
             .map(gvasToString)
             .join('\n');
         f.element('title')
@@ -1504,12 +1504,11 @@ function gradeTextClass(percentage: number) {
     return `grade-text-${index}`;
 }
 
-function cargoText(frame: Frame) {
-    if (!frame.type) return null;
-    if (!frame.state.freightType) return null;
-    if (!(frame.type in cargoLimits)) return null;
-    if (!(frame.state.freightType in cargoLimits[frame.type])) return null;
-    const limit = cargoLimits[frame.type][frame.state.freightType];
+function cargoText(frame: Frame): string | undefined {
+    if (!hasCargoLimits(frame.type)) return;
+    if (!isCargoType(frame.state.freightType)) return;
+    const limits: Partial<Record<CargoType, number>> = cargoLimits[frame.type];
+    const limit = limits[frame.state.freightType] ?? 'unknown';
     return `${frame.state.freightType} [${frame.state.freightAmount} / ${limit}]`;
 }
 

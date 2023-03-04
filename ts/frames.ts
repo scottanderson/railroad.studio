@@ -34,39 +34,37 @@ export const frameTypes = [
     'waycar',
 ] as const;
 
-export const isFrameType = (type: GvasString): type is typeof frameTypes[number] =>
-    type ? (frameTypes as readonly string[]).includes(type) : false;
+type FrameType = typeof frameTypes[number];
+
+export const isFrameType = (type: GvasString): type is FrameType =>
+    type ? frameTypes.includes(type) : false;
 
 export const frameCategories = ['engine', 'tender', 'handcar', 'freight', 'passenger', 'mow'] as const;
 
-export interface FrameDefinition {
-    engine: boolean;
-    freight: boolean;
-    handcar?: boolean;
-    mow?: boolean;
-    passenger?: boolean;
+type FrameCategories = typeof frameCategories[number];
+
+type PRO<K extends string | number | symbol, T> = Partial<Readonly<Record<K, T>>>;
+
+export interface FrameDefinition extends PRO<FrameCategories, boolean> {
     length: number;
     name: string;
     name_length: number;
     name_lines: number;
     number_length: number;
     number_lines: number;
-    tender: boolean;
-    min?: Partial<Record<keyof NumericFrameState, number>>;
-    max?: Partial<Record<keyof NumericFrameState, number>>;
+    min?: PRO<keyof NumericFrameState, number>;
+    max?: PRO<keyof NumericFrameState, number>;
 }
 
-export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition> = {
+export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     '622D': {
         engine: true,
-        freight: false,
         length: 760.0,
         name: 'D&RGW Class 48',
         name_length: 20,
         name_lines: 3,
         number_length: 4,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -91,7 +89,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'boxcar': {
-        engine: false,
         freight: true,
         length: 822.82,
         name: 'Boxcar',
@@ -99,7 +96,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 4,
         number_length: 7,
         number_lines: 4,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -113,15 +109,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'caboose': {
-        engine: false,
-        freight: false,
         length: 679.0,
         name: 'Bobber Caboose',
         name_length: 20,
         name_lines: 1,
         number_length: 12,
         number_lines: 1,
-        tender: false,
         passenger: true,
         min: {
             headlightType: 1,
@@ -148,8 +141,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'class70': {
         engine: true,
-        tender: false,
-        freight: false,
         name: 'D&RG Class 70',
         length: 938.9,
         name_length: 14,
@@ -182,8 +173,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'class70_tender': {
-        engine: false,
-        freight: false,
         length: 678.81,
         name: 'Class 70 Tender',
         name_length: 22,
@@ -209,14 +198,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'climax': {
         engine: true,
-        freight: false,
         length: 849.89,
         name: 'Climax',
         name_length: 11,
         name_lines: 7,
         number_length: 2,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -245,14 +232,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'cooke260': {
         engine: true,
-        freight: false,
         length: 837.83,
         name: 'Cooke Mogul',
         name_length: 12,
         name_lines: 1,
         number_length: 3,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -277,8 +262,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'cooke260_tender': {
-        engine: false,
-        freight: false,
         length: 641.73,
         name: 'Cooke Mogul Tender',
         name_length: 11,
@@ -304,8 +287,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'cooke280': {
         engine: true,
-        tender: false,
-        freight: false,
         name: 'Cooke Consolidation',
         length: 870.0,
         name_length: 12,
@@ -338,9 +319,7 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'cooke280_tender': {
-        engine: false,
         tender: true,
-        freight: false,
         name: 'Cooke Consolidation Tender',
         length: 625.0,
         name_length: 11,
@@ -365,14 +344,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'eureka': {
         engine: true,
-        freight: false,
         length: 802.13,
         name: 'Eureka',
         name_length: 8,
         name_lines: 1,
         number_length: 2,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -397,8 +374,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'eureka_tender': {
-        engine: false,
-        freight: false,
         length: 497.08,
         name: 'Eureka Tender',
         name_length: 18,
@@ -423,7 +398,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'flatcar_cordwood': {
-        engine: false,
         freight: true,
         length: 785.6,
         name: 'Flatcar Tier 3',
@@ -431,7 +405,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 8,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -445,7 +418,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'flatcar_hopper': {
-        engine: false,
         freight: true,
         length: 785.6,
         name: 'Hopper',
@@ -453,7 +425,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 4,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -467,7 +438,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'flatcar_logs': {
-        engine: false,
         freight: true,
         length: 785.6,
         name: 'Flatcar Tier 1',
@@ -475,7 +445,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 12,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -489,7 +458,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'flatcar_stakes': {
-        engine: false,
         freight: true,
         length: 785.6,
         name: 'Flatcar Tier 2',
@@ -497,7 +465,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 8,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -511,7 +478,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'flatcar_tanker': {
-        engine: false,
         freight: true,
         length: 785.6,
         name: 'Tanker',
@@ -519,7 +485,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 12,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -534,14 +499,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'glenbrook': {
         engine: true,
-        freight: false,
         length: 837.83,
         name: 'Glenbrook',
         name_length: 12,
         name_lines: 1,
         number_length: 3,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -566,8 +529,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'glenbrook_tender': {
-        engine: false,
-        freight: false,
         length: 505.0,
         name: 'Glenbrook Tender',
         name_length: 11,
@@ -590,8 +551,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'handcar': {
-        engine: false,
-        freight: false,
         handcar: true,
         length: 220.2,
         name: 'Handcar',
@@ -599,7 +558,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         name_lines: 1,
         number_length: 5,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -621,14 +579,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'heisler': {
         engine: true,
-        freight: false,
         length: 913.73,
         name: 'Heisler',
         name_length: 11,
         name_lines: 6,
         number_length: 2,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -656,14 +612,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'montezuma': {
         engine: true,
-        freight: false,
         length: 680.0,
         name: 'Montezuma',
         name_length: 12,
         name_lines: 1,
         number_length: 3,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -686,8 +640,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'montezuma_tender': {
-        engine: false,
-        freight: false,
         length: 420.0,
         name: 'Montezuma Tender',
         name_length: 11,
@@ -711,14 +663,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'mosca': {
         engine: true,
-        freight: false,
         length: 873.0,
         name: 'Mosca',
         name_length: 12,
         name_lines: 1,
         number_length: 3,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -741,8 +691,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'mosca_tender': {
-        engine: false,
-        freight: false,
         length: 530.0,
         name: 'Mosca Tender',
         name_length: 11,
@@ -765,15 +713,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'plow': {
-        engine: false,
-        freight: false,
         length: 610.0,
         name: 'Snow Plow',
         name_length: 10,
         name_lines: 2,
         number_length: 4,
         number_lines: 1,
-        tender: false,
         mow: true,
         min: {
             headlightType: 1,
@@ -791,14 +736,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'porter_040': {
         engine: true,
-        freight: false,
         length: 391.2,
         name: 'Porter',
         name_length: 12,
         name_lines: 1,
         number_length: 2,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -824,7 +767,6 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
     },
     'porter_042': {
         engine: true,
-        freight: false,
         length: 461.35,
         name: 'Porter 2',
         name_length: 12,
@@ -851,18 +793,15 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
             tenderFuelAmount: 164,
             tenderWaterAmount: 800,
         },
-        tender: false,
     },
     'shay': {
         engine: true,
-        freight: false,
         length: 800.0,
         name: 'Shay',
         name_length: 12,
         name_lines: 1,
         number_length: 2,
         number_lines: 1,
-        tender: false,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -887,15 +826,12 @@ export const frameDefinitions: Record<typeof frameTypes[number], FrameDefinition
         },
     },
     'waycar': {
-        engine: false,
-        freight: false,
         length: 615.0,
         name: 'DSP&P Waycar',
         name_length: 21,
         name_lines: 1,
         number_length: 12,
         number_lines: 1,
-        tender: false,
         passenger: true,
         min: {
             headlightType: 1,
@@ -928,7 +864,7 @@ interface FrameStateMetadata {
     step?: number;
 }
 
-export const frameStateMetadata: Record<keyof NumericFrameState, FrameStateMetadata> = {
+export const frameStateMetadata = {
     boilerFireTemp: {
         name: 'Boiler Fire Temperature',
         type: 'slider',
@@ -1026,9 +962,9 @@ export const frameStateMetadata: Record<keyof NumericFrameState, FrameStateMetad
         type: 'slider',
         unit: 'L',
     },
-};
+} satisfies Record<keyof NumericFrameState, Readonly<FrameStateMetadata>>;
 
-export const cargoLimits: Record<string, Record<string, number>> = {
+export const cargoLimits = {
     boxcar: {
         crate_tools: 32,
     },
@@ -1053,9 +989,12 @@ export const cargoLimits: Record<string, Record<string, number>> = {
     flatcar_tanker: {
         crudeoil: 12,
     },
-};
+} as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 
-export const cargoTypes: Record<string, string> = {
+export const hasCargoLimits = (type: GvasString): type is keyof typeof cargoLimits =>
+    type ? type in cargoLimits : false;
+
+export const cargoTypes = {
     beam: 'Beams',
     coal: 'Coal',
     cordwood: 'Cordwood',
@@ -1068,4 +1007,9 @@ export const cargoTypes: Record<string, string> = {
     rail: 'Rails',
     rawiron: 'Raw Iron',
     steelpipe: 'Steel Pipes',
-};
+} as const satisfies PRO<string, string>;
+
+export const isCargoType = (type: GvasString): type is CargoType =>
+    type ? type in cargoTypes : false;
+
+export type CargoType = keyof typeof cargoTypes;

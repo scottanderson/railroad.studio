@@ -19,10 +19,13 @@
         "@typescript-eslint/no-inferrable-types": ["error"],
         "@typescript-eslint/no-require-imports": ["error"],
         "@typescript-eslint/no-type-alias": ["error", {
-            "allowAliases": "in-unions",
+            "allowAliases": "always",
             "allowCallbacks": "always",
+            "allowConditionalTypes": "never",
+            "allowConstructors": "never",
             "allowGenerics": "always",
             "allowLiterals": "always",
+            "allowMappedTypes": "never",
             "allowTupleTypes": "always"
         }],
         "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
