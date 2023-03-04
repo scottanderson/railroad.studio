@@ -83,10 +83,10 @@ function handleDrop(e: DragEvent) {
         file = Array.from(dt.items)
             .filter((item: DataTransferItem) => item.kind === 'file')
             .map((item: DataTransferItem) => item.getAsFile())
-            .find(Boolean) || null;
+            .find(Boolean) ?? null;
     } else if (dt.files) {
         file = Array.from(dt.files)
-            .find(Boolean) || null;
+            .find(Boolean) ?? null;
     }
     if (!file) return;
     handleFile(file);
@@ -186,7 +186,7 @@ export function handleError(error: unknown) {
     title.appendChild(titleText);
     const pre = document.createElement('pre');
     const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
-    const preText = document.createTextNode(stack || 'Stack trace not available');
+    const preText = document.createTextNode(stack ?? 'Stack trace not available');
     pre.appendChild(preText);
     document.getElementById('content')!.replaceChildren(title, pre);
     document.getElementById('header')!.replaceChildren();

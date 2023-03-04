@@ -940,8 +940,8 @@ export class Studio {
                     if (typeof frame.state[key] === 'undefined') return;
                     const meta = frameStateMetadata[key];
                     if (!meta) return;
-                    const maxValue = (max ? max[key] : undefined) || 0;
-                    const minValue = (min ? min[key] : undefined) || 0;
+                    const maxValue = (max ? max[key] : undefined) ?? 0;
+                    const minValue = (min ? min[key] : undefined) ?? 0;
                     const value = Number(frame.state[key]);
                     if (value === minValue && value === maxValue) return;
                     if (value === 0 && minValue === 1) return;
@@ -1016,7 +1016,7 @@ export class Studio {
                 editNumericState(frame, 'markerLightsRearRightState');
                 // Freight
                 if (freight) {
-                    const freightType = frame.state.freightType || '';
+                    const freightType = frame.state.freightType ?? '';
                     const limits = cargoLimits[frame.type] || {};
                     const setAmount = (amount: number) => frame.state.freightAmount = amount;
                     const max = (freightType in limits) ? String(limits[freightType]) : '0';

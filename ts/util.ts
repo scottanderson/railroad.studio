@@ -48,7 +48,7 @@ export function textToString(value: GvasText): GvasString {
         if (value.guid !== RRO_TEXT_GUID) throw new Error(`Unexpected GUID: ${value.guid}`);
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
-            (m, i) => value.textFormat[Number(i)].values[0] || '');
+            (m, i) => value.textFormat[Number(i)].values[0] ?? '');
     } else {
         // Simple text
         if (0 === value.length) {

@@ -153,7 +153,7 @@ export function editString(
     checkbox.type = 'checkbox';
     checkbox.title = 'Null';
     checkbox.checked = (value === null);
-    let tempValue = value || '';
+    let tempValue = value ?? '';
     checkbox.addEventListener('click', () => {
         input.disabled = checkbox.checked;
         if (checkbox.checked) {
@@ -177,7 +177,7 @@ export function editString(
             // Restore the original value
             input.disabled = checkbox.checked = (value === null);
             input.value = (value === null) ? 'null' : value;
-            tempValue = value || '';
+            tempValue = value ?? '';
             return true;
         }
         // Close the edit control

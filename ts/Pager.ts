@@ -29,7 +29,7 @@ export function createPager(
         });
         const first = i * pageSize;
         const last = Math.min(numItems, first + pageSize) - 1;
-        a.textContent = text || `${i + 1}`;
+        a.textContent = text ?? `${i + 1}`;
         a.title = `${first}-${last}`;
         li.appendChild(a);
         ul.appendChild(li);

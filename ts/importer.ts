@@ -427,7 +427,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         }
     }
     // Read cut trees
-    const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') || [];
+    const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') ?? [];
     // Import complete, build the railroad
     const railroad: Railroad = {
         _header: gvas._header,

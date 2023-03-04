@@ -609,7 +609,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
     const propertyData: BlobPart[] = [];
     switch (propertyType) {
         case 'StrProperty': {
-            const str = gvas.strings[propertyName] || null;
+            const str = gvas.strings[propertyName] ?? null;
             if (!str) return;
             propertyData.push(stringToBlob(str));
             break;

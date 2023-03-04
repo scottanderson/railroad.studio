@@ -6,7 +6,7 @@ export const setActiveTheme = (theme: string) => {
 };
 
 export const getActiveTheme = () => {
-    const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY) || 'auto';
+    const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY) ?? 'auto';
     if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
     const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const theme = preferDark ? 'dark' : 'light';

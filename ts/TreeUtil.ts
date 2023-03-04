@@ -130,12 +130,12 @@ export class TreeUtil {
 
     treeFilter(tree: Vector) {
         return !spawnFilter(tree) && undefined === (
-            this.railroad.industries.find((i) => industryFilter(i, tree)) ||
-            this.railroad.sandhouses.find((s) => sandhouseFilter(s, tree)) ||
-            this.railroad.splines.find((s) => splineFilter(s, tree)) ||
-            this.railroad.splineTracks.find((s) => splineTrackFilter(s, tree)) ||
-            this.railroad.switches.find((s) => switchFilter(s, tree)) ||
-            this.railroad.turntables.find((t) => turntableFilter(t, tree)) ||
+            this.railroad.industries.find((i) => industryFilter(i, tree)) ??
+            this.railroad.sandhouses.find((s) => sandhouseFilter(s, tree)) ??
+            this.railroad.splines.find((s) => splineFilter(s, tree)) ??
+            this.railroad.splineTracks.find((s) => splineTrackFilter(s, tree)) ??
+            this.railroad.switches.find((s) => switchFilter(s, tree)) ??
+            this.railroad.turntables.find((t) => turntableFilter(t, tree)) ??
             this.railroad.watertowers.find((w) => watertowerFilter(w, tree)));
     }
 }

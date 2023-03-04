@@ -416,7 +416,7 @@ export class RailroadMap {
 
     private readOptions(): MapOptions {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
-        const parsed = JSON.parse(localStorage.getItem(key) || '{}');
+        const parsed = JSON.parse(localStorage.getItem(key) ?? '{}');
         const pan = unknownProperty(parsed, 'pan');
         const x = unknownProperty(pan, 'x');
         const y = unknownProperty(pan, 'y');

@@ -1,4 +1,14 @@
-import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
+import {
+    CustomData,
+    EngineVersion,
+    Gvas,
+    GvasHeader,
+    GvasString,
+    GvasText,
+    GvasTypes,
+    RichTextFormat,
+    gvasToString,
+} from './Gvas';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 
@@ -177,7 +187,7 @@ function parseProperty(b: ArrayBuffer, pos: number, target: Gvas): [number, Gvas
         } else if (stype === 'Vector') {
             target.vectorArrays[pname] = structs as Vector[];
         } else {
-            throw new Error(stype || '');
+            throw new Error(gvasToString(stype));
         }
         const type: GvasTypes = [ptype, dtype, stype];
         target._types[pname] = type;
