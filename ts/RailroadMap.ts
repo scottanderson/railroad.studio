@@ -1,8 +1,18 @@
 import * as svgPanZoom from 'svg-pan-zoom';
 // eslint-disable-next-line no-redeclare
 import {Circle, Element, G, Line, Matrix, PathArrayAlias, PathCommand, Svg, Text} from '@svgdotjs/svg.js';
-// eslint-disable-next-line max-len
-import {Frame, Industry, Player, Railroad, Spline, SplineTrack, SplineType, Switch, SwitchType, Turntable} from './Railroad';
+import {
+    Frame,
+    Industry,
+    Player,
+    Railroad,
+    Spline,
+    SplineTrack,
+    SplineType,
+    Switch,
+    SwitchType,
+    Turntable,
+} from './Railroad';
 import {gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';

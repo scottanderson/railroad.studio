@@ -1,6 +1,16 @@
 import {Gvas} from './Gvas';
-// eslint-disable-next-line max-len
-import {Frame, Industry, Player, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
+import {
+    Frame,
+    Industry,
+    Player,
+    Railroad,
+    Sandhouse,
+    Spline,
+    SplineTrack,
+    Switch,
+    Turntable,
+    Watertower,
+} from './Railroad';
 import {textToString} from './util';
 
 /**
