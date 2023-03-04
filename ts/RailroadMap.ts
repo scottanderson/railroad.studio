@@ -66,7 +66,7 @@ export interface MapLayers {
     turntables: G;
 }
 
-interface MapLayerVisibility extends Record<keyof MapLayers, boolean> {}
+type MapLayerVisibility = Record<keyof MapLayers, boolean>;
 
 const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     background: true,
