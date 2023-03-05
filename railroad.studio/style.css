@@ -17,7 +17,7 @@
   --pile-bridge-old: #669;
   --wooden-bridge: goldenrod;
   --steel-bridge: steelblue;
-  --switch-leg-not-aligned: red;
+  --switch-leg-not-aligned: #666;
   --diamond: yellow;
   --control-point-primary: red;
   --control-point-secondary: blue;
@@ -70,7 +70,7 @@
   --stroke-inverted: black;
   --rail-deck: brown;
   --wooden-bridge: #fc3;
-  --switch-leg-not-aligned: cyan;
+  --switch-leg-not-aligned: #333;
   --control-point-primary: magenta;
   --control-point-secondary: cyan;
   --control-point-tertiary: yellow;
