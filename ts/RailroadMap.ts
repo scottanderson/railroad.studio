@@ -290,15 +290,17 @@ export class RailroadMap {
         this.renderLock = false;
     }
 
+    private circularizeToolRadiusFlag = false;
     toggleCircularizeTool(): boolean {
         if (this.toolMode === MapToolMode.circularize) {
             // Disable circularize tool
             this.toolMode = MapToolMode.pan_zoom;
             this.panZoom.enableDblClickZoom();
-            // Don't hide the radius layer
-            // if (this.layerVisibility.radius) {
-            //     this.toggleLayerVisibility('radius');
-            // }
+            // Hide the radius layer
+            if (this.layerVisibility.radius && this.circularizeToolRadiusFlag) {
+                this.toggleLayerVisibility('radius');
+            }
+            this.circularizeToolRadiusFlag = false;
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow delete tool while another tool is active
@@ -309,6 +311,7 @@ export class RailroadMap {
             this.panZoom.disableDblClickZoom();
             // Show the radius layer
             if (!this.layerVisibility.radius) {
+                this.circularizeToolRadiusFlag = true;
                 this.toggleLayerVisibility('radius');
             }
             return true;
@@ -332,13 +335,16 @@ export class RailroadMap {
         }
     }
 
+    private flattenToolGradesFlag = false;
     toggleFlattenTool(): boolean {
         if (this.toolMode === MapToolMode.flatten_spline) {
             // Disable flatten tool
             this.toolMode = MapToolMode.pan_zoom;
-            if (this.layerVisibility.grades) {
+            // Hide the grades layer
+            if (this.layerVisibility.grades && this.flattenToolGradesFlag) {
                 this.toggleLayerVisibility('grades');
             }
+            this.flattenToolGradesFlag = false;
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow flatten tool while another tool is active
@@ -346,7 +352,9 @@ export class RailroadMap {
         } else {
             // Enable flatten tool
             this.toolMode = MapToolMode.flatten_spline;
+            // Show the grades layer
             if (!this.layerVisibility.grades) {
+                this.flattenToolGradesFlag = true;
                 this.toggleLayerVisibility('grades');
             }
             return true;
@@ -367,27 +375,33 @@ export class RailroadMap {
         return this.layerVisibility[layer];
     }
 
+    private parallelToolTracksFlag = false;
     toggleParallelTool(): boolean {
         if (this.toolMode === MapToolMode.parallel) {
-            // Disable flatten tool
+            // Disable parallel tool
             this.toolMode = MapToolMode.pan_zoom;
-            return false;
-        } else if (this.toolMode !== MapToolMode.pan_zoom) {
-            // Don't allow flatten tool while another tool is active
-            return false;
-        } else {
-            // Enable flatten tool
-            this.toolMode = MapToolMode.parallel;
-            if (!this.layerVisibility.tracks) {
+            // Hide the tracks layer
+            if (this.layerVisibility.tracks && this.parallelToolTracksFlag) {
                 this.toggleLayerVisibility('tracks');
             }
-            if (this.layerVisibility.tracksHidden) {
-                this.toggleLayerVisibility('tracksHidden');
+            this.parallelToolTracksFlag = false;
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow parallel tool while another tool is active
+            return false;
+        } else {
+            // Enable parallel tool
+            this.toolMode = MapToolMode.parallel;
+            // Show the tracks layer
+            if (!this.layerVisibility.tracks) {
+                this.parallelToolTracksFlag = true;
+                this.toggleLayerVisibility('tracks');
             }
             return true;
         }
     }
 
+    private treeBrushTreesFlag = false;
     toggleTreeBrush(): boolean {
         if (this.toolMode === MapToolMode.tree_brush) {
             // Disable tree brush
@@ -396,9 +410,15 @@ export class RailroadMap {
                 .enableDblClickZoom()
                 .enablePan()
                 .enableZoom();
+            // Hide the brush layer
             if (this.layerVisibility.brush) {
                 this.toggleLayerVisibility('brush');
             }
+            // Hide the trees layer
+            if (this.layerVisibility.trees && this.treeBrushTreesFlag) {
+                this.toggleLayerVisibility('trees');
+            }
+            this.treeBrushTreesFlag = false;
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow tree brush while another tool is active
@@ -410,10 +430,13 @@ export class RailroadMap {
                 .disableDblClickZoom()
                 .disablePan()
                 .disableZoom();
+            // Show the brush layer
             if (!this.layerVisibility.brush) {
                 this.toggleLayerVisibility('brush');
             }
+            // Show the trees layer
             if (!this.layerVisibility.trees) {
+                this.treeBrushTreesFlag = true;
                 this.toggleLayerVisibility('trees');
             }
             return true;
