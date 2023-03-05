@@ -23,8 +23,7 @@ export interface Vector {
 /**
  * Calculates the sum of two vectors by adding their corresponding x, y and z values.
  *
- * @param {Vector} a - The first vector to be added.
- * @param {Vector} b - The second vector to be added.
+ * @param {Vector} args - The vectors to be added.
  * @return {Vector} The sum of the two input vectors.
  */
 export const vectorSum = (...args: Vector[]): Vector => args.reduce((a, b) => ({
