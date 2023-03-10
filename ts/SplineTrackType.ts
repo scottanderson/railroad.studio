@@ -9,6 +9,10 @@ export enum SplineTrackType {
     RAIL_914_H01 = 'rail_914_h01',
     RAIL_914_H05 = 'rail_914_h05',
     RAIL_914_H10 = 'rail_914_h10',
+    RAIL_914_SWITCH_3WAY_LEFT = 'rail_914_switch_3way_left',
+    RAIL_914_SWITCH_3WAY_LEFT_NOBALLAST = 'rail_914_switch_3way_left_noballast',
+    RAIL_914_SWITCH_3WAY_RIGHT = 'rail_914_switch_3way_right',
+    RAIL_914_SWITCH_3WAY_RIGHT_NOBALLAST = 'rail_914_switch_3way_right_noballast',
     RAIL_914_SWITCH_CROSS_45 = 'rail_914_switch_cross_45',
     RAIL_914_SWITCH_CROSS_90 = 'rail_914_switch_cross_90',
     RAIL_914_SWITCH_LEFT = 'rail_914_switch_left',
@@ -42,6 +46,10 @@ const secondLegSwitchRight = {
 };
 
 export const switchSecondLeg: Partial<Record<SplineTrackType, HermiteCurve>> = {
+    [SplineTrackType.RAIL_914_SWITCH_3WAY_LEFT]: secondLegSwitchLeft,
+    [SplineTrackType.RAIL_914_SWITCH_3WAY_LEFT_NOBALLAST]: secondLegSwitchLeft,
+    [SplineTrackType.RAIL_914_SWITCH_3WAY_RIGHT]: secondLegSwitchLeft,
+    [SplineTrackType.RAIL_914_SWITCH_3WAY_RIGHT_NOBALLAST]: secondLegSwitchLeft,
     [SplineTrackType.RAIL_914_SWITCH_CROSS_45]: {
         startPoint: {x: 87.9, y: 212.1, z: 0},
         startTangent: {x: 424.2, y: -424.2, z: 0},

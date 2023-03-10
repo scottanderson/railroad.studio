@@ -1264,6 +1264,10 @@ export class RailroadMap {
                 makeGradeText();
                 makeRadiusText();
                 break;
+            case 'rail_914_switch_3way_left': // TODO: Render right-diverging leg
+            case 'rail_914_switch_3way_left_noballast': // TODO: Render right-diverging leg
+            case 'rail_914_switch_3way_right': // TODO: Render right-diverging leg
+            case 'rail_914_switch_3way_right_noballast': // TODO: Render right-diverging leg
             case 'rail_914_switch_cross_45':
             case 'rail_914_switch_cross_90':
             case 'rail_914_switch_left':
