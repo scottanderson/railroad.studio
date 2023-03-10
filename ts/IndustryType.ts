@@ -16,7 +16,20 @@ export enum IndustryType {
     engine_house_gold = 12,
     engine_house_red = 13,
     engine_house_brown = 14,
-    telegraph_office = 16
+    coaling_tower = 15,
+    telegraph_office = 16,
+    water_tower_a_red = 20,
+    water_tower_a_brown = 21,
+    water_tower_a_beige = 22,
+    water_tower_a_old = 23,
+    water_tower_b_red = 30,
+    water_tower_b_brown = 31,
+    water_tower_b_beige = 32,
+    water_tower_b_old = 33,
+    large_engine_house_red = 40,
+    large_engine_house_brown = 41,
+    large_engine_house_beige = 42,
+    large_engine_house_old = 43,
 }
 
 export const industryName: Record<IndustryType, string> = {
@@ -34,7 +47,20 @@ export const industryName: Record<IndustryType, string> = {
     [IndustryType.engine_house_gold]: 'Engine House (Gold)',
     [IndustryType.engine_house_red]: 'Engine House (Red)',
     [IndustryType.engine_house_brown]: 'Engine House (Brown)',
+    [IndustryType.coaling_tower]: 'Coaling Tower',
     [IndustryType.telegraph_office]: 'Telegraph Office',
+    [IndustryType.water_tower_a_red]: 'Water Tower A (Red)',
+    [IndustryType.water_tower_a_brown]: 'Water Tower A (Brown)',
+    [IndustryType.water_tower_a_beige]: 'Water Tower A (Beige)',
+    [IndustryType.water_tower_a_old]: 'Water Tower A (Old)',
+    [IndustryType.water_tower_b_red]: 'Water Tower B (Red)',
+    [IndustryType.water_tower_b_brown]: 'Water Tower B (Brown)',
+    [IndustryType.water_tower_b_beige]: 'Water Tower B (Beige)',
+    [IndustryType.water_tower_b_old]: 'Water Tower B (Old)',
+    [IndustryType.large_engine_house_red]: 'Large Engine House (Red)',
+    [IndustryType.large_engine_house_brown]: 'Large Engine House (Brown)',
+    [IndustryType.large_engine_house_beige]: 'Large Engine House (Beige)',
+    [IndustryType.large_engine_house_old]: 'Large Engine House (Old)',
 };
 
 type FourStrings = [string, string, string, string];
@@ -58,7 +84,20 @@ export const industryProductInputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.engine_house_gold]: input1234,
     [IndustryType.engine_house_red]: input1234,
     [IndustryType.engine_house_brown]: input1234,
+    [IndustryType.coaling_tower]: input1234,
     [IndustryType.telegraph_office]: input1234,
+    [IndustryType.water_tower_a_red]: input1234,
+    [IndustryType.water_tower_a_brown]: input1234,
+    [IndustryType.water_tower_a_beige]: input1234,
+    [IndustryType.water_tower_a_old]: input1234,
+    [IndustryType.water_tower_b_red]: input1234,
+    [IndustryType.water_tower_b_brown]: input1234,
+    [IndustryType.water_tower_b_beige]: input1234,
+    [IndustryType.water_tower_b_old]: input1234,
+    [IndustryType.large_engine_house_red]: input1234,
+    [IndustryType.large_engine_house_brown]: input1234,
+    [IndustryType.large_engine_house_beige]: input1234,
+    [IndustryType.large_engine_house_old]: input1234,
 };
 
 export const industryProductOutputLabels: Record<IndustryType, FourStrings> = {
@@ -76,7 +115,20 @@ export const industryProductOutputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.engine_house_gold]: output1234,
     [IndustryType.engine_house_red]: output1234,
     [IndustryType.engine_house_brown]: output1234,
+    [IndustryType.coaling_tower]: output1234,
     [IndustryType.telegraph_office]: output1234,
+    [IndustryType.water_tower_a_red]: output1234,
+    [IndustryType.water_tower_a_brown]: output1234,
+    [IndustryType.water_tower_a_beige]: output1234,
+    [IndustryType.water_tower_a_old]: output1234,
+    [IndustryType.water_tower_b_red]: output1234,
+    [IndustryType.water_tower_b_brown]: output1234,
+    [IndustryType.water_tower_b_beige]: output1234,
+    [IndustryType.water_tower_b_old]: output1234,
+    [IndustryType.large_engine_house_red]: output1234,
+    [IndustryType.large_engine_house_brown]: output1234,
+    [IndustryType.large_engine_house_beige]: output1234,
+    [IndustryType.large_engine_house_old]: output1234,
 };
 
 export const gizmoSvgPaths = {
@@ -87,6 +139,18 @@ export const gizmoSvgPaths = {
 
 const engineHouse = {
     'building': rect(0, 500, 2000, -1000),
+};
+
+const largeEngineHouse = {
+    'building': rect(0, 200, 200, -200), // TODO: Measure the engine house
+};
+
+const waterTowerA = {
+    'building': rect(0, 200, 200, -200), // TODO: Measure the water tower
+};
+
+const waterTowerB = {
+    'building': rect(0, 200, 200, -200), // TODO: Measure the water tower
 };
 
 export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlias>> = {
@@ -235,7 +299,22 @@ export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlia
     [IndustryType.engine_house_gold]: engineHouse,
     [IndustryType.engine_house_red]: engineHouse,
     [IndustryType.engine_house_brown]: engineHouse,
-    [IndustryType.telegraph_office]: {
-        'building': rect(-200, 150, 400, -300),
+    [IndustryType.coaling_tower]: {
+        'building': rect(-200, 200, 200, -200), // TODO: Measure the coaling tower
     },
+    [IndustryType.telegraph_office]: {
+        'building': rect(-200, 150, 400, -300), // TODO: Measure the telegraph office
+    },
+    [IndustryType.water_tower_a_red]: waterTowerA,
+    [IndustryType.water_tower_a_brown]: waterTowerA,
+    [IndustryType.water_tower_a_beige]: waterTowerA,
+    [IndustryType.water_tower_a_old]: waterTowerA,
+    [IndustryType.water_tower_b_red]: waterTowerB,
+    [IndustryType.water_tower_b_brown]: waterTowerB,
+    [IndustryType.water_tower_b_beige]: waterTowerB,
+    [IndustryType.water_tower_b_old]: waterTowerB,
+    [IndustryType.large_engine_house_red]: largeEngineHouse,
+    [IndustryType.large_engine_house_brown]: largeEngineHouse,
+    [IndustryType.large_engine_house_beige]: largeEngineHouse,
+    [IndustryType.large_engine_house_old]: largeEngineHouse,
 };
