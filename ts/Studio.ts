@@ -945,11 +945,12 @@ export class Studio {
             addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
             // Frame state
             if (isFrameType(frame.type)) {
-                const {max, min} = frameDefinitions[frame.type];
+                const frameDef = frameDefinitions[frame.type];
                 const editNumericState = (frame: Frame, key: keyof NumericFrameState) => {
                     if (typeof frame.state[key] === 'undefined') return;
                     const meta = frameStateMetadata[key];
                     if (!meta) return;
+                    const {max, min} = frameDef;
                     const maxValue = (max ? max[key] : undefined) ?? 0;
                     const minValue = (min ? min[key] : undefined) ?? 0;
                     const value = Number(frame.state[key]);
@@ -974,7 +975,12 @@ export class Studio {
                             result += ` / ${maxValue}`;
                         }
                         if ('unit' in meta && meta.unit) {
-                            result += ` ${meta.unit}`;
+                            if (typeof meta.unit === 'string') {
+                                result += ` ${meta.unit}`;
+                            } else {
+                                const idx = frameDef.coal ? 1 : 0;
+                                result += ` ${meta.unit[idx]}`;
+                            }
                         }
                         if ('type' in meta && meta.type === 'slider') {
                             const percent = 100 * value / maxValue;

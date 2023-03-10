@@ -341,6 +341,14 @@ body {
 .frame.flatcar_stakes.cargo-loaded { fill: var(--flatcar-stakes-loaded); }
 .frame.flatcar_tanker { fill: var(--flatcar-tanker); }
 .frame.flatcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
+.frame.hopperBB { fill: var(--flatcar-hopper); }
+.frame.hopperBB.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
+.frame.skeletoncar { fill: var(--flatcar-logs); }
+.frame.skeletoncar.cargo-loaded { fill: var(--flatcar-logs-loaded); }
+.frame.stockcar { fill: var(--boxcar); }
+.frame.stockcar.cargo-loaded { fill: var(--boxcar-loaded); }
+.frame.tankcarNCO { fill: var(--flatcar-tanker); }
+.frame.tankcarNCO.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.plow { fill: var(--plow); }
 
 .frame-text {
