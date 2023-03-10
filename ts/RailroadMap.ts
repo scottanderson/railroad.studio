@@ -169,14 +169,28 @@ export class RailroadMap {
 
     private animationInterval = 0;
     panTo(point: Point, animationTime = 1000) {
-        const sizes = this.panZoom.getSizes();
-        const x = (point.x * sizes.realZoom) + (sizes.width / 2);
-        const y = (point.y * sizes.realZoom) + (sizes.height / 2);
         if (animationTime < 1) {
-            this.panZoom.pan({x, y});
+            const sizes = this.panZoom.getSizes();
+            const endX = (point.x * sizes.realZoom) + (sizes.width / 2);
+            const endY = (point.y * sizes.realZoom) + (sizes.height / 2);
+            this.panZoom.pan({x: endX, y: endY});
             return;
         }
-        const start = this.panZoom.getPan();
+        const startRadius = 100_00;
+        const endRadius = 1_00;
+        const start = this.panFrom();
+        const animate = (t: number) => {
+            const a = cubicBezier(t, 0, 0, 1, 1); // Ease in and out
+            const x = lerp(start.x, point.x, a);
+            const y = lerp(start.y, point.y, a);
+            this.panTo({x, y}, 0);
+            if (this.locator) {
+                const r = lerp(startRadius, endRadius, t);
+                this.locator
+                    .center(x, y)
+                    .radius(r);
+            }
+        };
         const animationStepTime = 15; // one frame per 30 ms
         const animationSteps = Math.ceil(animationTime / animationStepTime);
         let animationStep = 0;
@@ -184,13 +198,9 @@ export class RailroadMap {
         this.animationInterval = window.setInterval(() => {
             if (animationStep < animationSteps) {
                 const t = animationStep++ / (animationSteps - 1);
-                const a = cubicBezier(t, 0, 0, 1, 1); // Ease in and out
-                // console.log({animationStep, animationSteps, t, a});
-                this.panZoom.pan({
-                    x: lerp(start.x, x, a),
-                    y: lerp(start.y, y, a),
-                });
+                animate(t);
             } else {
+                this.layers.locator.hide();
                 // Cancel interval
                 clearInterval(this.animationInterval);
                 this.animationInterval = 0;
@@ -198,18 +208,11 @@ export class RailroadMap {
         }, animationStepTime);
         // Animate the locator
         if (this.locator) {
-            const {x, y} = this.panFrom();
-            const startRadius = 100_00;
-            const endRadius = 1_00;
             this.layers.locator.show();
             this.locator
                 .show()
-                .center(x, y)
-                .attr('r', startRadius)
-                .animate()
-                .center(point.x, point.y)
-                .attr('r', String(endRadius))
-                .after(() => this.layers.locator.hide());
+                .center(start.x, start.y)
+                .attr('r', startRadius);
         }
     }
 
