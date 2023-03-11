@@ -413,7 +413,7 @@ export class Studio {
                 this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
                 btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
             }
-            this.setMapModified();
+            this.setMapModified(true);
             this.map.refreshSplines().then(() => {
                 if (segmentCountAfter < this.originalSegmentCount) {
                     this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
@@ -741,7 +741,7 @@ export class Studio {
         }
     }
 
-    setMapModified() {
+    setMapModified(affectsSplines = false) {
         if (!this.modified) {
             this.modified = true;
             this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
@@ -749,7 +749,9 @@ export class Studio {
             const onBeforeUnload = (e: BeforeUnloadEvent) => e.returnValue = 'Changes you made may not be saved.';
             window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
         }
-        this.logRadiusGrade();
+        if (affectsSplines) {
+            this.logRadiusGrade();
+        }
     }
 
     private lastLoggedRadius = Infinity;

@@ -119,7 +119,7 @@ export class RailroadMap {
     private toolMode: MapToolMode;
     private layers: MapLayers;
     private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
-    private readonly setMapModified: () => void;
+    private readonly setMapModified;
     private readonly setTitle: (title: string) => void;
     private brush?: Circle;
     private locator?: Circle;
@@ -127,7 +127,7 @@ export class RailroadMap {
     private readonly mergeLimits: MergeLimits;
 
     constructor(studio: Studio, element: HTMLElement) {
-        this.setMapModified = () => studio.setMapModified();
+        this.setMapModified = (affectsSplines = false) => studio.setMapModified(affectsSplines);
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
         this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
@@ -1424,12 +1424,12 @@ export class RailroadMap {
                 break;
             case MapToolMode.delete:
                 this.railroad.splines = this.railroad.splines.filter((s) => s !== spline);
-                this.setMapModified();
+                this.setMapModified(true);
                 elements.forEach((element) => element.remove());
                 break;
             case MapToolMode.flatten_spline: {
                 spline.controlPoints = flattenSpline(spline);
-                this.setMapModified();
+                this.setMapModified(true);
                 // Re-render just this spline
                 elements.forEach((element) => element.remove());
                 this.renderSpline(spline);
@@ -1453,7 +1453,7 @@ export class RailroadMap {
                 if (parallel.length === 0) return;
                 console.log(...parallel);
                 this.railroad.splines.push(...parallel);
-                this.setMapModified();
+                this.setMapModified(true);
                 parallel.forEach(this.renderSpline, this);
             }
         }
@@ -1474,7 +1474,7 @@ export class RailroadMap {
                 break;
             case MapToolMode.delete:
                 this.railroad.splineTracks = this.railroad.splineTracks.filter((s) => s !== spline);
-                this.setMapModified();
+                this.setMapModified(true);
                 elements.forEach((element) => element.remove());
                 break;
             case MapToolMode.circularize:
@@ -1507,7 +1507,7 @@ export class RailroadMap {
                 this.setTitle(`Radius before: ${beforeFmt}, radius after: ${afterFmt}`);
                 spline.startTangent = curve.startTangent;
                 spline.endTangent = curve.endTangent;
-                this.setMapModified();
+                this.setMapModified(true);
                 elements.forEach((element) => element.remove());
                 this.renderSplineTrack(spline);
                 break;
