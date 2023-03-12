@@ -138,19 +138,15 @@ export const gizmoSvgPaths = {
 };
 
 const engineHouse = {
-    'building': rect(0, 500, 2000, -1000),
+    'building': rect(0, -500, 2000, 1000),
 };
 
 const largeEngineHouse = {
-    'building': rect(0, 200, 200, -200), // TODO: Measure the engine house
+    'building': rect(0, -490, 2100, 980),
 };
 
-const waterTowerA = {
-    'building': rect(0, 200, 200, -200), // TODO: Measure the water tower
-};
-
-const waterTowerB = {
-    'building': rect(0, 200, 200, -200), // TODO: Measure the water tower
+const waterTower = {
+    'building': rect(250, 250, 500, -500),
 };
 
 export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlias>> = {
@@ -300,19 +296,19 @@ export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlia
     [IndustryType.engine_house_red]: engineHouse,
     [IndustryType.engine_house_brown]: engineHouse,
     [IndustryType.coaling_tower]: {
-        'building': rect(-200, 200, 200, -200), // TODO: Measure the coaling tower
+        'building': rect(50, -900, 600, 600),
     },
     [IndustryType.telegraph_office]: {
-        'building': rect(-200, 150, 400, -300), // TODO: Measure the telegraph office
+        'building': rect(-200, -150, 400, 300),
     },
-    [IndustryType.water_tower_a_red]: waterTowerA,
-    [IndustryType.water_tower_a_brown]: waterTowerA,
-    [IndustryType.water_tower_a_beige]: waterTowerA,
-    [IndustryType.water_tower_a_old]: waterTowerA,
-    [IndustryType.water_tower_b_red]: waterTowerB,
-    [IndustryType.water_tower_b_brown]: waterTowerB,
-    [IndustryType.water_tower_b_beige]: waterTowerB,
-    [IndustryType.water_tower_b_old]: waterTowerB,
+    [IndustryType.water_tower_a_red]: waterTower,
+    [IndustryType.water_tower_a_brown]: waterTower,
+    [IndustryType.water_tower_a_beige]: waterTower,
+    [IndustryType.water_tower_a_old]: waterTower,
+    [IndustryType.water_tower_b_red]: waterTower,
+    [IndustryType.water_tower_b_brown]: waterTower,
+    [IndustryType.water_tower_b_beige]: waterTower,
+    [IndustryType.water_tower_b_old]: waterTower,
     [IndustryType.large_engine_house_red]: largeEngineHouse,
     [IndustryType.large_engine_house_brown]: largeEngineHouse,
     [IndustryType.large_engine_house_beige]: largeEngineHouse,

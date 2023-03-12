@@ -63,6 +63,9 @@
   --engine-house-red: #f66;
   --engine-house-brown: #633;
   --telegraph-office: #fc0;
+  --coaling-tower: #fc0;
+  --building-beige: #cc9;
+  --building-old: #663;
 }
 
 [data-bs-theme=dark] {
@@ -407,6 +410,19 @@ body {
 .industry.engine_house_red .building { fill: var(--engine-house-red); }
 .industry.engine_house_brown .building { fill: var(--engine-house-brown); }
 .industry.telegraph_office .building { fill: var(--telegraph-office); }
+.industry.coaling_tower .building { fill: var(--coaling-tower); }
+.industry.water_tower_a_red .building { fill: var(--engine-house-red); }
+.industry.water_tower_a_brown .building { fill: var(--engine-house-brown); }
+.industry.water_tower_a_beige .building { fill: var(--building-beige); }
+.industry.water_tower_a_old .building { fill: var(--building-old); }
+.industry.water_tower_b_red .building { fill: var(--engine-house-red); }
+.industry.water_tower_b_brown .building { fill: var(--engine-house-brown); }
+.industry.water_tower_b_beige .building { fill: var(--building-beige); }
+.industry.water_tower_b_old .building { fill: var(--building-old); }
+.industry.large_engine_house_red .building { fill: var(--engine-house-red); }
+.industry.large_engine_house_brown .building { fill: var(--engine-house-brown); }
+.industry.large_engine_house_beige .building { fill: var(--building-beige); }
+.industry.large_engine_house_old .building { fill: var(--building-old); }
 
 .gizmo .x { fill: var(--engine-house-red); }
 .gizmo .y { fill: var(--boxcar); }

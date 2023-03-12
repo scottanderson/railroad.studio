@@ -221,7 +221,6 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
         case IndustryType.coaling_tower:
             return radiusFilter(industry.location, tree, 15_00); // 15m
         case IndustryType.telegraph_office:
-            return radiusFilter(industry.location, tree, 10_00); // 10m
         case IndustryType.water_tower_a_red:
         case IndustryType.water_tower_a_brown:
         case IndustryType.water_tower_a_beige:
@@ -230,11 +229,18 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
         case IndustryType.water_tower_b_brown:
         case IndustryType.water_tower_b_beige:
         case IndustryType.water_tower_b_old:
+            return radiusFilter(industry.location, tree, 10_00); // 10m
         case IndustryType.large_engine_house_red:
         case IndustryType.large_engine_house_brown:
         case IndustryType.large_engine_house_beige:
         case IndustryType.large_engine_house_old:
-            return radiusFilter(industry.location, tree, 15_00); // 15m
+        {
+            const p0local = {x: 500, y: 0, z: 0};
+            const p1local = {x: 1600, y: 0, z: 0};
+            const p0 = vectorSum(industry.location, rotateVector(p0local, industry.rotation));
+            const p1 = vectorSum(industry.location, rotateVector(p1local, industry.rotation));
+            return pillFilter(tree, p0, p1, 10_00);
+        }
         default:
             console.log(`Unknown industry type ${industry.type}`);
             return false;
