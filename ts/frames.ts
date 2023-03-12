@@ -789,7 +789,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'rubybasin': {
         coal: true,
         engine: true,
-        length: 700, // TODO: Fill in rubybasin length
+        length: 853.7,
         name: 'Ruby Basin',
         min: {
             headlightType: 1,
@@ -844,7 +844,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'skeletoncar': {
         freight: true,
-        length: 700, // TODO: Find the correct length
+        length: 530.6,
         name: 'Skeleton Car',
         min: {
             headlightType: 1,
@@ -861,7 +861,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'stockcar': {
         freight: true,
-        length: 700, // TODO: Find the correct length
+        length: 789.9,
         name: 'Stock Car',
         min: {
             headlightType: 1,
@@ -878,7 +878,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tankcarNCO': {
         freight: true,
-        length: 700, // TODO: Fill in rubybasin length
+        length: 789.9,
         name: 'Coffin Tank Car',
         min: {
             headlightType: 1,
@@ -895,7 +895,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tenmile': {
         engine: true,
-        length: 700, // TODO: Find the correct length
+        length: 853.7,
         name: 'Tenmile',
         min: {
             headlightType: 1,
@@ -922,7 +922,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tweetsie280': {
         engine: true,
-        length: 700, // TODO: Find the correct length
+        length: 878.9,
         name: 'ET&WNC 2-8-0',
         min: {
             headlightType: 1,
@@ -952,7 +952,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'tweetsie280_tender': {
         coal: true,
         tender: true,
-        length: 700, // TODO: Find the correct length
+        length: 618.8,
         name: 'ET&WNC 2-8-0 Tender',
         min: {
             headlightType: 1,
