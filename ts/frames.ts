@@ -794,6 +794,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         min: {
             headlightType: 1,
             paintType: 1,
+            reverserValue: -1,
             smokestackType: 1,
         },
         max: {
@@ -807,6 +808,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             compressorValveValue: 1,
             headlightType: 6,
             paintType: 5,
+            reverserValue: 1,
             sanderAmount: 100,
             smokestackType: 5,
             tenderFuelAmount: 1000,
@@ -900,6 +902,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         min: {
             headlightType: 1,
             paintType: 1,
+            reverserValue: -1,
             smokestackType: 1,
         },
         max: {
@@ -913,6 +916,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             compressorValveValue: 1,
             headlightType: 9,
             paintType: 5,
+            reverserValue: 1,
             sanderAmount: 100,
             smokestackType: 9,
             tenderFuelAmount: 3320,
