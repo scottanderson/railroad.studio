@@ -980,8 +980,8 @@ export class Studio {
                             if (typeof meta.unit === 'string') {
                                 result += ` ${meta.unit}`;
                             } else {
-                                const idx = frameDef.coal ? 1 : 0;
-                                result += ` ${meta.unit[idx]}`;
+                                const fuelType = frameDef.coal ? 1 : 0;
+                                result += ` ${meta.unit[fuelType]}`;
                             }
                         }
                         if ('type' in meta && meta.type === 'slider') {
@@ -1034,7 +1034,6 @@ export class Studio {
                 editNumericState(frame, 'markerLightsRearRightState');
                 // Freight
                 if (hasCargoLimits(frame.type)) {
-                    if (frame.type !== 'flatcar_logs') return;
                     const freightType = frame.state.freightType ?? '';
                     const setAmount = (amount: number) => frame.state.freightAmount = amount;
                     const limits: Partial<Record<CargoType, number>> = cargoLimits[frame.type];
