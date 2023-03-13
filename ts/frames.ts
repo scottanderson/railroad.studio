@@ -49,18 +49,66 @@ type FrameType = typeof frameTypes[number];
 export const isFrameType = (type: GvasString): type is FrameType =>
     type ? frameTypes.includes(type) : false;
 
-export const frameCategories = ['engine', 'tender', 'coal', 'handcar', 'freight', 'passenger', 'mow'] as const;
-
-type FrameCategories = typeof frameCategories[number];
+export const frameCategories = ['engine', 'tender', 'freight', 'passenger', 'mow', 'handcar'] as const;
 
 type PRO<K extends string | number | symbol, T> = Partial<Readonly<Record<K, T>>>;
 
-export interface FrameDefinition extends PRO<FrameCategories, boolean> {
-    length: number;
-    name: string;
-    min?: PRO<keyof NumericFrameState, number>;
-    max?: PRO<keyof NumericFrameState, number>;
-}
+type CategoryFlags = {
+    engine: true,
+    tender?: undefined,
+    coal?: true,
+    freight?: undefined,
+    passenger?: undefined,
+    mow?: undefined,
+    handcar?: undefined,
+} | {
+    engine?: undefined,
+    tender: true,
+    coal?: true,
+    freight?: undefined,
+    passenger?: undefined,
+    mow?: undefined,
+    handcar?: undefined,
+} | {
+    engine?: undefined,
+    tender?: undefined,
+    coal?: undefined,
+    freight: true,
+    passenger?: undefined,
+    mow?: undefined,
+    handcar?: undefined,
+} | {
+    engine?: undefined,
+    tender?: undefined,
+    coal?: undefined,
+    freight?: undefined,
+    passenger: true,
+    mow?: undefined,
+    handcar?: undefined,
+} | {
+    engine?: undefined,
+    tender?: undefined,
+    coal?: undefined,
+    freight?: undefined,
+    passenger?: undefined,
+    mow: true,
+    handcar?: undefined,
+} | {
+    engine?: undefined,
+    tender?: undefined,
+    coal?: undefined,
+    freight?: undefined,
+    passenger?: undefined,
+    mow?: undefined,
+    handcar: true,
+};
+
+export type FrameDefinition = CategoryFlags & {
+    length: number,
+    name: string,
+    min?: PRO<keyof NumericFrameState, number>,
+    max?: PRO<keyof NumericFrameState, number>,
+};
 
 export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
