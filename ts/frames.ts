@@ -238,7 +238,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'climax': {
         engine: true,
-        length: 849.89,
+        length: 820,
         name: 'Climax',
         min: {
             headlightType: 1,
@@ -538,7 +538,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'flatcar_tanker': {
         freight: true,
-        length: 785.6,
+        length: 760,
         name: 'Tanker',
         min: {
             headlightType: 1,
@@ -656,7 +656,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'hopperBB': {
         freight: true,
-        length: 785.6,
+        length: 720,
         name: 'Carter Brothers Drop-Bottom Hopper',
         min: {
             headlightType: 1,
@@ -894,7 +894,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'skeletoncar': {
         freight: true,
-        length: 530.6,
+        length: 600,
         name: 'Skeleton Car',
         min: {
             headlightType: 1,
@@ -1181,6 +1181,19 @@ export const cargoLimits = {
     },
     flatcar_tanker: {
         crudeoil: 12,
+    },
+    hopperBB: {
+        coal: 10,
+        ironore: 8,
+    },
+    skeletoncar: {
+        log: 5,
+    },
+    stockcar: {
+        crate_tools: 32,
+    },
+    tankcarNCO: {
+        crudeoil: 8,
     },
 } as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 

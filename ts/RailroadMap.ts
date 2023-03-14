@@ -756,7 +756,7 @@ export class RailroadMap {
             .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
         const f = g
-            .rect(definition.length, 300)
+            .rect(definition.length, 250)
             .center(0, 0)
             .addClass('frame')
             .addClass(frame.type);
