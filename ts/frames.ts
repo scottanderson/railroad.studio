@@ -42,7 +42,7 @@ export const frameTypes = [
     'tweetsie280',
     'tweetsie280_tender',
     'waycar',
-] as const;
+] as const satisfies ReadonlyArray<string>;
 
 type FrameType = typeof frameTypes[number];
 
@@ -1050,12 +1050,12 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
 };
 
-interface FrameStateMetadata {
-    name: string | [string, string];
-    type?: ('slider' | string[]);
-    unit?: string | [string, string];
-    step?: number;
-}
+type FrameStateMetadata = {
+    name: string | readonly [string, string],
+    type?: 'slider' | readonly string[],
+    unit?: string | readonly [string, string],
+    step?: number,
+};
 
 export const frameStateMetadata = {
     boilerFireTemp: {
@@ -1155,7 +1155,7 @@ export const frameStateMetadata = {
         type: 'slider',
         unit: 'L',
     },
-} satisfies Record<keyof NumericFrameState, Readonly<FrameStateMetadata>>;
+} as const satisfies Record<keyof NumericFrameState, FrameStateMetadata>;
 
 export const cargoLimits = {
     boxcar: {
