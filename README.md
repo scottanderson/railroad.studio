@@ -25,6 +25,33 @@ within a .sav file by loading that file in to Railroad Studio, modifying the
 to call functions which update the user interface, such as
 `window.studio.setMapModified()`, and `window.studio.map.refreshSplines()`.
 
+The following commands can be pasted into the browser's JavaScript console.
+Note that these commands will only work after loading a save file:
+
+#### Delete all rolling stock except Betsy
+```js
+betsy = window.studio.railroad.frames.find((f) => f.name === 'betsy');
+window.studio.railroad.frames = [betsy];
+window.studio.setMapModified();
+```
+
+#### Reset all players money and experience
+```js
+window.studio.railroad.players.forEach((p) => {
+    p.xp = 0;
+    p.money = 2000;
+});
+window.studio.setMapModified();
+```
+
+#### Delete all old splines
+```js
+window.studio.railroad.splines = []; // Catmull-rom tracks (old spline system)
+window.studio.railroad.switches = []; // Switch objects (old spline system)
+window.studio.setMapModified();
+window.studio.map.refreshSplines(); // Update the map view
+```
+
 ## Development
 
 ### Requirements
