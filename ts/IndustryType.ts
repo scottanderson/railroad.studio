@@ -75,7 +75,7 @@ export const industryProductInputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.smelter]: ['Cordwood', 'Iron Ore', input3, input4],
     [IndustryType.ironworks]: ['Raw Iron', 'Coal', 'Lumber', input4],
     [IndustryType.oil_field]: ['Steel Pipes', 'Beams', 'Tool Crates', input4],
-    [IndustryType.refinery]: ['Crude Oil', 'Lumber', 'Steel Pipes', input4],
+    [IndustryType.refinery]: ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
     [IndustryType.coal_mine]: ['Beams', 'Rails', input3, input4],
     [IndustryType.iron_mine]: ['Lumber', 'Beams', input3, input4],
     [IndustryType.freight_depot]: input1234,
