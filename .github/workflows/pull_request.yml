@@ -1,9 +1,6 @@
 name: Build with Webpack
 
 on:
-  push:
-    branches:
-      - mainline
   pull_request:
     branches:
       - mainline
@@ -27,4 +24,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci
-      - run: npx webpack --mode=production
+      - run: npx webpack --mode=development
