@@ -25,7 +25,14 @@ import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, i
 import {handleError} from './index';
 import {parallelSpline} from './tool-parallel';
 import {asyncForEach} from './util-async';
-import {BezierCurve, cubicBezier, cubicBezier3, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {
+    BezierCurve,
+    cubicBezier,
+    cubicBezier3,
+    cubicBezierLength,
+    cubicBezierMinRadius,
+    hermiteToBezier,
+} from './util-bezier';
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
 import {clamp, lerp} from './math';
@@ -1468,8 +1475,10 @@ export class RailroadMap {
                         .map((v) => JSON.stringify(v))
                         .indexOf(JSON.stringify(spline));
                     const steepest = calculateSteepestGrade(spline);
-                    const sharpest = cubicBezierMinRadius(hermiteToBezier(spline));
-                    console.log({index, sharpest, spline, steepest});
+                    const bezier = hermiteToBezier(spline);
+                    const sharpest = cubicBezierMinRadius(bezier);
+                    const length = cubicBezierLength(bezier);
+                    console.log({index, sharpest, spline, steepest, length});
                 }
                 break;
             case MapToolMode.delete:

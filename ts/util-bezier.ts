@@ -161,6 +161,21 @@ type OsculatingCircle = {
     t: number,
 };
 
+export function cubicBezierLength(bezier: BezierCurve, samples = 1000): number {
+    const controlPoints: Vector[] = [];
+    // Calculate one extra control point, so we end with `samples` segments
+    for (let i = 0; i <= samples; i++) {
+        const t = i / samples;
+        const p = cubicBezier3(t, bezier);
+        controlPoints.push(p);
+    }
+    let length = 0;
+    for (let i = 0; i < samples; i++) {
+        length += distance(controlPoints[i], controlPoints[i + 1]);
+    }
+    return length;
+}
+
 /**
  * Calculates the radius of the osculating circle of a cubic Bezier curve at a
  * given position. The osculating circle is a circle that is tangent to the
