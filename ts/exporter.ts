@@ -833,6 +833,24 @@ function engineVersionToBlob(engineVersion: EngineVersion): BlobPart {
     ]);
 }
 
+function isAsciiString(str: string): boolean {
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        const c = str.charCodeAt(i);
+        if (c !== (c & 0x007F)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function encodeUtf16(str: string): Uint16Array {
+    const utf16 = new Uint16Array(str.length);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        utf16[i] = str.charCodeAt(i);
+    }
+    return utf16;
+}
+
 function stringToBlob(str: GvasString): BlobPart {
     // string:
     //   seq:
@@ -844,6 +862,15 @@ function stringToBlob(str: GvasString): BlobPart {
     //       encoding: 'UTF-8'
     if (str === null) return new Uint32Array([0]);
     if (typeof str !== 'string') throw new Error('argument must be a string');
+
+    if (!isAsciiString(str)) {
+        const words = encodeUtf16(str + '\0');
+        return new Blob([
+            new Uint32Array([-words.length]),
+            words,
+        ]);
+    }
+
     const bytes = new TextEncoder().encode(str + '\0');
     return new Blob([
         new Uint32Array([bytes.length]),
