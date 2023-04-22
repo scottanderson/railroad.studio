@@ -39,6 +39,9 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     }
     let uint32View = new Uint32Array(buffer, 4, 2);
     const saveVersion = uint32View[0];
+    if (saveVersion !== 2) {
+        throw new Error(`GVAS format version ${saveVersion} is not supported`);
+    }
     const structureVersion = uint32View[1];
     let [pos, engineVersion]: [number, EngineVersion] = parseEngineVersion(buffer, 12);
     uint32View = new Uint32Array(buffer.slice(pos, pos + 8));
