@@ -46,6 +46,12 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
     const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
     const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
+    const saveGame = {
+        date: saveGameDate,
+        uniqueId: saveGameUniqueID,
+        uniqueWorldId: saveGameUniqueWorldID,
+        version: saveGameVersion,
+    };
     // Read frames
     const boilerFireTemp = optionalMap(gvas.floatArrays, 'BoilerFireTempArray');
     const boilerFuelAmount = optionalMap(gvas.floatArrays, 'BoilerFuelAmountArray');
@@ -438,27 +444,27 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read cut trees
     const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') ?? [];
+    // Read time of day
+    const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
+    const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? undefined;
     // Import complete, build the railroad
     const railroad: Railroad = {
         _header: gvas._header,
         _order: gvas._order,
         _types: gvas._types,
-        frames: frames,
-        industries: industries,
-        players: players,
-        removedVegetationAssets: removedVegetationAssets,
-        sandhouses: sandhouses,
-        saveGame: {
-            date: saveGameDate,
-            uniqueId: saveGameUniqueID,
-            uniqueWorldId: saveGameUniqueWorldID,
-            version: saveGameVersion,
-        },
-        splines: splines,
-        splineTracks: splineTracks,
-        switches: switches,
-        turntables: turntables,
-        watertowers: watertowers,
+        binaryTexture,
+        frames,
+        industries,
+        players,
+        removedVegetationAssets,
+        sandhouses,
+        saveGame,
+        splineTracks,
+        splines,
+        switches,
+        timeOfDay,
+        turntables,
+        watertowers,
     };
     return railroad;
 }
