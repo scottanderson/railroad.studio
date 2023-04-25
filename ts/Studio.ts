@@ -41,7 +41,7 @@ import {toggleDarkMode} from './themes';
 import {catmullRomToHermite} from './util-catmullrom';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
-const NEWEST_TESTED_SAVE_GAME_VERSION = 221006;
+const NEWEST_TESTED_SAVE_GAME_VERSION = 230403;
 
 /**
  * Web UI for editing a Railroad object.
