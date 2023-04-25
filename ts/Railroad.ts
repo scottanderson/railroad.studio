@@ -28,6 +28,8 @@ export interface Railroad {
     };
     splines: Spline[];
     splineTracks: SplineTrack[];
+    timeOfDay: number | undefined;
+    binaryTexture: number[] | undefined;
 }
 
 export interface Frame {

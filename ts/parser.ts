@@ -37,13 +37,15 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     if (magic !== 'GVAS') {
         throw new Error('Error reading file: Format doesn\'t start with GVAS.');
     }
-    let uint32View = new Uint32Array(buffer, 4, 2);
-    const saveVersion = uint32View[0];
-    if (saveVersion !== 2) {
-        throw new Error(`GVAS format version ${saveVersion} is not supported`);
+    let uint32View = new Uint32Array(buffer, 4, 3);
+    const gvasVersion = uint32View[0];
+    if (gvasVersion !== 2 && gvasVersion !== 3) {
+        throw new Error(`GVAS format version ${gvasVersion} is not supported`);
     }
     const structureVersion = uint32View[1];
-    let [pos, engineVersion]: [number, EngineVersion] = parseEngineVersion(buffer, 12);
+    const unknownVersion = gvasVersion === 3 ? uint32View[2] : undefined;
+    const engineVersionOffset = gvasVersion === 3 ? 16 : 12;
+    let [pos, engineVersion]: [number, EngineVersion] = parseEngineVersion(buffer, engineVersionOffset);
     uint32View = new Uint32Array(buffer.slice(pos, pos + 8));
     pos += 8;
     const customFormatVersion = uint32View[0];
@@ -60,18 +62,20 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     let saveType;
     [pos, saveType] = parseString(buffer, pos);
     const header: GvasHeader = {
-        saveVersion: saveVersion,
-        structureVersion: structureVersion,
-        engineVersion: engineVersion,
-        customFormatVersion: customFormatVersion,
-        customData: customData,
-        saveType: saveType,
+        gvasVersion,
+        structureVersion,
+        unknownVersion,
+        engineVersion,
+        customFormatVersion,
+        customData,
+        saveType,
     };
     const result: Gvas = {
         _header: header,
         _order: [],
         _types: {},
         boolArrays: {},
+        byteArrays: {},
         floatArrays: {},
         floats: {},
         intArrays: {},
@@ -81,9 +85,10 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         textArrays: {},
         vectorArrays: {},
     };
+    const largeWorldCoords = (gvasVersion === 3);
     while (pos < buffer.byteLength) {
         let pname; let ptype;
-        [pos, pname, ptype] = parseProperty(buffer, pos, result);
+        [pos, pname, ptype] = parseProperty(buffer, pos, result, largeWorldCoords);
         if (!pname) throw new Error('Property name is null');
         if (pname === 'None') break; // End of properties
         result._order.push(pname);
@@ -141,7 +146,12 @@ function parseString(buffer: ArrayBuffer, start: number): [number, GvasString] {
     }
 }
 
-function parseProperty(b: ArrayBuffer, pos: number, target: Gvas): [number, GvasString, GvasTypes] {
+function parseProperty(
+    b: ArrayBuffer,
+    pos: number,
+    target: Gvas,
+    largeWorldCoords: boolean,
+): [number, GvasString, GvasTypes] {
     // pname
     let pname;
     [pos, pname] = parseString(b, pos);
@@ -184,7 +194,7 @@ function parseProperty(b: ArrayBuffer, pos: number, target: Gvas): [number, Gvas
     } else if (ptype !== 'ArrayProperty') {
         throw new Error(`property type for '${pname}' is not implemented ('${ptype}')`);
     } else if (dtype === 'StructProperty') {
-        const [stype, structs] = parseStructArray(pdata, pname);
+        const [stype, structs] = parseStructArray(pdata, pname, largeWorldCoords);
         if (stype === 'Rotator') {
             target.rotatorArrays[pname] = structs as Rotator[];
         } else if (stype === 'Vector') {
@@ -205,6 +215,8 @@ function parseProperty(b: ArrayBuffer, pos: number, target: Gvas): [number, Gvas
         target.stringArrays[pname] = parseStringArray(pdata);
     } else if (dtype === 'TextProperty') {
         target.textArrays[pname] = parseTextArray(pdata);
+    } else if (dtype === 'ByteProperty') {
+        target.byteArrays[pname] = [...new Uint8Array(pdata)];
     } else {
         throw new Error(`${dtype} data type for '${pname}' is not implemented`);
     }
@@ -252,9 +264,14 @@ function parseStringArray(buffer: ArrayBuffer): GvasString[] {
  * Parse a struct array from a buffer.
  * @param {ArrayBuffer} buffer
  * @param {GvasString} expectPropertyName
+ * @param {boolean} largeWorldCoords
  * @return {GvasStruct[]}
  */
-function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): [GvasString, (Rotator | Vector)[]] {
+function parseStructArray(
+    buffer: ArrayBuffer,
+    expectPropertyName: GvasString,
+    largeWorldCoords: boolean,
+): [GvasString, (Rotator | Vector)[]] {
     // - id: entry_count
     //   type: u4
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
@@ -280,8 +297,9 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
     if (fieldSize[1] !== 0) {
         throw new Error(`field_size too large: ${fieldSize[1]}`);
     }
-    if (fieldSize[0] !== 12 * entryCount) {
-        throw new Error(`field_size !== 12 * entryCount: ${fieldSize}, ${entryCount}`);
+    const structSize = largeWorldCoords ? 24 : 12;
+    if (fieldSize[0] !== structSize * entryCount) {
+        throw new Error(`field_size !== ${structSize} * entryCount: ${fieldSize}, ${entryCount}`);
     }
     // - id: field_name
     //   type: string
@@ -305,8 +323,8 @@ function parseStructArray(buffer: ArrayBuffer, expectPropertyName: GvasString): 
     //   repeat-expr: entryCount
     const value = [];
     for (let i = 0; i < entryCount; i++) {
-        const values = new Float32Array(buffer.slice(pos, pos + 12));
-        pos += 12;
+        const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
+        pos += structSize;
         if (fieldName === 'Rotator') {
             value.push({
                 pitch: values[0], // y (need to confirm)
@@ -388,9 +406,12 @@ function parseTextArray(buffer: ArrayBuffer): GvasText[] {
             //       contents: [8, 0, 0, 0, 0, 0, 0, 0, 0]
             const numFlags = new Uint8Array(buffer, pos, 1)[0];
             if (numFlags !== 8) throw new Error(`Expected numFlags == 8, ${numFlags}`);
-            const flags = [...new Uint32Array(buffer.slice(pos + 1, pos + 9))];
-            if (flags[0] !== 0 || flags[1] !== 0) throw new Error(`Expected flags == [0, 0], ${flags}`);
-            pos += 9;
+            const flags = new Uint32Array(buffer.slice(pos + 1, pos + 5))[0];
+            if (flags !== 0) throw new Error(`Expected flags == 0, ${flags}`);
+            pos += 5;
+            let unknownStr;
+            [pos, unknownStr] = parseString(buffer, pos);
+            if (unknownStr && unknownStr.length) throw new Error(`Expected empty str, ${unknownStr}`);
             //     - id: component_guid
             //       type: string
             let componentGuid;

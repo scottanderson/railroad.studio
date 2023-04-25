@@ -9,6 +9,7 @@ export interface Gvas {
     _types: Record<string, GvasTypes>;
     _header: GvasHeader;
     boolArrays: Record<string, boolean[]>;
+    byteArrays: Record<string, number[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
@@ -24,6 +25,7 @@ export type GvasTypes =
     | ['FloatProperty']
     | ['StrProperty']
     | ['ArrayProperty', 'BoolProperty']
+    | ['ArrayProperty', 'ByteProperty']
     | ['ArrayProperty', 'FloatProperty']
     | ['ArrayProperty', 'IntProperty']
     | ['ArrayProperty', 'StrProperty']
@@ -38,8 +40,9 @@ export function gvasToString(gs: GvasString): string {
 }
 
 export interface GvasHeader {
-    saveVersion: number;
+    gvasVersion: number;
     structureVersion: number;
+    unknownVersion?: number;
     engineVersion: EngineVersion;
     customFormatVersion: number;
     customData: CustomData[];

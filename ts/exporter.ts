@@ -6,6 +6,7 @@ import {Vector} from './Vector';
 import {stringToText} from './util';
 
 const exportKeys = [
+    'BinaryTexture',
     'BoilerFireTempArray',
     'BoilerFuelAmountArray',
     'BoilerPressureArray',
@@ -84,6 +85,7 @@ const exportKeys = [
     'SwitchTypeArray',
     'TenderFuelAmountArray',
     'TenderWaterAmountArray',
+    'TimeOfDay',
     'TurntableDeckRotationArray',
     'TurntableLocationArray',
     'TurntableRotatorArray',
@@ -131,6 +133,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         splineSegmentVisibility = splineSegmentVisibility.concat(spline.segmentsVisible);
         splineVisibilityEnd[idx] = splineSegmentVisibility.length - 1;
     }
+    const byteArrays: Record<string, number[]> = {};
     const boolArrays: Record<string, boolean[]> = {};
     const floatArrays: Record<string, number[]> = {};
     const floats: Record<string, number> = {};
@@ -152,6 +155,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     // Fill in the properties, preserving name capitalization
     for (const propertyName of railroad._order) {
         switch (propertyName.toLowerCase()) {
+            case 'binarytexture':
+                if (railroad.binaryTexture) {
+                    byteArrays[propertyName] = railroad.binaryTexture;
+                }
+                break;
             case 'boilerfiretemparray':
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerFireTemp);
                 break;
@@ -407,6 +415,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'tenderwateramountarray':
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.tenderWaterAmount);
                 break;
+            case 'timeofday':
+                if (railroad.timeOfDay) {
+                    floats[propertyName] = railroad.timeOfDay;
+                }
+                break;
             case 'turntabledeckrotationarray':
                 rotatorArrays[propertyName] = removeUndefinedTail(
                     railroad.turntables.map((t) => t.deckRotation));
@@ -436,11 +449,12 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 throw new Error(`Unrecognized property: ${propertyName}`);
         }
     }
-    return <Gvas>{
+    return {
         _header: railroad._header,
         _order: railroad._order,
         _types: railroad._types,
         boolArrays: boolArrays,
+        byteArrays: byteArrays,
         floatArrays: floatArrays,
         floats: floats,
         intArrays: intArrays,
@@ -454,6 +468,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
 
 function propertyType(propertyName: string): GvasTypes {
     switch (propertyName) {
+        case 'binarytexture': return ['ArrayProperty', 'ByteProperty'];
         case 'boilerfiretemparray': return ['ArrayProperty', 'FloatProperty'];
         case 'boilerfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
         case 'boilerpressurearray': return ['ArrayProperty', 'FloatProperty'];
@@ -535,6 +550,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'switchtypearray': return ['ArrayProperty', 'IntProperty'];
         case 'tenderfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
         case 'tenderwateramountarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'timeofday': return ['FloatProperty'];
         case 'turntabledeckrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'turntablelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'turntablerotatorarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
@@ -615,6 +631,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
             break;
         }
         case 'FloatProperty': {
+            if (!(propertyName in gvas.floats)) return;
             const float = gvas.floats[propertyName] || NaN;
             propertyData.push(new Float32Array([float]));
             break;
@@ -667,8 +684,15 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
                     //       repeat-expr: entry_count
                     const texts = gvas.textArrays[propertyName] || [];
                     if (texts.length === 0) return;
+                    const largeWorldCoords = (gvas._header.gvasVersion > 2);
                     propertyData.push(new Uint32Array([texts.length]));
-                    propertyData.push(new Blob(texts.map(textToBlob)));
+                    propertyData.push(new Blob(texts.map((t) => textToBlob(t, largeWorldCoords))));
+                    break;
+                }
+                case 'ByteProperty': {
+                    const bytes = gvas.byteArrays[propertyName] || [];
+                    if (bytes.length === 0) return;
+                    propertyData.push(new Uint8Array(bytes));
                     break;
                 }
                 default:
@@ -697,12 +721,13 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
 function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: string): void | Blob {
     const data: BlobPart[] = [];
     let structs; let structSize;
+    const largeWorldCoords = (gvas._header.gvasVersion > 2);
     if (structType === 'Vector') {
         structs = gvas.vectorArrays[propertyName] || [];
-        structSize = 12;
+        structSize = largeWorldCoords ? 24 : 12;
     } else if (structType === 'Rotator') {
         structs = gvas.rotatorArrays[propertyName] || [];
-        structSize = 12;
+        structSize = largeWorldCoords ? 24 : 12;
     } else {
         throw new Error('Unexpected structType: ' + structType);
     }
@@ -748,7 +773,7 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
         } else {
             throw new Error(structType);
         }
-        data.push(new Float32Array(floats));
+        data.push(new (largeWorldCoords ? Float64Array : Float32Array)(floats));
     }
     return new Blob(data);
 }
@@ -766,10 +791,18 @@ function gvasHeaderToBlob(header: GvasHeader): Blob {
     //       type: custom_format
     //     - id: save_type
     //       type: string
+    const versions = [
+        header.gvasVersion,
+        header.structureVersion,
+    ];
+
+    const unknown = header.unknownVersion;
+    if (typeof unknown !== 'undefined') {
+        versions.push(unknown);
+    }
+
     return new Blob([
-        new Uint32Array([
-            header.saveVersion,
-            header.structureVersion]),
+        new Uint32Array(versions),
         engineVersionToBlob(header.engineVersion),
         customToBlob(header.customFormatVersion, header.customData),
         stringToBlob(header.saveType),
@@ -878,7 +911,7 @@ function stringToBlob(str: GvasString): BlobPart {
     ]);
 }
 
-function textToBlob(text: GvasText): BlobPart {
+function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
     // text:
     //   seq:
     //     - id: component_type
@@ -920,7 +953,8 @@ function textToBlob(text: GvasText): BlobPart {
         return new Blob([
             new Uint32Array([1]),
             new Uint8Array([3]),
-            new Uint8Array([8, 0, 0, 0, 0, 0, 0, 0, 0]),
+            new Uint8Array([8, 0, 0, 0, 0]),
+            stringToBlob(largeWorldCoords ? '' : null),
             stringToBlob(text.guid),
             stringToBlob(text.pattern),
             new Uint32Array([text.textFormat.length]),
