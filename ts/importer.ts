@@ -52,6 +52,23 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         uniqueWorldId: saveGameUniqueWorldID,
         version: saveGameVersion,
     };
+    // Read settings
+    const animateTimeOfDay = optionalMap(gvas.bools, 'AnimateTimeOfDay') ?? undefined;
+    const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? [];
+    const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
+    const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
+    const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
+    const weatherTransitionTime = optionalMap(gvas.floats, 'WeatherTransitionTime') ?? undefined;
+    const weatherType = optionalMap(gvas.ints, 'WeatherType') ?? undefined;
+    const settings = {
+        animateTimeOfDay,
+        binaryTexture,
+        dayLength,
+        nightLength,
+        timeOfDay,
+        weatherTransitionTime,
+        weatherType,
+    };
     // Read frames
     const boilerFireTemp = optionalMap(gvas.floatArrays, 'BoilerFireTempArray');
     const boilerFuelAmount = optionalMap(gvas.floatArrays, 'BoilerFuelAmountArray');
@@ -444,40 +461,23 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read cut trees
     const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') ?? [];
-    // Read AnimateTimeOfDay
-    const animateTimeOfDay = optionalMap(gvas.bools, 'AnimateTimeOfDay') ?? undefined;
-    // Read screenshot
-    const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? undefined;
-    // Read day length
-    const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
-    // Read night length
-    const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
-    // Read time of day
-    const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
-    // Read weather type
-    const weatherType = optionalMap(gvas.ints, 'WeatherType') ?? undefined;
     // Import complete, build the railroad
     const railroad: Railroad = {
         _header: gvas._header,
         _order: gvas._order,
         _types: gvas._types,
-        animateTimeOfDay,
-        binaryTexture,
-        dayLength,
         frames,
         industries,
-        nightLength,
         players,
         removedVegetationAssets,
         sandhouses,
         saveGame,
+        settings,
         splineTracks,
         splines,
         switches,
-        timeOfDay,
         turntables,
         watertowers,
-        weatherType,
     };
     return railroad;
 }

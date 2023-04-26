@@ -162,14 +162,12 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     for (const propertyName of railroad._order) {
         switch (propertyName.toLowerCase()) {
             case 'animatetimeofday':
-                if (typeof railroad.animateTimeOfDay !== 'undefined') {
-                    bools[propertyName] = railroad.animateTimeOfDay;
+                if (typeof railroad.settings.animateTimeOfDay !== 'undefined') {
+                    bools[propertyName] = railroad.settings.animateTimeOfDay;
                 }
                 break;
             case 'binarytexture':
-                if (railroad.binaryTexture) {
-                    byteArrays[propertyName] = railroad.binaryTexture;
-                }
+                byteArrays[propertyName] = railroad.settings.binaryTexture;
                 break;
             case 'boilerfiretemparray':
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.boilerFireTemp);
@@ -202,8 +200,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerRearState);
                 break;
             case 'daylength':
-                if (railroad.dayLength) {
-                    floats[propertyName] = railroad.dayLength;
+                if (typeof railroad.settings.dayLength !== 'undefined') {
+                    floats[propertyName] = railroad.settings.dayLength;
                 }
                 break;
             case 'framelocationarray':
@@ -289,8 +287,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearRightState);
                 break;
             case 'nightlength':
-                if (railroad.nightLength) {
-                    floats[propertyName] = railroad.nightLength;
+                if (typeof railroad.settings.nightLength !== 'undefined') {
+                    floats[propertyName] = railroad.settings.nightLength;
                 }
                 break;
             case 'painttypearray':
@@ -437,8 +435,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.tenderWaterAmount);
                 break;
             case 'timeofday':
-                if (railroad.timeOfDay) {
-                    floats[propertyName] = railroad.timeOfDay;
+                if (typeof railroad.settings.timeOfDay !== 'undefined') {
+                    floats[propertyName] = railroad.settings.timeOfDay;
                 }
                 break;
             case 'turntabledeckrotationarray':
@@ -466,9 +464,14 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'watertowerwaterlevelarray':
                 floatArrays[propertyName] = railroad.watertowers.map((w) => w.waterlevel);
                 break;
+            case 'weathertransitiontime':
+                if (typeof railroad.settings.weatherTransitionTime !== 'undefined') {
+                    floats[propertyName] = railroad.settings.weatherTransitionTime;
+                }
+                break;
             case 'weathertype':
-                if (typeof railroad.weatherType !== 'undefined') {
-                    ints[propertyName] = railroad.weatherType;
+                if (typeof railroad.settings.weatherType !== 'undefined') {
+                    ints[propertyName] = railroad.settings.weatherType;
                 }
                 break;
             default:
