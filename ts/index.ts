@@ -141,6 +141,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     return new Promise<void>((resolve, reject) => {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
+            console.log(gvas);
             titleText.textContent = 'Importing ' + filename;
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);

@@ -9,10 +9,12 @@ export interface Gvas {
     _types: Record<string, GvasTypes>;
     _header: GvasHeader;
     boolArrays: Record<string, boolean[]>;
+    bools: Record<string, boolean>;
     byteArrays: Record<string, number[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
+    ints: Record<string, number>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
     vectorArrays: Record<string, Vector[]>;
@@ -22,7 +24,9 @@ export interface Gvas {
 
 export type GvasTypes =
     | []
+    | ['BoolProperty']
     | ['FloatProperty']
+    | ['IntProperty']
     | ['StrProperty']
     | ['ArrayProperty', 'BoolProperty']
     | ['ArrayProperty', 'ByteProperty']

@@ -6,6 +6,7 @@ import {Vector} from './Vector';
 import {stringToText} from './util';
 
 const exportKeys = [
+    'AnimateTimeOfDay',
     'BinaryTexture',
     'BoilerFireTempArray',
     'BoilerFuelAmountArray',
@@ -17,6 +18,7 @@ const exportKeys = [
     'CompressorairPressureArray',
     'CouplerFrontStateArray',
     'CouplerrearStateArray',
+    'DayLength',
     'FrameLocationArray',
     'FrameNameArray',
     'FrameNumberArray',
@@ -44,6 +46,7 @@ const exportKeys = [
     'MarkerLightsFrontRightStateArray',
     'MarkerLightsRearLeftStateArray',
     'MarkerLightsRearRightStateArray',
+    'NightLength',
     'PlayerIDArray',
     'PlayerLocationArray',
     'PlayerMoneyArray',
@@ -94,6 +97,7 @@ const exportKeys = [
     'WatertowerRotationArray',
     'WatertowerTypeArray',
     'WatertowerWaterLevelArray',
+    'WeatherType',
 ];
 
 /**
@@ -135,9 +139,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     }
     const byteArrays: Record<string, number[]> = {};
     const boolArrays: Record<string, boolean[]> = {};
+    const bools: Record<string, boolean> = {};
     const floatArrays: Record<string, number[]> = {};
     const floats: Record<string, number> = {};
     const intArrays: Record<string, number[]> = {};
+    const ints: Record<string, number> = {};
     const stringArrays: Record<string, GvasString[]> = {};
     const strings: Record<string, GvasString> = {};
     const rotatorArrays: Record<string, Rotator[]> = {};
@@ -155,6 +161,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     // Fill in the properties, preserving name capitalization
     for (const propertyName of railroad._order) {
         switch (propertyName.toLowerCase()) {
+            case 'animatetimeofday':
+                if (typeof railroad.animateTimeOfDay !== 'undefined') {
+                    bools[propertyName] = railroad.animateTimeOfDay;
+                }
+                break;
             case 'binarytexture':
                 if (railroad.binaryTexture) {
                     byteArrays[propertyName] = railroad.binaryTexture;
@@ -189,6 +200,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 break;
             case 'couplerrearstatearray':
                 boolArrays[propertyName] = railroad.frames.map((f) => f.state.couplerRearState);
+                break;
+            case 'daylength':
+                if (railroad.dayLength) {
+                    floats[propertyName] = railroad.dayLength;
+                }
                 break;
             case 'framelocationarray':
                 vectorArrays[propertyName] = railroad.frames.map((f) => f.location);
@@ -271,6 +287,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 break;
             case 'markerlightsrearrightstatearray':
                 intArrays[propertyName] = railroad.frames.map((f) => f.state.markerLightsRearRightState);
+                break;
+            case 'nightlength':
+                if (railroad.nightLength) {
+                    floats[propertyName] = railroad.nightLength;
+                }
                 break;
             case 'painttypearray':
                 intArrays[propertyName] = removeUndefinedTail(
@@ -445,6 +466,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'watertowerwaterlevelarray':
                 floatArrays[propertyName] = railroad.watertowers.map((w) => w.waterlevel);
                 break;
+            case 'weathertype':
+                if (typeof railroad.weatherType !== 'undefined') {
+                    ints[propertyName] = railroad.weatherType;
+                }
+                break;
             default:
                 throw new Error(`Unrecognized property: ${propertyName}`);
         }
@@ -453,21 +479,24 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         _header: railroad._header,
         _order: railroad._order,
         _types: railroad._types,
-        boolArrays: boolArrays,
-        byteArrays: byteArrays,
-        floatArrays: floatArrays,
-        floats: floats,
-        intArrays: intArrays,
-        rotatorArrays: rotatorArrays,
-        stringArrays: stringArrays,
-        strings: strings,
-        textArrays: textArrays,
-        vectorArrays: vectorArrays,
+        boolArrays,
+        bools,
+        byteArrays,
+        floatArrays,
+        floats,
+        intArrays,
+        ints,
+        rotatorArrays,
+        stringArrays,
+        strings,
+        textArrays,
+        vectorArrays,
     };
 }
 
 function propertyType(propertyName: string): GvasTypes {
     switch (propertyName) {
+        case 'animatetimeofday': return ['BoolProperty'];
         case 'binarytexture': return ['ArrayProperty', 'ByteProperty'];
         case 'boilerfiretemparray': return ['ArrayProperty', 'FloatProperty'];
         case 'boilerfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
@@ -479,6 +508,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'compressorvalvevaluearray': return ['ArrayProperty', 'FloatProperty'];
         case 'couplerfrontstatearray': return ['ArrayProperty', 'BoolProperty'];
         case 'couplerrearstatearray': return ['ArrayProperty', 'BoolProperty'];
+        case 'daylength': return ['FloatProperty'];
         case 'framelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'framenamearray': return ['ArrayProperty', 'TextProperty'];
         case 'framenumberarray': return ['ArrayProperty', 'TextProperty'];
@@ -506,6 +536,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'markerlightsfrontrightstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'markerlightsrearleftstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'markerlightsrearrightstatearray': return ['ArrayProperty', 'IntProperty'];
+        case 'nightlength': return ['FloatProperty'];
         case 'painttypearray': return ['ArrayProperty', 'IntProperty'];
         case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
         // case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
@@ -559,6 +590,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'watertowerrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'watertowertypearray': return ['ArrayProperty', 'IntProperty'];
         case 'watertowerwaterlevelarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'weathertype': return ['IntProperty'];
         default: throw new Error(`Unknown property name ${propertyName}`);
     }
 }
@@ -624,6 +656,20 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
     const [propertyType, dataType, structType] = gvas._types[propertyName];
     const propertyData: BlobPart[] = [];
     switch (propertyType) {
+        case 'BoolProperty': {
+            if (!(propertyName in gvas.bools)) return;
+            const bool = gvas.bools[propertyName];
+
+            const propertyBlob = new Blob(propertyData);
+            const data: BlobPart[] = [
+                stringToBlob(propertyName),
+                stringToBlob(propertyType),
+                new Uint32Array([propertyBlob.size, 0]),
+            ];
+            data.push(new Uint8Array([bool ? 1 : 0]));
+            data.push(new Uint8Array([0])); // terminator
+            return new Blob(data);
+        }
         case 'StrProperty': {
             const str = gvas.strings[propertyName] ?? null;
             if (!str) return;
@@ -634,6 +680,12 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
             if (!(propertyName in gvas.floats)) return;
             const float = gvas.floats[propertyName] || NaN;
             propertyData.push(new Float32Array([float]));
+            break;
+        }
+        case 'IntProperty': {
+            if (!(propertyName in gvas.floats)) return;
+            const int = gvas.ints[propertyName];
+            propertyData.push(new Uint32Array([int]));
             break;
         }
         case 'ArrayProperty': {

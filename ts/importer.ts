@@ -444,17 +444,29 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read cut trees
     const removedVegetationAssets = optionalMap(gvas.vectorArrays, 'RemovedVegetationAssetsArray') ?? [];
+    // Read AnimateTimeOfDay
+    const animateTimeOfDay = optionalMap(gvas.bools, 'AnimateTimeOfDay') ?? undefined;
+    // Read screenshot
+    const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? undefined;
+    // Read day length
+    const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
+    // Read night length
+    const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
     // Read time of day
     const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
-    const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? undefined;
+    // Read weather type
+    const weatherType = optionalMap(gvas.ints, 'WeatherType') ?? undefined;
     // Import complete, build the railroad
     const railroad: Railroad = {
         _header: gvas._header,
         _order: gvas._order,
         _types: gvas._types,
+        animateTimeOfDay,
         binaryTexture,
+        dayLength,
         frames,
         industries,
+        nightLength,
         players,
         removedVegetationAssets,
         sandhouses,
@@ -465,6 +477,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         timeOfDay,
         turntables,
         watertowers,
+        weatherType,
     };
     return railroad;
 }

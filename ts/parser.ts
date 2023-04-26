@@ -75,10 +75,12 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         _order: [],
         _types: {},
         boolArrays: {},
+        bools: {},
         byteArrays: {},
         floatArrays: {},
         floats: {},
         intArrays: {},
+        ints: {},
         rotatorArrays: {},
         stringArrays: {},
         strings: {},
@@ -173,10 +175,26 @@ function parseProperty(
     if (isArray) {
         [pos, dtype] = parseString(b, pos);
     }
+    // bool only: value
+    if (ptype === 'BoolProperty') {
+        if (plen !== 0) throw new Error(`BoolProperty length !== 0, ${plen}`);
+        const c = new Uint8Array(b, pos, 1)[0];
+        if (c !== 0 && c !== 1) throw new Error(`Unexpected BoolProperty value: ${c}`);
+        pos++;
+        target.bools[pname] = (c !== 0);
+        const type: GvasTypes = [ptype];
+        target._types[pname] = type;
+    }
     // terminator
     const terminator = new Uint8Array(b, pos, 1)[0];
     if (terminator !== 0) throw new Error(`terminator !== 0, ${terminator}`);
     pos++;
+    // bail early if plen === 0
+    if (ptype === 'BoolProperty' && plen === 0) {
+        const type: GvasTypes = [ptype];
+        target._types[pname] = type;
+        return [pos, pname, type];
+    }
     // pdata
     const pdata = b.slice(pos, pos + plen);
     pos += plen;
@@ -196,9 +214,9 @@ function parseProperty(
     } else if (dtype === 'StructProperty') {
         const [stype, structs] = parseStructArray(pdata, pname, largeWorldCoords);
         if (stype === 'Rotator') {
-            target.rotatorArrays[pname] = structs as Rotator[];
+            target.rotatorArrays[pname] = structs;
         } else if (stype === 'Vector') {
-            target.vectorArrays[pname] = structs as Vector[];
+            target.vectorArrays[pname] = structs;
         } else {
             throw new Error(gvasToString(stype));
         }
@@ -260,6 +278,10 @@ function parseStringArray(buffer: ArrayBuffer): GvasString[] {
     return value;
 }
 
+type ParseStructArrayReturnType =
+    | ['Rotator', Rotator[]]
+    | ['Vector', Vector[]];
+
 /**
  * Parse a struct array from a buffer.
  * @param {ArrayBuffer} buffer
@@ -271,7 +293,7 @@ function parseStructArray(
     buffer: ArrayBuffer,
     expectPropertyName: GvasString,
     largeWorldCoords: boolean,
-): [GvasString, (Rotator | Vector)[]] {
+): ParseStructArrayReturnType {
     // - id: entry_count
     //   type: u4
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
@@ -350,7 +372,13 @@ function parseStructArray(
         console.log(`Warning: Struct[] size ${pos} does not match ArrayProperty data size ${buffer.byteLength}, ` +
             '.sav file may be corrupt. Proceed with caution.');
     }
-    return [fieldName, value];
+    if (fieldName === 'Vector') {
+        return [fieldName, value as Vector[]];
+    } else if (fieldName === 'Rotator') {
+        return [fieldName, value as Rotator[]];
+    } else {
+        throw new Error();
+    }
 }
 
 /**

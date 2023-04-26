@@ -12,24 +12,28 @@ export interface Railroad {
     _header: GvasHeader;
     _order: string[];
     _types: Record<string, GvasTypes>;
+    animateTimeOfDay: boolean | undefined;
+    binaryTexture: number[] | undefined;
+    dayLength: number | undefined;
     frames: Frame[];
     industries: Industry[];
+    nightLength: number | undefined;
     players: Player[];
-    sandhouses: Sandhouse[];
-    switches: Switch[];
-    turntables: Turntable[];
-    watertowers: Watertower[];
     removedVegetationAssets: Vector[];
+    sandhouses: Sandhouse[];
     saveGame: {
         date: GvasString;
         uniqueId: GvasString;
         uniqueWorldId: GvasString;
         version: GvasString;
     };
-    splines: Spline[];
     splineTracks: SplineTrack[];
+    splines: Spline[];
+    switches: Switch[];
     timeOfDay: number | undefined;
-    binaryTexture: number[] | undefined;
+    turntables: Turntable[];
+    watertowers: Watertower[];
+    weatherType: number | undefined;
 }
 
 export interface Frame {

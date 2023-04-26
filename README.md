@@ -165,7 +165,9 @@ combinations of types, only the ones used by Railroads Online are implemented.
 ```ts
 type GvasTypes =
     | []
+    | ['BoolProperty']
     | ['FloatProperty']
+    | ['IntProperty']
     | ['StrProperty']
     | ['ArrayProperty', 'BoolProperty']
     | ['ArrayProperty', 'FloatProperty']
