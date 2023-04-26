@@ -209,6 +209,12 @@ function parseProperty(
         const type: GvasTypes = [ptype];
         target._types[pname] = type;
         return [pos, pname, type];
+    } else if (ptype === 'IntProperty') {
+        if (plen !== 4) throw new Error(`IntProperty length !== 4, ${plen}, ${pdata}`);
+        target.ints[pname] = new Uint32Array(pdata)[0];
+        const type: GvasTypes = [ptype];
+        target._types[pname] = type;
+        return [pos, pname, type];
     } else if (ptype !== 'ArrayProperty') {
         throw new Error(`property type for '${pname}' is not implemented ('${ptype}')`);
     } else if (dtype === 'StructProperty') {

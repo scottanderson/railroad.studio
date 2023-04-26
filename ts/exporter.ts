@@ -686,7 +686,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
             break;
         }
         case 'IntProperty': {
-            if (!(propertyName in gvas.floats)) return;
+            if (!(propertyName in gvas.ints)) return;
             const int = gvas.ints[propertyName];
             propertyData.push(new Uint32Array([int]));
             break;
