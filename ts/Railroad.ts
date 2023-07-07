@@ -142,6 +142,7 @@ export enum SplineType {
     variable_stone_wall = 5,
     constant_stone_wall = 6,
     steel_bridge = 7,
+    steel_truss = 8,
 }
 
 export interface Switch {
