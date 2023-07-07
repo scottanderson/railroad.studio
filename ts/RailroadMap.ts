@@ -1078,6 +1078,9 @@ export class RailroadMap {
                 case SplineType.steel_bridge:
                     rect.addClass('steel-bridge');
                     break;
+                case SplineType.steel_truss:
+                    rect.addClass('steel-truss');
+                    break;
                 default:
                     throw new Error(`Unknown spline type ${spline.type}`);
             }
@@ -1334,6 +1337,12 @@ export class RailroadMap {
             case 'rail_914_wall_01_norail':
                 makePath(this.layers.bridges, ['stone-wall']);
                 makeGradeText();
+                break;
+            case 'rail_914_bridge_truss':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.bridges, ['steel-truss']);
+                makeGradeText();
+                makeRadiusText();
                 break;
             default:
                 console.log(`Unknown spline type ${spline.type}`);

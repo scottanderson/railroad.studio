@@ -17,6 +17,7 @@
   --pile-bridge-old: #669;
   --wooden-bridge: goldenrod;
   --steel-bridge: steelblue;
+  --steel-truss: lightsteelblue;
   --switch-leg-not-aligned: #666;
   --diamond: yellow;
   --control-point-primary: red;
@@ -226,6 +227,10 @@ body {
   stroke: var(--steel-bridge);
 }
 
+.steel-truss {
+  stroke: var(--steel-truss);
+}
+
 .grade,
 .stone-wall,
 .tunnel,
@@ -235,7 +240,8 @@ body {
 .pile-bridge-4,
 .pile-bridge-5,
 .wooden-bridge,
-.steel-bridge {
+.steel-bridge,
+.steel-truss {
   stroke-width: 400;
 }
 
@@ -254,7 +260,8 @@ body {
 .pile-bridge-4:hover,
 .pile-bridge-5:hover,
 .wooden-bridge:hover,
-.steel-bridge:hover {
+.steel-bridge:hover,
+.steel-truss:hover {
   opacity: 0.8;
   stroke: var(--spline-hover);
 }
@@ -262,7 +269,8 @@ body {
 .grade.hidden,
 .stone-wall.hidden,
 .wooden-bridge.hidden,
-.steel-bridge.hidden {
+.steel-bridge.hidden,
+.steel-truss.hidden {
   opacity: 0.5;
 }
 
@@ -271,7 +279,8 @@ body {
 .grade.hidden:hover,
 .stone-wall.hidden:hover,
 .wooden-bridge.hidden:hover,
-.steel-bridge.hidden:hover {
+.steel-bridge.hidden:hover,
+.steel-truss.hidden:hover {
   opacity: 0.8;
 }
 
