@@ -756,7 +756,6 @@ export class RailroadMap {
     private renderFrame(frame: Frame) {
         if (!isFrameType(frame.type)) {
             console.log(`Unknown frame type ${frame.type}`);
-            console.log({frame});
             return;
         }
         const definition = frameDefinitions[frame.type];
