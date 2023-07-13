@@ -30,6 +30,15 @@ export const frameTypes = [
     'montezuma_tender',
     'mosca',
     'mosca_tender',
+    'plantationcar_boxcar',
+    'plantationcar_flatcar',
+    'plantationcar_flatcar_logs',
+    'plantationcar_flatcar_stakes',
+    'plantationcar_flatcar_stakes_bulkhead',
+    'plantationcar_hopper_large',
+    'plantationcar_hopper_medium',
+    'plantationcar_hopper_small',
+    'plantationcar_tanker',
     'plow',
     'porter_040',
     'porter_042',
@@ -761,6 +770,159 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         },
     },
 
+    'plantationcar_boxcar': {
+        freight: true,
+        length: 331.2,
+        name: 'EWA Plantation Box Car',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_flatcar': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Cane Flat',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_flatcar_logs': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Logging Flat',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_flatcar_stakes': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Stake Flat',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_flatcar_stakes_bulkhead': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Bulkhead Flat',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_hopper_large': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Lowside Gondola',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_hopper_medium': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Medium Gondola',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_hopper_small': {
+        freight: true,
+        length: 331.2,
+        name: 'Gregg Sugar Cane Highside Gondola',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
+    'plantationcar_tanker': {
+        freight: true,
+        length: 331.2,
+        name: 'Waualua Agricultural Tank Car',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+    },
+
     'plow': {
         length: 610,
         name: 'Snow Plow',
@@ -1185,6 +1347,44 @@ export const cargoLimits = {
     hopperBB: {
         coal: 10,
         ironore: 8,
+    },
+    plantationcar_boxcar: {
+        crate_tools: 12,
+        crudeoil: 15,
+    },
+    plantationcar_flatcar: {
+        crate_tools: 6,
+    },
+    plantationcar_flatcar_logs: {
+        log: 5,
+        steelpipe: 7,
+    },
+    plantationcar_flatcar_stakes: {
+        beam: 3,
+        lumber: 3,
+        rail: 4,
+        rawiron: 3,
+    },
+    plantationcar_flatcar_stakes_bulkhead: {
+        cordwood: 2,
+    },
+    plantationcar_hopper_large: {
+        coal: 6,
+        ironore: 6,
+        oilbarrel: 15,
+    },
+    plantationcar_hopper_medium: {
+        coal: 3,
+        ironore: 3,
+        oilbarrel: 15,
+    },
+    plantationcar_hopper_small: {
+        coal: 2,
+        ironore: 2,
+        oilbarrel: 15,
+    },
+    plantationcar_tanker: {
+        crudeoil: 2,
     },
     skeletoncar: {
         log: 5,
