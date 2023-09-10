@@ -156,53 +156,53 @@ function parseProperty(
 ): [number, GvasString, GvasTypes] {
     let pname;
     let ptype: GvasTypes;
-    const parsed = readProperty(b, pos, largeWorldCoords);
-    [pos, pname] = parsed;
-    if (!pname || pname === 'None' || parsed.length === 2) {
+    const read = readProperty(b, pos, largeWorldCoords);
+    [pos, pname] = read;
+    if (!pname || pname === 'None' || read.length === 2) {
         // NoneProperty, bail without storring type info
         return [pos, pname, []];
-    } else if (parsed[2] === 'BoolProperty') {
-        ptype = [parsed[2]];
-        target.bools[pname] = parsed[3];
-    } else if (parsed[2] === 'StrProperty') {
-        ptype = [parsed[2]];
-        target.strings[pname] = parsed[3];
-    } else if (parsed[2] === 'FloatProperty') {
-        ptype = [parsed[2]];
-        target.floats[pname] = parsed[3];
-    } else if (parsed[2] === 'IntProperty') {
-        ptype = [parsed[2]];
-        target.ints[pname] = parsed[3];
-    } else if (parsed[2] !== 'ArrayProperty') {
-        throw new Error(`Unexpected Property type: ${parsed[2]}`);
-    } else if (parsed[3] === 'BoolProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.boolArrays[pname] = parsed[4];
-    } else if (parsed[3] === 'IntProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.intArrays[pname] = parsed[4];
-    } else if (parsed[3] === 'FloatProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.floatArrays[pname] = parsed[4];
-    } else if (parsed[3] === 'StrProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.stringArrays[pname] = parsed[4];
-    } else if (parsed[3] === 'TextProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.textArrays[pname] = parsed[4];
-    } else if (parsed[3] === 'ByteProperty') {
-        ptype = [parsed[2], parsed[3]];
-        target.byteArrays[pname] = parsed[4];
-    } else if (parsed[3] !== 'StructProperty') {
-        throw new Error(`Unexpected ArrayProperty type: ${parsed[3]}`);
-    } else if (parsed[4] === 'Vector') {
-        ptype = [parsed[2], parsed[3], parsed[4]];
-        target.vectorArrays[pname] = parsed[5];
-    } else if (parsed[4] === 'Rotator') {
-        ptype = [parsed[2], parsed[3], parsed[4]];
-        target.rotatorArrays[pname] = parsed[5];
+    } else if (read[2] === 'BoolProperty') {
+        ptype = [read[2]];
+        target.bools[pname] = read[3];
+    } else if (read[2] === 'StrProperty') {
+        ptype = [read[2]];
+        target.strings[pname] = read[3];
+    } else if (read[2] === 'FloatProperty') {
+        ptype = [read[2]];
+        target.floats[pname] = read[3];
+    } else if (read[2] === 'IntProperty') {
+        ptype = [read[2]];
+        target.ints[pname] = read[3];
+    } else if (read[2] !== 'ArrayProperty') {
+        throw new Error(`Unexpected Property type: ${read[2]}`);
+    } else if (read[3] === 'BoolProperty') {
+        ptype = [read[2], read[3]];
+        target.boolArrays[pname] = read[4];
+    } else if (read[3] === 'IntProperty') {
+        ptype = [read[2], read[3]];
+        target.intArrays[pname] = read[4];
+    } else if (read[3] === 'FloatProperty') {
+        ptype = [read[2], read[3]];
+        target.floatArrays[pname] = read[4];
+    } else if (read[3] === 'StrProperty') {
+        ptype = [read[2], read[3]];
+        target.stringArrays[pname] = read[4];
+    } else if (read[3] === 'TextProperty') {
+        ptype = [read[2], read[3]];
+        target.textArrays[pname] = read[4];
+    } else if (read[3] === 'ByteProperty') {
+        ptype = [read[2], read[3]];
+        target.byteArrays[pname] = read[4];
+    } else if (read[3] !== 'StructProperty') {
+        throw new Error(`Unexpected ArrayProperty type: ${read[3]}`);
+    } else if (read[4] === 'Vector') {
+        ptype = [read[2], read[3], read[4]];
+        target.vectorArrays[pname] = read[5];
+    } else if (read[4] === 'Rotator') {
+        ptype = [read[2], read[3], read[4]];
+        target.rotatorArrays[pname] = read[5];
     } else {
-        throw new Error(`Unhandled StructProperty type: ${parsed[4]}`);
+        throw new Error(`Unhandled StructProperty type: ${read[4]}`);
     }
     target._types[pname] = ptype;
     return [pos, pname, ptype];
