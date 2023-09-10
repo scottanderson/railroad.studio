@@ -12,16 +12,16 @@
         "sync": "aws s3 sync railroad.studio s3://railroad.studio"
     },
     "devDependencies": {
-        "@svgdotjs/svg.js": "^3.1.2",
+        "@svgdotjs/svg.js": "^3.2.0",
         "@total-typescript/ts-reset": "^0.4.2",
-        "@typescript-eslint/eslint-plugin": "^5.59.1",
-        "eslint": "^8.39.0",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "eslint": "^8.49.0",
         "eslint-config-google": "^0.14.0",
         "eslint-webpack-plugin": "^4.0.1",
         "svg-pan-zoom": "^3.6.1",
-        "ts-loader": "^9.4.2",
-        "typescript": "^5.0.4",
-        "webpack-cli": "^5.0.2",
-        "webpack-dev-server": "^4.13.3"
+        "ts-loader": "^9.4.4",
+        "typescript": "^5.2.2",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^4.15.1"
     }
 }
