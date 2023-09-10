@@ -3,12 +3,12 @@ import {Rotator} from './Rotator';
 import {HermiteCurve} from './util-bezier';
 import {Vector, vectorSum} from './Vector';
 
-export interface Transform {
+export interface HasLocationRotation {
     location: Vector;
     rotation: Rotator;
 }
 
-export function localToWorld(transform: Transform, curve: HermiteCurve): HermiteCurve {
+export function localToWorld(transform: HasLocationRotation, curve: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = curve;
     return {
         startPoint: vectorSum(transform.location, rotateVector(startPoint, transform.rotation)),

@@ -37,7 +37,7 @@ import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
 import {clamp, lerp} from './math';
 import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
-import {localToWorld} from './Transform';
+import {localToWorld} from './HasLocationRotation';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
