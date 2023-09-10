@@ -154,6 +154,81 @@ function parseProperty(
     target: Gvas,
     largeWorldCoords: boolean,
 ): [number, GvasString, GvasTypes] {
+    let pname;
+    let ptype: GvasTypes;
+    const parsed = readProperty(b, pos, largeWorldCoords);
+    [pos, pname] = parsed;
+    if (!pname || pname === 'None' || parsed.length === 2) {
+        // NoneProperty, bail without storring type info
+        return [pos, pname, []];
+    } else if (parsed[2] === 'BoolProperty') {
+        ptype = [parsed[2]];
+        target.bools[pname] = parsed[3];
+    } else if (parsed[2] === 'StrProperty') {
+        ptype = [parsed[2]];
+        target.strings[pname] = parsed[3];
+    } else if (parsed[2] === 'FloatProperty') {
+        ptype = [parsed[2]];
+        target.floats[pname] = parsed[3];
+    } else if (parsed[2] === 'IntProperty') {
+        ptype = [parsed[2]];
+        target.ints[pname] = parsed[3];
+    } else if (parsed[2] !== 'ArrayProperty') {
+        throw new Error(`Unexpected Property type: ${parsed[2]}`);
+    } else if (parsed[3] === 'BoolProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.boolArrays[pname] = parsed[4];
+    } else if (parsed[3] === 'IntProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.intArrays[pname] = parsed[4];
+    } else if (parsed[3] === 'FloatProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.floatArrays[pname] = parsed[4];
+    } else if (parsed[3] === 'StrProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.stringArrays[pname] = parsed[4];
+    } else if (parsed[3] === 'TextProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.textArrays[pname] = parsed[4];
+    } else if (parsed[3] === 'ByteProperty') {
+        ptype = [parsed[2], parsed[3]];
+        target.byteArrays[pname] = parsed[4];
+    } else if (parsed[3] !== 'StructProperty') {
+        throw new Error(`Unexpected ArrayProperty type: ${parsed[3]}`);
+    } else if (parsed[4] === 'Vector') {
+        ptype = [parsed[2], parsed[3], parsed[4]];
+        target.vectorArrays[pname] = parsed[5];
+    } else if (parsed[4] === 'Rotator') {
+        ptype = [parsed[2], parsed[3], parsed[4]];
+        target.rotatorArrays[pname] = parsed[5];
+    } else {
+        throw new Error(`Unhandled StructProperty type: ${parsed[4]}`);
+    }
+    target._types[pname] = ptype;
+    return [pos, pname, ptype];
+}
+
+type ParsePropertyReturnType = (
+    | [number, GvasString]
+    | [number, GvasString, 'BoolProperty', boolean]
+    | [number, GvasString, 'FloatProperty', number]
+    | [number, GvasString, 'IntProperty', number]
+    | [number, GvasString, 'StrProperty', GvasString]
+    | [number, GvasString, 'ArrayProperty', 'BoolProperty', boolean[]]
+    | [number, GvasString, 'ArrayProperty', 'ByteProperty', number[]]
+    | [number, GvasString, 'ArrayProperty', 'FloatProperty', number[]]
+    | [number, GvasString, 'ArrayProperty', 'IntProperty', number[]]
+    | [number, GvasString, 'ArrayProperty', 'StrProperty', GvasString[]]
+    | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Rotator', Rotator[]]
+    | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Vector', Vector[]]
+    | [number, GvasString, 'ArrayProperty', 'TextProperty', GvasText[]]
+);
+
+function readProperty(
+    b: ArrayBuffer,
+    pos: number,
+    largeWorldCoords: boolean,
+): ParsePropertyReturnType {
     // pname
     let pname;
     [pos, pname] = parseString(b, pos);
@@ -162,7 +237,7 @@ function parseProperty(
     [pos, ptype] = parseString(b, pos);
     if (!pname || pname === 'None') {
         if (ptype !== null) throw new Error(`Unexpected type: ${ptype}`);
-        return [pos, pname, []];
+        return [pos, pname];
     }
     // plen
     const qword = new Int32Array(b.slice(pos, pos + 8));
@@ -181,72 +256,54 @@ function parseProperty(
         const c = new Uint8Array(b, pos, 1)[0];
         if (c !== 0 && c !== 1) throw new Error(`Unexpected BoolProperty value: ${c}`);
         pos++;
-        target.bools[pname] = (c !== 0);
-        const type: GvasTypes = [ptype];
-        target._types[pname] = type;
+        // terminator
+        const terminator = new Uint8Array(b, pos, 1)[0];
+        if (terminator !== 0) throw new Error(`terminator !== 0, ${terminator}`);
+        pos++;
+        // Bail early because plen is zero
+        return [pos, pname, ptype, (c !== 0)];
     }
     // terminator
     const terminator = new Uint8Array(b, pos, 1)[0];
     if (terminator !== 0) throw new Error(`terminator !== 0, ${terminator}`);
     pos++;
-    // bail early if plen === 0
-    if (ptype === 'BoolProperty' && plen === 0) {
-        const type: GvasTypes = [ptype];
-        target._types[pname] = type;
-        return [pos, pname, type];
-    }
     // pdata
     const pdata = b.slice(pos, pos + plen);
     pos += plen;
     if (ptype === 'StrProperty') {
-        target.strings[pname] = parseString(pdata, 0)[1];
-        const type: GvasTypes = [ptype];
-        target._types[pname] = type;
-        return [pos, pname, type];
+        return [pos, pname, ptype, parseString(pdata, 0)[1]];
     } else if (ptype === 'FloatProperty') {
         if (plen !== 4) throw new Error(`FloatProperty length !== 4, ${plen}, ${pdata}`);
-        target.floats[pname] = new Float32Array(pdata)[0];
-        const type: GvasTypes = [ptype];
-        target._types[pname] = type;
-        return [pos, pname, type];
+        return [pos, pname, ptype, new Float32Array(pdata)[0]];
     } else if (ptype === 'IntProperty') {
         if (plen !== 4) throw new Error(`IntProperty length !== 4, ${plen}, ${pdata}`);
-        target.ints[pname] = new Uint32Array(pdata)[0];
-        const type: GvasTypes = [ptype];
-        target._types[pname] = type;
-        return [pos, pname, type];
+        return [pos, pname, ptype, new Uint32Array(pdata)[0]];
     } else if (ptype !== 'ArrayProperty') {
         throw new Error(`property type for '${pname}' is not implemented ('${ptype}')`);
     } else if (dtype === 'StructProperty') {
-        const [stype, structs] = parseStructArray(pdata, pname, largeWorldCoords);
+        const [stype, sdata] = parseStructArray(pdata, pname, largeWorldCoords);
         if (stype === 'Rotator') {
-            target.rotatorArrays[pname] = structs;
+            return [pos, pname, ptype, dtype, stype, sdata];
         } else if (stype === 'Vector') {
-            target.vectorArrays[pname] = structs;
+            return [pos, pname, ptype, dtype, stype, sdata];
         } else {
             throw new Error(gvasToString(stype));
         }
-        const type: GvasTypes = [ptype, dtype, stype];
-        target._types[pname] = type;
-        return [pos, pname, type];
     } else if (dtype === 'BoolProperty') {
-        target.boolArrays[pname] = parseBoolArray(pdata);
+        return [pos, pname, ptype, dtype, parseBoolArray(pdata)];
     } else if (dtype === 'IntProperty') {
-        target.intArrays[pname] = parseIntArray(pdata);
+        return [pos, pname, ptype, dtype, parseIntArray(pdata)];
     } else if (dtype === 'FloatProperty') {
-        target.floatArrays[pname] = parseFloatArray(pdata);
+        return [pos, pname, ptype, dtype, parseFloatArray(pdata)];
     } else if (dtype === 'StrProperty') {
-        target.stringArrays[pname] = parseStringArray(pdata);
+        return [pos, pname, ptype, dtype, parseStringArray(pdata)];
     } else if (dtype === 'TextProperty') {
-        target.textArrays[pname] = parseTextArray(pdata);
+        return [pos, pname, ptype, dtype, parseTextArray(pdata)];
     } else if (dtype === 'ByteProperty') {
-        target.byteArrays[pname] = [...new Uint8Array(pdata)];
+        return [pos, pname, ptype, dtype, [...new Uint8Array(pdata)]];
     } else {
         throw new Error(`${dtype} data type for '${pname}' is not implemented`);
     }
-    const type: GvasTypes = [ptype, dtype];
-    target._types[pname] = type;
-    return [pos, pname, type];
 }
 
 function parseBoolArray(buffer: ArrayBuffer) {
