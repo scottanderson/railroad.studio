@@ -2,6 +2,7 @@
 import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
 import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
+import {Transform} from './Transform';
 import {Vector} from './Vector';
 import {stringToText} from './util';
 
@@ -147,6 +148,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     const stringArrays: Record<string, GvasString[]> = {};
     const strings: Record<string, GvasString> = {};
     const rotatorArrays: Record<string, Rotator[]> = {};
+    const transformArrays: Record<string, Transform[]> = {};
     const vectorArrays: Record<string, Vector[]> = {};
     const textArrays: Record<string, GvasText[]> = {};
     const orderLowerCase = railroad._order.map((s) => s.toLowerCase());
@@ -493,6 +495,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         stringArrays,
         strings,
         textArrays,
+        transformArrays,
         vectorArrays,
     };
 }
