@@ -54,6 +54,9 @@ const exportKeys = [
     'PlayerNameArray',
     'PlayerRotationArray',
     'PlayerXPArray',
+    'PropsNameArray',
+    'PropsTextArray',
+    'PropsTransformArray',
     'RegulatorValueArray',
     'RemovedVegetationAssetsArray',
     'ReverserValueArray',
@@ -318,6 +321,15 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'playerxparray':
                 intArrays[propertyName] = railroad.players.map((p) => p.xp);
                 break;
+            case 'propsnamearray':
+                stringArrays[propertyName] = railroad.props.map((p) => p.name);
+                break;
+            case 'propstextarray':
+                textArrays[propertyName] = railroad.props.map((p) => p.text);
+                break;
+            case 'propstransformarray':
+                transformArrays[propertyName] = railroad.props.map((p) => p.transform);
+                break;
             case 'regulatorvaluearray':
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.regulatorValue);
                 break;
@@ -550,6 +562,9 @@ function propertyType(propertyName: string): GvasTypes {
         // case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
         // case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
+        // case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
+        // case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
+        // case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
         case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
         // case 'removedvegetationassetsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'reverservaluearray': return ['ArrayProperty', 'FloatProperty'];
@@ -786,30 +801,27 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
     } else if (structType === 'Rotator') {
         structs = gvas.rotatorArrays[propertyName] || [];
         structSize = largeWorldCoords ? 24 : 12;
+    } else if (structType === 'Transform') {
+        structs = gvas.transformArrays[propertyName] || [];
+        structSize = largeWorldCoords ? 293 : 253;
     } else {
         throw new Error('Unexpected structType: ' + structType);
     }
+    // Omit empty properties
     if (structs.length === 0) return;
-    // struct_array:
-    //   seq:
-    //     - id: entry_count
-    //       type: u4
+    // (u32) entry count
     data.push(new Uint32Array([structs.length]));
-    //     - id: property_name
-    //       type: string
+    // (str) property name
     data.push(stringToBlob(propertyName));
-    //     - id: struct_property
-    //       contents: [15, 0, 0, 0, "StructProperty", 0]
+    // (str) StructProperty
     data.push(stringToBlob('StructProperty'));
-    //     - id: field_size
-    //       type: u8
+    // (u64) length
     const fieldSize = structs.length * structSize;
     data.push(new Uint32Array([fieldSize, 0]));
-    //     - id: field_name
-    //       type: string
+    // (str) data type
     data.push(stringToBlob(structType));
-    //     - id: reserved
-    //       size: 17
+    // (u128) guid
+    // (u8) terminator
     data.push(new Uint8Array(17));
     //     - id: data
     //       size: field_size / entry_count
@@ -825,13 +837,42 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
         if (structType === 'Vector') {
             const v = struct as Vector;
             floats = [v.x, v.y, v.z];
+            data.push(new (largeWorldCoords ? Float64Array : Float32Array)(floats));
+        } else if (structType === 'Transform') {
+            const t = struct as Transform;
+            // Rotation
+            data.push(stringToBlob('Rotation'));
+            data.push(stringToBlob('StructProperty'));
+            data.push(new Uint32Array([largeWorldCoords ? 32 : 16, 0]));
+            data.push(stringToBlob('Quat'));
+            data.push(new Uint8Array(17)); // guid, terminator
+            data.push(new (largeWorldCoords ? Float64Array : Float32Array)([
+                t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w]));
+            // Translation
+            data.push(stringToBlob('Translation'));
+            data.push(stringToBlob('StructProperty'));
+            data.push(new Uint32Array([largeWorldCoords ? 24 : 12, 0]));
+            data.push(stringToBlob('Vector'));
+            data.push(new Uint8Array(17)); // guid, terminator
+            data.push(new (largeWorldCoords ? Float64Array : Float32Array)([
+                t.translation.x, t.translation.y, t.translation.z]));
+            // Scale3D
+            data.push(stringToBlob('Scale3D'));
+            data.push(stringToBlob('StructProperty'));
+            data.push(new Uint32Array([largeWorldCoords ? 24 : 12, 0]));
+            data.push(stringToBlob('Vector'));
+            data.push(new Uint8Array(17)); // guid, terminator
+            data.push(new (largeWorldCoords ? Float64Array : Float32Array)([
+                t.scale3d.x, t.scale3d.y, t.scale3d.z]));
+            // End of properties list
+            data.push(stringToBlob('None'));
         } else if (structType === 'Rotator') {
             const r = struct as Rotator;
             floats = [r.pitch, r.yaw, r.roll];
+            data.push(new (largeWorldCoords ? Float64Array : Float32Array)(floats));
         } else {
             throw new Error(structType);
         }
-        data.push(new (largeWorldCoords ? Float64Array : Float32Array)(floats));
     }
     return new Blob(data);
 }

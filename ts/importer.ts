@@ -3,6 +3,7 @@ import {
     Frame,
     Industry,
     Player,
+    Prop,
     Railroad,
     Sandhouse,
     Spline,
@@ -251,6 +252,25 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             players.push(player);
         }
     }
+    // Read props
+    const props: Prop[] = [];
+    const propNames = optionalMap(gvas.stringArrays, 'PropsNameArray');
+    const propTransforms = optionalMap(gvas.transformArrays, 'PropsTransformArray');
+    const propText = optionalMap(gvas.textArrays, 'PropsTextArray');
+    if (propNames || propTransforms || propText) {
+        if (!propNames || !propTransforms || !propText) {
+            throw new Error('Some prop values are missing');
+        }
+        enforceEqualLengths([propNames, propTransforms, propText]);
+        for (let i = 0; i < propNames.length; i++) {
+            const prop: Prop = {
+                name: propNames[i],
+                transform: propTransforms[i],
+                text: propText[i],
+            };
+            props.push(prop);
+        }
+    }
     // Read sandhouses
     const sandhouses: Sandhouse[] = [];
     const sandhouseLocation = optionalMap(gvas.vectorArrays, 'SandhouseLocationArray');
@@ -469,6 +489,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         frames,
         industries,
         players,
+        props,
         removedVegetationAssets,
         sandhouses,
         saveGame,
