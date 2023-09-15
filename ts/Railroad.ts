@@ -1,6 +1,7 @@
-import {GvasHeader, GvasString, GvasTypes} from './Gvas';
+import {GvasHeader, GvasString, GvasText, GvasTypes} from './Gvas';
 import {IndustryType} from './IndustryType';
 import {Rotator} from './Rotator';
+import {Transform} from './Transform';
 import {Vector} from './Vector';
 
 /**
@@ -15,6 +16,7 @@ export interface Railroad {
     frames: Frame[];
     industries: Industry[];
     players: Player[];
+    props: Prop[];
     removedVegetationAssets: Vector[];
     sandhouses: Sandhouse[];
     saveGame: {
@@ -99,6 +101,12 @@ export interface Player {
     rotation?: number;
     money: number;
     xp: number;
+}
+
+export interface Prop {
+    name: GvasString;
+    text: GvasText;
+    transform: Transform;
 }
 
 export interface Sandhouse {

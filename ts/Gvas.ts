@@ -1,4 +1,5 @@
 import {Rotator} from './Rotator';
+import {Transform} from './Transform';
 import {Vector} from './Vector';
 
 /**
@@ -19,6 +20,7 @@ export interface Gvas {
     strings: Record<string, GvasString>;
     vectorArrays: Record<string, Vector[]>;
     rotatorArrays: Record<string, Rotator[]>;
+    transformArrays: Record<string, Transform[]>;
     textArrays: Record<string, GvasText[]>;
 }
 
@@ -28,14 +30,18 @@ export type GvasTypes =
     | ['FloatProperty']
     | ['IntProperty']
     | ['StrProperty']
+    | ['StructProperty', 'Quat']
+    | ['StructProperty', 'Vector']
     | ['ArrayProperty', 'BoolProperty']
     | ['ArrayProperty', 'ByteProperty']
     | ['ArrayProperty', 'FloatProperty']
     | ['ArrayProperty', 'IntProperty']
     | ['ArrayProperty', 'StrProperty']
     | ['ArrayProperty', 'StructProperty', 'Rotator']
+    | ['ArrayProperty', 'StructProperty', 'Transform']
     | ['ArrayProperty', 'StructProperty', 'Vector']
-    | ['ArrayProperty', 'TextProperty'];
+    | ['ArrayProperty', 'TextProperty']
+    ;
 
 export type GvasString = string | null;
 

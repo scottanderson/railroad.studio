@@ -9,7 +9,9 @@ import {
     RichTextFormat,
     gvasToString,
 } from './Gvas';
+import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
+import {Transform} from './Transform';
 import {Vector} from './Vector';
 
 /**
@@ -85,6 +87,7 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         stringArrays: {},
         strings: {},
         textArrays: {},
+        transformArrays: {},
         vectorArrays: {},
     };
     const largeWorldCoords = (gvasVersion === 3);
@@ -123,6 +126,33 @@ function parseEngineVersion(buffer: ArrayBuffer, pos: number): [number, EngineVe
     return [pos, engineVersion];
 }
 
+function parseQuat(
+    buffer: ArrayBuffer,
+    pos: number,
+    largeWorldCoords: boolean,
+): [number, Quaternion] {
+    const structSize = largeWorldCoords ? 32 : 16;
+    const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
+    const [x, y, z, w] = values;
+    const result = {x, y, z, w};
+    return [pos + structSize, result];
+}
+
+function parseRotator(
+    buffer: ArrayBuffer,
+    pos: number,
+    largeWorldCoords: boolean,
+): [number, Rotator] {
+    const structSize = largeWorldCoords ? 24 : 12;
+    const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
+    const result: Rotator = ({
+        pitch: values[0], // y (need to confirm)
+        yaw: values[1], // Rotation around the Z axis
+        roll: values[2], // x (need to confirm)
+    });
+    return [pos + structSize, result];
+}
+
 function parseString(buffer: ArrayBuffer, start: number): [number, GvasString] {
     const pos = start + 4;
     const size = new Int32Array(buffer.slice(start, pos))[0];
@@ -146,6 +176,21 @@ function parseString(buffer: ArrayBuffer, start: number): [number, GvasString] {
     } else {
         throw new Error(`Unexpected size ${size}`);
     }
+}
+
+function parseVector(
+    buffer: ArrayBuffer,
+    pos: number,
+    largeWorldCoords: boolean,
+): [number, Vector] {
+    const structSize = largeWorldCoords ? 24 : 12;
+    const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
+    const result: Vector = ({
+        x: values[0], // East (need to confirm)
+        y: values[1], // North (need to confirm)
+        z: values[2], // Altitude
+    });
+    return [pos + structSize, result];
 }
 
 function parseProperty(
@@ -201,8 +246,11 @@ function parseProperty(
     } else if (read[4] === 'Rotator') {
         ptype = [read[2], read[3], read[4]];
         target.rotatorArrays[pname] = read[5];
+    } else if (read[4] === 'Transform') {
+        ptype = [read[2], read[3], read[4]];
+        target.transformArrays[pname] = read[5];
     } else {
-        throw new Error(`Unhandled StructProperty type: ${read[4]}`);
+        throw new Error(`Unexpected StructProperty type: ${read[4]}`);
     }
     target._types[pname] = ptype;
     return [pos, pname, ptype];
@@ -214,12 +262,15 @@ type ParsePropertyReturnType = (
     | [number, GvasString, 'FloatProperty', number]
     | [number, GvasString, 'IntProperty', number]
     | [number, GvasString, 'StrProperty', GvasString]
+    | [number, GvasString, 'StructProperty', 'Quat', Quaternion]
+    | [number, GvasString, 'StructProperty', 'Vector', Vector]
     | [number, GvasString, 'ArrayProperty', 'BoolProperty', boolean[]]
     | [number, GvasString, 'ArrayProperty', 'ByteProperty', number[]]
     | [number, GvasString, 'ArrayProperty', 'FloatProperty', number[]]
     | [number, GvasString, 'ArrayProperty', 'IntProperty', number[]]
     | [number, GvasString, 'ArrayProperty', 'StrProperty', GvasString[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Rotator', Rotator[]]
+    | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Transform', Transform[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Vector', Vector[]]
     | [number, GvasString, 'ArrayProperty', 'TextProperty', GvasText[]]
 );
@@ -228,10 +279,14 @@ function readProperty(
     b: ArrayBuffer,
     pos: number,
     largeWorldCoords: boolean,
+    earlyExit = false,
 ): ParsePropertyReturnType {
     // pname
     let pname;
     [pos, pname] = parseString(b, pos);
+    if (earlyExit && (!pname || pname === 'None')) {
+        return [pos, pname];
+    }
     // ptype
     let ptype: GvasString;
     [pos, ptype] = parseString(b, pos);
@@ -244,13 +299,12 @@ function readProperty(
     if (qword[1] !== 0) throw new Error(`plen too large: ${qword}`);
     const plen = qword[0];
     pos += 8;
-    // arrays only: dtype
+    // ArrayProperty and StructProperty: dtype
     let dtype = null;
-    const isArray = (ptype === 'ArrayProperty');
-    if (isArray) {
+    if (ptype === 'ArrayProperty' || ptype === 'StructProperty') {
         [pos, dtype] = parseString(b, pos);
     }
-    // bool only: value
+    // BoolProperty: value
     if (ptype === 'BoolProperty') {
         if (plen !== 0) throw new Error(`BoolProperty length !== 0, ${plen}`);
         const c = new Uint8Array(b, pos, 1)[0];
@@ -263,6 +317,12 @@ function readProperty(
         // Bail early because plen is zero
         return [pos, pname, ptype, (c !== 0)];
     }
+    // StructProperty: guid
+    if (ptype === 'StructProperty') {
+        const guid = new Uint8Array(b, pos, 16);
+        if (guid.some((v) => v !== 0)) throw new Error(`guid !== 0, ${guid}`);
+        pos += 16;
+    }
     // terminator
     const terminator = new Uint8Array(b, pos, 1)[0];
     if (terminator !== 0) throw new Error(`terminator !== 0, ${terminator}`);
@@ -271,13 +331,27 @@ function readProperty(
     const pdata = b.slice(pos, pos + plen);
     pos += plen;
     if (ptype === 'StrProperty') {
-        return [pos, pname, ptype, parseString(pdata, 0)[1]];
+        const [len, result] = parseString(pdata, 0);
+        if (plen !== len) throw new Error(`String length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, result];
     } else if (ptype === 'FloatProperty') {
         if (plen !== 4) throw new Error(`FloatProperty length !== 4, ${plen}, ${pdata}`);
         return [pos, pname, ptype, new Float32Array(pdata)[0]];
     } else if (ptype === 'IntProperty') {
         if (plen !== 4) throw new Error(`IntProperty length !== 4, ${plen}, ${pdata}`);
         return [pos, pname, ptype, new Uint32Array(pdata)[0]];
+    } else if (ptype === 'StructProperty') {
+        if (dtype === 'Quat') {
+            const [len, result] = parseQuat(pdata, 0, largeWorldCoords);
+            if (plen !== len) throw new Error(`Quat length !== ${len}, ${plen}, ${pdata}`);
+            return [pos, pname, ptype, dtype, result];
+        } else if (dtype === 'Vector') {
+            const [len, result] = parseVector(pdata, 0, largeWorldCoords);
+            if (plen !== len) throw new Error(`Vector length !== ${len}, ${plen}, ${pdata}`);
+            return [pos, pname, ptype, dtype, result];
+        } else {
+            throw new Error(`Not yet implemented StructProperty:${dtype}`);
+        }
     } else if (ptype !== 'ArrayProperty') {
         throw new Error(`property type for '${pname}' is not implemented ('${ptype}')`);
     } else if (dtype === 'StructProperty') {
@@ -286,19 +360,31 @@ function readProperty(
             return [pos, pname, ptype, dtype, stype, sdata];
         } else if (stype === 'Vector') {
             return [pos, pname, ptype, dtype, stype, sdata];
+        } else if (stype === 'Transform') {
+            return [pos, pname, ptype, dtype, stype, sdata];
         } else {
             throw new Error(gvasToString(stype));
         }
     } else if (dtype === 'BoolProperty') {
-        return [pos, pname, ptype, dtype, parseBoolArray(pdata)];
+        const [len, result] = parseBoolArray(pdata);
+        if (plen !== len) throw new Error(`BoolProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'IntProperty') {
-        return [pos, pname, ptype, dtype, parseIntArray(pdata)];
+        const [len, result] = parseIntArray(pdata);
+        if (plen !== len) throw new Error(`IntProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'FloatProperty') {
-        return [pos, pname, ptype, dtype, parseFloatArray(pdata)];
+        const [len, result] = parseFloatArray(pdata);
+        if (plen !== len) throw new Error(`FloatProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'StrProperty') {
-        return [pos, pname, ptype, dtype, parseStringArray(pdata)];
+        const [len, result] = parseStringArray(pdata);
+        if (plen !== len) throw new Error(`StrProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'TextProperty') {
-        return [pos, pname, ptype, dtype, parseTextArray(pdata)];
+        const [len, result] = parseTextArray(pdata);
+        if (plen !== len) throw new Error(`TextProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'ByteProperty') {
         return [pos, pname, ptype, dtype, [...new Uint8Array(pdata)]];
     } else {
@@ -306,22 +392,22 @@ function readProperty(
     }
 }
 
-function parseBoolArray(buffer: ArrayBuffer) {
+function parseBoolArray(buffer: ArrayBuffer): [number, boolean[]] {
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
     const uint8View = new Uint8Array(buffer, 4, entryCount);
-    return [...uint8View].map(Boolean);
+    return [4 + entryCount, [...uint8View].map(Boolean)];
 }
 
-function parseIntArray(buffer: ArrayBuffer) {
+function parseIntArray(buffer: ArrayBuffer): [number, number[]] {
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
     const int32View = new Int32Array(buffer, 4, entryCount);
-    return [...int32View];
+    return [4 + (entryCount * 4), [...int32View]];
 }
 
-function parseFloatArray(buffer: ArrayBuffer) {
+function parseFloatArray(buffer: ArrayBuffer): [number, number[]] {
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
     const floatView = new Float32Array(buffer, 4, entryCount);
-    return [...floatView];
+    return [4 + (entryCount * 4), [...floatView]];
 }
 
 /**
@@ -329,7 +415,7 @@ function parseFloatArray(buffer: ArrayBuffer) {
  * @param {ArrayBuffer} buffer
  * @return {GvasString[]}
  */
-function parseStringArray(buffer: ArrayBuffer): GvasString[] {
+function parseStringArray(buffer: ArrayBuffer): [number, GvasString[]] {
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
     let pos = 4;
     const value = [];
@@ -338,12 +424,14 @@ function parseStringArray(buffer: ArrayBuffer): GvasString[] {
         [pos, str] = parseString(buffer, pos);
         value.push(str);
     }
-    return value;
+    return [pos, value];
 }
 
 type ParseStructArrayReturnType =
     | ['Rotator', Rotator[]]
-    | ['Vector', Vector[]];
+    | ['Transform', Transform[]]
+    | ['Vector', Vector[]]
+    ;
 
 /**
  * Parse a struct array from a buffer.
@@ -382,10 +470,6 @@ function parseStructArray(
     if (fieldSize[1] !== 0) {
         throw new Error(`field_size too large: ${fieldSize[1]}`);
     }
-    const structSize = largeWorldCoords ? 24 : 12;
-    if (fieldSize[0] !== structSize * entryCount) {
-        throw new Error(`field_size !== ${structSize} * entryCount: ${fieldSize}, ${entryCount}`);
-    }
     // - id: field_name
     //   type: string
     let fieldName;
@@ -407,24 +491,70 @@ function parseStructArray(
     //   repeat: expr
     //   repeat-expr: entryCount
     const value = [];
-    for (let i = 0; i < entryCount; i++) {
-        const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
-        pos += structSize;
-        if (fieldName === 'Rotator') {
-            value.push({
-                pitch: values[0], // y (need to confirm)
-                yaw: values[1], // Rotation around the Z axis
-                roll: values[2], // x (need to confirm)
-            });
-        } else if (fieldName === 'Vector') {
-            value.push({
-                x: values[0], // East (need to confirm)
-                y: values[1], // North (need to confirm)
-                z: values[2], // Altitude
-            });
-        } else {
-            throw new Error(`Unknown field_name: ${fieldName}`);
+    const startPos = pos;
+    if (fieldName === 'Rotator') {
+        for (let i = 0; i < entryCount; i++) {
+            let result;
+            [pos, result] = parseRotator(buffer, pos, largeWorldCoords);
+            value.push(result);
         }
+    } else if (fieldName === 'Vector') {
+        for (let i = 0; i < entryCount; i++) {
+            let result;
+            [pos, result] = parseVector(buffer, pos, largeWorldCoords);
+            value.push(result);
+        }
+    } else if (fieldName === 'Transform') {
+        console.log(`Reading ${entryCount} Transforms...`);
+        for (let i = 0; i < entryCount; i++) {
+            let translation: Vector | undefined;
+            let rotation: Quaternion | undefined;
+            let scale3d: Vector | undefined;
+            // Read transform property array.
+            while (true) {
+                const property = readProperty(buffer, pos, largeWorldCoords, true);
+                let pname;
+                [pos, pname] = property;
+                if (!pname || pname === 'None' || property.length === 2) {
+                    // End of property list
+                    break;
+                } else if (
+                    property.length === 5 &&
+                    property[2] === 'StructProperty' &&
+                    property[3] === 'Quat'
+                ) {
+                    if (pname === 'Rotation') {
+                        rotation = property[4];
+                    } else {
+                        throw new Error(`Unexpected Quat ${pname}`);
+                    }
+                } else if (
+                    property.length === 5 &&
+                    property[2] === 'StructProperty' &&
+                    property[3] === 'Vector'
+                ) {
+                    if (pname === 'Translation') {
+                        translation = property[4];
+                    } else if (pname === 'Scale3D') {
+                        scale3d = property[4];
+                    } else {
+                        throw new Error(`Unexpected Vector ${pname}`);
+                    }
+                } else {
+                    throw new Error(`Unsupported Transform property type ${property}`);
+                }
+            }
+            if (!translation) throw new Error('Did not find translation');
+            if (!rotation) throw new Error('Did not find translation');
+            if (!scale3d) throw new Error('Did not find translation');
+            const transform: Transform = {translation, rotation, scale3d};
+            value.push(transform);
+        }
+    } else {
+        throw new Error(`Unknown field_name: ${fieldName}`);
+    }
+    if (fieldSize[0] !== pos - startPos) {
+        console.error(`field_size !== pos - startPos: ${fieldSize}, ${pos}, ${startPos}`);
     }
     if (pos > buffer.byteLength) {
         throw new Error(
@@ -439,6 +569,8 @@ function parseStructArray(
         return [fieldName, value as Vector[]];
     } else if (fieldName === 'Rotator') {
         return [fieldName, value as Rotator[]];
+    } else if (fieldName === 'Transform') {
+        return [fieldName, value as Transform[]];
     } else {
         throw new Error();
     }
@@ -449,7 +581,7 @@ function parseStructArray(
  * @param {ArrayBuffer} buffer
  * @return {GvasText[]}
  */
-function parseTextArray(buffer: ArrayBuffer): GvasText[] {
+function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
     // text_array:
     //   seq:
     //     - id: entry_count
@@ -590,5 +722,5 @@ function parseTextArray(buffer: ArrayBuffer): GvasText[] {
             throw new Error(`Unknown componentType: ${componentType}`);
         }
     }
-    return array;
+    return [pos, array];
 }
