@@ -562,9 +562,9 @@ function propertyType(propertyName: string): GvasTypes {
         // case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
         // case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
-        // case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
-        // case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
-        // case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
+        case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
+        case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
         case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
         // case 'removedvegetationassetsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'reverservaluearray': return ['ArrayProperty', 'FloatProperty'];
