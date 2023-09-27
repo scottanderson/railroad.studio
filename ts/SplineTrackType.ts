@@ -5,6 +5,7 @@ export enum SplineTrackType {
     BALLAST_H05 = 'ballast_h05',
     BALLAST_H10 = 'ballast_h10',
     RAIL_914 = 'rail_914',
+    RAIL_914_BRIDGE_TRUSS = 'rail_914_bridge_truss',
     RAIL_914_BUMPER = 'rail_914_bumper',
     RAIL_914_H01 = 'rail_914_h01',
     RAIL_914_H05 = 'rail_914_h05',
