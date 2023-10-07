@@ -1,6 +1,6 @@
 import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
-import {GvasString, gvasToString} from './Gvas';
+import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryType, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
 import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
@@ -42,6 +42,7 @@ import {clamp} from './math';
 import {toggleDarkMode} from './themes';
 import {catmullRomToHermite} from './util-catmullrom';
 import {Quaternion} from './Quaternion';
+import {textToString} from './util';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 230403;
@@ -239,8 +240,8 @@ export class Studio {
             const imgFrame = document.createElement('i');
             const text =
                 (isFrameType(frame.type) ? frameDefinitions[frame.type].name + ' ' : '') +
-                (frame.number ? '#' + gvasToString(frame.number) + ' ' : '') +
-                (frame.name ? gvasToString(frame.name) : '');
+                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
+                (frame.name ? gvasToString(textToString(frame.name)) : '');
             const txtFrame = document.createTextNode(` ${text} `);
             imgFrame.classList.add('bi', 'bi-geo');
             btnFrame.classList.add('dropdown-item', 'text-nowrap');
@@ -922,13 +923,13 @@ export class Studio {
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
-            const setFrameName = (name: GvasString) => frame.name = name;
-            td.appendChild(editString(this, frame.name, setFrameName));
+            const setFrameName = (name: GvasText) => frame.name = name;
+            td.appendChild(editText(this, frame.name, setFrameName));
             tr.appendChild(td);
             // Number
             td = document.createElement('td');
-            const setFrameNumber = (frameNo: GvasString) => frame.number = frameNo;
-            td.appendChild(editString(this, frame.number, setFrameNumber));
+            const setFrameNumber = (frameNo: GvasText) => frame.number = frameNo;
+            td.appendChild(editText(this, frame.number, setFrameNumber));
             tr.appendChild(td);
             // State table
             td = document.createElement('td');

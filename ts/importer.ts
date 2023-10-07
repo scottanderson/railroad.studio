@@ -13,7 +13,6 @@ import {
     Vegeation,
     Watertower,
 } from './Railroad';
-import {textToString} from './util';
 
 /**
  * Converts a Gvas object, which represents the contents of a GVAS file, into a
@@ -33,9 +32,7 @@ import {textToString} from './util';
  * as the player, industries, and splines.
  *
  * The function also makes use of several helper functions, such as optionalMap,
- * which is used to retrieve a property from the Gvas object if it exists, and
- * textToString, which is used to convert a GvasText object (a special type of
- * string used in GVAS files) into a regular string.
+ * which is used to retrieve a property from the Gvas object if it exists.
  * @param {Gvas} gvas
  * @return {Railroad}
  */
@@ -143,8 +140,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         for (let i = 0; i < frameLocation.length; i++) {
             const frame: Frame = {
                 location: frameLocation[i],
-                name: textToString(frameName[i]),
-                number: textToString(frameNumber[i]),
+                name: frameName[i],
+                number: frameNumber[i],
                 rotation: frameRotation[i],
                 type: frameType[i],
                 state: {

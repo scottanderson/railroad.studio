@@ -4,7 +4,6 @@ import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
-import {stringToText} from './util';
 
 const exportKeys = [
     'AnimateTimeOfDay',
@@ -216,10 +215,10 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 vectorArrays[propertyName] = railroad.frames.map((f) => f.location);
                 break;
             case 'framenamearray':
-                textArrays[propertyName] = railroad.frames.map((f) => stringToText(f.name));
+                textArrays[propertyName] = railroad.frames.map((f) => f.name);
                 break;
             case 'framenumberarray':
-                textArrays[propertyName] = railroad.frames.map((f) => stringToText(f.number));
+                textArrays[propertyName] = railroad.frames.map((f) => f.number);
                 break;
             case 'framerotationarray':
                 rotatorArrays[propertyName] = railroad.frames.map((f) => f.rotation);

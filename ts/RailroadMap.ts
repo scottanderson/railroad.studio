@@ -41,7 +41,7 @@ import {localToWorld} from './HasLocationRotation';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
-import {unknownProperty} from './util';
+import {textToString, unknownProperty} from './util';
 
 enum MapToolMode {
     pan_zoom,
@@ -782,8 +782,8 @@ export class RailroadMap {
         // Tooltip
         const tooltipText = [
             definition.name,
-            frame.name,
-            frame.number,
+            textToString(frame.name),
+            textToString(frame.number),
             cargoText(frame)]
             .filter(Boolean)
             .map(gvasToString)
@@ -795,7 +795,7 @@ export class RailroadMap {
         const frameText = frame.number;
         if (frameText) {
             const text = g
-                .text(gvasToString(frameText))
+                .text(gvasToString(textToString(frameText)))
                 .attr('transform', `rotate(180) translate(${dx} 90)`)
                 .addClass('frame-text');
             if (definition.engine) {
