@@ -153,6 +153,9 @@ export class RailroadMap {
         this.svg = new Svg()
             .addClass('map-svg')
             .addTo(element);
+        if (this.railroad.settings.gameLevelName) {
+            this.layerVisibility.background = false;
+        }
         this.layers = this.createLayers();
         this.render();
         this.panZoom = this.initPanZoom();
