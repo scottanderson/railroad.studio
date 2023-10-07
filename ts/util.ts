@@ -1,4 +1,5 @@
 import {GvasString, GvasText} from './Gvas';
+import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
 
@@ -13,6 +14,11 @@ export function fp32(n: number): number {
     const float = new Float32Array(1);
     float[0] = n;
     return float[0];
+}
+
+export function fp32q(q: Quaternion): Quaternion {
+    const [x, y, z, w] = new Float32Array([q.x, q.y, q.z, q.w]);
+    return {x, y, z, w};
 }
 
 export function fp32r(r: Rotator): Rotator {
