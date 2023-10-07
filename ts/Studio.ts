@@ -641,14 +641,30 @@ export class Studio {
         const btnProps = document.createElement('button');
         btnProps.textContent = 'Props';
         btnProps.classList.add('btn', 'btn-secondary');
-        btnProps.addEventListener('click', () => {
+        let propPage = 0;
+        const resetPropPage = () => {
+            const pageSize = 20;
+            const onPage = (page: number): void => {
+                propPage = page;
+                resetPropPage();
+            };
+            const propNav = createPager(propPage, railroad.props.length, onPage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            table.classList.add('table', 'table-striped', 'mb-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
+            if (propNav) {
+                propNav.classList.add('mt-5');
+                content.replaceChildren(propNav, table);
+            } else {
+                table.classList.add('mt-5');
+                content.replaceChildren(table);
+            }
             this.floatHeader(false);
-            this.props(table);
-        });
+            const first = pageSize * propPage;
+            const last = Math.min(railroad.props.length, first + pageSize) - 1;
+            this.props(table, first, last);
+        };
+        btnProps.addEventListener('click', resetPropPage);
         // Spline Tracks
         const btnSplineTracks = document.createElement('button');
         btnSplineTracks.textContent = 'Spline Tracks';
@@ -700,7 +716,10 @@ export class Studio {
         btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnProps, btnDownload, btnDark);
+        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
+        if (railroad.props.length > 0) {
+            buttons.insertBefore(btnProps, btnDownload);
+        }
         if (railroad.splineTracks.length > 0) {
             buttons.insertBefore(btnSplineTracks, btnDownload);
         }
@@ -1169,24 +1188,29 @@ export class Studio {
         }
     }
 
-    private props(table: HTMLTableElement): void {
+    private props(table: HTMLTableElement, first: number, last: number): void {
         this.setTitle('Props');
         const thead = document.createElement('thead');
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Name', 'Text', 'Location', 'Rotation', 'Scale']) {
+        for (const columnHeader of ['ID', 'Name', 'Text', 'Location', 'Rotation', 'Scale']) {
             const th = document.createElement('th');
             th.textContent = columnHeader;
             tr.appendChild(th);
         }
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
-        for (const prop of this.railroad.props) {
+        for (let idx = first; idx <= last; idx++) {
+            const prop = this.railroad.props[idx];
             tr = document.createElement('tr');
             tbody.appendChild(tr);
-            // Name
+            // ID
             let td = document.createElement('td');
+            td.textContent = String(idx);
+            tr.appendChild(td);
+            // Name
+            td = document.createElement('td');
             const setPropName = (name: GvasString): GvasString => prop.name = name;
             td.appendChild(editString(this, prop.name, setPropName));
             tr.appendChild(td);
