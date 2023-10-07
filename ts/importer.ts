@@ -10,6 +10,7 @@ import {
     SplineTrack,
     Switch,
     Turntable,
+    Vegeation,
     Watertower,
 } from './Railroad';
 import {textToString} from './util';
@@ -57,6 +58,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const animateTimeOfDay = optionalMap(gvas.bools, 'AnimateTimeOfDay') ?? undefined;
     const binaryTexture = optionalMap(gvas.byteArrays, 'BinaryTexture') ?? [];
     const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
+    const gameLevelName = optionalMap(gvas.strings, 'GameLevelName');
     const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
     const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
     const weatherTransitionTime = optionalMap(gvas.floats, 'WeatherTransitionTime') ?? undefined;
@@ -65,6 +67,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         animateTimeOfDay,
         binaryTexture,
         dayLength,
+        gameLevelName,
         nightLength,
         timeOfDay,
         weatherTransitionTime,
@@ -335,6 +338,23 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             turntables.push(t);
         }
     }
+    // Read vegetation
+    const vegetation: Vegeation[] = [];
+    const vegetationInstanceIndexArray = optionalMap(gvas.intArrays, 'VegetationInstanceIndexArray');
+    const vegetationIsmCompNameArray = optionalMap(gvas.stringArrays, 'VegetationISMCompNameArray');
+    if (vegetationInstanceIndexArray || vegetationIsmCompNameArray) {
+        if (!vegetationInstanceIndexArray || !vegetationIsmCompNameArray) {
+            throw new Error('Some vegetation values are missing');
+        }
+        enforceEqualLengths([vegetationInstanceIndexArray, vegetationIsmCompNameArray]);
+        for (let i = 0; i < vegetationInstanceIndexArray.length; i++) {
+            const v: Vegeation = {
+                instanceIndex: vegetationInstanceIndexArray[i],
+                ismCompName: vegetationIsmCompNameArray[i],
+            };
+            vegetation.push(v);
+        }
+    }
     // Read watertowers
     const watertowers: Watertower[] = [];
     const watertowerLocation = optionalMap(gvas.vectorArrays, 'WatertowerLocationArray');
@@ -498,6 +518,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         splines,
         switches,
         turntables,
+        vegetation,
         watertowers,
     };
     return railroad;

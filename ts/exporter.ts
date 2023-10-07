@@ -27,6 +27,7 @@ const exportKeys = [
     'FrameTypeArray',
     'FreightAmountArray',
     'FreightTypeArray',
+    'GameLevelName',
     'GeneratorValveValueArray',
     'HeadlightFrontStateArray',
     'HeadlightTypeArray',
@@ -97,6 +98,8 @@ const exportKeys = [
     'TurntableLocationArray',
     'TurntableRotatorArray',
     'TurntableTypeArray',
+    'VegetationISMCompNameArray',
+    'VegetationInstanceIndexArray',
     'WatertowerLocationArray',
     'WatertowerRotationArray',
     'WatertowerTypeArray',
@@ -229,6 +232,9 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 break;
             case 'freighttypearray':
                 stringArrays[propertyName] = railroad.frames.map((f) => f.state.freightType);
+                break;
+            case 'gamelevelname':
+                strings[propertyName] = railroad.settings.gameLevelName;
                 break;
             case 'generatorvalvevaluearray':
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.generatorValveValue);
@@ -466,6 +472,12 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'turntabletypearray':
                 intArrays[propertyName] = railroad.turntables.map((t) => t.type);
                 break;
+            case 'vegetationismcompnamearray':
+                stringArrays[propertyName] = railroad.vegetation.map((v) => v.ismCompName);
+                break;
+            case 'vegetationinstanceindexarray':
+                intArrays[propertyName] = railroad.vegetation.map((v) => v.instanceIndex);
+                break;
             case 'watertowerlocationarray':
                 vectorArrays[propertyName] = railroad.watertowers.map((w) => w.location);
                 break;
@@ -534,6 +546,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'frametypearray': return ['ArrayProperty', 'StrProperty'];
         case 'freightamountarray': return ['ArrayProperty', 'IntProperty'];
         case 'freighttypearray': return ['ArrayProperty', 'StrProperty'];
+        case 'gamelevelname': return ['StrProperty'];
         case 'generatorvalvevaluearray': return ['ArrayProperty', 'FloatProperty'];
         case 'headlightfrontstatearray': return ['ArrayProperty', 'BoolProperty'];
         case 'headlightrearstatearray': return ['ArrayProperty', 'BoolProperty'];
@@ -566,7 +579,7 @@ function propertyType(propertyName: string): GvasTypes {
         case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
         case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
         case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
-        // case 'removedvegetationassetsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'removedvegetationassetsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'reverservaluearray': return ['ArrayProperty', 'FloatProperty'];
         case 'sanderamountarray': return ['ArrayProperty', 'FloatProperty'];
         case 'sandhouselocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
@@ -607,6 +620,8 @@ function propertyType(propertyName: string): GvasTypes {
         case 'turntablelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'turntablerotatorarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'turntabletypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'vegetationismcompnamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'vegetationinstanceindexarray': return ['ArrayProperty', 'IntProperty'];
         case 'watertowerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'watertowerrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'watertowertypearray': return ['ArrayProperty', 'IntProperty'];

@@ -29,6 +29,7 @@ export interface Railroad {
         animateTimeOfDay: boolean | undefined;
         binaryTexture: number[];
         dayLength: number | undefined;
+        gameLevelName: GvasString;
         nightLength: number | undefined;
         timeOfDay: number | undefined;
         weatherType: number | undefined;
@@ -38,6 +39,7 @@ export interface Railroad {
     splines: Spline[];
     switches: Switch[];
     turntables: Turntable[];
+    vegetation: Vegeation[];
     watertowers: Watertower[];
 }
 
@@ -178,6 +180,11 @@ export interface Turntable {
 export enum TurntableType {
     dark = 0,
     light = 1,
+}
+
+export interface Vegeation {
+    instanceIndex: number;
+    ismCompName: GvasString;
 }
 
 export interface Watertower {
