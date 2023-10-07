@@ -1011,6 +1011,7 @@ function stringToBlob(str: GvasString): BlobPart {
 }
 
 function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
+    const notSimple = !Array.isArray(text) && typeof text === 'object';
     // text:
     //   seq:
     //     - id: component_type
@@ -1034,7 +1035,7 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint8Array([255]),
             new Uint32Array([0]),
         ]);
-    } else if (!Array.isArray(text) && typeof text === 'object') {
+    } else if (notSimple && 'pattern' in text) {
         // text_rich:
         //   seq:
         //     - id: flags
@@ -1058,6 +1059,12 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             stringToBlob(text.pattern),
             new Uint32Array([text.textFormat.length]),
             new Blob(text.textFormat.map(rtfToBlob)),
+        ]);
+    } else if (notSimple) {
+        return new Blob([
+            new Uint32Array([8]),
+            new Uint8Array([0]),
+            new Blob([text.unknown, text.guid, text.value].map(stringToBlob)),
         ]);
     } else {
         // text_simple:

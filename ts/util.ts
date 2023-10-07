@@ -43,12 +43,17 @@ export function stringToText(str: GvasString): GvasText {
 
 export function textToString(value: GvasText): GvasString {
     if (value === null) return null;
-    if (!Array.isArray(value) && typeof value === 'object') {
+    const notSimple = !Array.isArray(value) && typeof value === 'object';
+    if (notSimple && 'pattern' in value) {
         // Rich text
         if (value.guid !== RRO_TEXT_GUID) throw new Error(`Unexpected GUID: ${value.guid}`);
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
             (m, i) => value.textFormat[Number(i)].values[0] ?? '');
+    } else if (notSimple) {
+        // Type 8
+        if (value.unknown !== '') throw new Error(`Unexpected unknown value: ${value.unknown}`);
+        return value.value;
     } else {
         // Simple text
         if (0 === value.length) {
