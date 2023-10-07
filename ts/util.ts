@@ -63,7 +63,7 @@ export function textToString(value: GvasText): GvasString {
     } else {
         // Simple text
         if (0 === value.length) {
-            console.log(`Warning: GvasText contains zero-length string array, converting to null`);
+            // console.log(`Warning: GvasText contains zero-length string array, converting to null`);
             return null;
         }
         if (1 !== value.length) throw new Error('Expected single entry in simple GvasText');
