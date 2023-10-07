@@ -1,11 +1,12 @@
-import {GvasString, gvasToString} from './Gvas';
+import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryType, industryName} from './IndustryType';
+import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
 import {Rotator} from './Rotator';
 import {SplineTrackType} from './SplineTrackType';
 import {Studio} from './Studio';
 import {Vector} from './Vector';
-import {fp32r, fp32v} from './util';
+import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 
 export interface InputTextOptions {
     max?: string;
@@ -190,6 +191,14 @@ export function editString(
     return saveContext(studio, form, onSave, onCancel, formatValue);
 }
 
+export function editText(
+    studio: Studio,
+    value: GvasText,
+    saveValue: (value: GvasText) => void,
+) {
+    return editString(studio, textToString(value), (value) => saveValue(stringToText(value)));
+}
+
 export function editNumbers(
     studio: Studio,
     labels: string[],
@@ -255,6 +264,27 @@ export function editIndustryProducts(
         step: '1',
     };
     return editNumbers(studio, labels, values, display, saveValue, options);
+}
+
+export function editQuaternion(
+    studio: Studio,
+    value: Quaternion,
+    saveValue: (value: Quaternion) => Quaternion,
+) {
+    const encode = (v: Quaternion): number[] => [v.x, v.y, v.z, v.w];
+    const decode = (t: number[]): Quaternion => fp32q({x: t[0], y: t[1], z: t[2], w: t[3]});
+    const display = (t: number[]) => {
+        const xZero = t[0] === 0;
+        const yZero = t[1] === 0;
+        const zZero = t[2] === 0;
+        const wZero = t[3] === 0;
+        if (xZero && yZero && zZero && wZero) return '0';
+        if (t.every(Number.isInteger)) return `{${t[0]},${t[1]},${t[2]},${t[3]}}`;
+        return '[Quaternion]';
+    };
+    const labels = ['x', 'y', 'z', 'w'];
+    const save = (t: number[]) => encode(saveValue(decode(t)));
+    return editNumbers(studio, labels, encode(value), display, save);
 }
 
 export function editRotator(

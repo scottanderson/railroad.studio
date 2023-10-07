@@ -13,9 +13,11 @@ import {
     editIndustryProducts,
     editIndustryType,
     editNumber,
+    editQuaternion,
     editRotator,
     editSlider,
     editString,
+    editText,
     editTrackType,
     editVector,
 } from './StudioEditor';
@@ -39,6 +41,7 @@ import {handleError} from './index';
 import {clamp} from './math';
 import {toggleDarkMode} from './themes';
 import {catmullRomToHermite} from './util-catmullrom';
+import {Quaternion} from './Quaternion';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 230403;
@@ -633,6 +636,18 @@ export class Studio {
             this.floatHeader(false);
             this.players(table);
         });
+        // Props
+        const btnProps = document.createElement('button');
+        btnProps.textContent = 'Props';
+        btnProps.classList.add('btn', 'btn-secondary');
+        btnProps.addEventListener('click', () => {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(table);
+            this.floatHeader(false);
+            this.props(table);
+        });
         // Spline Tracks
         const btnSplineTracks = document.createElement('button');
         btnSplineTracks.textContent = 'Spline Tracks';
@@ -684,7 +699,7 @@ export class Studio {
         btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
+        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnProps, btnDownload, btnDark);
         if (railroad.splineTracks.length > 0) {
             buttons.insertBefore(btnSplineTracks, btnDownload);
         }
@@ -1150,6 +1165,49 @@ export class Studio {
                 td.replaceChildren(editNumber(this, player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
                 tr.appendChild(td);
             }
+        }
+    }
+
+    private props(table: HTMLTableElement): void {
+        this.setTitle('Props');
+        const thead = document.createElement('thead');
+        table.appendChild(thead);
+        let tr = document.createElement('tr');
+        thead.appendChild(tr);
+        for (const columnHeader of ['Name', 'Text', 'Location', 'Rotation', 'Scale']) {
+            const th = document.createElement('th');
+            th.textContent = columnHeader;
+            tr.appendChild(th);
+        }
+        const tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        for (const prop of this.railroad.props) {
+            tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            // Name
+            let td = document.createElement('td');
+            const setPropName = (name: GvasString): GvasString => prop.name = name;
+            td.appendChild(editString(this, prop.name, setPropName));
+            tr.appendChild(td);
+            // Text
+            td = document.createElement('td');
+            td.appendChild(editText(this, prop.text, (text) => prop.text = text));
+            tr.appendChild(td);
+            // Location
+            td = document.createElement('td');
+            const setPropLocation = (location: Vector): Vector => prop.transform.translation = location;
+            td.appendChild(editVector(this, prop.transform.translation, setPropLocation));
+            tr.appendChild(td);
+            // Rotation
+            td = document.createElement('td');
+            const setPropRotation = (rotation: Quaternion) => prop.transform.rotation = rotation;
+            td.replaceChildren(editQuaternion(this, prop.transform.rotation, setPropRotation));
+            tr.appendChild(td);
+            // Scale
+            td = document.createElement('td');
+            const setPropScale = (scale: Vector) => prop.transform.scale3d = scale;
+            td.replaceChildren(editVector(this, prop.transform.scale3d, setPropScale));
+            tr.appendChild(td);
         }
     }
 }
