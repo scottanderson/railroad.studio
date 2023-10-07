@@ -5,6 +5,7 @@ import {
     GvasHeader,
     GvasString,
     GvasText,
+    GvasTextType8,
     GvasTypes,
     RichTextFormat,
     gvasToString,
@@ -599,12 +600,15 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
         //     - id: component_type
         //       type: u4
         const componentType = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-        if (componentType < 0 || componentType > 2) throw new Error(`Unexpected component type ${componentType}`);
+        if (![0, 1, 2, 8].includes(componentType)) throw new Error(`Unexpected component type ${componentType}`);
         pos += 4;
         //     - id: indicator
         //       type: u1
         const indicator = new Uint8Array(buffer, pos, 1)[0];
-        if (indicator !== [255, 3, 255][componentType]) throw new Error(`Unexpected component type ${componentType}`);
+        const expectedIndicator = componentType === 1 ? 3 : componentType === 8 ? 0 : 255;
+        if (indicator !== expectedIndicator) {
+            throw new Error(`Unexpected indicator ${indicator} for component type ${componentType}`);
+        }
         pos++;
         //     - id: body
         //       type:
@@ -717,6 +721,15 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 [pos, value] = parseString(buffer, pos);
                 values.push(value);
             }
+            array.push(values);
+        } else if (componentType === 8) {
+            let unknown;
+            let guid;
+            let value;
+            [pos, unknown] = parseString(buffer, pos);
+            [pos, guid] = parseString(buffer, pos);
+            [pos, value] = parseString(buffer, pos);
+            const values: GvasTextType8 = {unknown, guid, value};
             array.push(values);
         } else {
             throw new Error(`Unknown componentType: ${componentType}`);
