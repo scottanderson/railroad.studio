@@ -45,8 +45,8 @@ export interface Railroad {
 
 export interface Frame {
     location: Vector;
-    name: GvasString;
-    number: GvasString;
+    name: GvasText;
+    number: GvasText;
     rotation: Rotator;
     type: GvasString;
     state: FrameState;
