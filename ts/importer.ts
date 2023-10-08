@@ -1,4 +1,5 @@
 import {Gvas} from './Gvas';
+import {IndustryType} from './IndustryType';
 import {
     Frame,
     Industry,
@@ -218,6 +219,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                     industryStorageProduct3[i], industryStorageProduct4[i]],
                 type: industryType[i],
             };
+            if (industry.type > IndustryType.wood_rick) {
+                throw new Error(`Unexpected industry type ${industry.type}`);
+            }
             industries.push(industry);
         }
     }
