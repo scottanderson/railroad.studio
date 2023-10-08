@@ -30,6 +30,7 @@ export enum IndustryType {
     large_engine_house_brown = 41,
     large_engine_house_beige = 42,
     large_engine_house_old = 43,
+    wood_rick = 44,
 }
 
 export const industryName: Record<IndustryType, string> = {
@@ -61,6 +62,7 @@ export const industryName: Record<IndustryType, string> = {
     [IndustryType.large_engine_house_brown]: 'Large Engine House (Brown)',
     [IndustryType.large_engine_house_beige]: 'Large Engine House (Beige)',
     [IndustryType.large_engine_house_old]: 'Large Engine House (Old)',
+    [IndustryType.wood_rick]: 'Wood Rick',
 };
 
 type FourStrings = [string, string, string, string];
@@ -98,6 +100,7 @@ export const industryProductInputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.large_engine_house_brown]: input1234,
     [IndustryType.large_engine_house_beige]: input1234,
     [IndustryType.large_engine_house_old]: input1234,
+    [IndustryType.wood_rick]: input1234,
 };
 
 export const industryProductOutputLabels: Record<IndustryType, FourStrings> = {
@@ -129,6 +132,7 @@ export const industryProductOutputLabels: Record<IndustryType, FourStrings> = {
     [IndustryType.large_engine_house_brown]: output1234,
     [IndustryType.large_engine_house_beige]: output1234,
     [IndustryType.large_engine_house_old]: output1234,
+    [IndustryType.wood_rick]: ['Firewood', 'Firewood', output3, output4],
 };
 
 export const gizmoSvgPaths = {
@@ -313,4 +317,7 @@ export const industrySvgPaths: Record<IndustryType, Record<string, PathArrayAlia
     [IndustryType.large_engine_house_brown]: largeEngineHouse,
     [IndustryType.large_engine_house_beige]: largeEngineHouse,
     [IndustryType.large_engine_house_old]: largeEngineHouse,
+    [IndustryType.wood_rick]: {
+        'building': rect(-130, -65, 260, 130),
+    },
 };
