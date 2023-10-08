@@ -8,6 +8,7 @@ export const frameTypes = [
     'class70',
     'class70_tender',
     'climax',
+    'coach_dsprr_1',
     'cooke260',
     'cooke260_new',
     'cooke260_new_tender',
@@ -26,6 +27,8 @@ export const frameTypes = [
     'handcar',
     'heisler',
     'hopperBB',
+    'lima280',
+    'lima280_tender',
     'montezuma',
     'montezuma_tender',
     'mosca',
@@ -114,6 +117,7 @@ type CategoryFlags = {
 
 export type FrameDefinition = CategoryFlags & {
     length: number,
+    width?: number,
     name: string,
     min?: PRO<keyof NumericFrameState, number>,
     max?: PRO<keyof NumericFrameState, number>,
@@ -273,6 +277,24 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 3,
             tenderFuelAmount: 332,
             tenderWaterAmount: 3000,
+        },
+    },
+
+    'coach_dsprr_1': {
+        passenger: true,
+        length: 1420,
+        width: 300,
+        name: 'Coach DSP&P RR No. 57',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 5,
+            smokestackType: 1,
         },
     },
 
@@ -680,9 +702,50 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         },
     },
 
+    'lima280': {
+        engine: true,
+        length: 1080,
+        name: 'Lima 2-8-0',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 70,
+            boilerPressure: 160,
+            boilerWaterLevel: 5000,
+            boilerWaterTemp: 110,
+            brakeValue: 1,
+            headlightType: 8,
+            paintType: 2,
+            regulatorValue: 1,
+            reverserValue: 1,
+            sanderAmount: 100,
+            smokestackType: 4,
+        },
+    },
+
+    'lima280_tender': {
+        length: 620,
+        name: 'Lima 2-8-0 Tender',
+        tender: true,
+        min: {
+            paintType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            paintType: 2,
+            tenderFuelAmount: 5400,
+            tenderWaterAmount: 9000,
+        },
+    },
+
     'montezuma': {
         engine: true,
-        length: 680,
+        length: 580,
         name: 'Montezuma',
         min: {
             headlightType: 1,
@@ -772,7 +835,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_boxcar': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'EWA Plantation Box Car',
         min: {
             headlightType: 1,
@@ -789,7 +852,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_flatcar': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Cane Flat',
         min: {
             headlightType: 1,
@@ -806,7 +869,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_flatcar_logs': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Logging Flat',
         min: {
             headlightType: 1,
@@ -823,7 +886,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_flatcar_stakes': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Stake Flat',
         min: {
             headlightType: 1,
@@ -840,7 +903,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_flatcar_stakes_bulkhead': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Bulkhead Flat',
         min: {
             headlightType: 1,
@@ -857,7 +920,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_hopper_large': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Lowside Gondola',
         min: {
             headlightType: 1,
@@ -874,7 +937,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_hopper_medium': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Medium Gondola',
         min: {
             headlightType: 1,
@@ -891,7 +954,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_hopper_small': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Gregg Sugar Cane Highside Gondola',
         min: {
             headlightType: 1,
@@ -908,7 +971,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'plantationcar_tanker': {
         freight: true,
-        length: 331.2,
+        length: 420,
         name: 'Waualua Agricultural Tank Car',
         min: {
             headlightType: 1,
