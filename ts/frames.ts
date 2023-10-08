@@ -1125,7 +1125,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             compressorAirPressure: 100,
             compressorValveValue: 1,
             headlightType: 9,
-            paintType: 5,
+            paintType: 6,
             reverserValue: 1,
             sanderAmount: 100,
             smokestackType: 9,
