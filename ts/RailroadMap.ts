@@ -772,7 +772,7 @@ export class RailroadMap {
             .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
         const f = g
-            .rect(definition.length, 250)
+            .rect(definition.length, definition.width ?? 250)
             .center(0, 0)
             .addClass('frame')
             .addClass(frame.type);
@@ -801,10 +801,10 @@ export class RailroadMap {
             .words(tooltipText);
         // Frame text (number)
         const dx = Math.round(45 - definition.length / 2);
-        const frameText = frame.number;
+        const frameText = textToString(frame.number);
         if (frameText) {
             const text = g
-                .text(gvasToString(textToString(frameText)))
+                .text(gvasToString(frameText))
                 .attr('transform', `rotate(180) translate(${dx} 90)`)
                 .addClass('frame-text');
             if (definition.engine) {
