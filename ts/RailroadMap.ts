@@ -153,9 +153,6 @@ export class RailroadMap {
         this.svg = new Svg()
             .addClass('map-svg')
             .addTo(element);
-        if (this.railroad.settings.gameLevelName) {
-            this.layerVisibility.background = false;
-        }
         this.layers = this.createLayers();
         this.render();
         this.panZoom = this.initPanZoom();
@@ -582,9 +579,18 @@ export class RailroadMap {
     }
 
     private renderBackground(): Element {
+        let image;
+        let transform;
+        if (this.railroad.settings.gameLevelName === 'LakeValley') {
+            image = 'LakeValleyMap2.png';
+            transform = 'matrix(-200,0,0,-200,200000,200000)';
+        } else {
+            image = 'RRO_Pine_Valley_topo_map.png';
+            transform = 'matrix(-116.75,0,0,-116.75,233700,231900)';
+        }
         return this.layers.background
-            .image('RRO_Pine_Valley_topo_map.png')
-            .attr('transform', 'matrix(-116.75,0,0,-116.75,233700,231900)');
+            .image(image)
+            .attr('transform', transform);
     }
 
     private renderBorder(): Element {
@@ -766,7 +772,7 @@ export class RailroadMap {
             .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
         const f = g
-            .rect(definition.length, 250)
+            .rect(definition.length, definition.width ?? 250)
             .center(0, 0)
             .addClass('frame')
             .addClass(frame.type);
@@ -795,10 +801,10 @@ export class RailroadMap {
             .words(tooltipText);
         // Frame text (number)
         const dx = Math.round(45 - definition.length / 2);
-        const frameText = frame.number;
+        const frameText = textToString(frame.number);
         if (frameText) {
             const text = g
-                .text(gvasToString(textToString(frameText)))
+                .text(gvasToString(frameText))
                 .attr('transform', `rotate(180) translate(${dx} 90)`)
                 .addClass('frame-text');
             if (definition.engine) {

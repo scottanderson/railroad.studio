@@ -32,6 +32,7 @@
   --tender: black;
   --handcar: #f9f;
   --caboose: #f99;
+  --coach: gold;
   --waycar: gold;
   --plow: gold;
   --boxcar: #6f9;
@@ -343,6 +344,7 @@ body {
 .frame.waycar { fill: var(--waycar); }
 .frame.boxcar { fill: var(--boxcar); }
 .frame.boxcar.cargo-loaded { fill: var(--boxcar-loaded); }
+.frame.coach_dsprr_1 { fill: var(--coach); }
 .frame.flatcar_cordwood { fill: var(--flatcar-cordwood); }
 .frame.flatcar_cordwood.cargo-loaded { fill: var(--flatcar-cordwood-loaded); }
 .frame.flatcar_hopper { fill: var(--flatcar-hopper); }
