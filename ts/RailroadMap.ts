@@ -5,6 +5,7 @@ import {
     Frame,
     Industry,
     Player,
+    Prop,
     Railroad,
     Spline,
     SplineTrack,
@@ -75,6 +76,7 @@ export interface MapLayers {
     industries: G;
     locator: G;
     players: G;
+    props: G;
     radius: G;
     radiusSwitch: G;
     tracks: G;
@@ -99,6 +101,7 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     industries: true,
     locator: false,
     players: false,
+    props: false,
     radius: false,
     radiusSwitch: false,
     tracks: true,
@@ -293,6 +296,7 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
+        this.railroad.props.forEach(this.renderProp, this);
         this.railroad.turntables.forEach(this.renderTurntable, this);
         this.renderSwitches();
         await this.renderSplines();
@@ -514,6 +518,7 @@ export class RailroadMap {
             groundworksHidden,
             bridges,
             industries,
+            props,
             turntables,
             tracks,
             tracksHidden,
@@ -528,6 +533,7 @@ export class RailroadMap {
             brush,
             locator,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -563,6 +569,7 @@ export class RailroadMap {
             industries,
             locator,
             players,
+            props,
             radius,
             radiusSwitch,
             tracks,
@@ -919,6 +926,16 @@ export class RailroadMap {
             .text(player.name)
             .attr('transform', makeTransform(player.location.x, player.location.y, 180))
             .addClass('player');
+    }
+
+    private renderProp(prop: Prop) {
+        if (!prop.name) return;
+        const string = textToString(prop.text);
+        if (!string) return;
+        return this.layers.props
+            .text(gvasToString(string))
+            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, 180))
+            .addClass('prop');
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {

@@ -150,6 +150,10 @@ export class Studio {
                 name: 'Groundwork and Bridge Hidden Segments',
             },
             {
+                key: 'props',
+                name: 'Props',
+            },
+            {
                 key: 'industries',
                 name: 'Industries',
             },
@@ -183,8 +187,8 @@ export class Studio {
         const hasIndustries = railroad.industries.length > 0;
         const hasPlayers = railroad.players.length > 0;
         const hasProps = railroad.props.length > 0;
-        const hasSplines = railroad.splines.length > 0;
         const hasSplineTracks = railroad.splineTracks.length > 0;
+        const hasSplines = railroad.splines.length > 0;
         const hasTurntables = railroad.turntables.length > 0;
         if (!hasFrames) {
             layers = layers.filter((layer) => layer.key !== 'frames');
@@ -202,6 +206,9 @@ export class Studio {
         }
         if (!hasPlayers) {
             layers = layers.filter((layer) => layer.key !== 'players');
+        }
+        if (!hasProps) {
+            layers = layers.filter((layer) => layer.key !== 'props');
         }
         if (!hasSplines) {
             // Hide layers that only apply to old splines
