@@ -807,12 +807,14 @@ export class RailroadMap {
         f.element('title')
             .words(tooltipText);
         // Frame text (number)
-        const dx = Math.round(45 - definition.length / 2);
         const frameText = textToString(frame.number);
         if (frameText) {
+            const yaw = normalizeAngle(frame.rotation.yaw);
+            const flip = (yaw > -90) && (yaw < 90);
+            const transform = flip ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
             const text = g
                 .text(gvasToString(frameText))
-                .attr('transform', `rotate(180) translate(${dx} 90)`)
+                .attr('transform', transform)
                 .addClass('frame-text');
             if (definition.engine) {
                 text.addClass('engine');
