@@ -29,10 +29,13 @@ export function parallelSpline(spline: Spline, offset: number): [Spline, Spline]
 }
 
 export function parallelSplineTrack(spline: SplineTrack, offset: number): SplineTrack[] {
-    const endOffset = rotateVector(normalizeVector(spline.endTangent, offset), {pitch: 0, yaw: 90, roll: 0});
+    const yaw90 = {pitch: 0, yaw: 90, roll: 0};
+    const endDirXY = {x: spline.endTangent.x, y: spline.endTangent.y, z: 0};
+    const endOffset = rotateVector(normalizeVector(endDirXY, offset), yaw90);
     const endPointD = vectorDifference(spline.endPoint, endOffset);
     const endPointS = vectorSum(spline.endPoint, endOffset);
-    const startOffset = rotateVector(normalizeVector(spline.startTangent, offset), {pitch: 0, yaw: 90, roll: 0});
+    const startDirXY = {x: spline.startTangent.x, y: spline.startTangent.y, z: 0};
+    const startOffset = rotateVector(normalizeVector(startDirXY, offset), yaw90);
     const startPointD = vectorDifference(spline.startPoint, startOffset);
     const startPointS = vectorSum(spline.startPoint, startOffset);
     const {
