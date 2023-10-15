@@ -598,7 +598,6 @@ export class Studio {
             // Enable tools that only work for old splines
             [
                 btnFlattenSpline,
-                btnParallelSpline,
                 grpMinimizeSegments,
             ].forEach((e) => mapButtons.appendChild(e));
         }
@@ -606,6 +605,12 @@ export class Studio {
             // Enable tools that only work for new splines
             [
                 btnCircularizeSpline,
+            ].forEach((e) => mapButtons.appendChild(e));
+        }
+        if (hasSplines || hasSplineTracks) {
+            // Enable tools that work for any splines
+            [
+                btnParallelSpline,
             ].forEach((e) => mapButtons.appendChild(e));
         }
         // Frames

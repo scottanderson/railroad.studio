@@ -24,7 +24,7 @@ import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splin
 import {flattenSpline} from './tool-flatten';
 import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
 import {handleError} from './index';
-import {parallelSpline} from './tool-parallel';
+import {parallelSpline, parallelSplineTrack} from './tool-parallel';
 import {asyncForEach} from './util-async';
 import {
     BezierCurve,
@@ -1557,6 +1557,27 @@ export class RailroadMap {
                 elements.forEach((element) => element.remove());
                 this.renderSplineTrack(spline);
                 break;
+            }
+            case MapToolMode.parallel: {
+                const offset = 3_83; // Length of a diamond
+                const keepSpline = (a: SplineTrack) =>
+                    !this.railroad.splineTracks.some((b) =>
+                        a !== b &&
+                        a.type === b.type &&
+                        [a.startPoint, a.endPoint].every((cp1) =>
+                            [b.startPoint, b.endPoint].some((cp2) => {
+                                const dx = cp2.x - cp1.x;
+                                const dy = cp2.y - cp1.y;
+                                const dz = cp2.z - cp1.z;
+                                const m2 = dx * dx + dy * dy + dz * dz;
+                                return m2 < 1; // Points within 1cm
+                            })));
+                const parallel = parallelSplineTrack(spline, offset).filter(keepSpline);
+                if (parallel.length === 0) return;
+                console.log(...parallel);
+                this.railroad.splineTracks.push(...parallel);
+                this.setMapModified(true);
+                parallel.forEach(this.renderSplineTrack, this);
             }
         }
     }
