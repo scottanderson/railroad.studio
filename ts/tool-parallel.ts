@@ -2,6 +2,7 @@ import {Spline, SplineTrack} from './Railroad';
 import {rotateVector} from './RotationMatrix';
 import {Vector, normalizeVector, vectorDifference, vectorSum} from './Vector';
 import {splineHeading} from './splines';
+import {circularizeCurve} from './tool-circularize';
 
 export function parallelSpline(spline: Spline, offset: number): [Spline, Spline] {
     const mapper = (offset: number) => (cp: Vector, i: number) => {
@@ -34,25 +35,42 @@ export function parallelSplineTrack(spline: SplineTrack, offset: number): Spline
     const startOffset = rotateVector(normalizeVector(spline.startTangent, offset), {pitch: 0, yaw: 90, roll: 0});
     const startPointD = vectorDifference(spline.startPoint, startOffset);
     const startPointS = vectorSum(spline.startPoint, startOffset);
-    // TODO: Refine tangent scale to improve the fit
-    return [{
+    const {
+        startTangent: startTangentD,
+        endTangent: endTangentD,
+    } = circularizeCurve({
         endPoint: endPointD,
         endTangent: spline.endTangent,
+        startPoint: startPointD,
+        startTangent: spline.startTangent,
+    });
+    const {
+        startTangent: startTangentS,
+        endTangent: endTangentS,
+    } = circularizeCurve({
+        endPoint: endPointS,
+        endTangent: spline.endTangent,
+        startPoint: startPointS,
+        startTangent: spline.startTangent,
+    });
+    return [{
+        endPoint: endPointD,
+        endTangent: endTangentD,
         location: startPointD,
         paintStyle: spline.paintStyle,
         rotation: spline.rotation,
         startPoint: startPointD,
-        startTangent: spline.startTangent,
+        startTangent: startTangentD,
         switchState: spline.switchState,
         type: spline.type,
     }, {
         endPoint: endPointS,
-        endTangent: spline.endTangent,
+        endTangent: endTangentS,
         location: startPointS,
         paintStyle: spline.paintStyle,
         rotation: spline.rotation,
         startPoint: startPointS,
-        startTangent: spline.startTangent,
+        startTangent: startTangentS,
         switchState: spline.switchState,
         type: spline.type,
     }];
