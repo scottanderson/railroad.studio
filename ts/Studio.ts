@@ -178,7 +178,32 @@ export class Studio {
                 name: 'Turntables',
             },
         ];
-        if (railroad.splines.length === 0) {
+        // Hide layers that don't apply to the current map
+        const hasFrames = railroad.frames.length > 0;
+        const hasIndustries = railroad.industries.length > 0;
+        const hasPlayers = railroad.players.length > 0;
+        const hasProps = railroad.props.length > 0;
+        const hasSplines = railroad.splines.length > 0;
+        const hasSplineTracks = railroad.splineTracks.length > 0;
+        const hasTurntables = railroad.turntables.length > 0;
+        if (!hasFrames) {
+            layers = layers.filter((layer) => layer.key !== 'frames');
+        }
+        if (!hasIndustries) {
+            // Hide layers that only apply to industries
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'industries':
+                    case 'gizmo':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasPlayers) {
+            layers = layers.filter((layer) => layer.key !== 'players');
+        }
+        if (!hasSplines) {
             // Hide layers that only apply to old splines
             layers = layers.filter((layer) => {
                 switch (layer.key) {
@@ -188,6 +213,37 @@ export class Studio {
                 }
                 return true;
             });
+        }
+        if (!hasSplineTracks) {
+            // Hide layers that only apply to new splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'radiusSwitch':
+                    case 'groundworksHidden':
+                    case 'tracksHidden':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasSplines && !hasSplineTracks) {
+            // Hide layers that only apply to splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'controlPoints':
+                    case 'grades':
+                    case 'radius':
+                    case 'bridges':
+                    case 'groundworks':
+                    case 'tracks':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasTurntables) {
+            // Hide layers that only apply to turntables
+            layers = layers.filter((layer) => layer.key !== 'turntables');
         }
         lstLayers.replaceChildren(...layers.map((layer) => {
             const btnToggleLayer = document.createElement('button');
@@ -531,7 +587,7 @@ export class Studio {
             btnTreeBrush,
             btnDelete,
         );
-        if (railroad.splines.length > 0) {
+        if (hasSplines) {
             // Enable tools that only work for old splines
             [
                 btnFlattenSpline,
@@ -539,7 +595,7 @@ export class Studio {
                 grpMinimizeSegments,
             ].forEach((e) => mapButtons.appendChild(e));
         }
-        if (railroad.splineTracks.length > 0) {
+        if (hasSplineTracks) {
             // Enable tools that only work for new splines
             [
                 btnCircularizeSpline,
@@ -716,11 +772,20 @@ export class Studio {
         btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnMap, btnFrames, btnIndustries, btnPlayers, btnDownload, btnDark);
-        if (railroad.props.length > 0) {
+        buttons.replaceChildren(btnMap, btnDownload, btnDark);
+        if (hasFrames) {
+            buttons.insertBefore(btnFrames, btnDownload);
+        }
+        if (hasIndustries) {
+            buttons.insertBefore(btnIndustries, btnDownload);
+        }
+        if (hasPlayers) {
+            buttons.insertBefore(btnPlayers, btnDownload);
+        }
+        if (hasProps) {
             buttons.insertBefore(btnProps, btnDownload);
         }
-        if (railroad.splineTracks.length > 0) {
+        if (hasSplineTracks) {
             buttons.insertBefore(btnSplineTracks, btnDownload);
         }
         // Studio controls
