@@ -384,7 +384,9 @@ body {
 .frame.plow { fill: var(--plow); }
 
 .frame-text {
+  dominant-baseline: middle;
   font-size: 50%;
+  text-anchor: middle;
 }
 
 .frame-text.engine,

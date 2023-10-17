@@ -5,6 +5,7 @@ import {
     Frame,
     Industry,
     Player,
+    Prop,
     Railroad,
     Spline,
     SplineTrack,
@@ -23,7 +24,7 @@ import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splin
 import {flattenSpline} from './tool-flatten';
 import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
 import {handleError} from './index';
-import {parallelSpline} from './tool-parallel';
+import {parallelSpline, parallelSplineTrack} from './tool-parallel';
 import {asyncForEach} from './util-async';
 import {
     BezierCurve,
@@ -75,6 +76,7 @@ export interface MapLayers {
     industries: G;
     locator: G;
     players: G;
+    props: G;
     radius: G;
     radiusSwitch: G;
     tracks: G;
@@ -99,6 +101,7 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     industries: true,
     locator: false,
     players: false,
+    props: false,
     radius: false,
     radiusSwitch: false,
     tracks: true,
@@ -293,6 +296,7 @@ export class RailroadMap {
         this.railroad.frames.forEach(this.renderFrame, this);
         this.railroad.industries.forEach(this.renderIndustry, this);
         this.railroad.players.forEach(this.renderPlayer, this);
+        this.railroad.props.forEach(this.renderProp, this);
         this.railroad.turntables.forEach(this.renderTurntable, this);
         this.renderSwitches();
         await this.renderSplines();
@@ -514,6 +518,7 @@ export class RailroadMap {
             groundworksHidden,
             bridges,
             industries,
+            props,
             turntables,
             tracks,
             tracksHidden,
@@ -528,6 +533,7 @@ export class RailroadMap {
             brush,
             locator,
         ] = [
+            group.group(),
             group.group(),
             group.group(),
             group.group(),
@@ -563,6 +569,7 @@ export class RailroadMap {
             industries,
             locator,
             players,
+            props,
             radius,
             radiusSwitch,
             tracks,
@@ -800,12 +807,14 @@ export class RailroadMap {
         f.element('title')
             .words(tooltipText);
         // Frame text (number)
-        const dx = Math.round(45 - definition.length / 2);
         const frameText = textToString(frame.number);
         if (frameText) {
+            const yaw = normalizeAngle(frame.rotation.yaw);
+            const flip = (yaw > -90) && (yaw < 90);
+            const transform = flip ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
             const text = g
                 .text(gvasToString(frameText))
-                .attr('transform', `rotate(180) translate(${dx} 90)`)
+                .attr('transform', transform)
                 .addClass('frame-text');
             if (definition.engine) {
                 text.addClass('engine');
@@ -919,6 +928,16 @@ export class RailroadMap {
             .text(player.name)
             .attr('transform', makeTransform(player.location.x, player.location.y, 180))
             .addClass('player');
+    }
+
+    private renderProp(prop: Prop) {
+        if (!prop.name) return;
+        const string = textToString(prop.text);
+        if (!string) return;
+        return this.layers.props
+            .text(gvasToString(string))
+            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, 180))
+            .addClass('prop');
     }
 
     private renderSwitchLeg(sw: Switch, yawOffset: number) {
@@ -1538,6 +1557,27 @@ export class RailroadMap {
                 elements.forEach((element) => element.remove());
                 this.renderSplineTrack(spline);
                 break;
+            }
+            case MapToolMode.parallel: {
+                const offset = 3_83; // Length of a diamond
+                const keepSpline = (a: SplineTrack) =>
+                    !this.railroad.splineTracks.some((b) =>
+                        a !== b &&
+                        a.type === b.type &&
+                        [a.startPoint, a.endPoint].every((cp1) =>
+                            [b.startPoint, b.endPoint].some((cp2) => {
+                                const dx = cp2.x - cp1.x;
+                                const dy = cp2.y - cp1.y;
+                                const dz = cp2.z - cp1.z;
+                                const m2 = dx * dx + dy * dy + dz * dz;
+                                return m2 < 1; // Points within 1cm
+                            })));
+                const parallel = parallelSplineTrack(spline, offset).filter(keepSpline);
+                if (parallel.length === 0) return;
+                console.log(...parallel);
+                this.railroad.splineTracks.push(...parallel);
+                this.setMapModified(true);
+                parallel.forEach(this.renderSplineTrack, this);
             }
         }
     }
