@@ -589,8 +589,10 @@ export class RailroadMap {
         let image;
         let transform;
         if (this.railroad.settings.gameLevelName === 'LakeValley') {
-            image = 'LakeValleyMap2.png';
-            transform = 'matrix(-200,0,0,-200,200000,200000)';
+            image = 'lakeValleyCont.png';
+            transform = 'matrix(-100,0,0,-100,200000,200000)';
+            // image = 'LakeValleyMap2.png';
+            // transform = 'matrix(-200,0,0,-200,200000,200000)';
         } else {
             image = 'RRO_Pine_Valley_topo_map.png';
             transform = 'matrix(-116.75,0,0,-116.75,233700,231900)';
