@@ -1633,8 +1633,7 @@ function treeBucket(tree: Vector) {
 function switchExtraLegsWorld(spline: SplineTrack): BezierCurve[] {
     const extraLegs = switchExtraLegs[spline.type as SplineTrackType] ?? [];
     return extraLegs
-        .map((leg) => localToWorld(spline, leg))
-        .map(hermiteToBezier);
+        .map((leg) => hermiteToBezier(localToWorld(spline, leg)))
 }
 
 function makeTransform(inx: number, iny: number, yaw: number) {
