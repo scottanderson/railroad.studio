@@ -37,7 +37,7 @@ import {
 import {circularizeCurve} from './tool-circularize';
 import {degreesToRadians} from './Rotator';
 import {clamp, lerp} from './math';
-import {SplineTrackType, switchSecondLeg} from './SplineTrackType';
+import {SplineTrackType, switchExtraLegs} from './SplineTrackType';
 import {localToWorld} from './HasLocationRotation';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
@@ -1304,10 +1304,10 @@ export class RailroadMap {
                 makeGradeText();
                 makeRadiusText();
                 break;
-            case 'rail_914_switch_3way_left': // TODO: Render right-diverging leg
-            case 'rail_914_switch_3way_left_noballast': // TODO: Render right-diverging leg
-            case 'rail_914_switch_3way_right': // TODO: Render right-diverging leg
-            case 'rail_914_switch_3way_right_noballast': // TODO: Render right-diverging leg
+            case 'rail_914_switch_3way_left':
+            case 'rail_914_switch_3way_left_noballast':
+            case 'rail_914_switch_3way_right':
+            case 'rail_914_switch_3way_right_noballast':
             case 'rail_914_switch_cross_45':
             case 'rail_914_switch_cross_90':
             case 'rail_914_switch_left':
@@ -1319,20 +1319,23 @@ export class RailroadMap {
             case 'rail_914_switch_right_mirror_noballast':
             case 'rail_914_switch_right_noballast':
             {
-                const secondLeg = switchSecondLegWorld(spline);
-                if (spline.switchState === 0) {
-                    makePath(this.layers.tracks, ['switch-leg', 'not-aligned'], secondLeg);
-                    makePath(this.layers.tracks, ['switch-leg', 'aligned']);
-                } else {
-                    makePath(this.layers.tracks, ['switch-leg', 'not-aligned']);
-                    makePath(this.layers.tracks, ['switch-leg', 'aligned'], secondLeg);
-                }
+                const extraLegs = switchExtraLegsWorld(spline);
+                if (extraLegs.length === 0) throw new Error(`Missing second leg for ${spline.type}`);
+                makePath(this.layers.tracks, ['switch-leg', spline.switchState === 0 ? 'aligned' : 'not-aligned']);
+                extraLegs.forEach((leg, i) => {
+                    const aligned = spline.switchState === (i + 1) ? 'aligned' : 'not-aligned';
+                    makePath(this.layers.tracks, ['switch-leg', aligned], leg);
+                });
                 if (!(spline.type.endsWith('_noballast') || spline.type.includes('_cross_'))) {
                     makePath(this.layers.groundworks, ['grade']);
-                    makePath(this.layers.groundworks, ['grade'], secondLeg);
+                    for (const leg of extraLegs) {
+                        makePath(this.layers.groundworks, ['grade'], leg);
+                    }
                 }
                 makeRadiusText(bezier, this.layers.radiusSwitch);
-                makeRadiusText(secondLeg, this.layers.radiusSwitch);
+                for (const leg of extraLegs) {
+                    makeRadiusText(leg, this.layers.radiusSwitch);
+                }
                 break;
             }
             case 'rail_914_trestle_pile_01':
@@ -1627,11 +1630,10 @@ function treeBucket(tree: Vector) {
     return `trees_${bucketX}_${bucketY}`;
 }
 
-function switchSecondLegWorld(spline: SplineTrack): BezierCurve {
-    const secondLeg = switchSecondLeg[spline.type as SplineTrackType];
-    if (!secondLeg) throw new Error(`Missing second leg for ${spline.type}`);
-    const world = localToWorld(spline, secondLeg);
-    return hermiteToBezier(world);
+function switchExtraLegsWorld(spline: SplineTrack): BezierCurve[] {
+    const extraLegs = switchExtraLegs[spline.type as SplineTrackType] ?? [];
+    return extraLegs
+        .map((leg) => hermiteToBezier(localToWorld(spline, leg)));
 }
 
 function makeTransform(inx: number, iny: number, yaw: number) {
