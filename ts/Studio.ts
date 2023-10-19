@@ -193,6 +193,9 @@ export class Studio {
         if (!hasFrames) {
             layers = layers.filter((layer) => layer.key !== 'frames');
         }
+        if (this.railroad.settings.gameLevelName !== null) {
+            layers = layers.filter((layer) => layer.key !== 'trees');
+        }
         if (!hasIndustries) {
             // Hide layers that only apply to industries
             layers = layers.filter((layer) => {
@@ -589,11 +592,19 @@ export class Studio {
         mapButtons.classList.add('hstack', 'gap-2');
         mapButtons.replaceChildren(
             grpLayers,
-            grpFrameList,
-            grpTrees,
-            btnTreeBrush,
             btnDelete,
         );
+        if (hasFrames) {
+            // Enable tools that work on frames
+            mapButtons.insertBefore(grpFrameList, btnDelete);
+        }
+        if (!this.railroad.settings.gameLevelName) {
+            // Enable tools that only work for Pine Valley
+            [
+                grpTrees,
+                btnTreeBrush,
+            ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
+        }
         if (hasSplines) {
             // Enable tools that only work for old splines
             [
