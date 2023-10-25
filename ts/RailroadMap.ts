@@ -19,7 +19,7 @@ import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
 import {gvasToString} from './Gvas';
-import {Vector, scaleVector, vectorSum, distanceSquared} from './Vector';
+import {Vector, scaleVector, vectorSum, distanceSquared, normalizeVector} from './Vector';
 import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
 import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
@@ -32,13 +32,14 @@ import {
     cubicBezier3,
     cubicBezierLength,
     cubicBezierMinRadius,
+    cubicBezierTangent3,
     hermiteToBezier,
 } from './util-bezier';
-import {circularizeCurve} from './tool-circularize';
-import {degreesToRadians} from './Rotator';
+import {circularizeCurve, goldenSection} from './tool-circularize';
+import {degreesToRadians, radiansToDegrees} from './Rotator';
 import {clamp, lerp} from './math';
 import {SplineTrackType, switchExtraLegs} from './SplineTrackType';
-import {localToWorld} from './HasLocationRotation';
+import {HasLocationRotation, localToWorld} from './HasLocationRotation';
 import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
@@ -51,6 +52,8 @@ enum MapToolMode {
     tree_brush,
     parallel,
     circularize,
+    rerail,
+    duplicate,
 }
 
 interface MapOptions {
@@ -126,6 +129,8 @@ export class RailroadMap {
     private readonly treeUtil: TreeUtil;
     private readonly svg: Svg;
     private panZoom: typeof svgPanZoom;
+    private toolFrame: Frame | undefined;
+    private toolFrameGroup: G | undefined;
     private toolMode: MapToolMode;
     private layers: MapLayers;
     private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
@@ -249,6 +254,26 @@ export class RailroadMap {
             .point(me.clientX, me.clientY)
             .transformO(new Matrix(ctm.inverse()));
         return {x, y};
+    }
+
+    splineWorldLocation(me: MouseEvent, spline: SplineTrack): HasLocationRotation {
+        const {x, y} = this.mouseWorldLocation(me);
+        const clickLocation = {x, y, z: 0};
+        const bezier = hermiteToBezier(spline);
+        const optimizeFunction = (t: number): number => {
+            const point = cubicBezier3(t, bezier);
+            return distanceSquared(clickLocation, point);
+        };
+        const t = goldenSection(0, 1, optimizeFunction);
+        const point = cubicBezier3(t, bezier);
+        const tangent = cubicBezierTangent3(t, bezier);
+        const direction = normalizeVector(tangent);
+        const yaw = radiansToDegrees(Math.atan2(direction.y, direction.x));
+        const pitch = radiansToDegrees(Math.atan2(direction.z,
+            Math.sqrt(direction.x * direction.x + direction.y * direction.y)));
+        const location = vectorSum({x: 0, y: 0, z: 100}, point);
+        const rotation = {yaw, pitch, roll: 0};
+        return {location, rotation};
     }
 
     refresh() {
@@ -409,6 +434,80 @@ export class RailroadMap {
             // Show the tracks layer
             if (!this.layerVisibility.tracks) {
                 this.parallelToolTracksFlag = true;
+                this.toggleLayerVisibility('tracks');
+            }
+            return true;
+        }
+    }
+
+    private rerailToolFramesFlag = false;
+    private rerailToolTracksFlag = false;
+    toggleRerailTool(): boolean {
+        if (this.toolMode === MapToolMode.rerail) {
+            // Disable rerail tool
+            this.toolMode = MapToolMode.pan_zoom;
+            // Hide the frames layer
+            if (this.layerVisibility.frames && this.rerailToolFramesFlag) {
+                this.toggleLayerVisibility('frames');
+            }
+            // Hide the tracks layer
+            if (this.layerVisibility.tracks && this.rerailToolTracksFlag) {
+                this.toggleLayerVisibility('tracks');
+            }
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow rerail tool while another tool is active
+            return false;
+        } else {
+            // Enable rerail tool
+            this.toolFrame = undefined;
+            this.toolFrameGroup = undefined;
+            this.toolMode = MapToolMode.rerail;
+            // Show the frames layer
+            if (!this.layerVisibility.frames) {
+                this.rerailToolFramesFlag = true;
+                this.toggleLayerVisibility('frames');
+            }
+            // Show the tracks layer
+            if (!this.layerVisibility.tracks) {
+                this.rerailToolTracksFlag = true;
+                this.toggleLayerVisibility('tracks');
+            }
+            return true;
+        }
+    }
+
+    private duplicateToolFramesFlag = false;
+    private duplicateToolTracksFlag = false;
+    toggleDuplicateTool(): boolean {
+        if (this.toolMode === MapToolMode.duplicate) {
+            // Disable duplicate tool
+            this.toolMode = MapToolMode.pan_zoom;
+            // Hide the frames layer
+            if (this.layerVisibility.frames && this.duplicateToolFramesFlag) {
+                this.toggleLayerVisibility('frames');
+            }
+            // Hide the tracks layer
+            if (this.layerVisibility.tracks && this.duplicateToolTracksFlag) {
+                this.toggleLayerVisibility('tracks');
+            }
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow duplicate tool while another tool is active
+            return false;
+        } else {
+            // Enable duplicate tool
+            this.toolFrame = undefined;
+            this.toolFrameGroup = undefined;
+            this.toolMode = MapToolMode.duplicate;
+            // Show the frames layer
+            if (!this.layerVisibility.frames) {
+                this.duplicateToolFramesFlag = true;
+                this.toggleLayerVisibility('frames');
+            }
+            // Show the tracks layer
+            if (!this.layerVisibility.tracks) {
+                this.duplicateToolTracksFlag = true;
                 this.toggleLayerVisibility('tracks');
             }
             return true;
@@ -780,9 +879,11 @@ export class RailroadMap {
         const g = this.layers.frames.group()
             .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
+        const onClick = () => this.onClickFrame(frame, g);
         const f = g
             .rect(definition.length, definition.width ?? 250)
             .center(0, 0)
+            .on('click', onClick)
             .addClass('frame')
             .addClass(frame.type);
         if (frame.state.brakeValue > 0) {
@@ -1193,7 +1294,7 @@ export class RailroadMap {
 
     private renderSplineTrack(spline: SplineTrack) {
         const elements: Element[] = [];
-        const clickHandler = () => this.onClickSplineTrack(spline, elements);
+        const clickHandler = (e: Event) => this.onClickSplineTrack(spline, elements, e as PointerEvent);
         const makePath = (group: G, classes: string[], curve: BezierCurve = bezier) => {
             const [a, b, c, d] = curve
                 .map((v) => ({
@@ -1465,6 +1566,22 @@ export class RailroadMap {
         return elements;
     }
 
+    private onClickFrame(frame: Frame, g: G) {
+        if (this.renderLock) return;
+        switch (this.toolMode) {
+            case MapToolMode.delete:
+                this.railroad.frames = this.railroad.frames.filter((f) => f !== frame);
+                this.setMapModified(true);
+                g.remove();
+                break;
+            case MapToolMode.rerail:
+            case MapToolMode.duplicate:
+                this.toolFrame = frame;
+                this.toolFrameGroup = g;
+                break;
+        }
+    }
+
     private onClickSpline(spline: Spline, elements: Element[]) {
         if (this.renderLock) return;
         switch (this.toolMode) {
@@ -1476,14 +1593,13 @@ export class RailroadMap {
                 this.setMapModified(true);
                 elements.forEach((element) => element.remove());
                 break;
-            case MapToolMode.flatten_spline: {
+            case MapToolMode.flatten_spline:
                 spline.controlPoints = flattenSpline(spline);
                 this.setMapModified(true);
                 // Re-render just this spline
                 elements.forEach((element) => element.remove());
                 this.renderSpline(spline);
                 break;
-            }
             case MapToolMode.parallel: {
                 const offset = 3_83; // Length of a diamond
                 const keepSpline = (a: Spline) =>
@@ -1504,11 +1620,12 @@ export class RailroadMap {
                 this.railroad.splines.push(...parallel);
                 this.setMapModified(true);
                 parallel.forEach(this.renderSpline, this);
+                break;
             }
         }
     }
 
-    private onClickSplineTrack(spline: SplineTrack, elements: Element[]) {
+    private onClickSplineTrack(spline: SplineTrack, elements: Element[], e: PointerEvent) {
         if (this.renderLock) return;
         switch (this.toolMode) {
             case MapToolMode.pan_zoom:
@@ -1583,7 +1700,36 @@ export class RailroadMap {
                 this.railroad.splineTracks.push(...parallel);
                 this.setMapModified(true);
                 parallel.forEach(this.renderSplineTrack, this);
+                break;
             }
+            case MapToolMode.rerail:
+                if (this.toolFrame) {
+                    // Find the closest point along the spline
+                    const {location, rotation} = this.splineWorldLocation(e, spline);
+                    // Move the frame to the new location
+                    this.toolFrame.location = location;
+                    this.toolFrame.rotation = rotation;
+                    this.setMapModified(true);
+                    // Move the frame group on the map
+                    if (this.toolFrameGroup) {
+                        this.toolFrameGroup
+                            .attr('transform', makeTransform(location.x, location.y, rotation.yaw));
+                    }
+                }
+                break;
+            case MapToolMode.duplicate:
+                if (this.toolFrame) {
+                    // Find the closest point along the spline
+                    const {location, rotation} = this.splineWorldLocation(e, spline);
+                    const {name, number, type, state} = this.toolFrame;
+                    // Copy the frame to the new location
+                    const frame: Frame = {location, name, number, rotation, type, state};
+                    this.railroad.frames.push(frame);
+                    this.setMapModified(true);
+                    // Update the map
+                    this.renderFrame(frame);
+                }
+                break;
         }
     }
 
