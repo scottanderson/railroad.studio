@@ -399,6 +399,38 @@ export class Studio {
                 btnTreeBrush.classList.add('btn-secondary');
             }
         });
+        // Rerail tool
+        const btnRerail = document.createElement('button');
+        const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Tool');
+        const txtRerail = document.createTextNode(' Rerail Tool ');
+        btnRerail.classList.add('btn', 'btn-secondary');
+        btnRerail.replaceChildren(imgRerail, txtRerail);
+        btnRerail.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleRerailTool();
+            if (toolEnabled) {
+                btnRerail.classList.add('active', 'btn-danger');
+                btnRerail.classList.remove('btn-secondary');
+            } else {
+                btnRerail.classList.remove('active', 'btn-danger');
+                btnRerail.classList.add('btn-secondary');
+            }
+        });
+        // Duplicate frame tool
+        const btnDuplicate = document.createElement('button');
+        const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Tool');
+        const txtDuplicate = document.createTextNode(' Duplicate Tool ');
+        btnDuplicate.classList.add('btn', 'btn-secondary');
+        btnDuplicate.replaceChildren(imgDuplicate, txtDuplicate);
+        btnDuplicate.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleDuplicateTool();
+            if (toolEnabled) {
+                btnDuplicate.classList.add('active', 'btn-danger');
+                btnDuplicate.classList.remove('btn-secondary');
+            } else {
+                btnDuplicate.classList.remove('active', 'btn-danger');
+                btnDuplicate.classList.add('btn-secondary');
+            }
+        });
         // Delete tool
         const btnDelete = document.createElement('button');
         const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
@@ -596,7 +628,11 @@ export class Studio {
         );
         if (hasFrames) {
             // Enable tools that work on frames
-            mapButtons.insertBefore(grpFrameList, btnDelete);
+            [
+                grpFrameList,
+                btnRerail,
+                btnDuplicate,
+            ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
         if (!this.railroad.settings.gameLevelName) {
             // Enable tools that only work for Pine Valley

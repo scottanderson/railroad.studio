@@ -27,4 +27,4 @@ jobs:
       - run: npm ci
       - run: npx webpack --mode=production
       - run: aws s3 sync railroad.studio s3://railroad.studio --size-only
-      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_ID }} --paths /studio.js /style.css
+      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_ID }} --paths /index.html /studio.js /style.css

@@ -70,7 +70,13 @@ export function circularizeCurve(hermite: HermiteCurve): HermiteCurve {
  * perform before giving up.
  * @return {number} The minimum value of the function within the given range.
  */
-function goldenSection(a: number, b: number, f: (x: number) => number, tolerance = 1e-7, maxIterations = 50): number {
+export function goldenSection(
+    a: number,
+    b: number,
+    f: (x: number) => number,
+    tolerance = 1e-7,
+    maxIterations = 50,
+): number {
     const phi = (1 + Math.sqrt(5)) / 2; // 1.618033988749895
     const resphi = 2 - phi; // 0.3819660112501051
     let x1 = a + resphi * (b - a);
