@@ -1078,7 +1078,7 @@ export class Studio {
             td = document.createElement('td');
             tr.appendChild(td);
             const table2 = document.createElement('table');
-            table2.classList.add('table', 'mb-0');
+            table2.classList.add('table', 'table-borderless', 'mb-0');
             td.appendChild(table2);
             const tbody2 = document.createElement('tbody');
             table2.appendChild(tbody2);
