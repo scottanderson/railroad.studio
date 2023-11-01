@@ -567,11 +567,11 @@ function getPropertyType(propertyName: string): GvasTypes {
         case 'nightlength': return ['FloatProperty'];
         case 'painttypearray': return ['ArrayProperty', 'IntProperty'];
         case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
-        // case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
-        // case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
-        // case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
-        // case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
+        case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
         case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
         case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
         case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
@@ -582,10 +582,8 @@ function getPropertyType(propertyName: string): GvasTypes {
         case 'sandhouselocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'sandhouserotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'sandhousetypearray': return ['ArrayProperty', 'IntProperty'];
-        // case 'savegamedate': return ['StrProperty'];
-        // case 'savegameuniqueid': return ['StrProperty'];
+        case 'savegamedate': return ['StrProperty'];
         case 'savegameuniqueid': return ['StrProperty'];
-        // case 'savegameuniqueworldid': return ['StrProperty'];
         case 'savegameuniqueworldid': return ['StrProperty'];
         case 'savegameversion': return ['StrProperty'];
         case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
