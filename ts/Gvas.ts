@@ -7,7 +7,6 @@ import {Vector} from './Vector';
  */
 export interface Gvas {
     _order: string[];
-    _types: Record<string, GvasTypes>;
     _header: GvasHeader;
     boolArrays: Record<string, boolean[]>;
     bools: Record<string, boolean>;
