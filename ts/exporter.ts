@@ -162,7 +162,6 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         const lowerCase = propertyName.toLowerCase();
         if (!orderLowerCase.includes(lowerCase)) {
             railroad._order.push(propertyName);
-            railroad._types[propertyName] = propertyType(lowerCase);
         }
     }
     // Fill in the properties, preserving name capitalization
@@ -506,7 +505,6 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     return {
         _header: railroad._header,
         _order: railroad._order,
-        _types: railroad._types,
         boolArrays,
         bools,
         byteArrays,
@@ -523,7 +521,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     };
 }
 
-function propertyType(propertyName: string): GvasTypes {
+function getPropertyType(propertyName: string): GvasTypes {
     switch (propertyName) {
         case 'animatetimeofday': return ['BoolProperty'];
         case 'binarytexture': return ['ArrayProperty', 'ByteProperty'];
@@ -569,11 +567,11 @@ function propertyType(propertyName: string): GvasTypes {
         case 'nightlength': return ['FloatProperty'];
         case 'painttypearray': return ['ArrayProperty', 'IntProperty'];
         case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
-        // case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
-        // case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
-        // case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
+        case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
-        // case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
+        case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
         case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
         case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
         case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
@@ -584,10 +582,8 @@ function propertyType(propertyName: string): GvasTypes {
         case 'sandhouselocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'sandhouserotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'sandhousetypearray': return ['ArrayProperty', 'IntProperty'];
-        // case 'savegamedate': return ['StrProperty'];
-        // case 'savegameuniqueid': return ['StrProperty'];
+        case 'savegamedate': return ['StrProperty'];
         case 'savegameuniqueid': return ['StrProperty'];
-        // case 'savegameuniqueworldid': return ['StrProperty'];
         case 'savegameuniqueworldid': return ['StrProperty'];
         case 'savegameversion': return ['StrProperty'];
         case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
@@ -688,7 +684,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
     //           '"StrProperty"': str_array
     //           '"StructProperty"': struct_array
     //           '"TextProperty"': text_array
-    const [propertyType, dataType, structType] = gvas._types[propertyName];
+    const [propertyType, dataType, structType] = getPropertyType(propertyName.toLowerCase());
     const propertyData: BlobPart[] = [];
     switch (propertyType) {
         case 'BoolProperty': {

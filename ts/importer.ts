@@ -506,7 +506,6 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const railroad: Railroad = {
         _header: gvas._header,
         _order: gvas._order,
-        _types: gvas._types,
         frames,
         industries,
         players,

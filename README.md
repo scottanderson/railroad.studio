@@ -178,17 +178,20 @@ type GvasTypes =
     | ['ArrayProperty', 'TextProperty'];
 
 interface Gvas {
-    _order: string[];
-    _types: Record<string, GvasTypes>;
     _header: GvasHeader;
+    _order: string[];
     boolArrays: Record<string, boolean[]>;
+    bools: Record<string, boolean>;
+    byteArrays: Record<string, number[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
+    ints: Record<string, number>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
     vectorArrays: Record<string, Vector[]>;
     rotatorArrays: Record<string, Rotator[]>;
+    transformArrays: Record<string, Transform[]>;
     textArrays: Record<string, GvasText[]>;
 }
 ```
@@ -202,23 +205,25 @@ stores in Gvas format.
 interface Railroad {
     _header: GvasHeader;
     _order: string[];
-    _types: GvasMap<GvasTypes>;
     frames: Frame[];
     industries: Industry[];
     players: Player[];
-    sandhouses: Sandhouse[];
-    switches: Switch[];
-    turntables: Turntable[];
-    watertowers: Watertower[];
+    props: Prop[];
     removedVegetationAssets: Vector[];
+    sandhouses: Sandhouse[];
     saveGame: {
         date: GvasString;
         uniqueId: GvasString;
         uniqueWorldId: GvasString;
         version: GvasString;
     };
-    splines: Spline[];
+    settings: { ... };
     splineTracks: SplineTrack[];
+    splines: Spline[];
+    switches: Switch[];
+    turntables: Turntable[];
+    vegetation: Vegeation[];
+    watertowers: Watertower[];
 }
 ```
 

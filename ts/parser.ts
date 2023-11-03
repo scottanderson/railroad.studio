@@ -6,7 +6,6 @@ import {
     GvasString,
     GvasText,
     GvasTextType8,
-    GvasTypes,
     RichTextFormat,
     gvasToString,
 } from './Gvas';
@@ -76,7 +75,6 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     const result: Gvas = {
         _header: header,
         _order: [],
-        _types: {},
         boolArrays: {},
         bools: {},
         byteArrays: {},
@@ -93,12 +91,11 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     };
     const largeWorldCoords = (gvasVersion === 3);
     while (pos < buffer.byteLength) {
-        let pname; let ptype;
-        [pos, pname, ptype] = parseProperty(buffer, pos, result, largeWorldCoords);
+        let pname;
+        [pos, pname] = parseProperty(buffer, pos, result, largeWorldCoords);
         if (!pname) throw new Error('Property name is null');
         if (pname === 'None') break; // End of properties
         result._order.push(pname);
-        result._types[pname] = ptype;
     }
     if (pos !== buffer.byteLength) {
         throw new Error(`Found extra data at EOF, pos=${pos}, byteLength=${buffer.byteLength}`);
@@ -199,62 +196,46 @@ function parseProperty(
     pos: number,
     target: Gvas,
     largeWorldCoords: boolean,
-): [number, GvasString, GvasTypes] {
+): [number, GvasString] {
     let pname;
-    let ptype: GvasTypes;
     const read = readProperty(b, pos, largeWorldCoords);
     [pos, pname] = read;
     if (!pname || pname === 'None' || read.length === 2) {
         // NoneProperty, bail without storring type info
-        return [pos, pname, []];
     } else if (read[2] === 'BoolProperty') {
-        ptype = [read[2]];
         target.bools[pname] = read[3];
     } else if (read[2] === 'StrProperty') {
-        ptype = [read[2]];
         target.strings[pname] = read[3];
     } else if (read[2] === 'FloatProperty') {
-        ptype = [read[2]];
         target.floats[pname] = read[3];
     } else if (read[2] === 'IntProperty') {
-        ptype = [read[2]];
         target.ints[pname] = read[3];
     } else if (read[2] !== 'ArrayProperty') {
         throw new Error(`Unexpected Property type: ${read[2]}`);
     } else if (read[3] === 'BoolProperty') {
-        ptype = [read[2], read[3]];
         target.boolArrays[pname] = read[4];
     } else if (read[3] === 'IntProperty') {
-        ptype = [read[2], read[3]];
         target.intArrays[pname] = read[4];
     } else if (read[3] === 'FloatProperty') {
-        ptype = [read[2], read[3]];
         target.floatArrays[pname] = read[4];
     } else if (read[3] === 'StrProperty') {
-        ptype = [read[2], read[3]];
         target.stringArrays[pname] = read[4];
     } else if (read[3] === 'TextProperty') {
-        ptype = [read[2], read[3]];
         target.textArrays[pname] = read[4];
     } else if (read[3] === 'ByteProperty') {
-        ptype = [read[2], read[3]];
         target.byteArrays[pname] = read[4];
     } else if (read[3] !== 'StructProperty') {
         throw new Error(`Unexpected ArrayProperty type: ${read[3]}`);
     } else if (read[4] === 'Vector') {
-        ptype = [read[2], read[3], read[4]];
         target.vectorArrays[pname] = read[5];
     } else if (read[4] === 'Rotator') {
-        ptype = [read[2], read[3], read[4]];
         target.rotatorArrays[pname] = read[5];
     } else if (read[4] === 'Transform') {
-        ptype = [read[2], read[3], read[4]];
         target.transformArrays[pname] = read[5];
     } else {
         throw new Error(`Unexpected StructProperty type: ${read[4]}`);
     }
-    target._types[pname] = ptype;
-    return [pos, pname, ptype];
+    return [pos, pname];
 }
 
 type ParsePropertyReturnType = (
