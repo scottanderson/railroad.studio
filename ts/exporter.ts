@@ -622,6 +622,7 @@ function getPropertyType(propertyName: string): GvasTypes {
         case 'watertowertypearray': return ['ArrayProperty', 'IntProperty'];
         case 'watertowerwaterlevelarray': return ['ArrayProperty', 'FloatProperty'];
         case 'weathertype': return ['IntProperty'];
+        case 'weathertransitiontime': return ['FloatProperty'];
         default: throw new Error(`Unknown property name ${propertyName}`);
     }
 }
