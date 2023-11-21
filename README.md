@@ -183,16 +183,20 @@ interface Gvas {
     boolArrays: Record<string, boolean[]>;
     bools: Record<string, boolean>;
     byteArrays: Record<string, number[]>;
+    dateTimes: Record<string, bigint>;
+    enumArrays: Record<string, GvasString[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
+    nameArrays: Record<string, GvasString[]>;
+    names: Record<string, GvasString>;
+    rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
-    vectorArrays: Record<string, Vector[]>;
-    rotatorArrays: Record<string, Rotator[]>;
-    transformArrays: Record<string, Transform[]>;
     textArrays: Record<string, GvasText[]>;
+    transformArrays: Record<string, Transform[]>;
+    vectorArrays: Record<string, Vector[]>;
 }
 ```
 
