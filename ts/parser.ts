@@ -78,10 +78,13 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         boolArrays: {},
         bools: {},
         byteArrays: {},
+        dateTimes: {},
+        enumArrays: {},
         floatArrays: {},
         floats: {},
         intArrays: {},
         ints: {},
+        nameArrays: {},
         rotatorArrays: {},
         stringArrays: {},
         strings: {},
@@ -122,6 +125,16 @@ function parseEngineVersion(buffer: ArrayBuffer, pos: number): [number, EngineVe
         buildID: engineVersionBuildID,
     };
     return [pos, engineVersion];
+}
+
+function parseUint64(
+    buffer: ArrayBuffer,
+    pos: number,
+): [number, bigint] {
+    const structSize = 8;
+    const values = new BigUint64Array(buffer.slice(pos, pos + structSize));
+    const [result] = values;
+    return [pos + structSize, result];
 }
 
 function parseQuat(
@@ -204,26 +217,32 @@ function parseProperty(
         // NoneProperty, bail without storring type info
     } else if (read[2] === 'BoolProperty') {
         target.bools[pname] = read[3];
-    } else if (read[2] === 'StrProperty') {
-        target.strings[pname] = read[3];
     } else if (read[2] === 'FloatProperty') {
         target.floats[pname] = read[3];
     } else if (read[2] === 'IntProperty') {
         target.ints[pname] = read[3];
+    } else if (read[2] === 'StrProperty') {
+        target.strings[pname] = read[3];
+    } else if (read[2] === 'StructProperty' && read[3] === 'DateTime') {
+        target.dateTimes[pname] = read[4];
     } else if (read[2] !== 'ArrayProperty') {
         throw new Error(`Unexpected Property type: ${read[2]}`);
     } else if (read[3] === 'BoolProperty') {
         target.boolArrays[pname] = read[4];
-    } else if (read[3] === 'IntProperty') {
-        target.intArrays[pname] = read[4];
+    } else if (read[3] === 'ByteProperty') {
+        target.byteArrays[pname] = read[4];
+    } else if (read[3] === 'EnumProperty') {
+        target.enumArrays[pname] = read[4];
     } else if (read[3] === 'FloatProperty') {
         target.floatArrays[pname] = read[4];
+    } else if (read[3] === 'IntProperty') {
+        target.intArrays[pname] = read[4];
+    } else if (read[3] === 'NameProperty') {
+        target.nameArrays[pname] = read[4];
     } else if (read[3] === 'StrProperty') {
         target.stringArrays[pname] = read[4];
     } else if (read[3] === 'TextProperty') {
         target.textArrays[pname] = read[4];
-    } else if (read[3] === 'ByteProperty') {
-        target.byteArrays[pname] = read[4];
     } else if (read[3] !== 'StructProperty') {
         throw new Error(`Unexpected ArrayProperty type: ${read[3]}`);
     } else if (read[4] === 'Vector') {
@@ -239,22 +258,26 @@ function parseProperty(
 }
 
 type ParsePropertyReturnType = (
-    | [number, GvasString]
-    | [number, GvasString, 'BoolProperty', boolean]
-    | [number, GvasString, 'FloatProperty', number]
-    | [number, GvasString, 'IntProperty', number]
-    | [number, GvasString, 'StrProperty', GvasString]
-    | [number, GvasString, 'StructProperty', 'Quat', Quaternion]
-    | [number, GvasString, 'StructProperty', 'Vector', Vector]
     | [number, GvasString, 'ArrayProperty', 'BoolProperty', boolean[]]
     | [number, GvasString, 'ArrayProperty', 'ByteProperty', number[]]
+    | [number, GvasString, 'ArrayProperty', 'EnumProperty', GvasString[]]
     | [number, GvasString, 'ArrayProperty', 'FloatProperty', number[]]
     | [number, GvasString, 'ArrayProperty', 'IntProperty', number[]]
+    | [number, GvasString, 'ArrayProperty', 'NameProperty', GvasString[]]
     | [number, GvasString, 'ArrayProperty', 'StrProperty', GvasString[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Rotator', Rotator[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Transform', Transform[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Vector', Vector[]]
     | [number, GvasString, 'ArrayProperty', 'TextProperty', GvasText[]]
+    | [number, GvasString, 'BoolProperty', boolean]
+    | [number, GvasString, 'FloatProperty', number]
+    | [number, GvasString, 'IntProperty', number]
+    | [number, GvasString, 'NameProperty', GvasString]
+    | [number, GvasString, 'StrProperty', GvasString]
+    | [number, GvasString, 'StructProperty', 'DateTime', bigint]
+    | [number, GvasString, 'StructProperty', 'Quat', Quaternion]
+    | [number, GvasString, 'StructProperty', 'Vector', Vector]
+    | [number, GvasString]
 );
 
 function readProperty(
@@ -312,18 +335,22 @@ function readProperty(
     // pdata
     const pdata = b.slice(pos, pos + plen);
     pos += plen;
-    if (ptype === 'StrProperty') {
-        const [len, result] = parseString(pdata, 0);
-        if (plen !== len) throw new Error(`String length !== ${len}, ${plen}, ${pdata}`);
-        return [pos, pname, ptype, result];
-    } else if (ptype === 'FloatProperty') {
+    if (ptype === 'FloatProperty') {
         if (plen !== 4) throw new Error(`FloatProperty length !== 4, ${plen}, ${pdata}`);
         return [pos, pname, ptype, new Float32Array(pdata)[0]];
     } else if (ptype === 'IntProperty') {
         if (plen !== 4) throw new Error(`IntProperty length !== 4, ${plen}, ${pdata}`);
         return [pos, pname, ptype, new Uint32Array(pdata)[0]];
+    } else if (ptype === 'StrProperty') {
+        const [len, result] = parseString(pdata, 0);
+        if (plen !== len) throw new Error(`String length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, result];
     } else if (ptype === 'StructProperty') {
-        if (dtype === 'Quat') {
+        if (dtype === 'DateTime') {
+            const [len, result] = parseUint64(pdata, 0);
+            if (plen !== len) throw new Error(`DateTime length !== ${len}, ${plen}, ${pdata}`);
+            return [pos, pname, ptype, dtype, result];
+        } else if (dtype === 'Quat') {
             const [len, result] = parseQuat(pdata, 0, largeWorldCoords);
             if (plen !== len) throw new Error(`Quat length !== ${len}, ${plen}, ${pdata}`);
             return [pos, pname, ptype, dtype, result];
@@ -336,6 +363,32 @@ function readProperty(
         }
     } else if (ptype !== 'ArrayProperty') {
         throw new Error(`property type for '${pname}' is not implemented ('${ptype}')`);
+    } else if (dtype === 'BoolProperty') {
+        const [len, result] = parseBoolArray(pdata);
+        if (plen !== len) throw new Error(`BoolProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
+    } else if (dtype === 'ByteProperty') {
+        return [pos, pname, ptype, dtype, [...new Uint8Array(pdata)]];
+    } else if (dtype === 'IntProperty') {
+        const [len, result] = parseIntArray(pdata);
+        if (plen !== len) throw new Error(`IntProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
+    } else if (dtype === 'EnumProperty') {
+        const [len, result] = parseStringArray(pdata);
+        if (plen !== len) throw new Error(`StrProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
+    } else if (dtype === 'FloatProperty') {
+        const [len, result] = parseFloatArray(pdata);
+        if (plen !== len) throw new Error(`FloatProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
+    } else if (dtype === 'NameProperty') {
+        const [len, result] = parseStringArray(pdata);
+        if (plen !== len) throw new Error(`NameProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
+    } else if (dtype === 'StrProperty') {
+        const [len, result] = parseStringArray(pdata);
+        if (plen !== len) throw new Error(`StrProperty array length !== ${len}, ${plen}, ${pdata}`);
+        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'StructProperty') {
         const [stype, sdata] = parseStructArray(pdata, pname, largeWorldCoords);
         if (stype === 'Rotator') {
@@ -347,28 +400,10 @@ function readProperty(
         } else {
             throw new Error(gvasToString(stype));
         }
-    } else if (dtype === 'BoolProperty') {
-        const [len, result] = parseBoolArray(pdata);
-        if (plen !== len) throw new Error(`BoolProperty array length !== ${len}, ${plen}, ${pdata}`);
-        return [pos, pname, ptype, dtype, result];
-    } else if (dtype === 'IntProperty') {
-        const [len, result] = parseIntArray(pdata);
-        if (plen !== len) throw new Error(`IntProperty array length !== ${len}, ${plen}, ${pdata}`);
-        return [pos, pname, ptype, dtype, result];
-    } else if (dtype === 'FloatProperty') {
-        const [len, result] = parseFloatArray(pdata);
-        if (plen !== len) throw new Error(`FloatProperty array length !== ${len}, ${plen}, ${pdata}`);
-        return [pos, pname, ptype, dtype, result];
-    } else if (dtype === 'StrProperty') {
-        const [len, result] = parseStringArray(pdata);
-        if (plen !== len) throw new Error(`StrProperty array length !== ${len}, ${plen}, ${pdata}`);
-        return [pos, pname, ptype, dtype, result];
     } else if (dtype === 'TextProperty') {
         const [len, result] = parseTextArray(pdata);
         if (plen !== len) throw new Error(`TextProperty array length !== ${len}, ${plen}, ${pdata}`);
         return [pos, pname, ptype, dtype, result];
-    } else if (dtype === 'ByteProperty') {
-        return [pos, pname, ptype, dtype, [...new Uint8Array(pdata)]];
     } else {
         throw new Error(`${dtype} data type for '${pname}' is not implemented`);
     }

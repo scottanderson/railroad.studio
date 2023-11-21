@@ -144,19 +144,22 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         splineSegmentVisibility = splineSegmentVisibility.concat(spline.segmentsVisible);
         splineVisibilityEnd[idx] = splineSegmentVisibility.length - 1;
     }
-    const byteArrays: Record<string, number[]> = {};
     const boolArrays: Record<string, boolean[]> = {};
     const bools: Record<string, boolean> = {};
+    const byteArrays: Record<string, number[]> = {};
+    const dateTimes: Record<string, bigint> = {};
+    const enumArrays: Record<string, GvasString[]> = {};
     const floatArrays: Record<string, number[]> = {};
     const floats: Record<string, number> = {};
     const intArrays: Record<string, number[]> = {};
     const ints: Record<string, number> = {};
+    const nameArrays: Record<string, GvasString[]> = {};
+    const rotatorArrays: Record<string, Rotator[]> = {};
     const stringArrays: Record<string, GvasString[]> = {};
     const strings: Record<string, GvasString> = {};
-    const rotatorArrays: Record<string, Rotator[]> = {};
+    const textArrays: Record<string, GvasText[]> = {};
     const transformArrays: Record<string, Transform[]> = {};
     const vectorArrays: Record<string, Vector[]> = {};
-    const textArrays: Record<string, GvasText[]> = {};
     const orderLowerCase = railroad._order.map((s) => s.toLowerCase());
     // Add missing keys to railroad._order
     for (const propertyName of exportKeys) {
@@ -509,10 +512,13 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         boolArrays,
         bools,
         byteArrays,
+        dateTimes,
+        enumArrays,
         floatArrays,
         floats,
         intArrays,
         ints,
+        nameArrays,
         rotatorArrays,
         stringArrays,
         strings,
