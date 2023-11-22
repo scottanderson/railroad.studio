@@ -134,6 +134,8 @@ const blob = gvasToBlob(gvas);
 const url = URL.createObjectURL(blob);
 ```
 
+## Types
+
 ### ArrayBuffer
 
 The [`ArrayBuffer`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
@@ -147,6 +149,38 @@ and a maximum observed size under 3MB.
 data that isn't necessarily in a JavaScript-native format. The File interface is
 based on Blob, inheriting blob functionality and expanding it to support files
 on the user's system.
+
+### GvasString
+
+One of the foundational types that is used throughout this repository is the
+`GvasString`. This is used to represent GVAS binary strings, and is equivalent
+to `string | null`. When reading and writing GVAS files, there are three binary
+formats, depending on whether the string is null, ASCII or Unicode:
+
+```
+Format: null
+(uint32) length (0)
+
+Format: ASCII (no characters >127)
+(uint32) positive length
+(uint8*) ascii string (null-terminated)
+
+Format: Unicode
+(uint32)  negative length
+(uint16*) utf-16 encoded string (null-terminated)
+
+Example: null
+00 00 00 00
+
+Example: ASCII ""
+01 00 00 00 00
+
+Example: ASCII "StrProperty"
+0c 00 00 00 53 74 72 50 72 6f 70 65 72 74 79 00
+
+Example: Unicode "§"
+fe ff ff ff a7 00 00 00
+```
 
 ### Gvas
 
