@@ -18,7 +18,6 @@ export interface Gvas {
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
     nameArrays: Record<string, GvasString[]>;
-    names: Record<string, GvasString>;
     rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
@@ -28,22 +27,26 @@ export interface Gvas {
 }
 
 export type GvasTypes =
-    | []
-    | ['BoolProperty']
-    | ['FloatProperty']
-    | ['IntProperty']
-    | ['StrProperty']
-    | ['StructProperty', 'Quat']
-    | ['StructProperty', 'Vector']
     | ['ArrayProperty', 'BoolProperty']
     | ['ArrayProperty', 'ByteProperty']
+    | ['ArrayProperty', 'EnumProperty']
     | ['ArrayProperty', 'FloatProperty']
     | ['ArrayProperty', 'IntProperty']
+    | ['ArrayProperty', 'NameProperty']
     | ['ArrayProperty', 'StrProperty']
     | ['ArrayProperty', 'StructProperty', 'Rotator']
     | ['ArrayProperty', 'StructProperty', 'Transform']
     | ['ArrayProperty', 'StructProperty', 'Vector']
     | ['ArrayProperty', 'TextProperty']
+    | ['BoolProperty']
+    | ['FloatProperty']
+    | ['IntProperty']
+    | ['NameProperty']
+    | ['StrProperty']
+    | ['StructProperty', 'DateTime']
+    | ['StructProperty', 'Quat']
+    | ['StructProperty', 'Vector']
+    | []
     ;
 
 export type GvasString = string | null;

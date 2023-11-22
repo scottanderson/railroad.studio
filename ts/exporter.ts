@@ -155,7 +155,6 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     const intArrays: Record<string, number[]> = {};
     const ints: Record<string, number> = {};
     const nameArrays: Record<string, GvasString[]> = {};
-    const names: Record<string, GvasString> = {};
     const rotatorArrays: Record<string, Rotator[]> = {};
     const stringArrays: Record<string, GvasString[]> = {};
     const strings: Record<string, GvasString> = {};
@@ -533,7 +532,6 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         intArrays,
         ints,
         nameArrays,
-        names,
         rotatorArrays,
         stringArrays,
         strings,

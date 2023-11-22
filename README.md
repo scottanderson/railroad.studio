@@ -164,18 +164,27 @@ combinations of types, only the ones used by Railroads Online are implemented.
 
 ```ts
 type GvasTypes =
-    | []
+    | ['ArrayProperty', 'BoolProperty']
+    | ['ArrayProperty', 'ByteProperty']
+    | ['ArrayProperty', 'EnumProperty']
+    | ['ArrayProperty', 'FloatProperty']
+    | ['ArrayProperty', 'IntProperty']
+    | ['ArrayProperty', 'NameProperty']
+    | ['ArrayProperty', 'StrProperty']
+    | ['ArrayProperty', 'StructProperty', 'Rotator']
+    | ['ArrayProperty', 'StructProperty', 'Transform']
+    | ['ArrayProperty', 'StructProperty', 'Vector']
+    | ['ArrayProperty', 'TextProperty']
     | ['BoolProperty']
     | ['FloatProperty']
     | ['IntProperty']
+    | ['NameProperty']
     | ['StrProperty']
-    | ['ArrayProperty', 'BoolProperty']
-    | ['ArrayProperty', 'FloatProperty']
-    | ['ArrayProperty', 'IntProperty']
-    | ['ArrayProperty', 'StrProperty']
-    | ['ArrayProperty', 'StructProperty', 'Rotator']
-    | ['ArrayProperty', 'StructProperty', 'Vector']
-    | ['ArrayProperty', 'TextProperty'];
+    | ['StructProperty', 'DateTime']
+    | ['StructProperty', 'Quat']
+    | ['StructProperty', 'Vector']
+    | []
+    ;
 
 interface Gvas {
     _header: GvasHeader;
@@ -190,7 +199,6 @@ interface Gvas {
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
     nameArrays: Record<string, GvasString[]>;
-    names: Record<string, GvasString>;
     rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;

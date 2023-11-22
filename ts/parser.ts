@@ -85,7 +85,6 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         intArrays: {},
         ints: {},
         nameArrays: {},
-        names: {},
         rotatorArrays: {},
         stringArrays: {},
         strings: {},
@@ -222,8 +221,6 @@ function parseProperty(
         target.floats[pname] = read[3];
     } else if (read[2] === 'IntProperty') {
         target.ints[pname] = read[3];
-    } else if (read[2] === 'NameProperty') {
-        target.names[pname] = read[3];
     } else if (read[2] === 'StrProperty') {
         target.strings[pname] = read[3];
     } else if (read[2] === 'StructProperty' && read[3] === 'DateTime') {
