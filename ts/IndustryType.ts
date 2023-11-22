@@ -1,5 +1,10 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
 import {arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
+import {Industry} from './Railroad';
+
+export type IndustryTypeNew =
+    | IndustryType
+    | string;
 
 export enum IndustryType {
     logging_camp = 1,
@@ -31,6 +36,16 @@ export enum IndustryType {
     large_engine_house_beige = 42,
     large_engine_house_old = 43,
     wood_rick = 44,
+}
+
+export function getIndustryType(industry: Industry): IndustryType {
+    if (typeof industry.type === 'number') {
+        return industry.type;
+    } else if (industry.type === 'logging_camp') {
+        return IndustryType.logging_camp;
+    } else {
+        throw new Error(`Unknown industry type: ${industry.type}`);
+    }
 }
 
 export const industryName: Record<IndustryType, string> = {

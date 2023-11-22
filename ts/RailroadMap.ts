@@ -14,7 +14,7 @@ import {
     SwitchType,
     Turntable,
 } from './Railroad';
-import {gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
+import {getIndustryType, gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -932,9 +932,12 @@ export class RailroadMap {
     private gizmoDebugLine?: Line;
     private gizmoDebugText?: Text;
     private renderIndustry(industry: Industry) {
-        const paths = Object.entries(industrySvgPaths[industry.type] || {});
-        const groupClass = industry.type in IndustryType ? IndustryType[industry.type] : 'unknown';
-        const tooltipText = industry.type in industryName ? industryName[industry.type] : `Unknown ${industry.type}`;
+        const industryType = getIndustryType(industry);
+        const paths = Object.entries(industrySvgPaths[industryType] || {});
+        const groupClass = typeof industryType !== 'number' ? gvasToString(industryType) :
+            industryType in IndustryType ? IndustryType[industryType] : 'unknown';
+        const tooltipText = typeof industryType !== 'number' ? gvasToString(industryType) :
+            industryType in industryName ? industryName[industryType] : `Unknown ${industry.type}`;
         const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()

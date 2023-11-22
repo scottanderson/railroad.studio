@@ -1,5 +1,5 @@
 import {GvasHeader, GvasString, GvasText} from './Gvas';
-import {IndustryType} from './IndustryType';
+import {IndustryTypeNew} from './IndustryType';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
@@ -92,7 +92,7 @@ export interface Industry {
     rotation: Rotator;
     inputs: Quadruplet<number>;
     outputs: Quadruplet<number>;
-    type: IndustryType;
+    type: IndustryTypeNew;
 }
 
 export interface Player {
@@ -173,7 +173,7 @@ export interface Turntable {
     deckRotation?: Rotator;
     location: Vector;
     rotator: Rotator;
-    type: TurntableType;
+    type: TurntableType | GvasString;
 }
 
 export enum TurntableType {

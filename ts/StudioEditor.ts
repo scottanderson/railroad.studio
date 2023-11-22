@@ -1,5 +1,5 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {IndustryType, industryName} from './IndustryType';
+import {IndustryType, IndustryTypeNew, industryName} from './IndustryType';
 import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
 import {Rotator} from './Rotator';
@@ -330,8 +330,8 @@ export function editVector(
 
 export function editIndustryType(
     studio: Studio,
-    type: IndustryType,
-    saveValue: (value: IndustryType) => void,
+    type: IndustryTypeNew,
+    saveValue: (value: IndustryTypeNew) => void,
 ): Node {
     const options: {[key: string]: string} = {};
     for (const key in IndustryType) {

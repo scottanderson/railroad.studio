@@ -32,6 +32,7 @@ const exportKeys = [
     'HeadlightTypeArray',
     'HeadlightrearStateArray',
     'IndustryLocationArray',
+    'IndustryNameArray',
     'IndustryRotationArray',
     'IndustryStorageEduct1Array',
     'IndustryStorageEduct2Array',
@@ -97,6 +98,7 @@ const exportKeys = [
     'TurntableLocationArray',
     'TurntableRotatorArray',
     'TurntableTypeArray',
+    'TurntableTypes',
     'VegetationISMCompNameArray',
     'VegetationInstanceIndexArray',
     'WatertowerLocationArray',
@@ -253,6 +255,9 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'industrylocationarray':
                 vectorArrays[propertyName] = railroad.industries.map((i) => i.location);
                 break;
+            case 'industrynamearray':
+                nameArrays[propertyName] = railroad.industries.map((i) => typeof i.type !== 'number' ? i.type : null);
+                break;
             case 'industryrotationarray':
                 rotatorArrays[propertyName] = railroad.industries.map((i) => i.rotation);
                 break;
@@ -281,7 +286,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.industries.map((i) => i.outputs[3]);
                 break;
             case 'industrytypearray':
-                intArrays[propertyName] = railroad.industries.map((i) => i.type);
+                intArrays[propertyName] = railroad.industries.map((i) => typeof i.type === 'number' ? i.type : 0);
                 break;
             case 'markerlightscenterstatearray':
                 intArrays[propertyName] = removeUndefinedTail(
@@ -472,7 +477,16 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 rotatorArrays[propertyName] = railroad.turntables.map((t) => t.rotator);
                 break;
             case 'turntabletypearray':
-                intArrays[propertyName] = railroad.turntables.map((t) => t.type);
+                intArrays[propertyName] = railroad.turntables.map((t) => {
+                    if (typeof t.type !== 'number') throw new Error(`Unexpected type ${t.type}`);
+                    return t.type;
+                });
+                break;
+            case 'turntabletypes':
+                nameArrays[propertyName] = railroad.turntables.map((t) => {
+                    if (typeof t.type !== 'string') throw new Error(`Unexpected type ${t.type}`);
+                    return t.type;
+                });
                 break;
             case 'vegetationismcompnamearray':
                 stringArrays[propertyName] = railroad.vegetation.map((v) => v.ismCompName);

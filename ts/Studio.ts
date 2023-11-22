@@ -1,7 +1,12 @@
 import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {IndustryType, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
+import {
+    IndustryTypeNew,
+    getIndustryType,
+    industryProductInputLabels,
+    industryProductOutputLabels,
+} from './IndustryType';
 import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
@@ -1235,19 +1240,20 @@ export class Studio {
             tbody.appendChild(tr);
             // Industry type
             let td = document.createElement('td');
-            const setIndustryType = (type: IndustryType) => industry.type = type;
+            const setIndustryType = (type: IndustryTypeNew) => industry.type = type;
             td.replaceChildren(editIndustryType(this, industry.type, setIndustryType));
             tr.appendChild(td);
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
-            const inputLabels = industryProductInputLabels[industry.type];
+            const industryTypeTemp = getIndustryType(industry);
+            const inputLabels = industryProductInputLabels[industryTypeTemp];
             td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
-            const outputLabels = industryProductOutputLabels[industry.type];
+            const outputLabels = industryProductOutputLabels[industryTypeTemp];
             td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
             tr.appendChild(td);
             // Location

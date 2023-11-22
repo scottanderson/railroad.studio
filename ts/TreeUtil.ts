@@ -1,4 +1,4 @@
-import {IndustryType} from './IndustryType';
+import {IndustryType, getIndustryType} from './IndustryType';
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
 import {Vector, vectorSum} from './Vector';
@@ -186,7 +186,7 @@ function rectFilter(x0: number, x1: number, y0: number, y1: number, tree: Point)
 }
 
 function industryFilter(industry: Industry, tree: Vector): boolean {
-    switch (industry.type) {
+    switch (getIndustryType(industry)) {
         case IndustryType.logging_camp:
             return radiusFilter(industry.location, tree, 45_00); // 45m
         case IndustryType.sawmill:
