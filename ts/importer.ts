@@ -446,6 +446,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const splineTrackEndSpline1Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline1IDArray');
     const splineTrackEndSpline2Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline2IDArray');
     const splineTrackEndTangent = optionalMap(gvas.vectorArrays, 'SplineTrackEndTangentArray');
+    const splineTrackIds = optionalMap(gvas.nameArrays, 'SplineTrackIds');
     const splineTrackLocation = optionalMap(gvas.vectorArrays, 'SplineTrackLocationArray');
     const splineTrackPaintStyle = optionalMap(gvas.intArrays, 'SplineTrackPaintStyleArray');
     const splineTrackRotation = optionalMap(gvas.rotatorArrays, 'SplineTrackRotationArray');
@@ -465,7 +466,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         splineTrackStartSplineId ||
         splineTrackStartTangent ||
         splineTrackSwitchState ||
-        splineTrackType) {
+        splineTrackType ||
+        splineTrackIds) {
+        const splineTrackIdentifier = splineTrackType ?? splineTrackIds;
         if (!splineTrackEndPoint ||
             !splineTrackEndTangent ||
             !splineTrackLocation ||
@@ -474,7 +477,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             !splineTrackStartPoint ||
             !splineTrackStartTangent ||
             !splineTrackSwitchState ||
-            !splineTrackType) {
+            !splineTrackIdentifier) {
             throw new Error('Some spline track values are missing');
         }
         enforceEqualLengths([
@@ -486,9 +489,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             splineTrackStartPoint,
             splineTrackStartTangent,
             splineTrackSwitchState,
-            splineTrackType,
+            splineTrackIdentifier,
         ]);
-        for (let i = 0; i < splineTrackType.length; i++) {
+        for (let i = 0; i < splineTrackIdentifier.length; i++) {
             const splineTrack: SplineTrack = {
                 endPoint: splineTrackEndPoint[i],
                 endSpline1Id: optionalIndex(splineTrackEndSpline1Id, i),
@@ -501,7 +504,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                 startSplineId: optionalIndex(splineTrackStartSplineId, i),
                 startTangent: splineTrackStartTangent[i],
                 switchState: splineTrackSwitchState[i],
-                type: splineTrackType[i],
+                type: splineTrackIdentifier[i],
             };
             splineTracks.push(splineTrack);
         }
