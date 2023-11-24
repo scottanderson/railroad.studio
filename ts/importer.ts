@@ -15,6 +15,17 @@ import {
     Watertower,
 } from './Railroad';
 
+function checkSaveType(gvas: Gvas): boolean {
+    switch (gvas._header.saveType) {
+        case '/Script/arr.arrSaveGame':
+            return false;
+        case '/Script/arr.ARRSaveGame':
+            return true;
+        default:
+            throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
+    }
+}
+
 /**
  * Converts a Gvas object, which represents the contents of a GVAS file, into a
  * Railroad object.
@@ -38,9 +49,7 @@ import {
  * @return {Railroad}
  */
 export function gvasToRailroad(gvas: Gvas): Railroad {
-    if (gvas._header.saveType?.toLowerCase() !== '/script/arr.arrsavegame') {
-        throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
-    }
+    const isNovemberUpdate = checkSaveType(gvas);
     // Read save game data
     const saveGameVersion = optionalMap(gvas.strings, 'SaveGameVersion');
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
@@ -58,7 +67,11 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
     const gameLevelName = optionalMap(gvas.strings, 'GameLevelName');
     const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
-    const timeOfDay = optionalMap(gvas.floats, 'TimeOfDay') ?? undefined;
+    const timeOfDay =
+        (isNovemberUpdate ?
+            optionalMap(gvas.dateTimes, 'TimeOfDay') :
+            optionalMap(gvas.floats, 'TimeOfDay')
+        ) ?? undefined;
     const weatherTransitionTime = optionalMap(gvas.floats, 'WeatherTransitionTime') ?? undefined;
     const weatherType = optionalMap(gvas.ints, 'WeatherType') ?? undefined;
     const settings = {
