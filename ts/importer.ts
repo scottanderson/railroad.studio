@@ -38,7 +38,7 @@ import {
  * @return {Railroad}
  */
 export function gvasToRailroad(gvas: Gvas): Railroad {
-    if (gvas._header.saveType !== '/Script/arr.arrSaveGame') {
+    if (gvas._header.saveType?.toLowerCase() !== '/script/arr.arrsavegame') {
         throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
     }
     // Read save game data
