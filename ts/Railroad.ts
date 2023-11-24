@@ -173,7 +173,7 @@ export interface Turntable {
     deckRotation?: Rotator;
     location: Vector;
     rotator: Rotator;
-    type: TurntableType;
+    type: TurntableType | GvasString;
 }
 
 export enum TurntableType {

@@ -98,6 +98,7 @@ const exportKeys = [
     'TurntableLocationArray',
     'TurntableRotatorArray',
     'TurntableTypeArray',
+    'TurntableTypes',
     'VegetationISMCompNameArray',
     'VegetationInstanceIndexArray',
     'WatertowerLocationArray',
@@ -481,7 +482,16 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 rotatorArrays[propertyName] = railroad.turntables.map((t) => t.rotator);
                 break;
             case 'turntabletypearray':
-                intArrays[propertyName] = railroad.turntables.map((t) => t.type);
+                intArrays[propertyName] = railroad.turntables.map((t) => {
+                    if (typeof t.type !== 'number') throw new Error(`Unexpected type ${t.type}`);
+                    return t.type;
+                });
+                break;
+            case 'turntabletypes':
+                nameArrays[propertyName] = railroad.turntables.map((t) => {
+                    if (typeof t.type !== 'string') throw new Error(`Unexpected type ${t.type}`);
+                    return t.type;
+                });
                 break;
             case 'vegetationismcompnamearray':
                 stringArrays[propertyName] = railroad.vegetation.map((v) => v.ismCompName);
