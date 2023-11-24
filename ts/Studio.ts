@@ -1202,6 +1202,7 @@ export class Studio {
                 if (hasCargoLimits(frame.type)) {
                     const freightType = frame.state.freightType ?? '';
                     const setAmount = (amount: number) => frame.state.freightAmount = amount;
+                    // TODO: Update this code for the November update's FreightTypes
                     const limits: Partial<Record<CargoType, number>> = cargoLimits[frame.type];
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
