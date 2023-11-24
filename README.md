@@ -159,15 +159,15 @@ formats, depending on whether the string is null, ASCII or Unicode:
 
 ```
 Format: null
-(uint32) length (0)
+(u32) length (0)
 
 Format: ASCII (no characters >127)
-(uint32) positive length
-(uint8*) ascii string (null-terminated)
+(u32) positive length
+(u8*) ascii string (null-terminated)
 
 Format: Unicode
-(uint32)  negative length
-(uint16*) utf-16 encoded string (null-terminated)
+(u32)  negative length
+(u16*) utf-16 encoded string (null-terminated)
 
 Example: null
 00 00 00 00
