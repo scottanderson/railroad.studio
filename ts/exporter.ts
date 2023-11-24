@@ -673,7 +673,17 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
                 case 'ByteProperty': {
                     const bytes = gvas.byteArrays[propertyName] || [];
                     if (bytes.length === 0) return;
+                    // (u8*) ByteProperty Array
                     propertyData.push(new Uint8Array(bytes));
+                    break;
+                }
+                case 'EnumProperty': {
+                    const strs = gvas.enumArrays[propertyName] || [];
+                    if (strs.length === 0) return;
+                    // (u32)  EnumProperty Count
+                    // (str*) EnumProperty Array
+                    propertyData.push(new Uint32Array([strs.length]));
+                    propertyData.push(new Blob(strs.map(stringToBlob)));
                     break;
                 }
                 case 'FloatProperty': {
@@ -683,6 +693,15 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
                     // (f32*) FloatProperty Array
                     propertyData.push(new Uint32Array([floats.length]));
                     propertyData.push(new Float32Array(floats));
+                    break;
+                }
+                case 'NameProperty': {
+                    const strs = gvas.nameArrays[propertyName] || [];
+                    if (strs.length === 0) return;
+                    // (u32)  NameProperty Count
+                    // (str*) NameProperty Array
+                    propertyData.push(new Uint32Array([strs.length]));
+                    propertyData.push(new Blob(strs.map(stringToBlob)));
                     break;
                 }
                 case 'IntProperty': {
@@ -781,6 +800,37 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
             // (str) StrProperty Value
             propertyData.push(stringToBlob(str));
             break;
+        }
+        case 'StructProperty': {
+            switch (dataType) {
+                case 'DateTime': {
+                    const dateTime = gvas.dateTimes[propertyName];
+                    if (typeof dateTime !== 'bigint') throw new Error('Unexpected dateTime type');
+                    propertyData.push(dateTimeToBlob(dateTime));
+                    break;
+                }
+                default:
+                    throw new Error(`Unexpected data type ${dataType}`);
+            }
+            // Property:
+            // (str)  Property Name
+            // (str)  Property Type
+            // (u64)  Property Value Size
+            // (str)  Data Type
+            // (u128) GUID (0)
+            // (u8)   Terminator
+            // (u8*)  Property Value
+            const propertyBlob = new Blob(propertyData);
+            const data: BlobPart[] = [
+                stringToBlob(propertyName),
+                stringToBlob(propertyType),
+                new Uint32Array([propertyBlob.size, 0]),
+                stringToBlob(dataType),
+                new Uint32Array([0, 0, 0, 0]),
+            ];
+            data.push(new Uint8Array([0])); // terminator
+            data.push(propertyBlob);
+            return new Blob(data);
         }
         default:
             throw new Error(`Unexpected property type ${propertyType}`);
@@ -1071,19 +1121,23 @@ function rtfToBlob(rtf: RichTextFormat): BlobPart {
     ]);
 }
 
-function quatToBlob(largeWorldCoords: boolean, q: Quaternion) {
+function dateTimeToBlob(dateTime: bigint): BlobPart {
+    return new BigUint64Array([dateTime]);
+}
+
+function quatToBlob(largeWorldCoords: boolean, q: Quaternion): BlobPart {
     return new (largeWorldCoords ? Float64Array : Float32Array)([
         q.x, q.y, q.z, q.w,
     ]);
 }
 
-function rotatorToBlob(largeWorldCoords: boolean, r: Rotator) {
+function rotatorToBlob(largeWorldCoords: boolean, r: Rotator): BlobPart {
     return new (largeWorldCoords ? Float64Array : Float32Array)([
         r.pitch, r.yaw, r.roll,
     ]);
 }
 
-function vectorToBlob(largeWorldCoords: boolean, v: Vector) {
+function vectorToBlob(largeWorldCoords: boolean, v: Vector): BlobPart {
     return new (largeWorldCoords ? Float64Array : Float32Array)([
         v.x, v.y, v.z,
     ]);
