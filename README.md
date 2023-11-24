@@ -215,8 +215,6 @@ type GvasTypes =
     | ['NameProperty']
     | ['StrProperty']
     | ['StructProperty', 'DateTime']
-    | ['StructProperty', 'Quat']
-    | ['StructProperty', 'Vector']
     | []
     ;
 
