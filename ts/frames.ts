@@ -1482,3 +1482,23 @@ export const isCargoType = (type: GvasString): type is CargoType =>
     type ? type in cargoTypes : false;
 
 export type CargoType = keyof typeof cargoTypes;
+
+export const cargoNames = {
+    ['EFreightType::Beam']: 'Beams',
+    ['EFreightType::Coal']: 'Coal',
+    ['EFreightType::CordWood']: 'Cordwood',
+    ['EFreightType::CrateTools']: 'Tool Crates',
+    ['EFreightType::CrudeOil']: 'Crude Oil',
+    ['EFreightType::IronOre']: 'Iron Ore',
+    ['EFreightType::Log']: 'Logs',
+    ['EFreightType::Lumber']: 'Lumber',
+    ['EFreightType::None']: 'None',
+    ['EFreightType::OilBarrel']: 'Oil Barrels',
+    ['EFreightType::SeedPallet']: 'Seed Pallet',
+    ['EFreightType::SteelPipe']: 'Steel Pipes',
+} as const satisfies PRO<string, string>;
+
+export const isCargoName = (name: GvasString): name is CargoName =>
+    name ? name in cargoNames : false;
+
+export type CargoName = keyof typeof cargoNames;
