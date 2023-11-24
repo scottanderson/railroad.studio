@@ -522,7 +522,6 @@ function parseStructArray(
             value.push(result);
         }
     } else if (fieldName === 'Transform') {
-        console.log(`Reading ${entryCount} Transforms...`);
         for (let i = 0; i < entryCount; i++) {
             let translation: Vector | undefined;
             let rotation: Quaternion | undefined;
