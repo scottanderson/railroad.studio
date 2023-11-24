@@ -6,40 +6,45 @@ import {Vector} from './Vector';
  * Stores the data from a GVAS '.sav' file.
  */
 export interface Gvas {
-    _order: string[];
     _header: GvasHeader;
+    _order: string[];
     boolArrays: Record<string, boolean[]>;
     bools: Record<string, boolean>;
     byteArrays: Record<string, number[]>;
+    dateTimes: Record<string, bigint>;
+    enumArrays: Record<string, GvasString[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
+    nameArrays: Record<string, GvasString[]>;
+    rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
-    vectorArrays: Record<string, Vector[]>;
-    rotatorArrays: Record<string, Rotator[]>;
-    transformArrays: Record<string, Transform[]>;
     textArrays: Record<string, GvasText[]>;
+    transformArrays: Record<string, Transform[]>;
+    vectorArrays: Record<string, Vector[]>;
 }
 
 export type GvasTypes =
-    | []
-    | ['BoolProperty']
-    | ['FloatProperty']
-    | ['IntProperty']
-    | ['StrProperty']
-    | ['StructProperty', 'Quat']
-    | ['StructProperty', 'Vector']
     | ['ArrayProperty', 'BoolProperty']
     | ['ArrayProperty', 'ByteProperty']
+    | ['ArrayProperty', 'EnumProperty']
     | ['ArrayProperty', 'FloatProperty']
     | ['ArrayProperty', 'IntProperty']
+    | ['ArrayProperty', 'NameProperty']
     | ['ArrayProperty', 'StrProperty']
     | ['ArrayProperty', 'StructProperty', 'Rotator']
     | ['ArrayProperty', 'StructProperty', 'Transform']
     | ['ArrayProperty', 'StructProperty', 'Vector']
     | ['ArrayProperty', 'TextProperty']
+    | ['BoolProperty']
+    | ['FloatProperty']
+    | ['IntProperty']
+    | ['NameProperty']
+    | ['StrProperty']
+    | ['StructProperty', 'DateTime']
+    | []
     ;
 
 export type GvasString = string | null;

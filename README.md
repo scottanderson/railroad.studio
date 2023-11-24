@@ -198,18 +198,25 @@ combinations of types, only the ones used by Railroads Online are implemented.
 
 ```ts
 type GvasTypes =
-    | []
+    | ['ArrayProperty', 'BoolProperty']
+    | ['ArrayProperty', 'ByteProperty']
+    | ['ArrayProperty', 'EnumProperty']
+    | ['ArrayProperty', 'FloatProperty']
+    | ['ArrayProperty', 'IntProperty']
+    | ['ArrayProperty', 'NameProperty']
+    | ['ArrayProperty', 'StrProperty']
+    | ['ArrayProperty', 'StructProperty', 'Rotator']
+    | ['ArrayProperty', 'StructProperty', 'Transform']
+    | ['ArrayProperty', 'StructProperty', 'Vector']
+    | ['ArrayProperty', 'TextProperty']
     | ['BoolProperty']
     | ['FloatProperty']
     | ['IntProperty']
+    | ['NameProperty']
     | ['StrProperty']
-    | ['ArrayProperty', 'BoolProperty']
-    | ['ArrayProperty', 'FloatProperty']
-    | ['ArrayProperty', 'IntProperty']
-    | ['ArrayProperty', 'StrProperty']
-    | ['ArrayProperty', 'StructProperty', 'Rotator']
-    | ['ArrayProperty', 'StructProperty', 'Vector']
-    | ['ArrayProperty', 'TextProperty'];
+    | ['StructProperty', 'DateTime']
+    | []
+    ;
 
 interface Gvas {
     _header: GvasHeader;
@@ -217,16 +224,19 @@ interface Gvas {
     boolArrays: Record<string, boolean[]>;
     bools: Record<string, boolean>;
     byteArrays: Record<string, number[]>;
+    dateTimes: Record<string, bigint>;
+    enumArrays: Record<string, GvasString[]>;
     floatArrays: Record<string, number[]>;
     floats: Record<string, number>;
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
+    nameArrays: Record<string, GvasString[]>;
+    rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
-    vectorArrays: Record<string, Vector[]>;
-    rotatorArrays: Record<string, Rotator[]>;
-    transformArrays: Record<string, Transform[]>;
     textArrays: Record<string, GvasText[]>;
+    transformArrays: Record<string, Transform[]>;
+    vectorArrays: Record<string, Vector[]>;
 }
 ```
 
