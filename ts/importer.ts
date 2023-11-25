@@ -338,8 +338,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const turntableLocation = optionalMap(gvas.vectorArrays, 'TurntableLocationArray');
     const turntableRotator = optionalMap(gvas.rotatorArrays, 'TurntableRotatorArray');
     const turntableType = isNovemberUpdate ?
-        optionalMap(gvas.intArrays, 'TurntableTypeArray') :
-        optionalMap(gvas.nameArrays, 'TurntableTypes');
+        optionalMap(gvas.nameArrays, 'TurntableTypes') :
+        optionalMap(gvas.intArrays, 'TurntableTypeArray');
     if (turntableDeckRotationArray || turntableLocation || turntableRotator || turntableType) {
         if (!turntableLocation || !turntableRotator || !turntableType) {
             throw new Error('Some turntable values are missing');
