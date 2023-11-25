@@ -78,6 +78,7 @@ const exportKeys = [
     'SplineSegmentsVisibilityArray',
     'SplineTrackEndPointArray',
     'SplineTrackEndTangentArray',
+    'SplineTrackIds',
     'SplineTrackLocationArray',
     'SplineTrackPaintStyleArray',
     'SplineTrackRotationArray',
@@ -415,6 +416,9 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'splinetrackendtangentarray':
                 vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.endTangent);
                 break;
+            case 'splinetrackids':
+                nameArrays[propertyName] = railroad.splineTracks.map((st) => st.type);
+                break;
             case 'splinetracklocationarray':
                 vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.location);
                 break;
@@ -585,6 +589,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'headlightrearstatearray': return ['ArrayProperty', 'BoolProperty'];
         case 'headlighttypearray': return ['ArrayProperty', 'IntProperty'];
         case 'industrylocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'industrynamearray': return ['ArrayProperty', 'NameProperty'];
         case 'industryrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'industrystorageeduct1array': return ['ArrayProperty', 'IntProperty'];
         case 'industrystorageeduct2array': return ['ArrayProperty', 'IntProperty'];
@@ -630,6 +635,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'splinesegmentsvisibilityarray': return ['ArrayProperty', 'BoolProperty'];
         case 'splinetrackendpointarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinetrackendtangentarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'splinetrackids': return ['ArrayProperty', 'NameProperty'];
         case 'splinetracklocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'splinetrackpaintstylearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinetrackrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
@@ -653,6 +659,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'turntablelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'turntablerotatorarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'turntabletypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'turntabletypes': return ['ArrayProperty', 'NameProperty'];
         case 'vegetationismcompnamearray': return ['ArrayProperty', 'StrProperty'];
         case 'vegetationinstanceindexarray': return ['ArrayProperty', 'IntProperty'];
         case 'watertowerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
