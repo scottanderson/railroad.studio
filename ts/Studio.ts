@@ -1217,9 +1217,13 @@ export class Studio {
                         entries.unshift(['', 'None']);
                         entries.unshift([freightType, freightType]);
                         const typeOptions = Object.fromEntries(entries);
-                        addStat('Freight Type', editDropdown(this, freightType, typeOptions, setFreightType));
+                        const form = editDropdown(this, freightType, typeOptions, setFreightType);
+                        addStat('Freight Type', form);
                     } else {
-                        addStat('Freight Type', editString(this, freightType, setFreightType));
+                        const title = `Unexpected freight type ${freightType} for ${frame.type}`;
+                        const c = 'table-warning';
+                        const form = editString(this, freightType, setFreightType);
+                        addStat('Freight Type', form, title, c);
                     }
                 }
             }
