@@ -295,6 +295,11 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             headlightType: 1,
             paintType: 5,
             smokestackType: 1,
+            markerLightsCenterState: 3,
+            markerLightsFrontLeftState: 3,
+            markerLightsFrontRightState: 3,
+            markerLightsRearLeftState: 3,
+            markerLightsRearRightState: 3,
         },
     },
 
