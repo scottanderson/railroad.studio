@@ -1,4 +1,4 @@
-import {Gvas} from './Gvas';
+import {Gvas, GvasHeader} from './Gvas';
 import {IndustryType} from './IndustryType';
 import {
     Frame,
@@ -15,14 +15,14 @@ import {
     Watertower,
 } from './Railroad';
 
-function checkSaveType(gvas: Gvas): boolean {
-    switch (gvas._header.saveType) {
+export function checkSaveType(header: GvasHeader): boolean {
+    switch (header.saveType) {
         case '/Script/arr.arrSaveGame':
             return false;
         case '/Script/arr.ARRSaveGame':
             return true;
         default:
-            throw new Error(`Unsupported saveType: ${gvas._header.saveType}`);
+            throw new Error(`Unsupported saveType: ${header.saveType}`);
     }
 }
 
@@ -49,7 +49,7 @@ function checkSaveType(gvas: Gvas): boolean {
  * @return {Railroad}
  */
 export function gvasToRailroad(gvas: Gvas): Railroad {
-    const isNovemberUpdate = checkSaveType(gvas);
+    const isNovemberUpdate = checkSaveType(gvas._header);
     // Read save game data
     const saveGameVersion = optionalMap(gvas.strings, 'SaveGameVersion');
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
@@ -101,7 +101,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const frameRotation = optionalMap(gvas.rotatorArrays, 'FrameRotationArray');
     const frameType = optionalMap(gvas.stringArrays, 'FrameTypeArray');
     const freightAmount = optionalMap(gvas.intArrays, 'FreightAmountArray');
-    const freightType = optionalMap(gvas.stringArrays, 'FreightTypeArray');
+    const freightType = isNovemberUpdate ?
+        optionalMap(gvas.enumArrays, 'FreightTypes') :
+        optionalMap(gvas.stringArrays, 'FreightTypeArray');
     const generatorValveValue = optionalMap(gvas.floatArrays, 'GeneratorValveValueArray');
     const headlightFrontState = optionalMap(gvas.boolArrays, 'HeadlightFrontStateArray');
     const headlightRearState = optionalMap(gvas.boolArrays, 'HeadlightRearStateArray');

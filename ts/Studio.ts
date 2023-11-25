@@ -1206,19 +1206,25 @@ export class Studio {
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
                     const options: InputTextOptions = {min: '0', max};
-                    addStat(`Freight Amount`, editNumber(this, frame.state.freightAmount, options, setAmount));
+                    addStat('Freight Amount', editNumber(this, frame.state.freightAmount, options, setAmount));
                     const allowedCargo = Object.keys(limits) as CargoType[];
-                    const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
-                    entries.unshift(['', 'None']);
-                    if (!allowedCargo.includes(freightType)) {
-                        entries.unshift([freightType, freightType]);
-                    }
-                    const typeOptions = Object.fromEntries(entries);
-                    const setFreightType = (type: string) => {
+                    const setFreightType = (type: GvasString) => {
                         // TODO: Update freight amount limits
                         return frame.state.freightType = type === '' ? null : type;
                     };
-                    addStat(`Freight Type`, editDropdown(this, freightType, typeOptions, setFreightType));
+                    if (allowedCargo.includes(freightType)) {
+                        const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
+                        entries.unshift(['', 'None']);
+                        entries.unshift([freightType, freightType]);
+                        const typeOptions = Object.fromEntries(entries);
+                        const form = editDropdown(this, freightType, typeOptions, setFreightType);
+                        addStat('Freight Type', form);
+                    } else {
+                        const title = `Unexpected freight type ${freightType} for ${frame.type}`;
+                        const c = 'table-warning';
+                        const form = editString(this, freightType, setFreightType);
+                        addStat('Freight Type', form, title, c);
+                    }
                 }
             }
         }
