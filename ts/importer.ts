@@ -101,9 +101,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const frameRotation = optionalMap(gvas.rotatorArrays, 'FrameRotationArray');
     const frameType = optionalMap(gvas.stringArrays, 'FrameTypeArray');
     const freightAmount = optionalMap(gvas.intArrays, 'FreightAmountArray');
-    const freightType =
-        optionalMap(gvas.stringArrays, 'FreightTypeArray') ??
-        optionalMap(gvas.enumArrays, 'FreightTypes');
+    const freightType = isNovemberUpdate ?
+        optionalMap(gvas.enumArrays, 'FreightTypes') :
+        optionalMap(gvas.stringArrays, 'FreightTypeArray');
     const generatorValveValue = optionalMap(gvas.floatArrays, 'GeneratorValveValueArray');
     const headlightFrontState = optionalMap(gvas.boolArrays, 'HeadlightFrontStateArray');
     const headlightRearState = optionalMap(gvas.boolArrays, 'HeadlightRearStateArray');
@@ -211,11 +211,13 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         optionalMap(gvas.intArrays, 'IndustryTypeArray');
     if (industryLocation || industryRotation ||
         industryStorageEduct1 || industryStorageEduct2 || industryStorageEduct3 || industryStorageEduct4 ||
-        industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4) {
-        if (!industryLocation || !industryRotation || !industryType ||
+        industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4 ||
+        industryType) {
+        if (!industryLocation || !industryRotation ||
             !industryStorageEduct1 || !industryStorageEduct2 || !industryStorageEduct3 || !industryStorageEduct4 ||
             !industryStorageProduct1 || !industryStorageProduct2 ||
-            !industryStorageProduct3 || !industryStorageProduct4) {
+            !industryStorageProduct3 || !industryStorageProduct4 ||
+            !industryType) {
             throw new Error('Some industry values are missing');
         }
         enforceEqualLengths([industryLocation, industryRotation,
@@ -459,7 +461,6 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const splineTrackEndSpline1Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline1IDArray');
     const splineTrackEndSpline2Id = optionalMap(gvas.intArrays, 'SplineTrackEndSpline2IDArray');
     const splineTrackEndTangent = optionalMap(gvas.vectorArrays, 'SplineTrackEndTangentArray');
-    const splineTrackIds = optionalMap(gvas.nameArrays, 'SplineTrackIds');
     const splineTrackLocation = optionalMap(gvas.vectorArrays, 'SplineTrackLocationArray');
     const splineTrackPaintStyle = optionalMap(gvas.intArrays, 'SplineTrackPaintStyleArray');
     const splineTrackRotation = optionalMap(gvas.rotatorArrays, 'SplineTrackRotationArray');
@@ -481,9 +482,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         splineTrackStartSplineId ||
         splineTrackStartTangent ||
         splineTrackSwitchState ||
-        splineTrackType ||
-        splineTrackIds) {
-        const splineTrackIdentifier = splineTrackType ?? splineTrackIds;
+        splineTrackType) {
         if (!splineTrackEndPoint ||
             !splineTrackEndTangent ||
             !splineTrackLocation ||
@@ -492,7 +491,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             !splineTrackStartPoint ||
             !splineTrackStartTangent ||
             !splineTrackSwitchState ||
-            !splineTrackIdentifier) {
+            !splineTrackType) {
             throw new Error('Some spline track values are missing');
         }
         enforceEqualLengths([
@@ -504,9 +503,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             splineTrackStartPoint,
             splineTrackStartTangent,
             splineTrackSwitchState,
-            splineTrackIdentifier,
+            splineTrackType,
         ]);
-        for (let i = 0; i < splineTrackIdentifier.length; i++) {
+        for (let i = 0; i < splineTrackType.length; i++) {
             const splineTrack: SplineTrack = {
                 endPoint: splineTrackEndPoint[i],
                 endSpline1Id: optionalIndex(splineTrackEndSpline1Id, i),
@@ -519,7 +518,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                 startSplineId: optionalIndex(splineTrackStartSplineId, i),
                 startTangent: splineTrackStartTangent[i],
                 switchState: splineTrackSwitchState[i],
-                type: splineTrackIdentifier[i],
+                type: splineTrackType[i],
             };
             splineTracks.push(splineTrack);
         }
