@@ -204,7 +204,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const industryStorageProduct2 = optionalMap(gvas.intArrays, 'IndustryStorageProduct2Array');
     const industryStorageProduct3 = optionalMap(gvas.intArrays, 'IndustryStorageProduct3Array');
     const industryStorageProduct4 = optionalMap(gvas.intArrays, 'IndustryStorageProduct4Array');
-    const industryType = optionalMap(gvas.intArrays, 'IndustryTypeArray');
+    const industryType = isNovemberUpdate ?
+        optionalMap(gvas.nameArrays, 'IndustryNameArray') :
+        optionalMap(gvas.intArrays, 'IndustryTypeArray');
     if (industryLocation || industryRotation ||
         industryStorageEduct1 || industryStorageEduct2 || industryStorageEduct3 || industryStorageEduct4 ||
         industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4 ||
@@ -221,6 +223,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             industryStorageProduct1, industryStorageProduct2, industryStorageProduct3, industryStorageProduct4,
             industryType]);
         for (let i = 0; i < industryLocation.length; i++) {
+            const industryTypeTemp = industryType[i];
+            if (industryTypeTemp === null) throw new Error('Null industryType');
             const industry: Industry = {
                 location: industryLocation[i],
                 rotation: industryRotation[i],
@@ -230,9 +234,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                 outputs: [
                     industryStorageProduct1[i], industryStorageProduct2[i],
                     industryStorageProduct3[i], industryStorageProduct4[i]],
-                type: industryType[i],
+                type: industryTypeTemp,
             };
-            if (industry.type > IndustryType.wood_rick) {
+            if (typeof industry.type === 'number' && industry.type > IndustryType.wood_rick) {
                 throw new Error(`Unexpected industry type ${industry.type}`);
             }
             industries.push(industry);
@@ -334,8 +338,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const turntableLocation = optionalMap(gvas.vectorArrays, 'TurntableLocationArray');
     const turntableRotator = optionalMap(gvas.rotatorArrays, 'TurntableRotatorArray');
     const turntableType = isNovemberUpdate ?
-        optionalMap(gvas.intArrays, 'TurntableTypeArray') :
-        optionalMap(gvas.nameArrays, 'TurntableTypes');
+        optionalMap(gvas.nameArrays, 'TurntableTypes') :
+        optionalMap(gvas.intArrays, 'TurntableTypeArray');
     if (turntableDeckRotationArray || turntableLocation || turntableRotator || turntableType) {
         if (!turntableLocation || !turntableRotator || !turntableType) {
             throw new Error('Some turntable values are missing');

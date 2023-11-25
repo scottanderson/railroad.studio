@@ -10,6 +10,7 @@ import {
     InputTextOptions,
     bootstrapIcon,
     editDropdown,
+    editIndustryName,
     editIndustryProducts,
     editIndustryType,
     editNumber,
@@ -43,6 +44,12 @@ import {toggleDarkMode} from './themes';
 import {catmullRomToHermite} from './util-catmullrom';
 import {Quaternion} from './Quaternion';
 import {textToString} from './util';
+import {
+    IndustryName,
+    industryNameProductInputLabels,
+    industryNameProductOutputLabels,
+    isIndustryName,
+} from './IndustryName';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 230403;
@@ -1235,20 +1242,37 @@ export class Studio {
             tbody.appendChild(tr);
             // Industry type
             let td = document.createElement('td');
-            const setIndustryType = (type: IndustryType) => industry.type = type;
-            td.replaceChildren(editIndustryType(this, industry.type, setIndustryType));
+            if (typeof industry.type === 'number') {
+                const setIndustryType = (type: IndustryType) => industry.type = type;
+                td.replaceChildren(editIndustryType(this, industry.type, setIndustryType));
+            } else if (isIndustryName(industry.type)) {
+                const setIndustryName = (name: IndustryName) => industry.type = name;
+                td.replaceChildren(editIndustryName(this, industry.type, setIndustryName));
+            } else {
+                throw new Error('Unexpected industry type');
+            }
             tr.appendChild(td);
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
-            const inputLabels = industryProductInputLabels[industry.type];
-            td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
+            if (typeof industry.type === 'number') {
+                const labels = industryProductInputLabels[industry.type];
+                td.appendChild(editIndustryProducts(this, 'Input', labels, industry.inputs, setIndustryInputs));
+            } else {
+                const labels = industryNameProductInputLabels[industry.type];
+                td.appendChild(editIndustryProducts(this, 'Input', labels, industry.inputs, setIndustryInputs));
+            }
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
-            const outputLabels = industryProductOutputLabels[industry.type];
-            td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
+            if (typeof industry.type === 'number') {
+                const labels = industryProductOutputLabels[industry.type];
+                td.appendChild(editIndustryProducts(this, 'Output', labels, industry.outputs, setIndustryOutputs));
+            } else {
+                const labels = industryNameProductOutputLabels[industry.type];
+                td.appendChild(editIndustryProducts(this, 'Output', labels, industry.outputs, setIndustryOutputs));
+            }
             tr.appendChild(td);
             // Location
             td = document.createElement('td');
