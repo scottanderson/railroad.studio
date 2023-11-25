@@ -1384,79 +1384,83 @@ export const frameStateMetadata = {
 
 export const cargoLimits = {
     boxcar: {
-        crate_tools: 32,
+        ['EFreightType::CrateTools']: 32,
+        ['EFreightType::None']: 0,
+        ['EFreightType::SeedPallet']: 14,
     },
     flatcar_cordwood: {
-        cordwood: 8,
-        oilbarrel: 46,
+        ['EFreightType::CordWood']: 8,
+        ['EFreightType::OilBarrel']: 46,
     },
     flatcar_hopper: {
-        coal: 10,
-        ironore: 10,
+        ['EFreightType::Coal']: 10,
+        ['EFreightType::IronOre']: 10,
     },
     flatcar_logs: {
-        log: 6,
-        steelpipe: 9,
+        ['EFreightType::Log']: 6,
+        ['EFreightType::SteelPipe']: 9,
     },
     flatcar_stakes: {
-        beam: 3,
-        lumber: 6,
+        ['EFreightType::Beam']: 3,
+        ['EFreightType::Lumber']: 6,
+        ['EFreightType::None']: 0,
         rail: 10,
-        rawiron: 3,
+        ['EFreightType::RawIron']: 3,
     },
     flatcar_tanker: {
-        crudeoil: 12,
+        ['EFreightType::CrudeOil']: 12,
     },
     hopperBB: {
-        coal: 10,
-        ironore: 8,
+        ['EFreightType::Coal']: 10,
+        ['EFreightType::IronOre']: 8,
     },
     plantationcar_boxcar: {
-        crate_tools: 12,
-        crudeoil: 15,
+        ['EFreightType::CrateTools']: 12,
+        ['EFreightType::CrudeOil']: 15,
+        ['EFreightType::None']: 0,
     },
     plantationcar_flatcar: {
-        crate_tools: 6,
+        ['EFreightType::CrateTools']: 6,
     },
     plantationcar_flatcar_logs: {
-        log: 5,
-        steelpipe: 7,
+        ['EFreightType::Log']: 5,
+        ['EFreightType::SteelPipe']: 7,
     },
     plantationcar_flatcar_stakes: {
-        beam: 3,
-        lumber: 3,
+        ['EFreightType::Beam']: 3,
+        ['EFreightType::Lumber']: 3,
         rail: 4,
-        rawiron: 3,
+        ['EFreightType::RawIron']: 3,
     },
     plantationcar_flatcar_stakes_bulkhead: {
-        cordwood: 2,
+        ['EFreightType::CordWood']: 2,
     },
     plantationcar_hopper_large: {
-        coal: 6,
-        ironore: 6,
-        oilbarrel: 15,
+        ['EFreightType::Coal']: 6,
+        ['EFreightType::IronOre']: 6,
+        ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_hopper_medium: {
-        coal: 3,
-        ironore: 3,
-        oilbarrel: 15,
+        ['EFreightType::Coal']: 3,
+        ['EFreightType::IronOre']: 3,
+        ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_hopper_small: {
-        coal: 2,
-        ironore: 2,
-        oilbarrel: 15,
+        ['EFreightType::Coal']: 2,
+        ['EFreightType::IronOre']: 2,
+        ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_tanker: {
-        crudeoil: 2,
+        ['EFreightType::CrudeOil']: 2,
     },
     skeletoncar: {
-        log: 5,
+        ['EFreightType::Log']: 5,
     },
     stockcar: {
-        crate_tools: 32,
+        ['EFreightType::CrateTools']: 32,
     },
     tankcarNCO: {
-        crudeoil: 8,
+        ['EFreightType::CrudeOil']: 8,
     },
 } as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 
@@ -1464,26 +1468,6 @@ export const hasCargoLimits = (type: GvasString): type is keyof typeof cargoLimi
     type ? type in cargoLimits : false;
 
 export const cargoTypes = {
-    beam: 'Beams',
-    coal: 'Coal',
-    cordwood: 'Cordwood',
-    crate_tools: 'Tool Crates',
-    crudeoil: 'Crude Oil',
-    ironore: 'Iron Ore',
-    log: 'Logs',
-    lumber: 'Lumber',
-    oilbarrel: 'Oil Barrels',
-    rail: 'Rails',
-    rawiron: 'Raw Iron',
-    steelpipe: 'Steel Pipes',
-} as const satisfies PRO<string, string>;
-
-export const isCargoType = (type: GvasString): type is CargoType =>
-    type ? type in cargoTypes : false;
-
-export type CargoType = keyof typeof cargoTypes;
-
-export const cargoNames = {
     ['EFreightType::Beam']: 'Beams',
     ['EFreightType::Coal']: 'Coal',
     ['EFreightType::CordWood']: 'Cordwood',
@@ -1494,11 +1478,13 @@ export const cargoNames = {
     ['EFreightType::Lumber']: 'Lumber',
     ['EFreightType::None']: 'None',
     ['EFreightType::OilBarrel']: 'Oil Barrels',
+    rail: 'Rails', // FIXME
+    ['EFreightType::RawIron']: 'Raw Iron',
     ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
 } as const satisfies PRO<string, string>;
 
-export const isCargoName = (name: GvasString): name is CargoName =>
-    name ? name in cargoNames : false;
+export const isCargoType = (type: GvasString): type is CargoType =>
+    type ? type in cargoTypes : false;
 
-export type CargoName = keyof typeof cargoNames;
+export type CargoType = keyof typeof cargoTypes;

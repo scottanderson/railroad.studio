@@ -515,6 +515,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 });
                 break;
             case 'turntabletypes':
+                if (!isNovemberUpdate) break;
                 nameArrays[propertyName] = railroad.turntables.map((t) => {
                     if (typeof t.type !== 'string') throw new Error(`Unexpected type ${t.type}`);
                     return t.type;
