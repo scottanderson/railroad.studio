@@ -1210,7 +1210,7 @@ export class Studio {
                     const allowedCargo = Object.keys(limits) as CargoType[];
                     const setFreightType = (type: GvasString) => {
                         // TODO: Update freight amount limits
-                        return frame.state.freightType = (type === '' ? null : type);
+                        return frame.state.freightType = type === '' ? null : type;
                     };
                     if (allowedCargo.includes(freightType)) {
                         const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
@@ -1220,9 +1220,10 @@ export class Studio {
                         const form = editDropdown(this, freightType, typeOptions, setFreightType);
                         addStat('Freight Type', form);
                     } else {
-                        const c = 'table-danger';
+                        const title = `Unexpected freight type ${freightType} for ${frame.type}`;
+                        const c = 'table-warning';
                         const form = editString(this, freightType, setFreightType);
-                        addStat('Freight Type', form, undefined, c);
+                        addStat('Freight Type', form, title, c);
                     }
                 }
             }
