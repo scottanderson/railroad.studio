@@ -1390,6 +1390,7 @@ export const cargoLimits = {
     },
     flatcar_cordwood: {
         ['EFreightType::CordWood']: 8,
+        ['EFreightType::None']: 0,
         ['EFreightType::OilBarrel']: 46,
     },
     flatcar_hopper: {
@@ -1398,6 +1399,7 @@ export const cargoLimits = {
     },
     flatcar_logs: {
         ['EFreightType::Log']: 6,
+        ['EFreightType::None']: 0,
         ['EFreightType::SteelPipe']: 9,
     },
     flatcar_stakes: {
