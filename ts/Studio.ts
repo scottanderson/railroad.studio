@@ -52,7 +52,7 @@ import {
 } from './IndustryName';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
-const NEWEST_TESTED_SAVE_GAME_VERSION = 230403;
+const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
 
 /**
  * Web UI for editing a Railroad object.
