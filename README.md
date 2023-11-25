@@ -98,6 +98,41 @@ The main entry point for the application is `ts/index.ts`. This file contains
 the logic for the front page of Railroad Studio, which presents the user with a
 file input box and instructions for locating the game .sav file.
 
+```mermaid
+stateDiagram-v2
+
+    state Load {
+        state "File" as LoadFile
+        state "ArrayBuffer" as LoadArrayBuffer
+        LoadFile --> LoadArrayBuffer : Read
+        state "Gvas" as LoadGvas
+        LoadArrayBuffer --> LoadGvas : Parse
+        state "Railroad" as LoadRailroad
+        LoadGvas --> LoadRailroad : Import
+    }
+
+    state "Railroad Studio Editor" as Edit {
+        state "Railroad" as EditRailroad
+        EditRailroad --> EditRailroad : Modify
+    }
+
+    state Export {
+        state "Railroad" as ExportRailroad
+        state "Gvas" as ExportGvas
+        ExportRailroad --> ExportGvas : Export
+        state "ArrayBuffer" as ExportArrayBuffer
+        ExportGvas --> ExportArrayBuffer : Serialize
+        state "File" as ExportFile
+        ExportArrayBuffer --> ExportFile : Write
+    }
+
+    direction LR
+    [*] --> Load
+    Load --> Edit
+    Edit --> Export
+    Export --> [*]
+```
+
 ### Reading files
 
 When the user provides a .sav file in to the form input field, index.ts maps the
