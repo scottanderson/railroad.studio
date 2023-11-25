@@ -1063,6 +1063,10 @@ export class Studio {
         });
         const tbody = document.createElement('tbody');
         table.appendChild(tbody);
+        if (last < 0) {
+            // Nothing to see
+            return;
+        }
         for (let idx = first; idx <= last; idx++) {
             const frame = filtered[idx];
             tr = document.createElement('tr');
