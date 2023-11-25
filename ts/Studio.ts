@@ -1217,9 +1217,12 @@ export class Studio {
                         entries.unshift(['', 'None']);
                         entries.unshift([freightType, freightType]);
                         const typeOptions = Object.fromEntries(entries);
-                        addStat('Freight Type', editDropdown(this, freightType, typeOptions, setFreightType));
+                        const form = editDropdown(this, freightType, typeOptions, setFreightType);
+                        addStat('Freight Type', form);
                     } else {
-                        addStat('Freight Type', editString(this, freightType, setFreightType));
+                        const c = 'table-danger';
+                        const form = editString(this, freightType, setFreightType);
+                        addStat('Freight Type', form, undefined, c);
                     }
                 }
             }
