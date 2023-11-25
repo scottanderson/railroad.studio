@@ -1405,7 +1405,7 @@ export const cargoLimits = {
         ['EFreightType::Lumber']: 6,
         ['EFreightType::None']: 0,
         rail: 10,
-        rawiron: 3,
+        ['EFreightType::RawIron']: 3,
     },
     flatcar_tanker: {
         ['EFreightType::CrudeOil']: 12,
@@ -1430,7 +1430,7 @@ export const cargoLimits = {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 3,
         rail: 4,
-        rawiron: 3,
+        ['EFreightType::RawIron']: 3,
     },
     plantationcar_flatcar_stakes_bulkhead: {
         ['EFreightType::CordWood']: 2,
@@ -1479,7 +1479,7 @@ export const cargoTypes = {
     ['EFreightType::None']: 'None',
     ['EFreightType::OilBarrel']: 'Oil Barrels',
     rail: 'Rails', // FIXME
-    rawiron: 'Raw Iron', // FIXME
+    ['EFreightType::RawIron']: 'Raw Iron',
     ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
 } as const satisfies PRO<string, string>;
