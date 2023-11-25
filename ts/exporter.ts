@@ -5,6 +5,7 @@ import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
+import {checkSaveType} from './importer';
 
 const exportKeys = [
     'AnimateTimeOfDay',
@@ -27,6 +28,7 @@ const exportKeys = [
     'FrameTypeArray',
     'FreightAmountArray',
     'FreightTypeArray',
+    'FreightTypes',
     'GameLevelName',
     'GeneratorValveValueArray',
     'HeadlightFrontStateArray',
@@ -131,6 +133,7 @@ const exportKeys = [
  * @return {Gvas}
  */
 export function railroadToGvas(railroad: Railroad): Gvas {
+    const isNovemberUpdate = checkSaveType(railroad._header);
     // Flatten control points and segment arrays
     let splineControlPoints: Vector[] = [];
     const splineControlPointsIndexStart: number[] = [];
@@ -236,7 +239,12 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.frames.map((f) => f.state.freightAmount);
                 break;
             case 'freighttypearray':
+                if (isNovemberUpdate) break;
                 stringArrays[propertyName] = railroad.frames.map((f) => f.state.freightType);
+                break;
+            case 'freighttypes':
+                if (!isNovemberUpdate) break;
+                enumArrays[propertyName] = railroad.frames.map((f) => f.state.freightType);
                 break;
             case 'gamelevelname':
                 strings[propertyName] = railroad.settings.gameLevelName;
@@ -257,6 +265,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 vectorArrays[propertyName] = railroad.industries.map((i) => i.location);
                 break;
             case 'industrynamearray':
+                if (!isNovemberUpdate) break;
                 nameArrays[propertyName] = railroad.industries.map((i) => {
                     if (typeof i.type !== 'string') throw new Error(`Unexpected type ${i.type}`);
                     return i.type;
@@ -290,6 +299,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.industries.map((i) => i.outputs[3]);
                 break;
             case 'industrytypearray':
+                if (isNovemberUpdate) break;
                 intArrays[propertyName] = railroad.industries.map((i) => {
                     if (typeof i.type !== 'number') throw new Error(`Unexpected type ${i.type}`);
                     return i.type;
@@ -417,6 +427,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 vectorArrays[propertyName] = railroad.splineTracks.map((st) => st.endTangent);
                 break;
             case 'splinetrackids':
+                if (!isNovemberUpdate) break;
                 nameArrays[propertyName] = railroad.splineTracks.map((st) => st.type);
                 break;
             case 'splinetracklocationarray':
@@ -442,6 +453,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.splineTracks.map((st) => st.switchState);
                 break;
             case 'splinetracktypearray':
+                if (isNovemberUpdate) break;
                 stringArrays[propertyName] = railroad.splineTracks.map((st) => st.type);
                 break;
             case 'splinetypearray':
@@ -496,6 +508,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 rotatorArrays[propertyName] = railroad.turntables.map((t) => t.rotator);
                 break;
             case 'turntabletypearray':
+                if (isNovemberUpdate) break;
                 intArrays[propertyName] = railroad.turntables.map((t) => {
                     if (typeof t.type !== 'number') throw new Error(`Unexpected type ${t.type}`);
                     return t.type;
@@ -583,6 +596,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'frametypearray': return ['ArrayProperty', 'StrProperty'];
         case 'freightamountarray': return ['ArrayProperty', 'IntProperty'];
         case 'freighttypearray': return ['ArrayProperty', 'StrProperty'];
+        case 'freighttypes': return ['ArrayProperty', 'EnumProperty'];
         case 'gamelevelname': return ['StrProperty'];
         case 'generatorvalvevaluearray': return ['ArrayProperty', 'FloatProperty'];
         case 'headlightfrontstatearray': return ['ArrayProperty', 'BoolProperty'];
@@ -842,6 +856,7 @@ function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
         case 'StructProperty': {
             switch (dataType) {
                 case 'DateTime': {
+                    if (!(propertyName in gvas.dateTimes)) return;
                     const dateTime = gvas.dateTimes[propertyName];
                     if (typeof dateTime !== 'bigint') throw new Error('Unexpected dateTime type');
                     propertyData.push(dateTimeToBlob(dateTime));
