@@ -1,0 +1,190 @@
+import {GvasString} from './Gvas';
+import {IndustryType} from './IndustryType';
+import {Industry} from './Railroad';
+
+export const IndustryNames = [
+    'coalmine',
+    'coaltower',
+    'enginehouse_alpine_blue',
+    'enginehouse_aspen_gold',
+    'enginehouse_barn_red',
+    'enginehouse_princes_mineral_brown',
+    'engineshed_style1',
+    'engineshed_style2',
+    'engineshed_style3',
+    'engineshed_style4',
+    'firewooddepot',
+    'freightdepot',
+    'ironoremine',
+    'ironworks',
+    'logcamp',
+    'oilfield',
+    'Refinery',
+    'sawmill',
+    'smelter',
+    'telegraphoffice',
+    'watertower_1870_style1',
+    'watertower_1870_style2',
+    'watertower_1870_style3',
+    'watertower_1870_style4',
+    'watertower_drgw',
+    'watertower_kanaskat_style1',
+    'watertower_kanaskat_style2',
+    'watertower_kanaskat_style3',
+    'watertower_kanaskat_style4',
+    'WheatFarm',
+    'Woodrick',
+] as const satisfies readonly string[];
+
+export const isIndustryName = (name: IndustryType | GvasString): name is IndustryName =>
+    !!name && (typeof name === 'string') && IndustryNames.includes(name);
+
+export type IndustryName = typeof IndustryNames[number];
+
+export const legacyIndustryTypes = {
+    'coalmine': IndustryType.coal_mine,
+    'coaltower': IndustryType.coaling_tower,
+    'enginehouse_alpine_blue': IndustryType.engine_house_lightblue,
+    'enginehouse_aspen_gold': IndustryType.engine_house_gold,
+    'enginehouse_barn_red': IndustryType.engine_house_red,
+    'enginehouse_princes_mineral_brown': IndustryType.engine_house_brown,
+    'engineshed_style1': IndustryType.large_engine_house_red,
+    'engineshed_style2': IndustryType.large_engine_house_brown,
+    'engineshed_style3': IndustryType.large_engine_house_beige,
+    'engineshed_style4': IndustryType.large_engine_house_old,
+    'firewooddepot': IndustryType.firewood_camp,
+    'freightdepot': IndustryType.freight_depot,
+    'ironoremine': IndustryType.iron_mine,
+    'ironworks': IndustryType.ironworks,
+    'logcamp': IndustryType.logging_camp,
+    'oilfield': IndustryType.oil_field,
+    'Refinery': IndustryType.refinery,
+    'sawmill': IndustryType.sawmill,
+    'smelter': IndustryType.smelter,
+    'telegraphoffice': IndustryType.telegraph_office,
+    'watertower_1870_style1': IndustryType.water_tower_a_red,
+    'watertower_1870_style2': IndustryType.water_tower_a_brown,
+    'watertower_1870_style3': IndustryType.water_tower_a_beige,
+    'watertower_1870_style4': IndustryType.water_tower_a_old,
+    'watertower_drgw': IndustryType.water_tower_a_beige, // ???
+    'watertower_kanaskat_style1': IndustryType.water_tower_b_red,
+    'watertower_kanaskat_style2': IndustryType.water_tower_b_brown,
+    'watertower_kanaskat_style3': IndustryType.water_tower_b_beige,
+    'watertower_kanaskat_style4': IndustryType.water_tower_b_old,
+    'WheatFarm': IndustryType.wood_rick, // FIXME
+    'Woodrick': IndustryType.wood_rick,
+} as const satisfies Record<IndustryName, IndustryType>;
+
+export function getIndustryType(industry: Industry): IndustryType {
+    if (typeof industry.type === 'number') return industry.type;
+    if (isIndustryName(industry.type)) return legacyIndustryTypes[industry.type];
+    throw new Error(`Unsupproted industry ${industry.type}`);
+}
+
+export const industryNames: Record<IndustryName, string> = {
+    'coalmine': 'Coal Mine',
+    'coaltower': 'Coaling Tower',
+    'enginehouse_alpine_blue': 'Engine House (Blue)',
+    'enginehouse_aspen_gold': 'Engine House (Gold)',
+    'enginehouse_barn_red': 'Engine House (Red)',
+    'enginehouse_princes_mineral_brown': 'Engine House (Brown)',
+    'engineshed_style1': 'Large Engine House (Red)',
+    'engineshed_style2': 'Large Engine House (Brown)',
+    'engineshed_style3': 'Large Engine House (Beige)',
+    'engineshed_style4': 'Large Engine House (Old)',
+    'firewooddepot': 'Firewood Camp',
+    'freightdepot': 'Freight Depot',
+    'ironoremine': 'Iron Mine',
+    'ironworks': 'Ironworks',
+    'logcamp': 'Logging Camp',
+    'oilfield': 'Oil Field',
+    'Refinery': 'Refinery',
+    'sawmill': 'Sawmill',
+    'smelter': 'Smelter',
+    'telegraphoffice': 'Telegraph Office',
+    'watertower_1870_style1': '1870 Water Tower (Red)',
+    'watertower_1870_style2': '1870 Water Tower (Brown)',
+    'watertower_1870_style3': '1870 Water Tower (Beige)',
+    'watertower_1870_style4': '1870 Water Tower (Old)',
+    'watertower_drgw': 'D&RGW Water Tower',
+    'watertower_kanaskat_style1': 'Kanaskat Water Tower (Red)',
+    'watertower_kanaskat_style2': 'Kanaskat Water Tower (Brown)',
+    'watertower_kanaskat_style3': 'Kanaskat Water Tower (Beige)',
+    'watertower_kanaskat_style4': 'Kanaskat Water Tower (Old)',
+    'WheatFarm': 'Wheat Farm',
+    'Woodrick': 'Wood Rick',
+};
+
+type FourStrings = [string, string, string, string];
+const [input2, input3, input4] = ['Input 2', 'Input 3', 'Input 4'];
+const [output2, output3, output4] = ['Output 2', 'Output 3', 'Output 4'];
+const input1234: FourStrings = ['Input 1', input2, input3, input4];
+const output1234: FourStrings = ['Output 1', output2, output3, output4];
+
+export const industryNameProductInputLabels: Record<IndustryName, FourStrings> = {
+    'logcamp': input1234,
+    'sawmill': ['Logs', input2, input3, input4],
+    'smelter': ['Cordwood', 'Iron Ore', input3, input4],
+    'ironworks': ['Raw Iron', 'Coal', 'Lumber', input4],
+    'oilfield': ['Steel Pipes', 'Beams', 'Tool Crates', input4],
+    'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
+    'coalmine': ['Beams', 'Rails', input3, input4],
+    'ironoremine': ['Lumber', 'Beams', input3, input4],
+    'freightdepot': input1234,
+    'firewooddepot': input1234,
+    'enginehouse_alpine_blue': input1234,
+    'enginehouse_aspen_gold': input1234,
+    'enginehouse_barn_red': input1234,
+    'enginehouse_princes_mineral_brown': input1234,
+    'coaltower': input1234,
+    'telegraphoffice': input1234,
+    'Woodrick': input1234,
+    'engineshed_style1': input1234,
+    'engineshed_style2': input1234,
+    'engineshed_style3': input1234,
+    'engineshed_style4': input1234,
+    'watertower_1870_style1': input1234,
+    'watertower_1870_style2': input1234,
+    'watertower_1870_style3': input1234,
+    'watertower_1870_style4': input1234,
+    'watertower_drgw': input1234,
+    'watertower_kanaskat_style1': input1234,
+    'watertower_kanaskat_style2': input1234,
+    'watertower_kanaskat_style3': input1234,
+    'watertower_kanaskat_style4': input1234,
+    'WheatFarm': input1234,
+};
+
+export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> = {
+    'logcamp': ['Logs', 'Cordwood', output3, output4],
+    'sawmill': ['Lumber', 'Beams', output3, output4],
+    'smelter': ['Raw Iron', 'Rails', output3, output4],
+    'ironworks': ['Steel Pipes', 'Tool Crates', output3, output4],
+    'oilfield': ['Crude Oil', output2, output3, output4],
+    'Refinery': ['Oil Barrel', output2, output3, output4],
+    'coalmine': ['Coal', output2, output3, output4],
+    'ironoremine': ['Iron Ore', output2, output3, output4],
+    'freightdepot': output1234,
+    'firewooddepot': output1234,
+    'enginehouse_alpine_blue': output1234,
+    'enginehouse_aspen_gold': output1234,
+    'enginehouse_barn_red': output1234,
+    'enginehouse_princes_mineral_brown': output1234,
+    'coaltower': output1234,
+    'telegraphoffice': output1234,
+    'Woodrick': ['Firewood', 'Firewood', output3, output4],
+    'engineshed_style1': output1234,
+    'engineshed_style2': output1234,
+    'engineshed_style3': output1234,
+    'engineshed_style4': output1234,
+    'watertower_1870_style1': output1234,
+    'watertower_1870_style2': output1234,
+    'watertower_1870_style3': output1234,
+    'watertower_1870_style4': output1234,
+    'watertower_drgw': output1234,
+    'watertower_kanaskat_style1': output1234,
+    'watertower_kanaskat_style2': output1234,
+    'watertower_kanaskat_style3': output1234,
+    'watertower_kanaskat_style4': output1234,
+    'WheatFarm': output1234,
+};

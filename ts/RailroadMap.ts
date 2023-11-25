@@ -44,6 +44,7 @@ import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
 import {textToString, unknownProperty} from './util';
+import {getIndustryType, industryNames, isIndustryName} from './IndustryName';
 
 enum MapToolMode {
     pan_zoom,
@@ -932,9 +933,11 @@ export class RailroadMap {
     private gizmoDebugLine?: Line;
     private gizmoDebugText?: Text;
     private renderIndustry(industry: Industry) {
-        const paths = Object.entries(industrySvgPaths[industry.type] || {});
-        const groupClass = industry.type in IndustryType ? IndustryType[industry.type] : 'unknown';
-        const tooltipText = industry.type in industryName ? industryName[industry.type] : `Unknown ${industry.type}`;
+        const industryType = getIndustryType(industry);
+        const paths = Object.entries(industrySvgPaths[industryType] || {});
+        const groupClass = IndustryType[industryType];
+        const tooltipText = typeof industry.type === 'number' ? industryName[industry.type] :
+            isIndustryName(industry.type) ? industryNames[industry.type] : `Unknown ${industry.type}`;
         const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()

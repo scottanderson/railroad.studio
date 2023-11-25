@@ -1,4 +1,5 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
+import {IndustryName, industryNames} from './IndustryName';
 import {IndustryType, industryName} from './IndustryType';
 import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
@@ -326,6 +327,15 @@ export function editVector(
     const labels = ['x', 'y', 'z'];
     const save = (t: number[]) => encode(saveValue(decode(t)));
     return editNumbers(studio, labels, encode(value), display, save);
+}
+
+export function editIndustryName(
+    studio: Studio,
+    name: IndustryName,
+    saveValue: (value: IndustryName) => void,
+): Node {
+    const save = (value: string) => saveValue(value as IndustryName);
+    return editDropdown(studio, name, industryNames, save);
 }
 
 export function editIndustryType(

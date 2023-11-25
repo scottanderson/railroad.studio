@@ -92,7 +92,7 @@ export interface Industry {
     rotation: Rotator;
     inputs: Quadruplet<number>;
     outputs: Quadruplet<number>;
-    type: IndustryType;
+    type: IndustryType | string;
 }
 
 export interface Player {
