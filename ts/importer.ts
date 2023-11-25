@@ -466,7 +466,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const splineTrackStartSplineId = optionalMap(gvas.intArrays, 'SplineTrackStartSplineIDArray');
     const splineTrackStartTangent = optionalMap(gvas.vectorArrays, 'SplineTrackStartTangentArray');
     const splineTrackSwitchState = optionalMap(gvas.intArrays, 'SplineTrackSwitchStateArray');
-    const splineTrackType = optionalMap(gvas.stringArrays, 'SplineTrackTypeArray');
+    const splineTrackType = isNovemberUpdate ?
+        optionalMap(gvas.nameArrays, 'SplineTrackIds') :
+        optionalMap(gvas.stringArrays, 'SplineTrackTypeArray');
     if (splineTrackEndPoint ||
         splineTrackEndSpline1Id ||
         splineTrackEndSpline2Id ||
