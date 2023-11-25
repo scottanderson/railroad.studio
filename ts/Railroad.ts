@@ -30,7 +30,7 @@ export interface Railroad {
         dayLength: number | undefined;
         gameLevelName: GvasString;
         nightLength: number | undefined;
-        timeOfDay: number | undefined;
+        timeOfDay: number | bigint | undefined;
         weatherType: number | undefined;
         weatherTransitionTime: number | undefined;
     };

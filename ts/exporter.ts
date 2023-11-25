@@ -462,8 +462,17 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 floatArrays[propertyName] = railroad.frames.map((f) => f.state.tenderWaterAmount);
                 break;
             case 'timeofday':
-                if (typeof railroad.settings.timeOfDay !== 'undefined') {
-                    floats[propertyName] = railroad.settings.timeOfDay;
+                switch (typeof railroad.settings.timeOfDay) {
+                    case 'number':
+                        floats[propertyName] = railroad.settings.timeOfDay;
+                        break;
+                    case 'bigint':
+                        dateTimes[propertyName] = railroad.settings.timeOfDay;
+                        break;
+                    case 'undefined':
+                        break;
+                    default:
+                        throw new Error('Unexpected timeOfDay type');
                 }
                 break;
             case 'turntabledeckrotationarray':
@@ -542,8 +551,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     };
 }
 
-function getPropertyType(propertyName: string): GvasTypes {
-    switch (propertyName) {
+function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
+    switch (propertyName.toLowerCase()) {
         case 'animatetimeofday': return ['BoolProperty'];
         case 'binarytexture': return ['ArrayProperty', 'ByteProperty'];
         case 'boilerfiretemparray': return ['ArrayProperty', 'FloatProperty'];
@@ -631,7 +640,9 @@ function getPropertyType(propertyName: string): GvasTypes {
         case 'switchtypearray': return ['ArrayProperty', 'IntProperty'];
         case 'tenderfuelamountarray': return ['ArrayProperty', 'FloatProperty'];
         case 'tenderwateramountarray': return ['ArrayProperty', 'FloatProperty'];
-        case 'timeofday': return ['FloatProperty'];
+        case 'timeofday': return typeof gvas.floats[propertyName] !== 'undefined' ?
+            ['FloatProperty'] :
+            ['StructProperty', 'DateTime'];
         case 'turntabledeckrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'turntablelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'turntablerotatorarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
@@ -669,7 +680,7 @@ export function gvasToBlob(gvas: Gvas): Blob {
 }
 
 function propertyToBlob(gvas: Gvas, propertyName: string): BlobPart | void {
-    const [propertyType, dataType, structType] = getPropertyType(propertyName.toLowerCase());
+    const [propertyType, dataType, structType] = getPropertyType(gvas, propertyName);
     const propertyData: BlobPart[] = [];
     switch (propertyType) {
         case 'ArrayProperty': {
