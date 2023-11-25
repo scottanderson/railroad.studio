@@ -32,6 +32,7 @@ export const IndustryNames = [
     'watertower_kanaskat_style2',
     'watertower_kanaskat_style3',
     'watertower_kanaskat_style4',
+    'watertower_small',
     'WheatFarm',
     'Woodrick',
 ] as const satisfies readonly string[];
@@ -66,12 +67,13 @@ export const legacyIndustryTypes = {
     'watertower_1870_style2': IndustryType.water_tower_a_brown,
     'watertower_1870_style3': IndustryType.water_tower_a_beige,
     'watertower_1870_style4': IndustryType.water_tower_a_old,
-    'watertower_drgw': IndustryType.water_tower_a_beige, // ???
+    'watertower_drgw': IndustryType.water_tower_a_beige, // FIXME, large water tower
     'watertower_kanaskat_style1': IndustryType.water_tower_b_red,
     'watertower_kanaskat_style2': IndustryType.water_tower_b_brown,
     'watertower_kanaskat_style3': IndustryType.water_tower_b_beige,
     'watertower_kanaskat_style4': IndustryType.water_tower_b_old,
-    'WheatFarm': IndustryType.wood_rick, // FIXME
+    'watertower_small': IndustryType.water_tower_a_beige,
+    'WheatFarm': IndustryType.wood_rick, // FIXME, wheat farm
     'Woodrick': IndustryType.wood_rick,
 } as const satisfies Record<IndustryName, IndustryType>;
 
@@ -111,6 +113,7 @@ export const industryNames: Record<IndustryName, string> = {
     'watertower_kanaskat_style2': 'Kanaskat Water Tower (Brown)',
     'watertower_kanaskat_style3': 'Kanaskat Water Tower (Beige)',
     'watertower_kanaskat_style4': 'Kanaskat Water Tower (Old)',
+    'watertower_small': 'Small Water Tower',
     'WheatFarm': 'Wheat Farm',
     'Woodrick': 'Wood Rick',
 };
@@ -152,6 +155,7 @@ export const industryNameProductInputLabels: Record<IndustryName, FourStrings> =
     'watertower_kanaskat_style2': input1234,
     'watertower_kanaskat_style3': input1234,
     'watertower_kanaskat_style4': input1234,
+    'watertower_small': input1234,
     'WheatFarm': input1234,
 };
 
@@ -186,5 +190,6 @@ export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> 
     'watertower_kanaskat_style2': output1234,
     'watertower_kanaskat_style3': output1234,
     'watertower_kanaskat_style4': output1234,
+    'watertower_small': output1234,
     'WheatFarm': output1234,
 };
