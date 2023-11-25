@@ -1404,7 +1404,7 @@ export const cargoLimits = {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 6,
         ['EFreightType::None']: 0,
-        rail: 10,
+        ['EFreightType::Rail']: 10,
         ['EFreightType::RawIron']: 3,
     },
     flatcar_tanker: {
@@ -1429,7 +1429,7 @@ export const cargoLimits = {
     plantationcar_flatcar_stakes: {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 3,
-        rail: 4,
+        ['EFreightType::Rail']: 4,
         ['EFreightType::RawIron']: 3,
     },
     plantationcar_flatcar_stakes_bulkhead: {
@@ -1478,7 +1478,7 @@ export const cargoTypes = {
     ['EFreightType::Lumber']: 'Lumber',
     ['EFreightType::None']: 'None',
     ['EFreightType::OilBarrel']: 'Oil Barrels',
-    rail: 'Rails', // FIXME
+    ['EFreightType::Rail']: 'Rails', // FIXME
     ['EFreightType::RawIron']: 'Raw Iron',
     ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
