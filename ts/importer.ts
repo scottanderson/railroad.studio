@@ -206,10 +206,10 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const industryStorageProduct2 = optionalMap(gvas.intArrays, 'IndustryStorageProduct2Array');
     const industryStorageProduct3 = optionalMap(gvas.intArrays, 'IndustryStorageProduct3Array');
     const industryStorageProduct4 = optionalMap(gvas.intArrays, 'IndustryStorageProduct4Array');
-    const industryType =
-        optionalMap(gvas.intArrays, 'IndustryTypeArray') ??
-        optionalMap(gvas.nameArrays, 'IndustryNameArray');
-    if (industryLocation || industryRotation || industryType ||
+    const industryType = isNovemberUpdate ?
+        optionalMap(gvas.nameArrays, 'IndustryNameArray') :
+        optionalMap(gvas.intArrays, 'IndustryTypeArray');
+    if (industryLocation || industryRotation ||
         industryStorageEduct1 || industryStorageEduct2 || industryStorageEduct3 || industryStorageEduct4 ||
         industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4) {
         if (!industryLocation || !industryRotation || !industryType ||
@@ -224,7 +224,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             industryType]);
         for (let i = 0; i < industryLocation.length; i++) {
             const industryTypeTemp = industryType[i];
-            if (industryTypeTemp === null) throw new Error(`Null industryType`);
+            if (industryTypeTemp === null) throw new Error('Null industryType');
             const industry: Industry = {
                 location: industryLocation[i],
                 rotation: industryRotation[i],

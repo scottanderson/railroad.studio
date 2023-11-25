@@ -1,4 +1,4 @@
-import {IndustryType, getIndustryType} from './IndustryType';
+import {IndustryType} from './IndustryType';
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
 import {Vector, vectorSum} from './Vector';
@@ -8,6 +8,7 @@ import {clamp} from './math';
 import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 import {rotateVector} from './RotationMatrix';
+import {getIndustryType} from './IndustryName';
 
 type Callback<T> = (value: T) => unknown;
 

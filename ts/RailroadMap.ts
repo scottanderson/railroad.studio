@@ -14,7 +14,7 @@ import {
     SwitchType,
     Turntable,
 } from './Railroad';
-import {getIndustryType, gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
+import {gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -44,6 +44,7 @@ import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
 import {textToString, unknownProperty} from './util';
+import {getIndustryType, industryNames, isIndustryName} from './IndustryName';
 
 enum MapToolMode {
     pan_zoom,
@@ -934,10 +935,9 @@ export class RailroadMap {
     private renderIndustry(industry: Industry) {
         const industryType = getIndustryType(industry);
         const paths = Object.entries(industrySvgPaths[industryType] || {});
-        const groupClass = typeof industryType !== 'number' ? gvasToString(industryType) :
-            industryType in IndustryType ? IndustryType[industryType] : 'unknown';
-        const tooltipText = typeof industryType !== 'number' ? gvasToString(industryType) :
-            industryType in industryName ? industryName[industryType] : `Unknown ${industry.type}`;
+        const groupClass = IndustryType[industryType];
+        const tooltipText = typeof industry.type === 'number' ? industryName[industry.type] :
+            isIndustryName(industry.type) ? industryNames[industry.type] : `Unknown ${industry.type}`;
         const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()

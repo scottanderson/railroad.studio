@@ -256,7 +256,10 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 vectorArrays[propertyName] = railroad.industries.map((i) => i.location);
                 break;
             case 'industrynamearray':
-                nameArrays[propertyName] = railroad.industries.map((i) => typeof i.type !== 'number' ? i.type : null);
+                nameArrays[propertyName] = railroad.industries.map((i) => {
+                    if (typeof i.type !== 'string') throw new Error(`Unexpected type ${i.type}`);
+                    return i.type;
+                });
                 break;
             case 'industryrotationarray':
                 rotatorArrays[propertyName] = railroad.industries.map((i) => i.rotation);
@@ -286,7 +289,10 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = railroad.industries.map((i) => i.outputs[3]);
                 break;
             case 'industrytypearray':
-                intArrays[propertyName] = railroad.industries.map((i) => typeof i.type === 'number' ? i.type : 0);
+                intArrays[propertyName] = railroad.industries.map((i) => {
+                    if (typeof i.type !== 'number') throw new Error(`Unexpected type ${i.type}`);
+                    return i.type;
+                });
                 break;
             case 'markerlightscenterstatearray':
                 intArrays[propertyName] = removeUndefinedTail(

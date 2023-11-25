@@ -1,10 +1,5 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
 import {arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
-import {Industry} from './Railroad';
-
-export type IndustryTypeNew =
-    | IndustryType
-    | string;
 
 export enum IndustryType {
     logging_camp = 1,
@@ -36,53 +31,6 @@ export enum IndustryType {
     large_engine_house_beige = 42,
     large_engine_house_old = 43,
     wood_rick = 44,
-}
-
-export function getIndustryType(industry: Industry): IndustryType {
-    if (typeof industry.type === 'number') {
-        return industry.type;
-    }
-    switch (industry.type.toLocaleLowerCase()) {
-        case 'logcamp': return IndustryType.logging_camp;
-        case 'sawmill': return IndustryType.sawmill;
-        case 'smelter': return IndustryType.smelter;
-        case 'ironworks': return IndustryType.ironworks;
-        case 'oilfield': return IndustryType.oil_field;
-        case 'refinery': return IndustryType.refinery;
-        case 'coalmine': return IndustryType.coal_mine;
-        case 'ironoremine': return IndustryType.iron_mine;
-        case 'freightdepot': return IndustryType.freight_depot;
-        case 'firewooddepot': return IndustryType.firewood_camp;
-        // case 'enginehouse_???': return IndustryType.engine_house_lightblue;
-        case 'enginehouse_aspen_gold': return IndustryType.engine_house_gold;
-        case 'enginehouse_barn_red': return IndustryType.engine_house_red;
-        case 'enginehouse_princes_mineral_brown': return IndustryType.engine_house_brown;
-        case 'coaltower': return IndustryType.coaling_tower;
-        case 'telegraphoffice': return IndustryType.telegraph_office;
-        // case 'watertower_???': return IndustryType.water_tower_a_red;
-        // case 'watertower_???': return IndustryType.water_tower_a_brown;
-        // case 'watertower_???': return IndustryType.water_tower_a_beige;
-        // case 'watertower_???': return IndustryType.water_tower_a_old;
-        // case 'watertower_???': return IndustryType.water_tower_b_red;
-        // case 'watertower_???': return IndustryType.water_tower_b_brown;
-        // case 'watertower_???': return IndustryType.water_tower_b_beige;
-        // case 'watertower_???': return IndustryType.water_tower_b_old;
-        case 'watertower_drgw':
-        case 'watertower_kanaskat_style2':
-        case 'watertower_1870_style2':
-        case 'watertower_1870_style3':
-        case 'watertower_1870_style4':
-            return IndustryType.water_tower_a_beige; // ???
-        // case 'engineshed_?': return IndustryType.large_engine_house_red;
-        // case 'engineshed_?': return IndustryType.large_engine_house_brown;
-        // case 'engineshed_?': return IndustryType.large_engine_house_beige;
-        // case 'engineshed_?': return IndustryType.large_engine_house_old;
-        case 'engineshed_style2':
-            return IndustryType.large_engine_house_beige; // ??
-        case 'woodrick': return IndustryType.wood_rick;
-        case 'wheatfarm': return IndustryType.wood_rick; // FIXME
-    }
-    throw new Error(`Unknown industry type: ${industry.type}`);
 }
 
 export const industryName: Record<IndustryType, string> = {
