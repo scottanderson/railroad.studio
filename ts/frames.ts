@@ -1385,6 +1385,8 @@ export const frameStateMetadata = {
 export const cargoLimits = {
     boxcar: {
         ['EFreightType::CrateTools']: 32,
+        ['EFreightType::None']: 0,
+        ['EFreightType::SeedPallet']: 14,
     },
     flatcar_cordwood: {
         ['EFreightType::CordWood']: 8,
@@ -1401,6 +1403,7 @@ export const cargoLimits = {
     flatcar_stakes: {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 6,
+        ['EFreightType::None']: 0,
         rail: 10,
         rawiron: 3,
     },
@@ -1414,6 +1417,7 @@ export const cargoLimits = {
     plantationcar_boxcar: {
         ['EFreightType::CrateTools']: 12,
         ['EFreightType::CrudeOil']: 15,
+        ['EFreightType::None']: 0,
     },
     plantationcar_flatcar: {
         ['EFreightType::CrateTools']: 6,
@@ -1472,9 +1476,11 @@ export const cargoTypes = {
     ['EFreightType::IronOre']: 'Iron Ore',
     ['EFreightType::Log']: 'Logs',
     ['EFreightType::Lumber']: 'Lumber',
+    ['EFreightType::None']: 'None',
     ['EFreightType::OilBarrel']: 'Oil Barrels',
     rail: 'Rails', // FIXME
     rawiron: 'Raw Iron', // FIXME
+    ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
 } as const satisfies PRO<string, string>;
 
