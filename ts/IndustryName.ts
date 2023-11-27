@@ -8,6 +8,7 @@ export const IndustryNames = [
     'enginehouse_alpine_blue',
     'enginehouse_aspen_gold',
     'enginehouse_barn_red',
+    'enginehouse_barn',
     'enginehouse_princes_mineral_brown',
     'engineshed_style1',
     'engineshed_style2',
@@ -20,6 +21,7 @@ export const IndustryNames = [
     'logcamp',
     'oilfield',
     'Refinery',
+    'SandHouse',
     'sawmill',
     'smelter',
     'telegraphoffice',
@@ -48,6 +50,7 @@ export const legacyIndustryTypes = {
     'enginehouse_alpine_blue': IndustryType.engine_house_lightblue,
     'enginehouse_aspen_gold': IndustryType.engine_house_gold,
     'enginehouse_barn_red': IndustryType.engine_house_red,
+    'enginehouse_barn': IndustryType.engine_house_red,
     'enginehouse_princes_mineral_brown': IndustryType.engine_house_brown,
     'engineshed_style1': IndustryType.large_engine_house_red,
     'engineshed_style2': IndustryType.large_engine_house_brown,
@@ -60,6 +63,7 @@ export const legacyIndustryTypes = {
     'logcamp': IndustryType.logging_camp,
     'oilfield': IndustryType.oil_field,
     'Refinery': IndustryType.refinery,
+    'SandHouse': IndustryType.wood_rick, // FIXME, sand house
     'sawmill': IndustryType.sawmill,
     'smelter': IndustryType.smelter,
     'telegraphoffice': IndustryType.telegraph_office,
@@ -86,9 +90,10 @@ export function getIndustryType(industry: Industry): IndustryType {
 export const industryNames: Record<IndustryName, string> = {
     'coalmine': 'Coal Mine',
     'coaltower': 'Coaling Tower',
-    'enginehouse_alpine_blue': 'Engine House (Blue)',
-    'enginehouse_aspen_gold': 'Engine House (Gold)',
-    'enginehouse_barn_red': 'Engine House (Red)',
+    'enginehouse_alpine_blue': 'Engine House (Alpine Blue)',
+    'enginehouse_aspen_gold': 'Engine House (Aspen Gold)',
+    'enginehouse_barn_red': 'Engine House (Barn Red)',
+    'enginehouse_barn': 'Engine House (Barn)',
     'enginehouse_princes_mineral_brown': 'Engine House (Brown)',
     'engineshed_style1': 'Large Engine House (Red)',
     'engineshed_style2': 'Large Engine House (Brown)',
@@ -101,6 +106,7 @@ export const industryNames: Record<IndustryName, string> = {
     'logcamp': 'Logging Camp',
     'oilfield': 'Oil Field',
     'Refinery': 'Refinery',
+    'SandHouse': 'Sand House',
     'sawmill': 'Sawmill',
     'smelter': 'Smelter',
     'telegraphoffice': 'Telegraph Office',
@@ -138,6 +144,7 @@ export const industryNameProductInputLabels: Record<IndustryName, FourStrings> =
     'enginehouse_alpine_blue': input1234,
     'enginehouse_aspen_gold': input1234,
     'enginehouse_barn_red': input1234,
+    'enginehouse_barn': input1234,
     'enginehouse_princes_mineral_brown': input1234,
     'coaltower': input1234,
     'telegraphoffice': input1234,
@@ -157,6 +164,7 @@ export const industryNameProductInputLabels: Record<IndustryName, FourStrings> =
     'watertower_kanaskat_style4': input1234,
     'watertower_small': input1234,
     'WheatFarm': input1234,
+    'SandHouse': input1234,
 };
 
 export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> = {
@@ -173,6 +181,7 @@ export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> 
     'enginehouse_alpine_blue': output1234,
     'enginehouse_aspen_gold': output1234,
     'enginehouse_barn_red': output1234,
+    'enginehouse_barn': output1234,
     'enginehouse_princes_mineral_brown': output1234,
     'coaltower': output1234,
     'telegraphoffice': output1234,
@@ -192,4 +201,5 @@ export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> 
     'watertower_kanaskat_style4': output1234,
     'watertower_small': output1234,
     'WheatFarm': output1234,
+    'SandHouse': output1234,
 };
