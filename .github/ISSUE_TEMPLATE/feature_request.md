@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Attach the save file**
+Add the .sav file to a zip, and attach the .zip file to this issue.
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
