@@ -32,6 +32,8 @@ export interface Railroad {
         nightLength: number | undefined;
         timeOfDay: number | bigint | undefined;
         weatherType: number | undefined;
+        weatherChangeIntervalMax: number | undefined;
+        weatherChangeIntervalMin: number | undefined;
         weatherTransitionTime: number | undefined;
     };
     splineTracks: SplineTrack[];
