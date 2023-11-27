@@ -2,10 +2,13 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: bug
 assignees: ''
 
 ---
+
+**Attach the save file**
+Add the .sav file to a zip, and attach the .zip file to this issue.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
