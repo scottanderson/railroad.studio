@@ -72,6 +72,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             optionalMap(gvas.dateTimes, 'TimeOfDay') :
             optionalMap(gvas.floats, 'TimeOfDay')
         ) ?? undefined;
+
+    const weatherChangeIntervalMax = optionalMap(gvas.floats, 'WeatherChangeIntervalMax') ?? undefined;
+    const weatherChangeIntervalMin = optionalMap(gvas.floats, 'WeatherChangeIntervalMin') ?? undefined;
     const weatherTransitionTime = optionalMap(gvas.floats, 'WeatherTransitionTime') ?? undefined;
     const weatherType = optionalMap(gvas.ints, 'WeatherType') ?? undefined;
     const settings = {
@@ -81,6 +84,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         gameLevelName,
         nightLength,
         timeOfDay,
+        weatherChangeIntervalMax,
+        weatherChangeIntervalMin,
         weatherTransitionTime,
         weatherType,
     };

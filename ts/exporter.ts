@@ -109,6 +109,9 @@ const exportKeys = [
     'WatertowerRotationArray',
     'WatertowerTypeArray',
     'WatertowerWaterLevelArray',
+    'WeatherChangeIntervalMax',
+    'WeatherChangeIntervalMin',
+    'WeatherTransitionTime',
     'WeatherType',
 ];
 
@@ -539,6 +542,16 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'watertowerwaterlevelarray':
                 floatArrays[propertyName] = railroad.watertowers.map((w) => w.waterlevel);
                 break;
+            case 'weatherchangeintervalmax':
+                if (typeof railroad.settings.weatherChangeIntervalMax !== 'undefined') {
+                    floats[propertyName] = railroad.settings.weatherChangeIntervalMax;
+                }
+                break;
+            case 'weatherchangeintervalmin':
+                if (typeof railroad.settings.weatherChangeIntervalMin !== 'undefined') {
+                    floats[propertyName] = railroad.settings.weatherChangeIntervalMin;
+                }
+                break;
             case 'weathertransitiontime':
                 if (typeof railroad.settings.weatherTransitionTime !== 'undefined') {
                     floats[propertyName] = railroad.settings.weatherTransitionTime;
@@ -681,8 +694,10 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'watertowerrotationarray': return ['ArrayProperty', 'StructProperty', 'Rotator'];
         case 'watertowertypearray': return ['ArrayProperty', 'IntProperty'];
         case 'watertowerwaterlevelarray': return ['ArrayProperty', 'FloatProperty'];
-        case 'weathertype': return ['IntProperty'];
+        case 'weatherchangeintervalmax': return ['FloatProperty'];
+        case 'weatherchangeintervalmin': return ['FloatProperty'];
         case 'weathertransitiontime': return ['FloatProperty'];
+        case 'weathertype': return ['IntProperty'];
         default: throw new Error(`Unknown property name ${propertyName}`);
     }
 }
