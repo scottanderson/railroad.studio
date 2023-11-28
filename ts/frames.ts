@@ -715,7 +715,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
-            boilerPressure: 160,
+            boilerPressure: 200,
             boilerWaterLevel: 5000,
             boilerWaterTemp: 110,
             brakeValue: 1,
@@ -1426,6 +1426,7 @@ export const cargoLimits = {
     },
     plantationcar_flatcar_logs: {
         ['EFreightType::Log']: 5,
+        ['EFreightType::None']: 0,
         ['EFreightType::SteelPipe']: 7,
     },
     plantationcar_flatcar_stakes: {
