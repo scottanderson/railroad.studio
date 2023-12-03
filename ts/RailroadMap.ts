@@ -933,20 +933,27 @@ export class RailroadMap {
     private gizmoDebugLine?: Line;
     private gizmoDebugText?: Text;
     private renderIndustry(industry: Industry) {
-        const industryType = getIndustryType(industry);
-        const paths = Object.entries(industrySvgPaths[industryType] || {});
-        const groupClass = IndustryType[industryType];
         const tooltipText = typeof industry.type === 'number' ? industryName[industry.type] :
-            isIndustryName(industry.type) ? industryNames[industry.type] : `Unknown ${industry.type}`;
+            isIndustryName(industry.type) ? industryNames[industry.type] : industry.type;
         const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()
             .attr('transform', industryTransform)
-            .addClass('industry')
-            .addClass(groupClass);
+            .addClass('industry');
         g.element('title').words(tooltipText);
         const renderPath = (g: G) => ([className, path]: [string, PathArrayAlias]) => g.path(path).addClass(className);
-        paths.forEach(renderPath(g));
+        try {
+            const industryType = getIndustryType(industry);
+            const groupClass = IndustryType[industryType];
+            g.addClass(groupClass);
+            const paths = Object.entries(industrySvgPaths[industryType]);
+            paths.forEach(renderPath(g));
+        } catch (e: unknown) {
+            console.warn(`Unsupported industry ${industry.type}`);
+            g.text(String(industry.type))
+                .attr('transform', 'rotate(90)')
+                .addClass('frame-text');
+        }
         const gizmoG = this.layers.gizmo
             .group()
             .attr('transform', industryTransform)

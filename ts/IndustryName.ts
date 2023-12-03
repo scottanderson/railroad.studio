@@ -86,7 +86,7 @@ export const legacyIndustryTypes = {
 export function getIndustryType(industry: Industry): IndustryType {
     if (typeof industry.type === 'number') return industry.type;
     if (isIndustryName(industry.type)) return legacyIndustryTypes[industry.type];
-    throw new Error(`Unsupproted industry ${industry.type}`);
+    throw new Error(`Unsupported industry ${industry.type}`);
 }
 
 export const industryNames: Record<IndustryName, string> = {
