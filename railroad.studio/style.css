@@ -131,6 +131,7 @@ body {
 .grade,
 .stone-wall,
 .tunnel,
+.pile-bridge-0,
 .pile-bridge-1,
 .pile-bridge-2,
 .pile-bridge-3,
@@ -198,6 +199,10 @@ body {
 
 .tunnel {
   stroke: var(--tunnel);
+}
+
+.pile-bridge-0 {
+  stroke: var(--pile-bridge-new);
 }
 
 .pile-bridge-1 {
