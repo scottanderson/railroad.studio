@@ -52,7 +52,13 @@ export function textToString(value: GvasText): GvasString {
     const notSimple = !Array.isArray(value) && typeof value === 'object';
     if (notSimple && 'pattern' in value) {
         // Rich text
-        if (value.guid !== RRO_TEXT_GUID) throw new Error(`Unexpected GUID: ${value.guid}`);
+        switch (value.guid) {
+            case RRO_TEXT_GUID:
+            case '69981E2B47B2AABC01CE39842FB03A96':
+                break;
+            default:
+                throw new Error(`Unexpected GUID: ${value.guid}`);
+        }
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
             (m, i) => value.textFormat[Number(i)].values[0] ?? '');
