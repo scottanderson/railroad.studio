@@ -1259,7 +1259,7 @@ export class Studio {
                 const setIndustryName = (name: IndustryName) => industry.type = name;
                 td.replaceChildren(editIndustryName(this, industry.type, setIndustryName));
             } else {
-                throw new Error('Unexpected industry type');
+                throw new Error(`Unexpected industry type ${industry.type}`);
             }
             tr.appendChild(td);
             // Inputs

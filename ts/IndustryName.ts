@@ -2,7 +2,7 @@ import {GvasString} from './Gvas';
 import {IndustryType} from './IndustryType';
 import {Industry} from './Railroad';
 
-export const IndustryNames = [
+const IndustryNames = [
     'coalmine',
     'coaltower',
     'enginehouse_alpine_blue',
@@ -24,6 +24,7 @@ export const IndustryNames = [
     'oilfield',
     'Refinery',
     'SandHouse',
+    'Sandhouse',
     'sawmill',
     'smelter',
     'telegraphoffice',
@@ -68,6 +69,7 @@ export const legacyIndustryTypes = {
     'oilfield': IndustryType.oil_field,
     'Refinery': IndustryType.refinery,
     'SandHouse': IndustryType.wood_rick, // FIXME, sand house
+    'Sandhouse': IndustryType.wood_rick, // FIXME, sand house
     'sawmill': IndustryType.sawmill,
     'smelter': IndustryType.smelter,
     'telegraphoffice': IndustryType.telegraph_office,
@@ -113,6 +115,7 @@ export const industryNames: Record<IndustryName, string> = {
     'oilfield': 'Oil Field',
     'Refinery': 'Refinery',
     'SandHouse': 'Sand House',
+    'Sandhouse': 'Sand house',
     'sawmill': 'Sawmill',
     'smelter': 'Smelter',
     'telegraphoffice': 'Telegraph Office',
@@ -173,6 +176,7 @@ export const industryNameProductInputLabels: Record<IndustryName, FourStrings> =
     'watertower_small': input1234,
     'WheatFarm': input1234,
     'SandHouse': input1234,
+    'Sandhouse': input1234,
 };
 
 export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> = {
@@ -212,4 +216,5 @@ export const industryNameProductOutputLabels: Record<IndustryName, FourStrings> 
     'watertower_small': output1234,
     'WheatFarm': output1234,
     'SandHouse': output1234,
+    'Sandhouse': output1234,
 };
