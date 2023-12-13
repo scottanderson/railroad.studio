@@ -143,7 +143,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             boilerWaterTemp: 110,
             brakeValue: 1,
             headlightType: 2,
-            paintType: 1,
+            paintType: 2,
             regulatorValue: 1,
             reverserValue: 1,
             sanderAmount: 100,
@@ -1401,6 +1401,7 @@ export const cargoLimits = {
     flatcar_hopper: {
         ['EFreightType::Coal']: 10,
         ['EFreightType::IronOre']: 10,
+        ['EFreightType::None']: 0,
     },
     flatcar_logs: {
         ['EFreightType::Log']: 6,
