@@ -1795,7 +1795,7 @@ function switchExtraLegsWorld(spline: SplineTrack): BezierCurve[] {
 function makeTransform(inx: number, iny: number, yaw: number) {
     const x = Math.round(inx);
     const y = Math.round(iny);
-    const degrees = Math.round(normalizeAngle(yaw));
+    const degrees = normalizeAngle(yaw).toFixed(1);
     return `translate(${x} ${y}) rotate(${degrees})`;
 }
 
