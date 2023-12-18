@@ -1,5 +1,6 @@
 import {RotationMatrix} from './RotationMatrix';
 import {degreesToRadians, Rotator} from './Rotator';
+import {dotProduct} from './Vector';
 
 /**
  * A quaternion is a mathematical object that extends the concept of complex
@@ -51,3 +52,8 @@ export function toRotationMatrix(q: Quaternion): RotationMatrix {
     };
     return {forward, right, up};
 }
+
+export const angleBetweenRotators = (r1: Rotator, r2: Rotator) =>
+    Math.acos(dotProduct(
+        toRotationMatrix(fromRotator(r1)).forward,
+        toRotationMatrix(fromRotator(r2)).forward));

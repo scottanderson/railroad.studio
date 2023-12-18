@@ -45,6 +45,7 @@ import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
 import {textToString, unknownProperty} from './util';
 import {getIndustryType, industryNames, isIndustryName} from './IndustryName';
+import {angleBetweenRotators} from './Quaternion';
 
 enum MapToolMode {
     pan_zoom,
@@ -274,6 +275,17 @@ export class RailroadMap {
             Math.sqrt(direction.x * direction.x + direction.y * direction.y)));
         const location = vectorSum({x: 0, y: 0, z: 100}, point);
         const rotation = {yaw, pitch, roll: 0};
+        return {location, rotation};
+    }
+
+    rerailLocation(me: MouseEvent, spline: SplineTrack, frame: Frame): HasLocationRotation {
+        const {location, rotation} = this.splineWorldLocation(me, spline);
+        const angleDiff = angleBetweenRotators(frame.rotation, rotation);
+        if (angleDiff >= 90) {
+            rotation.yaw = normalizeAngle(rotation.yaw + 180);
+            rotation.pitch = -rotation.pitch;
+            rotation.roll = -rotation.roll;
+        }
         return {location, rotation};
     }
 
@@ -1714,8 +1726,8 @@ export class RailroadMap {
             }
             case MapToolMode.rerail:
                 if (this.toolFrame) {
-                    // Find the closest point along the spline
-                    const {location, rotation} = this.splineWorldLocation(e, spline);
+                    // Find the selected location along the spline
+                    const {location, rotation} = this.rerailLocation(e, spline, this.toolFrame);
                     // Move the frame to the new location
                     this.toolFrame.location = location;
                     this.toolFrame.rotation = rotation;
@@ -1729,8 +1741,8 @@ export class RailroadMap {
                 break;
             case MapToolMode.duplicate:
                 if (this.toolFrame) {
-                    // Find the closest point along the spline
-                    const {location, rotation} = this.splineWorldLocation(e, spline);
+                    // Find the selected location along the spline
+                    const {location, rotation} = this.rerailLocation(e, spline, this.toolFrame);
                     const {name, number, type, state} = this.toolFrame;
                     // Copy the frame to the new location
                     const frame: Frame = {location, name, number, rotation, type, state};
