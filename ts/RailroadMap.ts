@@ -19,7 +19,7 @@ import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
 import {gvasToString} from './Gvas';
-import {Vector, scaleVector, vectorSum, distanceSquared, normalizeVector} from './Vector';
+import {Vector, scaleVector, vectorSum, distanceSquared, normalizeVector, distance} from './Vector';
 import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
 import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
@@ -56,6 +56,7 @@ enum MapToolMode {
     circularize,
     rerail,
     duplicate,
+    measure,
 }
 
 interface MapOptions {
@@ -521,6 +522,43 @@ export class RailroadMap {
             // Show the tracks layer
             if (!this.layerVisibility.tracks) {
                 this.duplicateToolTracksFlag = true;
+                this.toggleLayerVisibility('tracks');
+            }
+            return true;
+        }
+    }
+
+    private measureToolFramesFlag = false;
+    private measureToolTracksFlag = false;
+    toggleMeasureTool(): boolean {
+        if (this.toolMode === MapToolMode.measure) {
+            // Disable measure tool
+            this.toolMode = MapToolMode.pan_zoom;
+            // Hide the frames layer
+            if (this.layerVisibility.frames && this.measureToolFramesFlag) {
+                this.toggleLayerVisibility('frames');
+            }
+            // Hide the tracks layer
+            if (this.layerVisibility.tracks && this.measureToolTracksFlag) {
+                this.toggleLayerVisibility('tracks');
+            }
+            return false;
+        } else if (this.toolMode !== MapToolMode.pan_zoom) {
+            // Don't allow measure tool while another tool is active
+            return false;
+        } else {
+            // Enable measure tool
+            this.toolFrame = undefined;
+            this.toolFrameGroup = undefined;
+            this.toolMode = MapToolMode.measure;
+            // Show the frames layer
+            if (!this.layerVisibility.frames) {
+                this.measureToolFramesFlag = true;
+                this.toggleLayerVisibility('frames');
+            }
+            // Show the tracks layer
+            if (!this.layerVisibility.tracks) {
+                this.measureToolTracksFlag = true;
                 this.toggleLayerVisibility('tracks');
             }
             return true;
@@ -1598,6 +1636,14 @@ export class RailroadMap {
                 break;
             case MapToolMode.rerail:
             case MapToolMode.duplicate:
+                this.toolFrame = frame;
+                this.toolFrameGroup = g;
+                break;
+            case MapToolMode.measure:
+                if (this.toolFrame) {
+                    const d = distance(frame.location, this.toolFrame.location);
+                    console.log(`${d.toFixed(1)} ${this.toolFrame.type} -> ${frame.type}`);
+                }
                 this.toolFrame = frame;
                 this.toolFrameGroup = g;
                 break;
