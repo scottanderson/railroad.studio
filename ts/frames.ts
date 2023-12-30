@@ -738,11 +738,15 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Lima 2-8-0 Tender',
         tender: true,
         min: {
+            headlightType: 1,
             paintType: 1,
+            smokestackType: 1,
         },
         max: {
             brakeValue: 1,
+            headlightType: 1,
             paintType: 2,
+            smokestackType: 1,
             tenderFuelAmount: 5400,
             tenderWaterAmount: 9000,
         },
@@ -1417,6 +1421,7 @@ export const cargoLimits = {
     },
     flatcar_tanker: {
         ['EFreightType::CrudeOil']: 12,
+        ['EFreightType::None']: 0,
     },
     hopperBB: {
         ['EFreightType::Coal']: 10,
