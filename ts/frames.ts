@@ -201,7 +201,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'class70': {
         engine: true,
         name: 'D&RG Class 70',
-        length: 938.9,
+        length: 892,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -229,7 +229,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     },
 
     'class70_tender': {
-        length: 678.81,
+        length: 654,
         name: 'Class 70 Tender',
         tender: true,
         min: {
@@ -251,7 +251,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'climax': {
         engine: true,
-        length: 820,
+        length: 850,
         name: 'Climax',
         min: {
             headlightType: 1,
@@ -540,7 +540,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'flatcar_logs': {
         freight: true,
-        length: 785.6,
+        length: 818,
         name: 'Flatcar Tier 1',
         min: {
             headlightType: 1,
@@ -638,7 +638,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'handcar': {
         handcar: true,
-        length: 220.2,
+        length: 235,
         name: 'Handcar',
         min: {
             headlightType: 1,
@@ -692,7 +692,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'hopperBB': {
         freight: true,
-        length: 720,
+        length: 760,
         name: 'Carter Brothers Drop-Bottom Hopper',
         min: {
             headlightType: 1,
@@ -795,7 +795,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'mosca': {
         engine: true,
-        length: 873,
+        length: 852,
         name: 'Mosca',
         min: {
             headlightType: 1,
@@ -992,7 +992,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     },
 
     'plow': {
-        length: 610,
+        length: 530,
         name: 'Snow Plow',
         mow: true,
         min: {
@@ -1067,7 +1067,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'rubybasin': {
         coal: true,
         engine: true,
-        length: 853.7,
+        length: 1029,
         name: 'Ruby Basin',
         min: {
             headlightType: 1,
@@ -1096,7 +1096,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'shay': {
         engine: true,
-        length: 800,
+        length: 804,
         name: 'Shay',
         min: {
             headlightType: 1,
@@ -1141,7 +1141,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'stockcar': {
         freight: true,
-        length: 789.9,
+        length: 932,
         name: 'Stock Car',
         min: {
             headlightType: 1,
@@ -1158,7 +1158,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tankcarNCO': {
         freight: true,
-        length: 789.9,
+        length: 993,
         name: 'Coffin Tank Car',
         min: {
             headlightType: 1,
@@ -1175,7 +1175,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tenmile': {
         engine: true,
-        length: 853.7,
+        length: 697,
         name: 'Tenmile',
         min: {
             headlightType: 1,
@@ -1204,7 +1204,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tweetsie280': {
         engine: true,
-        length: 878.9,
+        length: 924,
         name: 'ET&WNC 2-8-0',
         min: {
             headlightType: 1,
@@ -1234,7 +1234,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'tweetsie280_tender': {
         coal: true,
         tender: true,
-        length: 618.8,
+        length: 679,
         name: 'ET&WNC 2-8-0 Tender',
         min: {
             headlightType: 1,
@@ -1421,6 +1421,7 @@ export const cargoLimits = {
     hopperBB: {
         ['EFreightType::Coal']: 10,
         ['EFreightType::IronOre']: 8,
+        ['EFreightType::None']: 0,
     },
     plantationcar_boxcar: {
         ['EFreightType::CrateTools']: 12,
@@ -1464,12 +1465,15 @@ export const cargoLimits = {
     },
     skeletoncar: {
         ['EFreightType::Log']: 5,
+        ['EFreightType::None']: 0,
     },
     stockcar: {
         ['EFreightType::CrateTools']: 32,
+        ['EFreightType::None']: 0,
     },
     tankcarNCO: {
         ['EFreightType::CrudeOil']: 8,
+        ['EFreightType::None']: 0,
     },
 } as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 

@@ -406,10 +406,10 @@ export class Studio {
                 btnTreeBrush.classList.add('btn-secondary');
             }
         });
-        // Rerail tool
+        // Rerail frame tool
         const btnRerail = document.createElement('button');
-        const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Tool');
-        const txtRerail = document.createTextNode(' Rerail Tool ');
+        const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
+        const txtRerail = document.createTextNode(' Rerail ');
         btnRerail.classList.add('btn', 'btn-secondary');
         btnRerail.replaceChildren(imgRerail, txtRerail);
         btnRerail.addEventListener('click', () => {
@@ -424,8 +424,8 @@ export class Studio {
         });
         // Duplicate frame tool
         const btnDuplicate = document.createElement('button');
-        const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Tool');
-        const txtDuplicate = document.createTextNode(' Duplicate Tool ');
+        const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Frame Tool');
+        const txtDuplicate = document.createTextNode(' Duplicate ');
         btnDuplicate.classList.add('btn', 'btn-secondary');
         btnDuplicate.replaceChildren(imgDuplicate, txtDuplicate);
         btnDuplicate.addEventListener('click', () => {
@@ -438,10 +438,26 @@ export class Studio {
                 btnDuplicate.classList.add('btn-secondary');
             }
         });
+        // Measure frame tool
+        const btnMeasure = document.createElement('button');
+        const imgMeasure = bootstrapIcon('bi-rulers', 'Measure Frame Tool');
+        const txtMeasure = document.createTextNode(' Measure ');
+        btnMeasure.classList.add('btn', 'btn-secondary');
+        btnMeasure.replaceChildren(imgMeasure, txtMeasure);
+        btnMeasure.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleMeasureTool();
+            if (toolEnabled) {
+                btnMeasure.classList.add('active', 'btn-danger');
+                btnMeasure.classList.remove('btn-secondary');
+            } else {
+                btnMeasure.classList.remove('active', 'btn-danger');
+                btnMeasure.classList.add('btn-secondary');
+            }
+        });
         // Delete tool
         const btnDelete = document.createElement('button');
         const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
-        const txtDelete = document.createTextNode(' Delete Tool ');
+        const txtDelete = document.createTextNode(' Delete ');
         btnDelete.classList.add('btn', 'btn-secondary');
         btnDelete.replaceChildren(imgDelete, txtDelete);
         btnDelete.addEventListener('click', () => {
@@ -457,7 +473,7 @@ export class Studio {
         // Flatten spline tool
         const btnFlattenSpline = document.createElement('button');
         const imgFlattenSpline = bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
-        const txtFlattenSpline = document.createTextNode(' Flatten Spline Tool ');
+        const txtFlattenSpline = document.createTextNode(' Flatten ');
         btnFlattenSpline.classList.add('btn', 'btn-secondary');
         btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
         btnFlattenSpline.addEventListener('click', () => {
@@ -473,7 +489,7 @@ export class Studio {
         // Parallel spline tool
         const btnParallelSpline = document.createElement('button');
         const imgParallelSpline = bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
-        const txtParallelSpline = document.createTextNode(' Parallel Spline Tool ');
+        const txtParallelSpline = document.createTextNode(' Parallel ');
         btnParallelSpline.classList.add('btn', 'btn-secondary');
         btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
         btnParallelSpline.addEventListener('click', () => {
@@ -489,7 +505,7 @@ export class Studio {
         // Circularize spline tool
         const btnCircularizeSpline = document.createElement('button');
         const imgCircularizeSpline = bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
-        const txtCircularizeSpline = document.createTextNode(' Circularize Spline Tool ');
+        const txtCircularizeSpline = document.createTextNode(' Circularize ');
         btnCircularizeSpline.classList.add('btn', 'btn-secondary');
         btnCircularizeSpline.replaceChildren(imgCircularizeSpline, txtCircularizeSpline);
         btnCircularizeSpline.addEventListener('click', () => {
@@ -639,6 +655,7 @@ export class Studio {
                 grpFrameList,
                 btnRerail,
                 btnDuplicate,
+                btnMeasure,
             ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
         if (!this.railroad.settings.gameLevelName) {
