@@ -1235,8 +1235,6 @@ export class Studio {
                     };
                     if (allowedCargo.includes(freightType)) {
                         const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
-                        entries.unshift(['', 'None']);
-                        entries.unshift([freightType, freightType]);
                         const typeOptions = Object.fromEntries(entries);
                         const form = editDropdown(this, freightType, typeOptions, setFreightType);
                         addStat('Freight Type', form);
