@@ -17,6 +17,7 @@ export const frameTypes = [
     'cooke280_tender',
     'eureka',
     'eureka_tender',
+    'Ferries242T',
     'flatcar_cordwood',
     'flatcar_hopper',
     'flatcar_logs',
@@ -305,7 +306,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'cooke260': {
         engine: true,
-        length: 837.83,
+        length: 834,
         name: 'Cooke Mogul Wood',
         min: {
             headlightType: 1,
@@ -334,7 +335,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'cooke260_new': {
         coal: true,
         engine: true,
-        length: 837.83,
+        length: 834,
         name: 'Cooke Mogul Coal',
         min: {
             headlightType: 1,
@@ -363,7 +364,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'cooke260_new_tender': {
         coal: true,
-        length: 641.73,
+        length: 642,
         name: 'Cooke Mogul Coal Tender',
         tender: true,
         min: {
@@ -384,7 +385,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     },
 
     'cooke260_tender': {
-        length: 641.73,
+        length: 642,
         name: 'Cooke Mogul Wood Tender',
         tender: true,
         min: {
@@ -437,7 +438,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'cooke280_tender': {
         tender: true,
         name: 'Cooke Consolidation Tender',
-        length: 625,
+        length: 616,
         min: {
             headlightType: 1,
             paintType: 1,
@@ -501,6 +502,36 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
             tenderFuelAmount: 499,
             tenderWaterAmount: 3800,
+        },
+    },
+
+    'Ferries242T': {
+        coal: true,
+        engine: true,
+        length: 872,
+        name: 'Ferries & Cliff House 2-4-2T',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 70,
+            boilerPressure: 150,
+            boilerWaterLevel: 4400,
+            boilerWaterTemp: 110,
+            brakeValue: 1,
+            compressorAirPressure: 100,
+            compressorValveValue: 1,
+            headlightType: 8,
+            paintType: 7,
+            regulatorValue: 1,
+            reverserValue: 1,
+            sanderAmount: 100,
+            smokestackType: 7,
+            tenderFuelAmount: 1000,
         },
     },
 
@@ -754,7 +785,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'montezuma': {
         engine: true,
-        length: 580,
+        length: 710,
         name: 'Montezuma',
         min: {
             headlightType: 1,
