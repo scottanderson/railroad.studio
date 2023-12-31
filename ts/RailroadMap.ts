@@ -281,6 +281,7 @@ export class RailroadMap {
 
     rerailLocation(me: MouseEvent, spline: SplineTrack, frame: Frame): HasLocationRotation {
         const {location, rotation} = this.splineWorldLocation(me, spline);
+        location.z += 100; // Add 1m to the Z coordinate
         const angleDiff = angleBetweenRotators(frame.rotation, rotation);
         if (angleDiff >= 90) {
             rotation.yaw = normalizeAngle(rotation.yaw + 180);
@@ -1853,7 +1854,7 @@ function switchExtraLegsWorld(spline: SplineTrack): BezierCurve[] {
 function makeTransform(inx: number, iny: number, yaw: number) {
     const x = Math.round(inx);
     const y = Math.round(iny);
-    const degrees = normalizeAngle(yaw).toFixed(1);
+    const degrees = normalizeAngle(yaw).toFixed(2);
     return `translate(${x} ${y}) rotate(${degrees})`;
 }
 

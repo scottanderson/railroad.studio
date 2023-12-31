@@ -1159,7 +1159,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'skeletoncar': {
         freight: true,
-        length: 600,
+        length: 635,
         name: 'Skeleton Car',
         min: {
             headlightType: 1,
@@ -1210,7 +1210,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'tenmile': {
         engine: true,
-        length: 697,
+        length: 1174,
         name: 'Tenmile',
         min: {
             headlightType: 1,
