@@ -1,4 +1,3 @@
-import {IndustryType} from './IndustryType';
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
 import {Vector, vectorSum} from './Vector';
@@ -8,7 +7,7 @@ import {clamp} from './math';
 import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
 import {rotateVector} from './RotationMatrix';
-import {getIndustryType} from './IndustryName';
+import {getIndustryName} from './industries';
 
 type Callback<T> = (value: T) => unknown;
 
@@ -187,31 +186,33 @@ function rectFilter(x0: number, x1: number, y0: number, y1: number, tree: Point)
 }
 
 function industryFilter(industry: Industry, tree: Vector): boolean {
-    switch (getIndustryType(industry)) {
-        case IndustryType.logging_camp:
+    const name = getIndustryName(industry);
+    if (!name) return false;
+    switch (name) {
+        case 'logcamp':
             return radiusFilter(industry.location, tree, 45_00); // 45m
-        case IndustryType.sawmill:
+        case 'sawmill':
             return radiusFilter(industry.location, tree, 60_00); // 60m
-        case IndustryType.smelter:
+        case 'smelter':
             return radiusFilter(industry.location, tree, 40_00); // 40m
-        case IndustryType.ironworks:
+        case 'ironworks':
             return radiusFilter(industry.location, tree, 40_00); // 40m
-        case IndustryType.oil_field:
+        case 'oilfield':
             return radiusFilter(industry.location, tree, 100_00); // 100m
-        case IndustryType.refinery:
+        case 'Refinery':
             return radiusFilter(industry.location, tree, 45_00); // 45m
-        case IndustryType.coal_mine:
+        case 'coalmine':
             return radiusFilter(industry.location, tree, 40_00); // 40m
-        case IndustryType.iron_mine:
+        case 'ironoremine':
             return radiusFilter(industry.location, tree, 30_00); // 30m
-        case IndustryType.freight_depot:
+        case 'freightdepot':
             return radiusFilter(industry.location, tree, 35_00); // 35m
-        case IndustryType.firewood_camp:
+        case 'firewooddepot':
             return radiusFilter(industry.location, tree, 15_00); // 15m
-        case IndustryType.engine_house_lightblue:
-        case IndustryType.engine_house_gold:
-        case IndustryType.engine_house_red:
-        case IndustryType.engine_house_brown:
+        case 'enginehouse_alpine':
+        case 'enginehouse_aspen':
+        case 'enginehouse_barn':
+        case 'enginehouse_princess':
         {
             const p0local = {x: 500, y: 0, z: 0};
             const p1local = {x: 1500, y: 0, z: 0};
@@ -219,22 +220,24 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             const p1 = vectorSum(industry.location, rotateVector(p1local, industry.rotation));
             return pillFilter(tree, p0, p1, 10_00);
         }
-        case IndustryType.coaling_tower:
+        case 'coaltower':
             return radiusFilter(industry.location, tree, 15_00); // 15m
-        case IndustryType.telegraph_office:
-        case IndustryType.water_tower_a_red:
-        case IndustryType.water_tower_a_brown:
-        case IndustryType.water_tower_a_beige:
-        case IndustryType.water_tower_a_old:
-        case IndustryType.water_tower_b_red:
-        case IndustryType.water_tower_b_brown:
-        case IndustryType.water_tower_b_beige:
-        case IndustryType.water_tower_b_old:
+        case 'telegraphoffice':
+        case 'watertower_1870_style1':
+        case 'watertower_1870_style2':
+        case 'watertower_1870_style3':
+        case 'watertower_1870_style4':
+        case 'watertower_drgw':
+        case 'watertower_kanaskat_style1':
+        case 'watertower_kanaskat_style2':
+        case 'watertower_kanaskat_style3':
+        case 'watertower_kanaskat_style4':
+        case 'watertower_small':
             return radiusFilter(industry.location, tree, 10_00); // 10m
-        case IndustryType.large_engine_house_red:
-        case IndustryType.large_engine_house_brown:
-        case IndustryType.large_engine_house_beige:
-        case IndustryType.large_engine_house_old:
+        case 'engineshed_style1':
+        case 'engineshed_style2':
+        case 'engineshed_style3':
+        case 'engineshed_style4':
         {
             const p0local = {x: 500, y: 0, z: 0};
             const p1local = {x: 1600, y: 0, z: 0};
@@ -243,7 +246,7 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             return pillFilter(tree, p0, p1, 10_00);
         }
         default:
-            console.log(`Unknown industry type ${industry.type}`);
+            console.log(`Unknown industry type ${name}`);
             return false;
     }
 }

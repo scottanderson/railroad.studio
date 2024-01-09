@@ -1,7 +1,6 @@
 import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {IndustryType, industryProductInputLabels, industryProductOutputLabels} from './IndustryType';
 import {createPager} from './Pager';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
@@ -46,10 +45,12 @@ import {Quaternion} from './Quaternion';
 import {textToString} from './util';
 import {
     IndustryName,
-    industryNameProductInputLabels,
-    industryNameProductOutputLabels,
+    IndustryType,
+    getIndustryName,
+    industryInputLabels,
+    industryOutputLabels,
     isIndustryName,
-} from './IndustryName';
+} from './industries';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
@@ -1274,30 +1275,34 @@ export class Studio {
                 const setIndustryName = (name: IndustryName) => industry.type = name;
                 td.replaceChildren(editIndustryName(this, industry.type, setIndustryName));
             } else {
-                throw new Error(`Unexpected industry type ${industry.type}`);
+                const setIndustryName = (name: GvasString) => industry.type = name;
+                td.replaceChildren(editString(this, industry.type, setIndustryName));
             }
             tr.appendChild(td);
             // Inputs
             td = document.createElement('td');
             const setIndustryInputs = (inputs: number[]) => industry.inputs = inputs as Quadruplet<number>;
-            if (typeof industry.type === 'number') {
-                const labels = industryProductInputLabels[industry.type];
-                td.appendChild(editIndustryProducts(this, 'Input', labels, industry.inputs, setIndustryInputs));
-            } else {
-                const labels = industryNameProductInputLabels[industry.type];
-                td.appendChild(editIndustryProducts(this, 'Input', labels, industry.inputs, setIndustryInputs));
-            }
+            const industryName = getIndustryName(industry);
+            const defaultLabelsI: Quadruplet<string> = [
+                'Unknown Input Slot 1',
+                'Unknown Input Slot 2',
+                'Unknown Input Slot 3',
+                'Unknown Input Slot 4',
+            ];
+            const inputLabels = industryName ? industryInputLabels[industryName] ?? defaultLabelsI : defaultLabelsI;
+            td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
             const setIndustryOutputs = (outputs: number[]) => industry.outputs = outputs as Quadruplet<number>;
-            if (typeof industry.type === 'number') {
-                const labels = industryProductOutputLabels[industry.type];
-                td.appendChild(editIndustryProducts(this, 'Output', labels, industry.outputs, setIndustryOutputs));
-            } else {
-                const labels = industryNameProductOutputLabels[industry.type];
-                td.appendChild(editIndustryProducts(this, 'Output', labels, industry.outputs, setIndustryOutputs));
-            }
+            const defaultLabelsO: Quadruplet<string> = [
+                'Unknown Output Slot 1',
+                'Unknown Output Slot 2',
+                'Unknown Output Slot 3',
+                'Unknown Output Slot 4',
+            ];
+            const outputLabels = industryName ? industryOutputLabels[industryName] ?? defaultLabelsO : defaultLabelsO;
+            td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
             tr.appendChild(td);
             // Location
             td = document.createElement('td');

@@ -1,8 +1,8 @@
 import {GvasHeader, GvasString, GvasText} from './Gvas';
-import {IndustryType} from './IndustryType';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
+import {IndustryType} from './industries';
 
 /**
  * A simplified save state that can be modified in Railroad Studio.
@@ -94,7 +94,7 @@ export interface Industry {
     rotation: Rotator;
     inputs: Quadruplet<number>;
     outputs: Quadruplet<number>;
-    type: IndustryType | string;
+    type: IndustryType | GvasString;
 }
 
 export interface Player {

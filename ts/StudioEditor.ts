@@ -1,6 +1,5 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {IndustryName, industryNames} from './IndustryName';
-import {IndustryType, industryName} from './IndustryType';
+import {IndustryName, IndustryNames, IndustryType, industryNames, isIndustryName} from './industries';
 import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
 import {Rotator} from './Rotator';
@@ -344,11 +343,8 @@ export function editIndustryType(
     saveValue: (value: IndustryType) => void,
 ): Node {
     const options: {[key: string]: string} = {};
-    for (const key in IndustryType) {
-        if (!isNaN(Number(key))) continue;
-        const i = Number(IndustryType[key]);
-        if (isNaN(i)) continue;
-        options[String(i)] = industryName[i as IndustryType] || 'Unknown';
+    for (const key of IndustryNames) {
+        options[key] = isIndustryName(key) ? industryNames[key] : key;
     }
     const save = (value: string) => saveValue(Number(value) as IndustryType);
     return editDropdown(studio, String(type), options, save);

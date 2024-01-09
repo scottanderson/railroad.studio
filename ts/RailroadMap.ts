@@ -14,7 +14,6 @@ import {
     SwitchType,
     Turntable,
 } from './Railroad';
-import {gizmoSvgPaths, industryName, industrySvgPaths, IndustryType} from './IndustryType';
 import {Studio} from './Studio';
 import {Point, TreeUtil, radiusFilter} from './TreeUtil';
 import {calculateGrade, calculateSteepestGrade} from './Grade';
@@ -44,7 +43,7 @@ import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
 import {textToString, unknownProperty} from './util';
-import {getIndustryType, industryNames, isIndustryName} from './IndustryName';
+import {getIndustryName, gizmoSvgPaths, industryNames, industrySvgPaths, isIndustryName} from './industries';
 import {angleBetweenRotators} from './Quaternion';
 
 enum MapToolMode {
@@ -984,8 +983,10 @@ export class RailroadMap {
     private gizmoDebugLine?: Line;
     private gizmoDebugText?: Text;
     private renderIndustry(industry: Industry) {
-        const tooltipText = typeof industry.type === 'number' ? industryName[industry.type] :
-            isIndustryName(industry.type) ? industryNames[industry.type] : industry.type;
+        const industryName = getIndustryName(industry);
+        const tooltipText = isIndustryName(industryName) ?
+            industryNames[industryName] :
+            industryName ?? String(industry.type);
         const industryTransform = makeTransform(industry.location.x, industry.location.y, industry.rotation.yaw);
         const g = this.layers.industries
             .group()
@@ -993,13 +994,11 @@ export class RailroadMap {
             .addClass('industry');
         g.element('title').words(tooltipText);
         const renderPath = (g: G) => ([className, path]: [string, PathArrayAlias]) => g.path(path).addClass(className);
-        try {
-            const industryType = getIndustryType(industry);
-            const groupClass = IndustryType[industryType];
-            g.addClass(groupClass);
-            const paths = Object.entries(industrySvgPaths[industryType]);
+        if (industryName && industryName in industrySvgPaths) {
+            g.addClass(industryName);
+            const paths = Object.entries(industrySvgPaths[industryName] ?? {});
             paths.forEach(renderPath(g));
-        } catch (e: unknown) {
+        } else {
             console.warn(`Unsupported industry ${industry.type}`);
             g.text(String(industry.type))
                 .attr('transform', 'rotate(90)')
