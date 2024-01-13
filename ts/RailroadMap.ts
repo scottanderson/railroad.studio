@@ -1482,11 +1482,18 @@ export class RailroadMap {
             {
                 const extraLegs = switchExtraLegsWorld(spline);
                 if (extraLegs.length === 0) throw new Error(`Missing second leg for ${spline.type}`);
-                makePath(this.layers.tracks, ['switch-leg', spline.switchState === 0 ? 'aligned' : 'not-aligned']);
-                extraLegs.forEach((leg, i) => {
-                    const aligned = spline.switchState === (i + 1) ? 'aligned' : 'not-aligned';
-                    makePath(this.layers.tracks, ['switch-leg', aligned], leg);
-                });
+                // Create the not-aligned track path first, then aligned
+                for (const aligned of [false, true]) {
+                    if (aligned === (spline.switchState === 0)) {
+                        const c = aligned ? 'aligned' : 'not-aligned';
+                        makePath(this.layers.tracks, ['switch-leg', c]);
+                    }
+                    extraLegs.forEach((leg, i) => {
+                        if (aligned !== (spline.switchState === (i + 1))) return;
+                        const c = aligned ? 'aligned' : 'not-aligned';
+                        makePath(this.layers.tracks, ['switch-leg', c], leg);
+                    });
+                }
                 if (!(spline.type.endsWith('_noballast') || spline.type.includes('_cross_'))) {
                     makePath(this.layers.groundworks, ['grade']);
                     for (const leg of extraLegs) {
