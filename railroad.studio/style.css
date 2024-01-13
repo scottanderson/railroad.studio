@@ -298,7 +298,6 @@ body {
 
 .switch-leg.not-aligned {
   stroke: var(--switch-leg-not-aligned);
-  opacity: 0.5;
 }
 
 .diamond {
