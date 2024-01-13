@@ -1149,7 +1149,7 @@ export class Studio {
                     let c: string | undefined = undefined;
                     let tooltip: string = key;
                     if (value < minValue || value > maxValue) {
-                        c = 'table-danger';
+                        c = 'table-warning';
                         tooltip = `Expected ${key} to in range [${minValue}, ${maxValue}]`;
                     }
                     const options: InputTextOptions = {
@@ -1228,7 +1228,16 @@ export class Studio {
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
                     const options: InputTextOptions = {min: '0', max};
-                    addStat('Freight Amount', editNumber(this, frame.state.freightAmount, options, setAmount));
+                    const form = editNumber(this, frame.state.freightAmount, options, setAmount);
+                    if (isCargoType(freightType) &&
+                        typeof limits[freightType] !== 'undefined' &&
+                        frame.state.freightAmount > limit) {
+                        const title = 'Too much freight';
+                        const c = 'table-warning';
+                        addStat('Freight Amount', form, title, c);
+                    } else {
+                        addStat('Freight Amount', form);
+                    }
                     const allowedCargo = Object.keys(limits) as CargoType[];
                     const setFreightType = (type: GvasString) => {
                         // TODO: Update freight amount limits
@@ -1277,6 +1286,7 @@ export class Studio {
             } else {
                 const setIndustryName = (name: GvasString) => industry.type = name;
                 td.replaceChildren(editString(this, industry.type, setIndustryName));
+                td.classList.add('table-warning');
             }
             tr.appendChild(td);
             // Inputs
