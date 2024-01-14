@@ -34,6 +34,7 @@ export const frameTypes = [
     'montezuma_tender',
     'mosca',
     'mosca_tender',
+    'OahuWaterCar',
     'plantationcar_boxcar',
     'plantationcar_flatcar',
     'plantationcar_flatcar_logs',
@@ -54,6 +55,8 @@ export const frameTypes = [
     'tenmile',
     'tweetsie280',
     'tweetsie280_tender',
+    'VentilatedBoxcarCC',
+    'WaterCar',
     'waycar',
 ] as const satisfies ReadonlyArray<string>;
 
@@ -605,7 +608,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'flatcar_tanker': {
         freight: true,
-        length: 760,
+        length: 804,
         name: 'Tanker',
         min: {
             headlightType: 1,
@@ -870,6 +873,23 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
             tenderFuelAmount: 854,
             tenderWaterAmount: 3800,
+        },
+    },
+
+    'OahuWaterCar': {
+        length: 428,
+        name: 'Oahu Water Car',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
         },
     },
 
@@ -1286,6 +1306,40 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         },
     },
 
+    'VentilatedBoxcarCC': {
+        length: 916,
+        name: 'Ventilated Boxcar',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 6,
+            smokestackType: 1,
+        },
+    },
+
+    'WaterCar': {
+        length: 876,
+        name: 'Water Car',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+    },
+
     'waycar': {
         length: 615,
         name: 'DSP&P Waycar',
@@ -1460,6 +1514,10 @@ export const cargoLimits = {
         ['EFreightType::IronOre']: 8,
         ['EFreightType::None']: 0,
     },
+    OahuWaterCar: {
+        ['EFreightType::DrinkingWater']: 6,
+        ['EFreightType::None']: 0,
+    },
     plantationcar_boxcar: {
         ['EFreightType::CrateTools']: 12,
         ['EFreightType::CrudeOil']: 15,
@@ -1525,6 +1583,7 @@ export const cargoTypes = {
     ['EFreightType::CordWood']: 'Cordwood',
     ['EFreightType::CrateTools']: 'Tool Crates',
     ['EFreightType::CrudeOil']: 'Crude Oil',
+    ['EFreightType::DrinkingWater']: 'Drinking Water',
     ['EFreightType::IronOre']: 'Iron Ore',
     ['EFreightType::Log']: 'Logs',
     ['EFreightType::Lumber']: 'Lumber',

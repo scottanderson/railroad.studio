@@ -346,6 +346,7 @@ body {
 .frame.tender { fill: var(--tender); }
 .frame.caboose { fill: var(--caboose); }
 .frame.waycar { fill: var(--waycar); }
+
 .frame.boxcar { fill: var(--boxcar); }
 .frame.boxcar.cargo-loaded { fill: var(--boxcar-loaded); }
 .frame.coach_dsprr_1 { fill: var(--coach); }
@@ -361,6 +362,8 @@ body {
 .frame.flatcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.hopperBB { fill: var(--flatcar-hopper); }
 .frame.hopperBB.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
+.frame.OahuWaterCar { fill: var(--flatcar-tanker); }
+.frame.OahuWaterCar.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.plantationcar_boxcar { fill: var(--boxcar); }
 .frame.plantationcar_boxcar.cargo-loaded { fill: var(--boxcar-loaded); }
 .frame.plantationcar_flatcar { fill: var(--boxcar); }
@@ -379,13 +382,17 @@ body {
 .frame.plantationcar_hopper_small.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
 .frame.plantationcar_tanker { fill: var(--flatcar-tanker); }
 .frame.plantationcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
+.frame.plow { fill: var(--plow); }
 .frame.skeletoncar { fill: var(--flatcar-logs); }
 .frame.skeletoncar.cargo-loaded { fill: var(--flatcar-logs-loaded); }
 .frame.stockcar { fill: var(--boxcar); }
 .frame.stockcar.cargo-loaded { fill: var(--boxcar-loaded); }
 .frame.tankcarNCO { fill: var(--flatcar-tanker); }
 .frame.tankcarNCO.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
-.frame.plow { fill: var(--plow); }
+.frame.VentilatedBoxcarCC { fill: var(--boxcar); }
+.frame.VentilatedBoxcarCC.cargo-loaded { fill: var(--boxcar-loaded); }
+.frame.WaterCar { fill: var(--flatcar-tanker); }
+.frame.WaterCar.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 
 .frame-text {
   dominant-baseline: middle;
