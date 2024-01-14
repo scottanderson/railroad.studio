@@ -124,7 +124,6 @@ export type IndustryName = typeof IndustryNames[number];
 export function getIndustryName(industry: Industry): IndustryName | null {
     if (typeof industry.type === 'number') return legacyIndustryNames[industry.type];
     if (isIndustryName(industry.type)) return industry.type;
-    console.warn(`Unrecognized industry ${industry.type}`);
     return null;
 }
 
@@ -179,10 +178,15 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
     'sawmill': ['Logs', input2, input3, input4],
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
+    'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
 };
 
+const water: FourStrings = ['Water', output2, output3, output4];
 export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'coalmine': ['Coal', output2, output3, output4],
+    'coaltower': ['Coal', output2, output3, output4],
+    'firewooddepot': ['Firewood', 'Firewood', 'Firewood', 'Firewood'],
+    'freightdepot': ['Seed Pallet', output2, output3, output4],
     'ironoremine': ['Iron Ore', output2, output3, output4],
     'ironworks': ['Steel Pipes', 'Tool Crates', output3, output4],
     'logcamp': ['Logs', 'Cordwood', output3, output4],
@@ -191,16 +195,19 @@ export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = 
     'Sandhouse': ['Sand', output2, output3, output4],
     'sawmill': ['Lumber', 'Beams', output3, output4],
     'smelter': ['Raw Iron', 'Rails', output3, output4],
-    'watertower_1870_style1': ['Water', output2, output3, output4],
-    'watertower_1870_style2': ['Water', output2, output3, output4],
-    'watertower_1870_style3': ['Water', output2, output3, output4],
-    'watertower_1870_style4': ['Water', output2, output3, output4],
-    'watertower_drgw': ['Water', output2, output3, output4],
-    'watertower_kanaskat_style1': ['Water', output2, output3, output4],
-    'watertower_kanaskat_style2': ['Water', output2, output3, output4],
-    'watertower_kanaskat_style3': ['Water', output2, output3, output4],
-    'watertower_kanaskat_style4': ['Water', output2, output3, output4],
-    'watertower_small': ['Water', output2, output3, output4],
+    'telegraphoffice': ['Unknown', output2, output3, output4],
+    'watertower_1870_style1': water,
+    'watertower_1870_style2': water,
+    'watertower_1870_style3': water,
+    'watertower_1870_style4': water,
+    'watertower_drgw': water,
+    'watertower_kanaskat_style1': water,
+    'watertower_kanaskat_style2': water,
+    'watertower_kanaskat_style3': water,
+    'watertower_kanaskat_style4': water,
+    'watertower_small': water,
+    'WaterWell': water,
+    'WheatFarm': ['Grain', 'Straw Bale', output3, output4],
     'Woodrick': ['Firewood', 'Firewood', output3, output4],
 };
 
@@ -383,6 +390,8 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'watertower_kanaskat_style2': waterTower,
     'watertower_kanaskat_style3': waterTower,
     'watertower_kanaskat_style4': waterTower,
+    'watertower_small': waterTower,
+    'WaterWell': waterTower,
     'engineshed_style1': largeEngineHouse,
     'engineshed_style2': largeEngineHouse,
     'engineshed_style3': largeEngineHouse,
