@@ -167,7 +167,7 @@ export function editString(
     const input = document.createElement('input');
     input.type = 'text';
     input.disabled = (value === null);
-    input.value = (value === null) ? 'null' : value;
+    input.value = value ?? 'null';
     const onSave = () => {
         value = checkbox.checked ? null : input.value;
         saveValue(value);
@@ -177,7 +177,7 @@ export function editString(
         if (newValue !== value) {
             // Restore the original value
             input.disabled = checkbox.checked = (value === null);
-            input.value = (value === null) ? 'null' : value;
+            input.value = value ?? 'null';
             tempValue = value ?? '';
             return true;
         }
