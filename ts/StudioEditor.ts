@@ -28,7 +28,7 @@ export function saveContext(
     saveAction: () => boolean | void,
     cancelAction: () => boolean,
     formatValue: () => string,
-): Node {
+): [Node, () => void, () => void] {
     const pre = document.createElement('pre');
     pre.classList.add('m-0');
     pre.textContent = formatValue();
@@ -39,28 +39,30 @@ export function saveContext(
     const btnSave = document.createElement('button');
     btnSave.classList.add('btn', 'btn-success');
     btnSave.appendChild(bootstrapIcon('bi-save', 'Save'));
-    btnSave.addEventListener('click', () => {
+    const save = () => {
         const stayOpen = saveAction();
         studio.setMapModified();
         pre.textContent = formatValue();
         if (typeof stayOpen === 'boolean' && stayOpen) return;
         // Close the edit control
         div.parentElement?.replaceChildren(pre);
-    });
+    };
+    btnSave.addEventListener('click', save);
     // Cancel
     const btnCancel = document.createElement('button');
     btnCancel.classList.add('btn', 'btn-danger');
     btnCancel.appendChild(bootstrapIcon('bi-x-circle', 'Cancel'));
-    btnCancel.addEventListener('click', () => {
+    const cancel = () => {
         if (cancelAction()) return;
         // Close the edit control
         div.parentElement?.replaceChildren(pre);
-    });
+    };
+    btnCancel.addEventListener('click', cancel);
     // Layout
     const div = document.createElement('div');
     div.classList.add('hstack', 'gap-2');
     div.replaceChildren(input, btnSave, btnCancel);
-    return pre;
+    return [pre, save, cancel];
 }
 
 export function editNumber(
@@ -77,12 +79,21 @@ export function editNumber(
     const input = document.createElement('input');
     input.type = 'number';
     input.classList.add('form-control');
+    input.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            save();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancel();
+        }
+    });
     if (options.max) input.max = options.max;
     if (options.min) input.min = options.min;
     if (options.step) input.step = options.step;
     input.pattern = '[0-9]+';
     input.value = String(value);
-    const onSaveValue = () => {
+    const onSave = () => {
         value = Number(input.value);
         value = saveValue(value);
         return onCancel();
@@ -96,7 +107,8 @@ export function editNumber(
         // Close the edit control
         return false;
     };
-    return saveContext(studio, input, onSaveValue, onCancel, formatValue);
+    const [pre, save, cancel] = saveContext(studio, input, onSave, onCancel, formatValue);
+    return pre;
 }
 
 export function editSlider(
@@ -114,7 +126,16 @@ export function editSlider(
     if (options.min) input.min = options.min;
     if (options.step) input.step = options.step;
     input.value = String(value);
-    const onSaveValue = () => {
+    input.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            save();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancel();
+        }
+    });
+    const onSave = () => {
         value = Number(input.value);
         value = saveValue(value);
         return onCancel();
@@ -142,7 +163,8 @@ export function editSlider(
     const form = document.createElement('form');
     form.classList.add('form-group', 'w-100');
     form.replaceChildren(preview, input);
-    return saveContext(studio, form, onSaveValue, onCancel, formatValue);
+    const [pre, save, cancel] = saveContext(studio, form, onSave, onCancel, formatValue);
+    return pre;
 }
 
 export function editString(
@@ -168,6 +190,15 @@ export function editString(
     input.type = 'text';
     input.disabled = (value === null);
     input.value = value ?? 'null';
+    input.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            save();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancel();
+        }
+    });
     const onSave = () => {
         value = checkbox.checked ? null : input.value;
         saveValue(value);
@@ -188,7 +219,8 @@ export function editString(
     const form = document.createElement('form');
     form.replaceChildren(checkbox, input);
     const formatValue = () => gvasToString(value);
-    return saveContext(studio, form, onSave, onCancel, formatValue);
+    const [pre, save, cancel] = saveContext(studio, form, onSave, onCancel, formatValue);
+    return pre;
 }
 
 export function editText(
@@ -216,6 +248,15 @@ export function editNumbers(
         inputs.push(input);
         input.type = 'number';
         input.value = String(value[i]);
+        input.addEventListener('keydown', (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                save();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                cancel();
+            }
+        });
         if (options) {
             if (options.min) input.min = options.min;
             if (options.max) input.max = options.max;
@@ -244,7 +285,8 @@ export function editNumbers(
         // Close the edit control
         return false;
     };
-    return saveContext(studio, vstack, onSave, onCancel, formatValue);
+    const [pre, save, cancel] = saveContext(studio, vstack, onSave, onCancel, formatValue);
+    return pre;
 }
 
 export function editIndustryProducts(
@@ -377,6 +419,15 @@ export function editDropdown(
         select.appendChild(option);
     }
     select.value = String(value);
+    select.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            save();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancel();
+        }
+    });
     const onSave = () => {
         value = select.value;
         saveValue(value);
@@ -391,5 +442,6 @@ export function editDropdown(
         return false;
     };
     const formatValue = () => (options[value] || 'Unknown');
-    return saveContext(studio, select, onSave, onCancel, formatValue);
+    const [pre, save, cancel] = saveContext(studio, select, onSave, onCancel, formatValue);
+    return pre;
 }
