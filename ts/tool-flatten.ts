@@ -1,7 +1,7 @@
-import {findLastIndex, fp32} from './util';
 import {Spline} from './Railroad';
 import {Vector} from './Vector';
 import {calculateGrade} from './Grade';
+import {findLastIndex, toFloatingPoint} from './util';
 
 export function flattenSpline(spline: Spline): Vector[] {
     // Find first and last visible segments
@@ -28,7 +28,7 @@ function flattenSegments(controlPoints: Vector[], start: number, end: number): V
         result[i] = {
             x: controlPoints[i].x,
             y: controlPoints[i].y,
-            z: fp32(z0 + (cumulativeXY * includeZ / includeXY)),
+            z: toFloatingPoint(z0 + (cumulativeXY * includeZ / includeXY)),
         };
     }
     const after = calculateGrade(result);

@@ -1,7 +1,6 @@
 import {angleBetweenVectors, distance, normalizeVector} from './Vector';
-import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
-import {HermiteCurve} from './util-bezier';
-import {fp32v} from './util';
+import {HermiteCurve, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {toFloatingPointVec} from './util';
 
 /**
  * Given a Hermite curve, returns a new Hermite curve that represents a circular
@@ -20,9 +19,9 @@ export function circularizeCurve(hermite: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = hermite;
     const withTangentLength = (tangentLength: number) => ({
         endPoint,
-        endTangent: fp32v(normalizeVector(endTangent, tangentLength)),
+        endTangent: toFloatingPointVec(normalizeVector(endTangent, tangentLength)),
         startPoint,
-        startTangent: fp32v(normalizeVector(startTangent, tangentLength)),
+        startTangent: toFloatingPointVec(normalizeVector(startTangent, tangentLength)),
     });
     // Calculate the angle between the start and end tangent.
     const angle = angleBetweenVectors(startTangent, endTangent);

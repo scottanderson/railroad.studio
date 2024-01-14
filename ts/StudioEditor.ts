@@ -1,7 +1,7 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryName, IndustryType, industryNames, isIndustryName, legacyIndustryNames} from './industries';
 import {Permission, permissionEqual, permissionLabels, permissionToString} from './Permission';
-import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
+import {toFloatingPointQuat, toFloatingPointRot, toFloatingPointVec, stringToText, textToString} from './util';
 import {Quadruplet} from './Railroad';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
@@ -398,7 +398,7 @@ export function editQuaternion(
 ) {
     const encode = (v: Quaternion): number[] => [v.x, v.y, v.z, v.w];
     // eslint-disable-next-line sort-keys
-    const decode = (t: number[]): Quaternion => fp32q({x: t[0], y: t[1], z: t[2], w: t[3]});
+    const decode = (t: number[]): Quaternion => toFloatingPointQuat({x: t[0], y: t[1], z: t[2], w: t[3]});
     const display = (t: number[]) => {
         const xZero = t[0] === 0;
         const yZero = t[1] === 0;
@@ -420,7 +420,7 @@ export function editRotator(
 ) {
     const encode = (r: Rotator): number[] => [r.roll, r.yaw, r.pitch];
     // eslint-disable-next-line sort-keys
-    const decode = (t: number[]): Rotator => fp32r({roll: t[0], yaw: t[1], pitch: t[2]});
+    const decode = (t: number[]): Rotator => toFloatingPointRot({roll: t[0], yaw: t[1], pitch: t[2]});
     const display = (t: number[]) => {
         if (t[0] === 0 && t[2] === 0) {
             return Number.isInteger(t[1]) ? String(t[1]) : t[1].toFixed(2);
@@ -438,7 +438,7 @@ export function editVector(
     saveValue: (value: Vector) => Vector,
 ) {
     const encode = (v: Vector): number[] => [v.x, v.y, v.z];
-    const decode = (t: number[]): Vector => fp32v({x: t[0], y: t[1], z: t[2]});
+    const decode = (t: number[]): Vector => toFloatingPointVec({x: t[0], y: t[1], z: t[2]});
     const display = (t: number[]) => {
         const xZero = t[0] === 0;
         const yZero = t[1] === 0;
