@@ -126,13 +126,13 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const tenderFuelAmount = optionalMap(gvas.floatArrays, 'TenderFuelAmountArray');
     const tenderWaterAmount = optionalMap(gvas.floatArrays, 'TenderWaterAmountArray');
     const frames: Frame[] = [];
-    if (boilerFireTemp || boilerFuelAmount || boilerPressure || boilerWaterLevel || boilerWaterTemp ||
-        brakeValue || compressorAirPressure || compressorValveValue || couplerFrontState || couplerRearState ||
-        frameLocation || frameName || frameNumber || frameRotation || frameType || freightAmount || freightType ||
-        generatorValveValue || headlightFrontState || headlightRearState || headlightType ||
-        markerLightsFrontLeftState || markerLightsFrontRightState ||
-        markerLightsRearLeftState || markerLightsRearRightState ||
-        regulatorValue || reverserValue || sanderAmount || smokestackType || tenderFuelAmount || tenderWaterAmount) {
+    if (boilerFireTemp ?? boilerFuelAmount ?? boilerPressure ?? boilerWaterLevel ?? boilerWaterTemp ??
+        brakeValue ?? compressorAirPressure ?? compressorValveValue ?? couplerFrontState ?? couplerRearState ??
+        frameLocation ?? frameName ?? frameNumber ?? frameRotation ?? frameType ?? freightAmount ?? freightType ??
+        generatorValveValue ?? headlightFrontState ?? headlightRearState ?? headlightType ??
+        markerLightsFrontLeftState ?? markerLightsFrontRightState ??
+        markerLightsRearLeftState ?? markerLightsRearRightState ??
+        regulatorValue ?? reverserValue ?? sanderAmount ?? smokestackType ?? tenderFuelAmount ?? tenderWaterAmount) {
         if (!boilerFireTemp || !boilerFuelAmount || !boilerPressure || !boilerWaterLevel || !boilerWaterTemp ||
             !brakeValue || !compressorAirPressure || !compressorValveValue || !couplerFrontState || !couplerRearState ||
             !frameLocation || !frameName || !frameNumber || !frameRotation || !frameType ||
@@ -214,9 +214,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const industryType = isNovemberUpdate ?
         optionalMap(gvas.nameArrays, 'IndustryNameArray') :
         optionalMap(gvas.intArrays, 'IndustryTypeArray');
-    if (industryLocation || industryRotation ||
-        industryStorageEduct1 || industryStorageEduct2 || industryStorageEduct3 || industryStorageEduct4 ||
-        industryStorageProduct1 || industryStorageProduct2 || industryStorageProduct3 || industryStorageProduct4 ||
+    if (industryLocation ?? industryRotation ??
+        industryStorageEduct1 ?? industryStorageEduct2 ?? industryStorageEduct3 ?? industryStorageEduct4 ??
+        industryStorageProduct1 ?? industryStorageProduct2 ?? industryStorageProduct3 ?? industryStorageProduct4 ??
         industryType) {
         if (!industryLocation || !industryRotation ||
             !industryStorageEduct1 || !industryStorageEduct2 || !industryStorageEduct3 || !industryStorageEduct4 ||
@@ -257,7 +257,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const playerName = optionalMap(gvas.stringArrays, 'PlayerNameArray');
     const playerRotation = optionalMap(gvas.floatArrays, 'PlayerRotationArray');
     const playerXp = optionalMap(gvas.intArrays, 'PlayerXPArray');
-    if (playerId || playerLocation || playerMoney || playerName || playerXp) {
+    if (playerId ?? playerLocation ?? playerMoney ?? playerName ?? playerXp) {
         if (!playerLocation || !playerMoney || !playerName || !playerXp) {
             throw new Error('Some player values are missing');
         }
@@ -285,7 +285,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const propNames = optionalMap(gvas.stringArrays, 'PropsNameArray');
     const propTransforms = optionalMap(gvas.transformArrays, 'PropsTransformArray');
     const propText = optionalMap(gvas.textArrays, 'PropsTextArray');
-    if (propNames || propTransforms || propText) {
+    if (propNames ?? propTransforms ?? propText) {
         if (!propNames || !propTransforms || !propText) {
             throw new Error('Some prop values are missing');
         }
@@ -304,7 +304,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const sandhouseLocation = optionalMap(gvas.vectorArrays, 'SandhouseLocationArray');
     const sandhouseRotation = optionalMap(gvas.rotatorArrays, 'SandhouseRotationArray');
     const sandhouseType = optionalMap(gvas.intArrays, 'SandhouseTypeArray');
-    if (sandhouseLocation || sandhouseRotation || sandhouseType) {
+    if (sandhouseLocation ?? sandhouseRotation ?? sandhouseType) {
         if (!sandhouseLocation || !sandhouseRotation || !sandhouseType) {
             throw new Error('Some sandhouse values are missing');
         }
@@ -324,7 +324,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const switchRotation = optionalMap(gvas.rotatorArrays, 'SwitchRotationArray');
     const switchState = optionalMap(gvas.intArrays, 'SwitchStateArray');
     const switchType = optionalMap(gvas.intArrays, 'SwitchTypeArray');
-    if (switchLocation || switchRotation || switchState || switchType) {
+    if (switchLocation ?? switchRotation ?? switchState ?? switchType) {
         if (!switchLocation || !switchRotation || !switchState || !switchType) {
             throw new Error('Some switch values are missing');
         }
@@ -347,7 +347,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const turntableType = isNovemberUpdate ?
         optionalMap(gvas.nameArrays, 'TurntableTypes') :
         optionalMap(gvas.intArrays, 'TurntableTypeArray');
-    if (turntableDeckRotationArray || turntableLocation || turntableRotator || turntableType) {
+    if (turntableDeckRotationArray ?? turntableLocation ?? turntableRotator ?? turntableType) {
         if (!turntableLocation || !turntableRotator || !turntableType) {
             throw new Error('Some turntable values are missing');
         }
@@ -369,7 +369,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const vegetation: Vegeation[] = [];
     const vegetationInstanceIndexArray = optionalMap(gvas.intArrays, 'VegetationInstanceIndexArray');
     const vegetationIsmCompNameArray = optionalMap(gvas.stringArrays, 'VegetationISMCompNameArray');
-    if (vegetationInstanceIndexArray || vegetationIsmCompNameArray) {
+    if (vegetationInstanceIndexArray ?? vegetationIsmCompNameArray) {
         if (!vegetationInstanceIndexArray || !vegetationIsmCompNameArray) {
             throw new Error('Some vegetation values are missing');
         }
@@ -388,7 +388,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const watertowerRotation = optionalMap(gvas.rotatorArrays, 'WatertowerRotationArray');
     const watertowerType = optionalMap(gvas.intArrays, 'WatertowerTypeArray');
     const watertowerWaterlevel = optionalMap(gvas.floatArrays, 'WatertowerWaterlevelArray');
-    if (watertowerLocation || watertowerRotation || watertowerType || watertowerWaterlevel) {
+    if (watertowerLocation ?? watertowerRotation ?? watertowerType ?? watertowerWaterlevel) {
         if (!watertowerLocation || !watertowerRotation || !watertowerType || !watertowerWaterlevel) {
             throw new Error('Some watertower values are missing');
         }
@@ -413,13 +413,13 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const splineType = optionalMap(gvas.intArrays, 'SplineTypeArray');
     const splineVisibilityEnd = optionalMap(gvas.intArrays, 'SplineVisibilityEndArray');
     const splineVisibilityStart = optionalMap(gvas.intArrays, 'SplineVisibilityStartArray');
-    if (splineControlPoints ||
-        splineControlPointsIndexEnd ||
-        splineControlPointsIndexStart ||
-        splineLocation ||
-        splineSegmentsVisibility ||
-        splineType ||
-        splineVisibilityEnd ||
+    if (splineControlPoints ??
+        splineControlPointsIndexEnd ??
+        splineControlPointsIndexStart ??
+        splineLocation ??
+        splineSegmentsVisibility ??
+        splineType ??
+        splineVisibilityEnd ??
         splineVisibilityStart) {
         if (!splineControlPoints ||
             !splineControlPointsIndexEnd ||
@@ -476,17 +476,17 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const splineTrackType = isNovemberUpdate ?
         optionalMap(gvas.nameArrays, 'SplineTrackIds') :
         optionalMap(gvas.stringArrays, 'SplineTrackTypeArray');
-    if (splineTrackEndPoint ||
-        splineTrackEndSpline1Id ||
-        splineTrackEndSpline2Id ||
-        splineTrackEndTangent ||
-        splineTrackLocation ||
-        splineTrackPaintStyle ||
-        splineTrackRotation ||
-        splineTrackStartPoint ||
-        splineTrackStartSplineId ||
-        splineTrackStartTangent ||
-        splineTrackSwitchState ||
+    if (splineTrackEndPoint ??
+        splineTrackEndSpline1Id ??
+        splineTrackEndSpline2Id ??
+        splineTrackEndTangent ??
+        splineTrackLocation ??
+        splineTrackPaintStyle ??
+        splineTrackRotation ??
+        splineTrackStartPoint ??
+        splineTrackStartSplineId ??
+        splineTrackStartTangent ??
+        splineTrackSwitchState ??
         splineTrackType) {
         if (!splineTrackEndPoint ||
             !splineTrackEndTangent ||

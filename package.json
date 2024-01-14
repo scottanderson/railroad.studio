@@ -13,14 +13,14 @@
     },
     "devDependencies": {
         "@svgdotjs/svg.js": "^3.2.0",
-        "@total-typescript/ts-reset": "^0.4.2",
-        "@typescript-eslint/eslint-plugin": "^5.62.0",
-        "eslint": "^8.49.0",
+        "@total-typescript/ts-reset": "^0.5.1",
+        "@typescript-eslint/eslint-plugin": "^6.18.1",
+        "eslint": "^8.56.0",
         "eslint-config-google": "^0.14.0",
         "eslint-webpack-plugin": "^4.0.1",
         "svg-pan-zoom": "^3.6.1",
-        "ts-loader": "^9.4.4",
-        "typescript": "^5.2.2",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.3.3",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.1"
     }
