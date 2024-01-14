@@ -1301,6 +1301,9 @@ export class Studio {
             ];
             const inputLabels = industryName ? industryInputLabels[industryName] ?? defaultLabelsI : defaultLabelsI;
             td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
+            if (inputLabels === defaultLabelsI && !industry.inputs.every((v) => v === 0)) {
+                td.classList.add('table-warning');
+            }
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
@@ -1313,6 +1316,9 @@ export class Studio {
             ];
             const outputLabels = industryName ? industryOutputLabels[industryName] ?? defaultLabelsO : defaultLabelsO;
             td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
+            if (outputLabels === defaultLabelsO && !industry.outputs.every((v) => v === 0)) {
+                td.classList.add('table-warning');
+            }
             tr.appendChild(td);
             // Location
             td = document.createElement('td');

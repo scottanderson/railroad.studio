@@ -999,7 +999,6 @@ export class RailroadMap {
             const paths = Object.entries(industrySvgPaths[industryName] ?? {});
             paths.forEach(renderPath(g));
         } else {
-            console.warn(`Unsupported industry ${industry.type}`);
             g.text(String(industry.type))
                 .attr('transform', 'rotate(90)')
                 .addClass('frame-text');

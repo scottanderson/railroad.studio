@@ -1432,6 +1432,7 @@ export const cargoLimits = {
         ['EFreightType::CordWood']: 8,
         ['EFreightType::None']: 0,
         ['EFreightType::OilBarrel']: 46,
+        ['EFreightType::StrawBale']: 15,
     },
     flatcar_hopper: {
         ['EFreightType::Coal']: 10,
@@ -1466,6 +1467,7 @@ export const cargoLimits = {
     },
     plantationcar_flatcar: {
         ['EFreightType::CrateTools']: 6,
+        ['EFreightType::SeedPallet']: 6,
     },
     plantationcar_flatcar_logs: {
         ['EFreightType::Log']: 5,
@@ -1480,6 +1482,7 @@ export const cargoLimits = {
     },
     plantationcar_flatcar_stakes_bulkhead: {
         ['EFreightType::CordWood']: 2,
+        ['EFreightType::None']: 0,
     },
     plantationcar_hopper_large: {
         ['EFreightType::Coal']: 6,
@@ -1531,6 +1534,7 @@ export const cargoTypes = {
     ['EFreightType::RawIron']: 'Raw Iron',
     ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
+    ['EFreightType::StrawBale']: 'Straw Bale',
 } as const satisfies PRO<string, string>;
 
 export const isCargoType = (type: GvasString): type is CargoType =>
