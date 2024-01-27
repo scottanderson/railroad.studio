@@ -361,6 +361,10 @@ export class Studio {
             onClick: () => void;
         }[] = [
             {
+                name: 'Fix trees (Then smart cut trees)',
+                onClick: () => this.map.getTreeUtil().cutFix().catch(handleError),
+            },
+            {
                 name: 'Cut All Trees (increases save file size)',
                 onClick: () => this.map.getTreeUtil().cutAll().catch(handleError),
             },
@@ -368,10 +372,10 @@ export class Studio {
                 name: 'Plant all trees (dangerous!)',
                 onClick: () => this.map.getTreeUtil().plantAll().catch(handleError),
             },
-            {
-                name: 'Smart plant trees',
-                onClick: () => this.map.getTreeUtil().smartPlant().catch(handleError),
-            },
+            // {
+            //    name: 'Smart plant trees',
+            //    onClick: () => this.map.getTreeUtil().smartPlant().catch(handleError),
+            // },
             {
                 name: 'Smart cut trees (preview)',
                 onClick: () => this.map.previewSmartPlant().catch(handleError),
@@ -695,7 +699,7 @@ export class Studio {
             resetFramePage();
         };
         const frameInCategory = (f: Frame, c: typeof frameCategories[number]) =>
-            isFrameType(f.type) && (frameDefinitions[f.type][c] ?? false);
+            isFrameType(f.type) && (frameDefinitions[f.type][c] || false);
         const labels = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
             tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
@@ -1149,7 +1153,7 @@ export class Studio {
                     let c: string | undefined = undefined;
                     let tooltip: string = key;
                     if (value < minValue || value > maxValue) {
-                        c = 'table-warning';
+                        c = 'table-danger';
                         tooltip = `Expected ${key} to in range [${minValue}, ${maxValue}]`;
                     }
                     const options: InputTextOptions = {
@@ -1228,16 +1232,7 @@ export class Studio {
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
                     const options: InputTextOptions = {min: '0', max};
-                    const form = editNumber(this, frame.state.freightAmount, options, setAmount);
-                    if (isCargoType(freightType) &&
-                        typeof limits[freightType] !== 'undefined' &&
-                        frame.state.freightAmount > limit) {
-                        const title = 'Too much freight';
-                        const c = 'table-warning';
-                        addStat('Freight Amount', form, title, c);
-                    } else {
-                        addStat('Freight Amount', form);
-                    }
+                    addStat('Freight Amount', editNumber(this, frame.state.freightAmount, options, setAmount));
                     const allowedCargo = Object.keys(limits) as CargoType[];
                     const setFreightType = (type: GvasString) => {
                         // TODO: Update freight amount limits
@@ -1286,7 +1281,6 @@ export class Studio {
             } else {
                 const setIndustryName = (name: GvasString) => industry.type = name;
                 td.replaceChildren(editString(this, industry.type, setIndustryName));
-                td.classList.add('table-warning');
             }
             tr.appendChild(td);
             // Inputs
@@ -1301,9 +1295,6 @@ export class Studio {
             ];
             const inputLabels = industryName ? industryInputLabels[industryName] ?? defaultLabelsI : defaultLabelsI;
             td.appendChild(editIndustryProducts(this, 'Input', inputLabels, industry.inputs, setIndustryInputs));
-            if (inputLabels === defaultLabelsI && !industry.inputs.every((v) => v === 0)) {
-                td.classList.add('table-warning');
-            }
             tr.appendChild(td);
             // Outputs
             td = document.createElement('td');
@@ -1316,9 +1307,6 @@ export class Studio {
             ];
             const outputLabels = industryName ? industryOutputLabels[industryName] ?? defaultLabelsO : defaultLabelsO;
             td.appendChild(editIndustryProducts(this, 'Output', outputLabels, industry.outputs, setIndustryOutputs));
-            if (outputLabels === defaultLabelsO && !industry.outputs.every((v) => v === 0)) {
-                td.classList.add('table-warning');
-            }
             tr.appendChild(td);
             // Location
             td = document.createElement('td');

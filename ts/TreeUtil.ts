@@ -1,4 +1,4 @@
-import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
+import {Industry, Railroad, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
 import {Studio} from './Studio';
 import {Vector, vectorSum} from './Vector';
 import {VectorSet} from './VectorSet';
@@ -70,7 +70,11 @@ export class TreeUtil {
             });
         }
     }
-
+    async cutFix() {
+        this.railroad.removedVegetationAssets = [];
+        this.railroad.vegetation = [];
+        this.setMapModified();
+    }
     async cutAll() {
         const trees = await this.allTrees();
         const before = this.railroad.removedVegetationAssets.length;
@@ -84,6 +88,7 @@ export class TreeUtil {
         if (before === 0) return;
         const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
+        this.railroad.vegetation = [];
         this.setMapModified();
         return this.onTreesChanged(before, 0, treesBefore);
     }
@@ -131,7 +136,6 @@ export class TreeUtil {
     treeFilter(tree: Vector) {
         return !spawnFilter(tree) && undefined === (
             this.railroad.industries.find((i) => industryFilter(i, tree)) ??
-            this.railroad.sandhouses.find((s) => sandhouseFilter(s, tree)) ??
             this.railroad.splines.find((s) => splineFilter(s, tree)) ??
             this.railroad.splineTracks.find((s) => splineTrackFilter(s, tree)) ??
             this.railroad.switches.find((s) => switchFilter(s, tree)) ??
@@ -209,6 +213,18 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             return radiusFilter(industry.location, tree, 35_00); // 35m
         case 'firewooddepot':
             return radiusFilter(industry.location, tree, 15_00); // 15m
+        case 'WaterWell':
+            return radiusFilter(industry.location, tree, 10_00); // 10m
+        case 'SandHouse':
+            return radiusFilter(industry.location, tree, 10_00); // 10m
+        case 'WheatFarm':
+            return radiusFilter(industry.location, tree, 41_00); // 41m
+        case 'MeatPackingPlant':
+            return radiusFilter(industry.location, tree, 36_00); // 36m
+        case 'CattleFarm':
+            return radiusFilter(industry.location, tree, 46_00); // 46m
+        case 'Woodrick':
+            return radiusFilter(industry.location, tree, 5_00); // 5m
         case 'enginehouse_alpine':
         case 'enginehouse_aspen':
         case 'enginehouse_barn':
@@ -249,10 +265,6 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             console.log(`Unknown industry type ${name}`);
             return false;
     }
-}
-
-function sandhouseFilter(sandhouse: Sandhouse, tree: Vector): boolean {
-    return radiusFilter(sandhouse.location, tree, 10_00); // 10m
 }
 
 function spawnFilter(tree: Vector): boolean {
