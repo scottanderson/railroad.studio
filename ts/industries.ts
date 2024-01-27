@@ -62,7 +62,7 @@ export const IndustryNames = [
     'MeatPackingPlant',
     'oilfield',
     'Refinery',
-    'Sandhouse',
+    'SandHouse',
     'sawmill',
     'smelter',
     'telegraphoffice',
@@ -124,6 +124,7 @@ export type IndustryName = typeof IndustryNames[number];
 export function getIndustryName(industry: Industry): IndustryName | null {
     if (typeof industry.type === 'number') return legacyIndustryNames[industry.type];
     if (isIndustryName(industry.type)) return industry.type;
+    console.warn(`Unrecognized industry ${industry.type}`);
     return null;
 }
 
@@ -147,7 +148,7 @@ export const industryNames: Record<IndustryName, string> = {
     'MeatPackingPlant': 'Meat Packing Plant',
     'oilfield': 'Oil Field',
     'Refinery': 'Refinery',
-    'Sandhouse': 'Sandhouse',
+    'SandHouse': 'Sand House',
     'sawmill': 'Sawmill',
     'smelter': 'Smelter',
     'telegraphoffice': 'Telegraph Office',
@@ -178,37 +179,36 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
     'sawmill': ['Logs', input2, input3, input4],
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
+    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
     'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
+    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
 };
 
-const water: FourStrings = ['Water', output2, output3, output4];
 export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'coalmine': ['Coal', output2, output3, output4],
-    'coaltower': ['Coal', output2, output3, output4],
-    'firewooddepot': ['Firewood', 'Firewood', 'Firewood', 'Firewood'],
-    'freightdepot': ['Seed Pallet', output2, output3, output4],
     'ironoremine': ['Iron Ore', output2, output3, output4],
     'ironworks': ['Steel Pipes', 'Tool Crates', output3, output4],
     'logcamp': ['Logs', 'Cordwood', output3, output4],
     'oilfield': ['Crude Oil', output2, output3, output4],
     'Refinery': ['Oil Barrel', output2, output3, output4],
-    'Sandhouse': ['Sand', output2, output3, output4],
+    'SandHouse': ['Sand', output2, output3, output4],
     'sawmill': ['Lumber', 'Beams', output3, output4],
     'smelter': ['Raw Iron', 'Rails', output3, output4],
-    'telegraphoffice': ['Unknown', output2, output3, output4],
-    'watertower_1870_style1': water,
-    'watertower_1870_style2': water,
-    'watertower_1870_style3': water,
-    'watertower_1870_style4': water,
-    'watertower_drgw': water,
-    'watertower_kanaskat_style1': water,
-    'watertower_kanaskat_style2': water,
-    'watertower_kanaskat_style3': water,
-    'watertower_kanaskat_style4': water,
-    'watertower_small': water,
-    'WaterWell': water,
+    'watertower_1870_style1': ['Water', output2, output3, output4],
+    'watertower_1870_style2': ['Water', output2, output3, output4],
+    'watertower_1870_style3': ['Water', output2, output3, output4],
+    'watertower_1870_style4': ['Water', output2, output3, output4],
+    'watertower_drgw': ['Water', output2, output3, output4],
+    'watertower_kanaskat_style1': ['Water', output2, output3, output4],
+    'watertower_kanaskat_style2': ['Water', output2, output3, output4],
+    'watertower_kanaskat_style3': ['Water', output2, output3, output4],
+    'watertower_kanaskat_style4': ['Water', output2, output3, output4],
+    'watertower_small': ['Water', output2, output3, output4],
+    'Woodrick': ['Firewood', output2, output3, output4],
+    'CattleFarm': ['Cattle', 'Cattle', output3, output4],
+    'WaterWell': ['Water', output2, output3, output4],
     'WheatFarm': ['Grain', 'Straw Bale', output3, output4],
-    'Woodrick': ['Firewood', 'Firewood', output3, output4],
+    'MeatPackingPlant': ['Meat', output2, output3, output4],
 };
 
 export const gizmoSvgPaths = {
@@ -381,6 +381,7 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'telegraphoffice': {
         'building': rect(-200, -150, 400, 300),
     },
+    'watertower_small': waterTower,
     'watertower_1870_style1': waterTower,
     'watertower_1870_style2': waterTower,
     'watertower_1870_style3': waterTower,
@@ -390,8 +391,6 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'watertower_kanaskat_style2': waterTower,
     'watertower_kanaskat_style3': waterTower,
     'watertower_kanaskat_style4': waterTower,
-    'watertower_small': waterTower,
-    'WaterWell': waterTower,
     'engineshed_style1': largeEngineHouse,
     'engineshed_style2': largeEngineHouse,
     'engineshed_style3': largeEngineHouse,
@@ -399,4 +398,11 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'Woodrick': {
         'building': rect(-130, -65, 260, 130),
     },
+    // ['M', 2800, 980],
+    // ['C', 2010, 640, 1600, 500, 1180, 420],
+    // ['S', 580, 500, -270, 1100],
+    // 'WheatFarm': {
+    // 'building': [
+    // ] as PathCommand[],
+    // },
 };
