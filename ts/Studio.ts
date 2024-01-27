@@ -699,7 +699,7 @@ export class Studio {
             resetFramePage();
         };
         const frameInCategory = (f: Frame, c: typeof frameCategories[number]) =>
-            isFrameType(f.type) && (frameDefinitions[f.type][c] || false);
+            isFrameType(f.type) && (frameDefinitions[f.type][c] ?? false);
         const labels = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
             tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
