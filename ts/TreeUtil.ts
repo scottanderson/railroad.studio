@@ -80,12 +80,13 @@ export class TreeUtil {
     }
 
     async plantAll() {
-        const before = this.railroad.removedVegetationAssets.length;
-        if (before === 0) return;
-        const treesBefore = this.railroad.removedVegetationAssets;
+        // const before = this.railroad.removedVegetationAssets.length;
+        // if (before === 0) return;
+        // const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
+        this.railroad.vegetation = []; // temp fix for plant all trees, and fix bugged maps
         this.setMapModified();
-        return this.onTreesChanged(before, 0, treesBefore);
+        // return this.onTreesChanged(before, 0, treesBefore);
     }
 
     async smartCut(renderFunc?: (trees: Vector[]) => void, dryrun = false) {
@@ -209,6 +210,18 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             return radiusFilter(industry.location, tree, 35_00); // 35m
         case 'firewooddepot':
             return radiusFilter(industry.location, tree, 15_00); // 15m
+        case 'WaterWell':
+            return radiusFilter(industry.location, tree, 10_00); // 10m
+        case 'Sandhouse':
+            return radiusFilter(industry.location, tree, 10_00); // 10m
+        case 'WheatFarm':
+            return radiusFilter(industry.location, tree, 42_00); // 42m
+        case 'MeatPackingPlant':
+            return radiusFilter(industry.location, tree, 37_00); // 37m
+        case 'CattleFarm':
+            return radiusFilter(industry.location, tree, 46_00); // 46m
+        case 'Woodrick':
+            return radiusFilter(industry.location, tree, 5_00); // 5m
         case 'enginehouse_alpine':
         case 'enginehouse_aspen':
         case 'enginehouse_barn':

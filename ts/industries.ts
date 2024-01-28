@@ -179,6 +179,8 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'sawmill': ['Logs', input2, input3, input4],
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
     'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
+    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
+    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
@@ -209,6 +211,8 @@ export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = 
     'WaterWell': water,
     'WheatFarm': ['Grain', 'Straw Bale', output3, output4],
     'Woodrick': ['Firewood', 'Firewood', output3, output4],
+    'CattleFarm': ['Cattle', 'Cattle', output3, output4],
+    'MeatPackingPlant': ['Meat', output2, output3, output4],
 };
 
 export const gizmoSvgPaths = {
