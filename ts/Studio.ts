@@ -51,6 +51,7 @@ import {
     industryOutputLabels,
     isIndustryName,
 } from './industries';
+import {VegetationUtil} from './VegetationUtil';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
@@ -66,12 +67,14 @@ export class Studio {
     private readonly map: RailroadMap;
     private readonly originalSegmentCount: number;
     readonly railroad: Railroad;
+    private readonly vegetationUtil: VegetationUtil;
 
     constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
         this.filename = filename;
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
+        this.vegetationUtil = new VegetationUtil(this);
         this.logRadiusGrade();
         // Set up the DOM
         const header = document.createElement('h2');
@@ -407,6 +410,39 @@ export class Studio {
                 btnTreeBrush.classList.add('btn-secondary');
             }
         });
+        // Vegetation dropdown
+        const txtVegetation = document.createTextNode(' Vegetation ');
+        const imgVegetation = bootstrapIcon('bi-tree', 'Vegetation Dropdown');
+        const btnVegetation = document.createElement('button');
+        btnVegetation.id = 'btnVegetation';
+        btnVegetation.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnVegetation.setAttribute('aria-expanded', 'false');
+        btnVegetation.setAttribute('data-bs-auto-close', 'true');
+        btnVegetation.setAttribute('data-bs-toggle', 'dropdown');
+        btnVegetation.replaceChildren(imgVegetation, txtVegetation);
+        const lstVegetation = document.createElement('ul');
+        lstVegetation.classList.add('dropdown-menu');
+        const grpVegetation = document.createElement('div');
+        grpVegetation.setAttribute('aria-labelledby', btnVegetation.id);
+        grpVegetation.classList.add('dropdown');
+        grpVegetation.replaceChildren(btnVegetation, lstVegetation);
+        const vegetationActions: {
+            name: string;
+            onClick: () => void;
+        }[] = [
+            {
+                name: 'Plant all vegetation',
+                onClick: () => this.vegetationUtil.plantAll(),
+            },
+        ];
+        lstVegetation.replaceChildren(...vegetationActions.map((action) => {
+            const btnAction = document.createElement('button');
+            const txtAction = document.createTextNode(` ${action.name} `);
+            btnAction.classList.add('dropdown-item', 'text-nowrap');
+            btnAction.replaceChildren(txtAction);
+            btnAction.addEventListener('click', action.onClick);
+            return btnAction;
+        }));
         // Rerail frame tool
         const btnRerail = document.createElement('button');
         const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
@@ -659,11 +695,16 @@ export class Studio {
                 btnMeasure,
             ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
-        if (!this.railroad.settings.gameLevelName) {
-            // Enable tools that only work for Pine Valley
+        if (!this.railroad.settings.gameLevelName && this.railroad.vegetation.length === 0) {
+            // Enable legacy tree tools based on railroad.removedVegetationAssets
             [
                 grpTrees,
                 btnTreeBrush,
+            ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
+        } else {
+            // Enable vegetation tools based on railroad.vegetation
+            [
+                grpVegetation,
             ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
         if (hasSplines) {
