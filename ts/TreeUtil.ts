@@ -80,13 +80,12 @@ export class TreeUtil {
     }
 
     async plantAll() {
-        // const before = this.railroad.removedVegetationAssets.length;
-        // if (before === 0) return;
-        // const treesBefore = this.railroad.removedVegetationAssets;
+        const before = this.railroad.removedVegetationAssets.length;
+        if (before === 0) return;
+        const treesBefore = this.railroad.removedVegetationAssets;
         this.railroad.removedVegetationAssets = [];
-        this.railroad.vegetation = []; // temp fix for plant all trees, and fix bugged maps
         this.setMapModified();
-        // return this.onTreesChanged(before, 0, treesBefore);
+        return this.onTreesChanged(before, 0, treesBefore);
     }
 
     async smartCut(renderFunc?: (trees: Vector[]) => void, dryrun = false) {
