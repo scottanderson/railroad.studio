@@ -432,7 +432,12 @@ export class Studio {
         }[] = [
             {
                 name: 'Plant all vegetation',
-                onClick: () => this.vegetationUtil.plantAll(),
+                onClick: () => this.vegetationUtil.plantAll().then(() => {
+                    if (!this.railroad.settings.gameLevelName) {
+                        // Enable legacy tree tools based on railroad.removedVegetationAssets
+                        grpVegetation.replaceWith(grpTrees, btnTreeBrush);
+                    }
+                }),
             },
         ];
         lstVegetation.replaceChildren(...vegetationActions.map((action) => {
