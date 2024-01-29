@@ -180,7 +180,7 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
     'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
     'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
-    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
+    'MeatPackingPlant': ['Cattle', 'Coal', input3, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
@@ -231,6 +231,13 @@ const largeEngineHouse = {
 
 const waterTower = {
     'building': rect(250, 250, 500, -500),
+};
+
+export const industrySvgAssets: Partial<Record<IndustryName, string>> = {
+    'CattleFarm': 'CattleFarm.svg',
+    'MeatPackingPlant': 'MeatPackingPlant.svg',
+    'WaterWell': 'WaterWell.svg',
+    'WheatFarm': 'WheatFarm.svg',
 };
 
 export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathArrayAlias>>> = {

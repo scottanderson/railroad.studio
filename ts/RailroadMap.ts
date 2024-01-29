@@ -43,7 +43,14 @@ import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
 import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
 import {textToString, unknownProperty} from './util';
-import {getIndustryName, gizmoSvgPaths, industryNames, industrySvgPaths, isIndustryName} from './industries';
+import {
+    getIndustryName,
+    gizmoSvgPaths,
+    industryNames,
+    industrySvgAssets,
+    industrySvgPaths,
+    isIndustryName,
+} from './industries';
 import {angleBetweenRotators} from './Quaternion';
 
 enum MapToolMode {
@@ -998,6 +1005,10 @@ export class RailroadMap {
             g.addClass(industryName);
             const paths = Object.entries(industrySvgPaths[industryName] ?? {});
             paths.forEach(renderPath(g));
+        } else if (industryName && industryName in industrySvgAssets) {
+            g.addClass(industryName);
+            g.image(industrySvgAssets[industryName])
+                .attr('preserveAspectRatio', 'xMinYMin meet');
         } else {
             g.text(String(industry.type))
                 .attr('transform', 'rotate(90)')
