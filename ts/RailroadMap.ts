@@ -1007,7 +1007,9 @@ export class RailroadMap {
             paths.forEach(renderPath(g));
         } else if (industryName && industryName in industrySvgAssets) {
             g.addClass(industryName);
-            g.image(industrySvgAssets[industryName])
+            const asset = industrySvgAssets[industryName]!;
+            g.image(asset.href)
+                .translate(asset.x ?? 0, asset.y ?? 0)
                 .attr('preserveAspectRatio', 'xMinYMin meet');
         } else {
             g.text(String(industry.type))

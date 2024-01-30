@@ -3,7 +3,9 @@
               "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="269.383mm" height="184.176mm"
+     width="5000" height="6000"
+     x="-1800" y="-3000"
+     transform="rotate(90)"
      viewBox="0 0 1018 696">
   <path id="un-load"
         fill="blue" stroke="gold" stroke-width="1"

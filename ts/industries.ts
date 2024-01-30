@@ -233,11 +233,27 @@ const waterTower = {
     'building': rect(250, 250, 500, -500),
 };
 
-export const industrySvgAssets: Partial<Record<IndustryName, string>> = {
-    'CattleFarm': 'CattleFarm.svg',
-    'MeatPackingPlant': 'MeatPackingPlant.svg',
-    'WaterWell': 'WaterWell.svg',
-    'WheatFarm': 'WheatFarm.svg',
+export const industrySvgAssets: Partial<Record<IndustryName, {
+    href: string,
+    x?: number,
+    y?: number,
+    width?: number,
+    height?: number,
+}>> = {
+    'CattleFarm': {
+        href: 'CattleFarm.svg',
+    },
+    'MeatPackingPlant': {
+        href: 'href:MeatPackingPlant.svg',
+    },
+    'WaterWell': {
+        href: 'WaterWell.svg',
+    },
+    'WheatFarm': {
+        href: 'WheatFarm.svg',
+        x: -1800,
+        y: -3000,
+    },
 };
 
 export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathArrayAlias>>> = {
