@@ -34,8 +34,8 @@ export function fp32v(v: Vector): Vector {
 export function stringToText(str: GvasString): GvasText {
     if (str === null) return null;
     const lines = str.split('<br>');
-    if (lines.length === 0) return [];
-    if (lines.length === 1) return [str];
+    if (lines.length === 0) return {flags: 0, values: []};
+    if (lines.length === 1) return {flags: 0, values: [str]};
     return {
         guid: RRO_TEXT_GUID,
         pattern: lines.map((line, i) => '{' + i + '}').join('<br>'),
@@ -49,8 +49,7 @@ export function stringToText(str: GvasString): GvasText {
 
 export function textToString(value: GvasText): GvasString {
     if (value === null) return null;
-    const notSimple = !Array.isArray(value) && typeof value === 'object';
-    if (notSimple && 'pattern' in value) {
+    if ('pattern' in value) {
         // Rich text
         switch (value.guid) {
             case RRO_TEXT_GUID:
@@ -62,19 +61,16 @@ export function textToString(value: GvasText): GvasString {
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
             (m, i) => value.textFormat[Number(i)].values[0] ?? '');
-    } else if (notSimple) {
+    } else if ('guid' in value) {
         // Type 8
         if (value.unknown !== '') throw new Error(`Unexpected unknown value: ${value.unknown}`);
         return value.value;
     } else {
-        // Simple text
-        if (0 === value.length) {
-            // console.log(`Warning: GvasText contains zero-length string array, converting to null`);
-            return null;
-        }
-        if (1 !== value.length) throw new Error('Expected single entry in simple GvasText');
-        if (value[0] === null) throw new Error('Null in simple text');
-        return value[0];
+        // Basic text
+        if (0 === value.values.length) return null;
+        if (1 !== value.values.length) throw new Error('Expected single entry in simple GvasText');
+        if (value.values[0] === null) throw new Error('Null in simple text');
+        return value.values[0];
     }
 }
 

@@ -76,7 +76,12 @@ export interface CustomData {
     value: number;
 }
 
-export type GvasText = null | RichText | GvasString[] | GvasTextType8;
+export type GvasText = null | BasicText | RichText | GvasTextType8;
+
+export interface BasicText {
+    flags: number;
+    values: GvasString[];
+}
 
 export interface RichText {
     guid: GvasString;
