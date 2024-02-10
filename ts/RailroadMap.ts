@@ -468,6 +468,7 @@ export class RailroadMap {
             if (this.layerVisibility.tracks && this.rerailToolTracksFlag) {
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Map');
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow rerail tool while another tool is active
@@ -487,6 +488,7 @@ export class RailroadMap {
                 this.rerailToolTracksFlag = true;
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Select a frame to rerail');
             return true;
         }
     }
@@ -505,6 +507,7 @@ export class RailroadMap {
             if (this.layerVisibility.tracks && this.duplicateToolTracksFlag) {
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Map');
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow duplicate tool while another tool is active
@@ -524,6 +527,7 @@ export class RailroadMap {
                 this.duplicateToolTracksFlag = true;
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Select a frame to duplicate');
             return true;
         }
     }
@@ -542,6 +546,7 @@ export class RailroadMap {
             if (this.layerVisibility.tracks && this.measureToolTracksFlag) {
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Map');
             return false;
         } else if (this.toolMode !== MapToolMode.pan_zoom) {
             // Don't allow measure tool while another tool is active
@@ -561,6 +566,7 @@ export class RailroadMap {
                 this.measureToolTracksFlag = true;
                 this.toggleLayerVisibility('tracks');
             }
+            this.setTitle('Select a frame to measure');
             return true;
         }
     }
@@ -1641,14 +1647,22 @@ export class RailroadMap {
                 g.remove();
                 break;
             case MapToolMode.rerail:
+                this.toolFrame = frame;
+                this.toolFrameGroup = g;
+                this.setTitle('Select a spline to rerail frame');
+                break;
             case MapToolMode.duplicate:
                 this.toolFrame = frame;
                 this.toolFrameGroup = g;
+                this.setTitle('Select a spline to duplicate frame');
                 break;
             case MapToolMode.measure:
                 if (this.toolFrame) {
                     const d = distance(frame.location, this.toolFrame.location);
+                    this.setTitle(`${(d / 100).toFixed(3)}m`);
                     console.log(`${d.toFixed(1)} ${this.toolFrame.type} -> ${frame.type}`);
+                } else {
+                    this.setTitle('Select another frame to measure');
                 }
                 this.toolFrame = frame;
                 this.toolFrameGroup = g;
