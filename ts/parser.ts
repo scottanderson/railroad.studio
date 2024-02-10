@@ -1,4 +1,5 @@
 import {
+    BasicText,
     CustomData,
     EngineVersion,
     Gvas,
@@ -598,50 +599,39 @@ function parseStructArray(
  * @return {GvasText[]}
  */
 function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
-    // text_array:
-    //   seq:
-    //     - id: entry_count
-    //       type: u4
+    // (u32) Entry Count
     const entryCount = new Uint32Array(buffer, 0, 1)[0];
     let pos = 4;
-    //     - id: body
-    //       type: text
-    //       repeat: expr
-    //       repeat-expr: entry_count
     const array: GvasText[] = [];
     for (let i = 0; i < entryCount; i++) {
-        // text:
-        //   seq:
-        //     - id: component_type
-        //       type: u4
-        const componentType = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-        if (![0, 1, 2, 8].includes(componentType)) throw new Error(`Unexpected component type ${componentType}`);
+        // (u32) Flags
+        const flags = new Uint32Array(buffer.slice(pos, pos + 4))[0];
         pos += 4;
-        //     - id: indicator
-        //       type: u1
-        const indicator = new Uint8Array(buffer, pos, 1)[0];
-        const expectedIndicator = componentType === 1 ? 3 : componentType === 8 ? 0 : 255;
-        if (indicator !== expectedIndicator) {
-            throw new Error(`Unexpected indicator ${indicator} for component type ${componentType}`);
-        }
+        // (u8) Component Type
+        const componentType = new Uint8Array(buffer, pos, 1)[0];
         pos++;
-        //     - id: body
-        //       type:
-        //         switch-on: component_type
-        //         cases:
-        //           0: text_empty
-        //           1: text_rich
-        //           2: text_simple
-        if (componentType === 0) {
-            // text_empty:
-            //   seq:
-            //     - id: count
-            //       contents: [0, 0, 0, 0]
+        // Read the component
+        if (componentType === 255) {
             const count = new Uint32Array(buffer.slice(pos, pos + 4))[0];
             pos += 4;
-            if (count !== 0) throw new Error(`Expected count == 0, ${count}`);
-            array.push(null);
-        } else if (componentType === 1) {
+            const values: GvasString[] = [];
+            for (let k = 0; k < count; k++) {
+                let value;
+                [pos, value] = parseString(buffer, pos);
+                values.push(value);
+            }
+            const value: BasicText = {flags, values};
+            array.push(value);
+        } else if (componentType === 0 && flags === 8) {
+            let unknown;
+            let guid;
+            let value;
+            [pos, unknown] = parseString(buffer, pos);
+            [pos, guid] = parseString(buffer, pos);
+            [pos, value] = parseString(buffer, pos);
+            const values: GvasTextType8 = {unknown, guid, value};
+            array.push(values);
+        } else if (componentType === 3 && flags === 1) {
             // text_rich:
             //   seq:
             //     - id: flags
@@ -684,15 +674,15 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 if (separator !== 4) {
                     throw new Error(`Expected separator == 4, ${separator}`);
                 }
-                //     - id: content_type
+                //     - id: flags
                 //       type: u4
-                const contentType = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+                const contentFlags = new Uint32Array(buffer.slice(pos, pos + 4))[0];
                 pos += 4;
-                //     - id: indicator
+                //     - id: component_type
                 //       contents: [255]
-                const indicator = new Uint8Array(buffer, pos++, 1)[0];
-                if (indicator !== 255) {
-                    throw new Error(`Expected indicator == 255, ${indicator}`);
+                const componentType = new Uint8Array(buffer, pos++, 1)[0];
+                if (componentType !== 255) {
+                    throw new Error(`Expected componentType == 255, ${componentType}`);
                 }
                 //     - id: count
                 //       type: u4
@@ -710,7 +700,7 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 }
                 textFormat.push({
                     formatKey: formatKey,
-                    contentType: contentType,
+                    contentType: contentFlags,
                     values: values,
                 });
             }
@@ -719,35 +709,8 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 pattern: textFormatPattern,
                 textFormat: textFormat,
             });
-        } else if (componentType === 2) {
-            // text_simple:
-            //   seq:
-            //     - id: count
-            //       type: u4
-            const count = new Uint32Array(buffer.slice(pos, pos + 4))[0];
-            pos += 4;
-            const values: GvasString[] = [];
-            for (let k = 0; k < count; k++) {
-                // - id: value
-                //   type: string
-                //   repeat: expr
-                //   repeat-expr: count
-                let value;
-                [pos, value] = parseString(buffer, pos);
-                values.push(value);
-            }
-            array.push(values);
-        } else if (componentType === 8) {
-            let unknown;
-            let guid;
-            let value;
-            [pos, unknown] = parseString(buffer, pos);
-            [pos, guid] = parseString(buffer, pos);
-            [pos, value] = parseString(buffer, pos);
-            const values: GvasTextType8 = {unknown, guid, value};
-            array.push(values);
         } else {
-            throw new Error(`Unknown componentType: ${componentType}`);
+            throw new Error(`Unexpected flags ${flags} for component type ${componentType}`);
         }
     }
     return [pos, array];

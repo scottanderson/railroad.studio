@@ -1113,7 +1113,6 @@ function stringToBlob(str: GvasString): BlobPart {
 }
 
 function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
-    const notSimple = !Array.isArray(text) && typeof text === 'object';
     if (text === null) {
         // Empty Text:
         // (u32) Component Type (0)
@@ -1124,7 +1123,7 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint8Array([255]),
             new Uint32Array([0]),
         ]);
-    } else if (notSimple && 'pattern' in text) {
+    } else if ('pattern' in text) {
         // Rich Text:
         // (u32) Component Type (1)
         // (u8)  Component Indicator (3)
@@ -1145,7 +1144,7 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint32Array([text.textFormat.length]),
             new Blob(text.textFormat.map(rtfToBlob)),
         ]);
-    } else if (notSimple) {
+    } else if ('guid' in text) {
         // Type8:
         // (u32) Component Type (8)
         // (u8)  Component Indicator (0)
@@ -1159,15 +1158,15 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
         ]);
     } else {
         // Simple Text:
-        // (u32)  Component Type (2)
-        // (u8)   Component Indicator (255)
+        // (u32)  Flags
+        // (u8)   Component Type (255)
         // (u32)  Component Count
         // (str*) Component Array
         return new Blob([
-            new Uint32Array([2]),
+            new Uint32Array([text.flags]),
             new Uint8Array([255]),
-            new Uint32Array([text.length]),
-            new Blob(text.map(stringToBlob)),
+            new Uint32Array([text.values.length]),
+            new Blob(text.values.map(stringToBlob)),
         ]);
     }
 }
