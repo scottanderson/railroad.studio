@@ -32,15 +32,16 @@ export function fp32v(v: Vector): Vector {
 }
 
 export function stringToText(str: GvasString): GvasText {
-    if (str === null) return null;
+    if (str === null) return {flags: 0, values: []};
     const lines = str.split('<br>');
     if (lines.length === 0) return {flags: 0, values: []};
     if (lines.length === 1) return {flags: 0, values: [str]};
     return {
+        flags: 1,
         guid: RRO_TEXT_GUID,
         pattern: lines.map((line, i) => '{' + i + '}').join('<br>'),
-        textFormat: lines.map((line, i) => ({
-            formatKey: String(i),
+        args: lines.map((line, i) => ({
+            name: String(i),
             contentType: 2,
             values: line ? [line] : [],
         })),
@@ -50,7 +51,7 @@ export function stringToText(str: GvasString): GvasText {
 export function textToString(value: GvasText): GvasString {
     if (value === null) return null;
     if ('pattern' in value) {
-        // Rich text
+        // ArgumentFormat
         switch (value.guid) {
             case RRO_TEXT_GUID:
             case '69981E2B47B2AABC01CE39842FB03A96':
@@ -60,13 +61,13 @@ export function textToString(value: GvasText): GvasString {
         }
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
-            (m, i) => value.textFormat[Number(i)].values[0] ?? '');
-    } else if ('guid' in value) {
-        // Type 8
-        if (value.unknown !== '') throw new Error(`Unexpected unknown value: ${value.unknown}`);
+            (m, i) => value.args[Number(i)].values[0] ?? '');
+    } else if ('key' in value) {
+        // Base
+        if (value.namespace !== '') throw new Error(`Unexpected unknown value: ${value.namespace}`);
         return value.value;
     } else {
-        // Basic text
+        // None
         if (0 === value.values.length) return null;
         if (1 !== value.values.length) throw new Error('Expected single entry in simple GvasText');
         if (value.values[0] === null) throw new Error('Null in simple text');

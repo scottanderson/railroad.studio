@@ -76,27 +76,32 @@ export interface CustomData {
     value: number;
 }
 
-export type GvasText = null | BasicText | RichText | GvasTextType8;
+export type GvasText = GvasTextNone | GvasTextArgumentFormat | GvasTextBase;
 
-export interface BasicText {
+// Component type 255
+export interface GvasTextNone {
     flags: number;
     values: GvasString[];
 }
 
-export interface RichText {
+// Component type 0
+export interface GvasTextBase {
+    flags: number;
+    namespace: GvasString;
+    key: GvasString;
+    value: GvasString;
+}
+
+// Component type 3
+export interface GvasTextArgumentFormat {
+    flags: number;
     guid: GvasString;
     pattern: GvasString;
-    textFormat: RichTextFormat[];
+    args: FormatArgumentValue[];
 }
 
-export interface RichTextFormat {
-    formatKey: GvasString;
+export interface FormatArgumentValue {
+    name: GvasString;
     contentType: number;
     values: GvasString[];
-}
-
-export interface GvasTextType8 {
-    unknown: GvasString;
-    guid: GvasString;
-    value: GvasString;
 }

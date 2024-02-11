@@ -1,5 +1,14 @@
 /* global BlobPart */
-import {CustomData, EngineVersion, Gvas, GvasHeader, GvasString, GvasText, GvasTypes, RichTextFormat} from './Gvas';
+import {
+    CustomData,
+    EngineVersion,
+    FormatArgumentValue,
+    Gvas,
+    GvasHeader,
+    GvasString,
+    GvasText,
+    GvasTypes,
+} from './Gvas';
 import {Quaternion} from './Quaternion';
 import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
@@ -1113,53 +1122,9 @@ function stringToBlob(str: GvasString): BlobPart {
 }
 
 function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
-    if (text === null) {
-        // Empty Text:
-        // (u32) Component Type (0)
-        // (u8)  Component Indicator (255)
-        // (u32) Zero
-        return new Blob([
-            new Uint32Array([0]),
-            new Uint8Array([255]),
-            new Uint32Array([0]),
-        ]);
-    } else if ('pattern' in text) {
-        // Rich Text:
-        // (u32) Component Type (1)
-        // (u8)  Component Indicator (3)
-        // (u8)  Unknown (8)
-        // (u32) Unknown (0)
-        // (str) Unknown
-        // (str) GUID
-        // (str) Pattern
-        // (u32) TextFormat Count
-        // (...) TextFormat Array
-        return new Blob([
-            new Uint32Array([1]),
-            new Uint8Array([3]),
-            new Uint8Array([8, 0, 0, 0, 0]),
-            stringToBlob(largeWorldCoords ? '' : null),
-            stringToBlob(text.guid),
-            stringToBlob(text.pattern),
-            new Uint32Array([text.textFormat.length]),
-            new Blob(text.textFormat.map(rtfToBlob)),
-        ]);
-    } else if ('guid' in text) {
-        // Type8:
-        // (u32) Component Type (8)
-        // (u8)  Component Indicator (0)
-        // (str) Unknown
-        // (str) Identifier
-        // (str) Value
-        return new Blob([
-            new Uint32Array([8]),
-            new Uint8Array([0]),
-            new Blob([text.unknown, text.guid, text.value].map(stringToBlob)),
-        ]);
-    } else {
-        // Simple Text:
+    if ('values' in text) {
         // (u32)  Flags
-        // (u8)   Component Type (255)
+        // (u8)   Component Type (None = 255)
         // (u32)  Component Count
         // (str*) Component Array
         return new Blob([
@@ -1168,10 +1133,43 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint32Array([text.values.length]),
             new Blob(text.values.map(stringToBlob)),
         ]);
+    } else if ('key' in text) {
+        // (u32) Flags
+        // (u8)  Component Type (Base = 0)
+        // (str) Namespace
+        // (str) Key
+        // (str) Source String
+        return new Blob([
+            new Uint32Array([text.flags]),
+            new Uint8Array([0]),
+            new Blob([text.namespace, text.key, text.value].map(stringToBlob)),
+        ]);
+    } else if ('pattern' in text) {
+        // (u32) Flags
+        // (u8)  Component Type (Argument Format = 3)
+        // (u8)  Unknown (8)
+        // (u32) Unknown (0)
+        // (str) Unknown
+        // (str) GUID
+        // (str) Pattern
+        // (u32) TextFormat Count
+        // (...) TextFormat Array
+        return new Blob([
+            new Uint32Array([text.flags]),
+            new Uint8Array([3]),
+            new Uint8Array([8, 0, 0, 0, 0]),
+            stringToBlob(largeWorldCoords ? '' : null),
+            stringToBlob(text.guid),
+            stringToBlob(text.pattern),
+            new Uint32Array([text.args.length]),
+            new Blob(text.args.map(rtfToBlob)),
+        ]);
+    } else {
+        throw new Error('Unexpected text type');
     }
 }
 
-function rtfToBlob(rtf: RichTextFormat): BlobPart {
+function rtfToBlob(rtf: FormatArgumentValue): BlobPart {
     // TextFormat:
     // (str)  Format Key
     // (u8)   Unknown (4)
@@ -1180,7 +1178,7 @@ function rtfToBlob(rtf: RichTextFormat): BlobPart {
     // (u32)  Values Count
     // (str*) Values Array
     return new Blob([
-        stringToBlob(rtf.formatKey),
+        stringToBlob(rtf.name),
         new Uint8Array([4]),
         new Uint32Array([rtf.contentType]),
         new Uint8Array([255]),
