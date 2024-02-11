@@ -1,13 +1,14 @@
 import {
-    BasicText,
     CustomData,
     EngineVersion,
     Gvas,
     GvasHeader,
     GvasString,
     GvasText,
-    GvasTextType8,
-    RichTextFormat,
+    GvasTextArgumentFormat,
+    GvasTextBase,
+    GvasTextNone,
+    FormatArgumentValue,
     gvasToString,
 } from './Gvas';
 import {Quaternion} from './Quaternion';
@@ -620,38 +621,38 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 [pos, value] = parseString(buffer, pos);
                 values.push(value);
             }
-            const value: BasicText = {flags, values};
+            const value: GvasTextNone = {flags, values};
             array.push(value);
-        } else if (componentType === 0 && flags === 8) {
-            let unknown;
-            let guid;
+        } else if (componentType === 0) {
+            let namespace;
+            let key;
             let value;
-            [pos, unknown] = parseString(buffer, pos);
-            [pos, guid] = parseString(buffer, pos);
+            [pos, namespace] = parseString(buffer, pos);
+            [pos, key] = parseString(buffer, pos);
             [pos, value] = parseString(buffer, pos);
-            const values: GvasTextType8 = {unknown, guid, value};
+            const values: GvasTextBase = {flags, namespace, key, value};
             array.push(values);
-        } else if (componentType === 3 && flags === 1) {
+        } else if (componentType === 3) {
             // text_rich:
             //   seq:
             //     - id: flags
             //       contents: [8, 0, 0, 0, 0, 0, 0, 0, 0]
-            const numFlags = new Uint8Array(buffer, pos, 1)[0];
-            if (numFlags !== 8) throw new Error(`Expected numFlags == 8, ${numFlags}`);
-            const flags = new Uint32Array(buffer.slice(pos + 1, pos + 5))[0];
-            if (flags !== 0) throw new Error(`Expected flags == 0, ${flags}`);
+            const argumentType = new Uint8Array(buffer, pos, 1)[0];
+            if (argumentType !== 8) throw new Error(`Expected argumentType == 8, ${argumentType}`);
+            const unknown = new Uint32Array(buffer.slice(pos + 1, pos + 5))[0];
+            if (unknown !== 0) throw new Error(`Expected unknown == 0, ${unknown}`);
             pos += 5;
             let unknownStr;
             [pos, unknownStr] = parseString(buffer, pos);
             if (unknownStr && unknownStr.length) throw new Error(`Expected empty str, ${unknownStr}`);
             //     - id: component_guid
             //       type: string
-            let componentGuid;
-            [pos, componentGuid] = parseString(buffer, pos);
+            let guid;
+            [pos, guid] = parseString(buffer, pos);
             //     - id: text_format_pattern
             //       type: string
-            let textFormatPattern;
-            [pos, textFormatPattern] = parseString(buffer, pos);
+            let pattern;
+            [pos, pattern] = parseString(buffer, pos);
             //     - id: text_format_arg_count
             //       type: u4
             const textFormatArgCount = new Uint32Array(buffer.slice(pos, pos + 4))[0];
@@ -660,14 +661,14 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
             //       type: text_format
             //       repeat: expr
             //       repeat-expr: text_format_arg_count
-            const textFormat: RichTextFormat[] = [];
+            const args: FormatArgumentValue[] = [];
             for (let j = 0; j < textFormatArgCount; j++) {
                 // textFormat:
                 //   seq:
                 //     - id: format_key
                 //       type: string
-                let formatKey;
-                [pos, formatKey] = parseString(buffer, pos);
+                let name;
+                [pos, name] = parseString(buffer, pos);
                 //     - id: separator
                 //       contents: [4]
                 const separator = new Uint8Array(buffer, pos++, 1)[0];
@@ -676,13 +677,13 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                 }
                 //     - id: flags
                 //       type: u4
-                const contentFlags = new Uint32Array(buffer.slice(pos, pos + 4))[0];
+                const contentType = new Uint32Array(buffer.slice(pos, pos + 4))[0];
                 pos += 4;
                 //     - id: component_type
                 //       contents: [255]
-                const componentType = new Uint8Array(buffer, pos++, 1)[0];
-                if (componentType !== 255) {
-                    throw new Error(`Expected componentType == 255, ${componentType}`);
+                const type = new Uint8Array(buffer, pos++, 1)[0];
+                if (type !== 255) {
+                    throw new Error(`Expected type == 255, ${type}`);
                 }
                 //     - id: count
                 //       type: u4
@@ -698,19 +699,12 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                     [pos, value] = parseString(buffer, pos);
                     values.push(value);
                 }
-                textFormat.push({
-                    formatKey: formatKey,
-                    contentType: contentFlags,
-                    values: values,
-                });
+                args.push({name, contentType, values});
             }
-            array.push({
-                guid: componentGuid,
-                pattern: textFormatPattern,
-                textFormat: textFormat,
-            });
+            const values: GvasTextArgumentFormat = {flags, guid, pattern, args};
+            array.push(values);
         } else {
-            throw new Error(`Unexpected flags ${flags} for component type ${componentType}`);
+            throw new Error(`Unexpected component type ${componentType} with flags ${flags}`);
         }
     }
     return [pos, array];
