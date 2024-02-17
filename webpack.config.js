@@ -3,13 +3,6 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
     devServer: {
-        proxy: {
-            '/attachments/**': {
-                target: 'https://cdn.discordapp.com',
-                changeOrigin: true,
-                secure: false,
-            },
-        },
         static: path.resolve(__dirname, 'railroad.studio'),
     },
     entry: './ts/index.ts',

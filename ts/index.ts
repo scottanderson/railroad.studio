@@ -104,10 +104,6 @@ function handleFile(file?: File): void {
  * @param {string} url
  */
 function handleUrl(url: string) {
-    if (url.startsWith('https://cdn.discordapp.com/attachments/')) {
-        // Workaround for CORS
-        url = url.substring(26);
-    }
     const filename = url.substring(url.lastIndexOf('/') + 1);
     fetch(url)
         .then((response) => {
