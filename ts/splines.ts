@@ -240,7 +240,7 @@ function mergeSplines(splines: Spline[], limits: MergeLimits): Spline[] {
                 if (typeof result[j] === 'undefined') {
                     throw new Error(`unexpected undef at idx i=${i}, j=${j}`);
                 }
-                const merged = mergeAdjacentSplines(result[i]!, result[j]!, limits);
+                const merged = mergeAdjacentSplines(result[i], result[j], limits);
                 if (merged) {
                     // console.log(`Merged splines ${i} and ${j}`);
                     result[i] = merged;
@@ -302,8 +302,8 @@ function mergeAdjacentSplines(spline1: Spline, spline2: Spline, limits: MergeLim
  * @return {boolean} true if splines can be merged.
  */
 function splinesAdjacent(a: Spline, enda: number, b: Spline, startb: number, limits: MergeLimits): boolean {
-    const cpa = a.controlPoints[enda]!;
-    const cpb = b.controlPoints[startb]!;
+    const cpa = a.controlPoints[enda];
+    const cpb = b.controlPoints[startb];
     // Compare the tail control point of A to the head control point of B
     if (!pointsAdjacent(cpa, cpb, limits)) {
         // Control points are too far apart to be merged
@@ -427,19 +427,19 @@ export function splineHeading(spline: Spline, i: number): number {
     const max = spline.segmentsVisible.length;
     if (i === 0) {
         // Head segment heading
-        const va = spline.controlPoints[1]!;
-        const vb = spline.controlPoints[0]!;
+        const va = spline.controlPoints[1];
+        const vb = spline.controlPoints[0];
         return vectorHeading(va, vb);
     } else if (i === max) {
         // Tail segment heading
-        const va = spline.controlPoints[i]!;
-        const vb = spline.controlPoints[i - 1]!;
+        const va = spline.controlPoints[i];
+        const vb = spline.controlPoints[i - 1];
         return vectorHeading(va, vb);
     } else if (i > 0 && i < max) {
         // Average two adjacent segments
-        const va = spline.controlPoints[i + 1]!;
-        const vb = spline.controlPoints[i]!;
-        const vc = spline.controlPoints[i - 1]!;
+        const va = spline.controlPoints[i + 1];
+        const vb = spline.controlPoints[i];
+        const vc = spline.controlPoints[i - 1];
         const ha = vectorHeading(va, vb);
         const hb = vectorHeading(vb, vc);
         return circularMean(ha, hb);
@@ -452,19 +452,19 @@ export function splineInclination(spline: Spline, i: number): number {
     const max = spline.segmentsVisible.length;
     if (i === 0) {
         // Head segment heading
-        const va = spline.controlPoints[1]!;
-        const vb = spline.controlPoints[0]!;
+        const va = spline.controlPoints[1];
+        const vb = spline.controlPoints[0];
         return vectorInclination(va, vb);
     } else if (i === max) {
         // Tail segment heading
-        const va = spline.controlPoints[i]!;
-        const vb = spline.controlPoints[i - 1]!;
+        const va = spline.controlPoints[i];
+        const vb = spline.controlPoints[i - 1];
         return vectorInclination(va, vb);
     } else if (i > 0 && i < max) {
         // Average two adjacent segments
-        const va = spline.controlPoints[i + 1]!;
-        const vb = spline.controlPoints[i]!;
-        const vc = spline.controlPoints[i - 1]!;
+        const va = spline.controlPoints[i + 1];
+        const vb = spline.controlPoints[i];
+        const vc = spline.controlPoints[i - 1];
         const ha = vectorInclination(va, vb);
         const hb = vectorInclination(vb, vc);
         return circularMean(ha, hb);
