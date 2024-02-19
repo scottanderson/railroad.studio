@@ -60,7 +60,7 @@ export const frameTypes = [
     'waycar',
 ] as const satisfies ReadonlyArray<string>;
 
-type FrameType = typeof frameTypes[number];
+export type FrameType = typeof frameTypes[number];
 
 export const isFrameType = (type: GvasString): type is FrameType =>
     type ? frameTypes.includes(type) : false;

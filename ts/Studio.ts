@@ -21,7 +21,7 @@ import {
     editTrackType,
     editVector,
 } from './StudioEditor';
-import {Vector} from './Vector';
+import {Vector, vectorSum} from './Vector';
 import {simplifySplines} from './splines';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {
@@ -773,6 +773,11 @@ export class Studio {
         options.unshift(['all', 'All']);
         const filterNav = createFilter(categories, labels, onFrameFilter, options, onOption);
         filterNav.classList.add('mt-5');
+        let editAll = false;
+        const onEditAll = () => {
+            editAll = !editAll;
+            resetFramePage();
+        };
         const resetFramePage = () => {
             const pageSize = 20;
             const filtered = railroad.frames.filter((f) => {
@@ -792,11 +797,18 @@ export class Studio {
                 framesNav.classList.add('mt-3');
                 children.push(framesNav);
             }
-            content.replaceChildren(filterNav, ...children, table);
+            const framesButtons = document.createElement('div');
+            framesButtons.classList.add('mt-2', 'hstack', 'gap-2');
+            const btnEditAll = document.createElement('button');
+            btnEditAll.textContent = 'Edit All';
+            btnEditAll.classList.add('btn', 'btn-secondary');
+            btnEditAll.addEventListener('click', onEditAll);
+            framesButtons.appendChild(btnEditAll);
+            content.replaceChildren(filterNav, ...children, framesButtons, table);
             this.floatHeader(false);
             const first = pageSize * framePage;
             const last = Math.min(filtered.length, first + pageSize) - 1;
-            this.frames(table, first, last, filtered);
+            this.frames(table, first, last, filtered, editAll);
         };
         btnFrames.addEventListener('click', resetFramePage);
         // Industries
@@ -1113,7 +1125,7 @@ export class Studio {
         }
     }
 
-    private frames(table: HTMLTableElement, first: number, last: number, filtered: Frame[]): void {
+    private frames(table: HTMLTableElement, first: number, last: number, filtered: Frame[], editAll?: boolean): void {
         this.setTitle('Frames');
         const thead = document.createElement('thead');
         table.appendChild(thead);
@@ -1131,6 +1143,89 @@ export class Studio {
             // Nothing to see
             return;
         }
+
+        const addStat = (text: string, input: Node, table: HTMLTableElement, title?: string, rowClass?: string) => {
+            const tr = document.createElement('tr');
+            if (rowClass) {
+                tr.classList.add(rowClass);
+            }
+            let td = document.createElement('td');
+            td.classList.add('col-2', 'text-nowrap');
+            td.textContent = text;
+            if (title) td.title = title;
+            tr.appendChild(td);
+            td = document.createElement('td');
+            td.classList.add('col-auto');
+            td.appendChild(input);
+            tr.appendChild(td);
+            table.append(tr);
+        };
+
+        if (editAll) {
+            const editFrame = <Frame>{
+                location: <Vector>{
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                },
+                rotation: <Rotator>{
+                    pitch: 0,
+                    yaw: 0,
+                    roll: 0,
+                },
+            };
+
+            tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            // Type
+            let td = document.createElement('td');
+            td.textContent = 'EDIT ALL';
+            tr.appendChild(td);
+            // Name
+            td = document.createElement('td');
+            td.textContent = 'N/A';
+            tr.appendChild(td);
+            // Number
+            td = document.createElement('td');
+            td.textContent = 'N/A';
+            tr.appendChild(td);
+            // State table
+            td = document.createElement('td');
+            tr.appendChild(td);
+            const table2 = document.createElement('table');
+            table2.classList.add('table', 'table-borderless', 'mb-0');
+            td.appendChild(table2);
+            const tbody2 = document.createElement('tbody');
+            table2.appendChild(tbody2);
+
+            // Location
+            const setFrameLocation = (locationOffset: Vector) => {
+                console.log(filtered);
+                filtered.forEach((frame: Frame) => {
+                    frame.location = vectorSum(frame.location, locationOffset);
+                });
+
+                console.log(filtered);
+
+                return editFrame.location = locationOffset;
+            };
+            addStat('Location', editVector(this, editFrame.location, setFrameLocation), table2);
+            // Rotation
+            const setFrameRotation = (rotationOffset: Rotator) => {
+                console.log(filtered);
+                filtered.forEach((frame: Frame) => {
+                    frame.rotation.pitch = (frame.rotation.pitch + rotationOffset.pitch) % 180;
+                    frame.rotation.roll = (frame.rotation.roll + rotationOffset.roll) % 180;
+                    frame.rotation.yaw = (frame.rotation.yaw + rotationOffset.yaw) % 180;
+                });
+
+                console.log(filtered);
+
+                return editFrame.rotation = rotationOffset;
+            };
+            addStat('Rotation', editRotator(this, editFrame.rotation, setFrameRotation), table2);
+        }
+
         for (let idx = first; idx <= last; idx++) {
             const frame = filtered[idx];
             tr = document.createElement('tr');
@@ -1157,28 +1252,13 @@ export class Studio {
             td.appendChild(table2);
             const tbody2 = document.createElement('tbody');
             table2.appendChild(tbody2);
-            const addStat = (text: string, input: Node, title?: string, rowClass?: string) => {
-                tr = document.createElement('tr');
-                if (rowClass) {
-                    tr.classList.add(rowClass);
-                }
-                td = document.createElement('td');
-                td.classList.add('col-2', 'text-nowrap');
-                td.textContent = text;
-                if (title) td.title = title;
-                tr.appendChild(td);
-                td = document.createElement('td');
-                td.classList.add('col-auto');
-                td.appendChild(input);
-                tr.appendChild(td);
-                tbody2.append(tr);
-            };
+
             // Location
             const setFrameLocation = (location: Vector) => frame.location = location;
-            addStat('Location', editVector(this, frame.location, setFrameLocation));
+            addStat('Location', editVector(this, frame.location, setFrameLocation), table2);
             // Rotation
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
-            addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
+            addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation), table2);
             // Frame state
             if (isFrameType(frame.type)) {
                 const frameDef = frameDefinitions[frame.type];
@@ -1238,7 +1318,7 @@ export class Studio {
                         const optionDict = Object.fromEntries(Object.entries(meta.type));
                         form = editDropdown(this, String(value), optionDict, saveString);
                     }
-                    addStat(meta.name, form, tooltip, c);
+                    addStat(meta.name, form, table2, tooltip, c);
                 };
                 // Configuration
                 editNumericState(frame, 'headlightType');
@@ -1280,9 +1360,9 @@ export class Studio {
                         frame.state.freightAmount > limit) {
                         const title = 'Too much freight';
                         const c = 'table-warning';
-                        addStat('Freight Amount', form, title, c);
+                        addStat('Freight Amount', form, table2, title, c);
                     } else {
-                        addStat('Freight Amount', form);
+                        addStat('Freight Amount', form, table2);
                     }
                     const allowedCargo = Object.keys(limits) as CargoType[];
                     const setFreightType = (type: GvasString) => {
@@ -1293,12 +1373,12 @@ export class Studio {
                         const entries = allowedCargo.map((t) => [t, cargoTypes[t]] as [string, string]);
                         const typeOptions = Object.fromEntries(entries);
                         const form = editDropdown(this, freightType, typeOptions, setFreightType);
-                        addStat('Freight Type', form);
+                        addStat('Freight Type', form, table2);
                     } else {
                         const title = `Unexpected freight type ${freightType} for ${frame.type}`;
                         const c = 'table-warning';
                         const form = editString(this, freightType, setFreightType);
-                        addStat('Freight Type', form, title, c);
+                        addStat('Freight Type', form, table2, title, c);
                     }
                 }
             }
