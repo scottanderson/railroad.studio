@@ -1200,20 +1200,26 @@ export class Studio {
 
             // Location
             const setFrameLocation = (locationOffset: Vector) => {
+                console.log(filtered);
                 filtered.forEach((frame: Frame) => {
                     frame.location = vectorSum(frame.location, locationOffset);
                 });
+
+                console.log(filtered);
 
                 return editFrame.location = locationOffset;
             };
             addStat('Location', editVector(this, editFrame.location, setFrameLocation), table2);
             // Rotation
             const setFrameRotation = (rotationOffset: Rotator) => {
+                console.log(filtered);
                 filtered.forEach((frame: Frame) => {
                     frame.rotation.pitch = (frame.rotation.pitch + rotationOffset.pitch) % 180;
                     frame.rotation.roll = (frame.rotation.roll + rotationOffset.roll) % 180;
                     frame.rotation.yaw = (frame.rotation.yaw + rotationOffset.yaw) % 180;
                 });
+
+                console.log(filtered);
 
                 return editFrame.rotation = rotationOffset;
             };
