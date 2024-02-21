@@ -33,7 +33,7 @@ import {
     frameStateMetadata,
     hasCargoLimits,
     isCargoType,
-    isFrameType,
+    isFrameType, FrameDefinition,
 } from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
@@ -734,6 +734,7 @@ export class Studio {
         // Frames
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
+        btnFrames.id = 'Frames';
         btnFrames.classList.add('btn', 'btn-secondary');
         let framePage = 0;
         const onFramePage = (page: number) => {
@@ -799,6 +800,18 @@ export class Studio {
             this.frames(table, first, last, filtered);
         };
         btnFrames.addEventListener('click', resetFramePage);
+        // Bulk Frames
+        const btnBulkFrames = document.createElement('button');
+        btnBulkFrames.textContent = 'Bulk Frames';
+        btnBulkFrames.classList.add('btn', 'btn-secondary');
+        btnBulkFrames.addEventListener('click', () => {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            studioControls.replaceChildren(buttons);
+            content.replaceChildren(table);
+            this.floatHeader(false);
+            this.bulkFrames(table, btnFrames);
+        });
         // Industries
         const btnIndustries = document.createElement('button');
         btnIndustries.textContent = 'Industries';
@@ -905,6 +918,7 @@ export class Studio {
         buttons.replaceChildren(btnMap, btnDownload, btnDark);
         if (hasFrames) {
             buttons.insertBefore(btnFrames, btnDownload);
+            buttons.insertBefore(btnBulkFrames, btnDownload);
         }
         if (hasIndustries) {
             buttons.insertBefore(btnIndustries, btnDownload);
@@ -1303,6 +1317,163 @@ export class Studio {
                 }
             }
         }
+    }
+
+    private bulkFrames(table: HTMLTableElement, framesButton: HTMLButtonElement) {
+        this.setTitle('Bulk Frames');
+
+        let thead = document.createElement('thead');
+        table.appendChild(thead);
+        let tr = document.createElement('tr');
+        thead.appendChild(tr);
+        for (const columnHeader of ['Action', 'Input']) {
+            const th = document.createElement('th');
+            th.textContent = columnHeader;
+            tr.appendChild(th);
+        }
+        const tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+
+        // Move Frame
+        tr = document.createElement('tr');
+        tbody.appendChild(tr);
+        let td = document.createElement('td');
+        td.textContent = 'Move Frame';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        let table2 = document.createElement('table');
+        table2.classList.add('table', 'table-borderless', 'mb-0');
+        td.appendChild(table2);
+        tr.appendChild(td);
+
+        // Move Frame Actions
+        const liftFrames = (value: number) => {
+            this.railroad.frames.forEach((frame: Frame) => {
+                frame.location.z += value;
+            });
+            framesButton.dispatchEvent(new Event('click'));
+            return value;
+        };
+
+        thead = document.createElement('thead');
+        table2.appendChild(thead);
+        tr = document.createElement('tr');
+        thead.appendChild(tr);
+        for (const columnHeader of ['Axis', 'Value']) {
+            const th = document.createElement('th');
+            th.textContent = columnHeader;
+            tr.appendChild(th);
+        }
+        let tbody2 = document.createElement('tbody');
+        table2.appendChild(tbody2);
+        tr = document.createElement('tr');
+        tbody2.appendChild(tr);
+        td = document.createElement('td');
+        td.textContent = 'Z';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        tr.appendChild(td);
+        const options: InputTextOptions = {min: '0'};
+        td.appendChild(editNumber(this, 0, options, liftFrames));
+
+        // Refill Consumables
+        tr = document.createElement('tr');
+        tbody.appendChild(tr);
+        td = document.createElement('td');
+        td.textContent = 'Refill Consumables';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        table2 = document.createElement('table');
+        table2.classList.add('table', 'table-borderless', 'mb-0');
+        td.appendChild(table2);
+        tr.appendChild(td);
+
+        // Refill Consumables Action
+        const refillFuel = (): void => {
+            this.railroad.frames.forEach((frame: Frame) => {
+                if (isFrameType(frame.type)) {
+                    const frameDef: FrameDefinition = frameDefinitions[frame.type];
+                    const {max} = frameDef;
+                    if (typeof frameDef.max?.boilerFuelAmount === 'number') {
+                        frame.state.boilerFuelAmount = (max ? max.boilerFuelAmount : undefined) ?? 0;
+                    }
+                    if (typeof frameDef.max?.tenderFuelAmount === 'number') {
+                        frame.state.tenderFuelAmount = (max ? max.tenderFuelAmount : undefined) ?? 0;
+                    }
+                }
+            });
+        };
+        const refillWater = (): void => {
+            this.railroad.frames.forEach((frame: Frame) => {
+                if (isFrameType(frame.type)) {
+                    const frameDef: FrameDefinition = frameDefinitions[frame.type];
+                    const {max} = frameDef;
+                    if (typeof frameDef.max?.boilerWaterLevel === 'number') {
+                        frame.state.boilerWaterLevel = (max ? max.boilerWaterLevel : undefined) ?? 0;
+                    }
+                    if (typeof frameDef.max?.tenderWaterAmount === 'number') {
+                        frame.state.tenderWaterAmount = (max ? max.tenderWaterAmount : undefined) ?? 0;
+                    }
+                }
+            });
+        };
+        thead = document.createElement('thead');
+        table2.appendChild(thead);
+        tr = document.createElement('tr');
+        thead.appendChild(tr);
+        for (const columnHeader of ['Consumable', 'Action']) {
+            const th = document.createElement('th');
+            th.textContent = columnHeader;
+            tr.appendChild(th);
+        }
+        tbody2 = document.createElement('tbody');
+        table2.appendChild(tbody2);
+        tr = document.createElement('tr');
+        tbody2.appendChild(tr);
+        td = document.createElement('td');
+        td.textContent = 'All';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        tr.appendChild(td);
+        const btnFillAll = document.createElement('button');
+        btnFillAll.classList.add('btn', 'btn-secondary');
+        btnFillAll.textContent = 'Fill';
+        btnFillAll.addEventListener('click', () => {
+            refillWater();
+            refillFuel();
+            framesButton.dispatchEvent(new Event('click'));
+        });
+        td.appendChild(btnFillAll);
+        tr = document.createElement('tr');
+        tbody2.appendChild(tr);
+        td = document.createElement('td');
+        td.textContent = 'Fuel';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        tr.appendChild(td);
+        const btnFillFuel = document.createElement('button');
+        btnFillFuel.classList.add('btn', 'btn-secondary');
+        btnFillFuel.textContent = 'Fill';
+        btnFillFuel.addEventListener('click', () => {
+            refillFuel();
+            framesButton.dispatchEvent(new Event('click'));
+        });
+        td.appendChild(btnFillFuel);
+        tr = document.createElement('tr');
+        tbody2.appendChild(tr);
+        td = document.createElement('td');
+        td.textContent = 'Water';
+        tr.appendChild(td);
+        td = document.createElement('td');
+        tr.appendChild(td);
+        const btnFillWater = document.createElement('button');
+        btnFillWater.classList.add('btn', 'btn-secondary');
+        btnFillWater.textContent = 'Fill';
+        btnFillWater.addEventListener('click', () => {
+            refillWater();
+            framesButton.dispatchEvent(new Event('click'));
+        });
+        td.appendChild(btnFillWater);
     }
 
     private industries(table: HTMLTableElement): void {
