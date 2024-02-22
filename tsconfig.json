@@ -12,6 +12,6 @@
     "./node_modules/@svgdotjs/svg.js/svg.js.d.ts",
     "./node_modules/@total-typescript/ts-reset/dist/recommended.d.ts",
     "./node_modules/svg-pan-zoom/dist/svg-pan-zoom.d.ts",
-    "./ts",
+    "./ts"
   ]
 }

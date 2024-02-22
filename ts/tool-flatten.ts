@@ -44,5 +44,3 @@ function flattenSegments(controlPoints: Vector[], start: number, end: number): V
     }
     return result;
 }
-
-

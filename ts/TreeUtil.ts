@@ -115,7 +115,8 @@ export class TreeUtil {
         };
         const result = await asyncFilter(
             this.railroad.removedVegetationAssets,
-            (tree) => !this.treeFilter(tree), undefined,
+            (tree) => !this.treeFilter(tree),
+            undefined,
             updateFunc,
         );
         const after = result.length;

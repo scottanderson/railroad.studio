@@ -6,22 +6,26 @@ export const rect = (x: number, y: number, width: number, height: number): PathC
     ['h', width],
     ['v', height],
     ['H', x],
-    ['Z']];
+    ['Z'],
+];
 
 export const rectAbs = (x0: number, y0: number, x1: number, y1: number): PathCommand[] => [
     ['M', x0, y0],
     ['H', x1],
     ['V', y1],
     ['H', x0],
-    ['Z']];
+    ['Z'],
+];
 
 export const rotatedRect = (x: number, y: number, width: number, height: number, direction: number): PathCommand[] => {
     const theta = degreesToRadians(direction);
     const cos = Math.cos(theta);
     const sin = Math.sin(theta);
-    const lineToPoint = (lx: number, ly: number): PathCommand => ['L',
+    const lineToPoint = (lx: number, ly: number): PathCommand => [
+        'L',
         Math.round(x + lx * cos - ly * sin),
-        Math.round(y + lx * sin + ly * cos)];
+        Math.round(y + lx * sin + ly * cos),
+    ];
     return [
         ['M', x, y],
         lineToPoint(width, 0),
@@ -36,7 +40,8 @@ export const poly = (points: [number, number][]): PathCommand[] =>
 export const circle = (cx: number, cy: number, r: number): PathCommand[] => [
     ['M', cx - r, cy],
     ['a', r, r, 0, 1, 0, r * 2, 0],
-    ['a', r, r, 0, 1, 0, r * -2, 0]];
+    ['a', r, r, 0, 1, 0, r * -2, 0],
+];
 
 export const polyRectRel = (x: number, y: number, ...legs: number[]): PathCommand[] => {
     const result: PathCommand[] = [['M', x, y]];
@@ -113,7 +118,8 @@ export const arrow = (xDirection: boolean, stemWidth = 100, arrowLength = 1000):
         [f, -halfStemWidth],
         [r, stemLength],
         [f, -halfHeadWidth],
-        ['Z']];
+        ['Z'],
+    ];
 };
 
 export const combine = (...commands: PathCommand[][]): PathCommand[] =>

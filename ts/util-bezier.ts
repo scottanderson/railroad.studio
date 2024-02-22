@@ -155,10 +155,10 @@ export const cubicBezierAcceleration3 = (t: number, bezier: BezierCurve): Vector
     scalar3(cubicBezierAcceleration, t, bezier);
 
 type OsculatingCircle = {
-    center: Vector,
-    location: Vector,
-    radius: number,
-    t: number,
+    center: Vector;
+    location: Vector;
+    radius: number;
+    t: number;
 };
 
 export function cubicBezierLength(bezier: BezierCurve, samples = 1000): number {

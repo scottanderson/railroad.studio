@@ -74,7 +74,7 @@
   --walkway-fill: #595959;
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme='dark'] {
   --stroke: white;
   --stroke-inverted: black;
   --rail-deck: brown;
@@ -124,7 +124,7 @@ body {
   fill: var(--tree);
   stroke: var(--tree-border);
   stroke-width: 100;
-  fill-opacity: .2;
+  fill-opacity: 0.2;
 }
 
 .map-border {
@@ -497,7 +497,7 @@ image {
   transition: filter var(--duration) var(--animation);
 }
 
-[data-bs-theme=dark] image {
+[data-bs-theme='dark'] image {
   --webkit-filter: invert(100%);
   filter: invert(100%);
 }
