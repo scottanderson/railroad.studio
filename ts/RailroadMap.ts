@@ -775,7 +775,7 @@ export class RailroadMap {
                 .translate(-3_000_00, -3_000_00)
                 .radius(100_00)
                 .addClass('map-border');
-        } else (this.railroad.settings.gameLevelName === 'PineValley'); {
+        } else {
             return this.layers.border
                 .rect(4_000_00, 4_000_00)
                 .translate(-2_000_00, -2_000_00)
