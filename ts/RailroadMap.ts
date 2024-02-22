@@ -745,13 +745,16 @@ export class RailroadMap {
         let image;
         let transform;
         if (this.railroad.settings.gameLevelName === 'LakeValley') {
-            image = 'lakeValleyCont.png';
-            transform = 'matrix(-100,0,0,-100,200000,200000)';
+            image = 'LakeValleyTopo.png';
+            transform = 'matrix(-92.74,0,0,-92.74,197453,197453)';
             // image = 'LakeValleyMap2.png';
             // transform = 'matrix(-200,0,0,-200,200000,200000)';
+        } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
+            image = 'AuroraFallsTopo.png';
+            transform = 'matrix(-141.86,0,0,-141.86,300459,300899)';
         } else {
-            image = 'RRO_Pine_Valley_topo_map.png';
-            transform = 'matrix(-116.75,0,0,-116.75,233700,231900)';
+            image = 'PineValleyTopo.png';
+            transform = 'matrix(-94.9,0,0,-94.9,199952,199952)';
         }
         return this.layers.background
             .image(image)
@@ -760,11 +763,25 @@ export class RailroadMap {
 
     private renderBorder(): Element {
         // Border
-        return this.layers.border
-            .rect(4_000_00, 4_000_00)
-            .translate(-2_000_00, -2_000_00)
-            .radius(100_00)
-            .addClass('map-border');
+        if (this.railroad.settings.gameLevelName === 'LakeValley') {
+            return this.layers.border
+                .rect(4_000_00, 4_000_00)
+                .translate(-2_000_00, -2_000_00)
+                .radius(100_00)
+                .addClass('map-border');
+        } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
+            return this.layers.border
+                .rect(6_000_00, 6_000_00)
+                .translate(-3_000_00, -3_000_00)
+                .radius(100_00)
+                .addClass('map-border');
+        } else {
+            return this.layers.border
+                .rect(4_000_00, 4_000_00)
+                .translate(-2_000_00, -2_000_00)
+                .radius(100_00)
+                .addClass('map-border');
+        }
     }
 
     private renderBrush(): Element {
