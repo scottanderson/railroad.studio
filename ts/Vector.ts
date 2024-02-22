@@ -142,7 +142,7 @@ export function angleBetweenVectors(a: Vector, b: Vector) {
  * @param {Vector} p1 - A point on the second line.
  * @param {Vector} t1 - The vector defining the direction of the second line.
  * @return {Vector} The point of closest approach between the two lines.
-*/
+ */
 export function closestApproach(p0: Vector, t0: Vector, p1: Vector, t1: Vector): Vector {
     const direction = vectorDifference(p0, p1);
     const rejection = rejectVector(direction, t1);

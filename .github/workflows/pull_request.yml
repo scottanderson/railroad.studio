@@ -17,4 +17,5 @@ jobs:
           node-version: 20.x
           cache: 'npm'
       - run: npm ci
+      - run: npm run check
       - run: npx webpack --mode=development

@@ -1,39 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Railroad Studio</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="manifest" href="site.webmanifest">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
-</head>
-<body class="p-3">
-  <div id="header" class="fixed-top m-3">
-    <h2>Railroad Studio</h2>
-  </div>
-  <div id="content" class="pt-5">
-    <div id="drop-area">
-      <form class="drop-form">
-        <p>Drag and drop a file here, or browse to select a save file.</p>
-        <input class="form-control" type="file" id="fileElem" accept=".sav">
-        <div class="form-text">Save files are located in <span class="font-monospace">%localappdata%\arr\saved\savegames</span></div>
-      </form>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Railroad Studio</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="p-3">
+    <div id="header" class="fixed-top m-3">
+      <h2>Railroad Studio</h2>
     </div>
-  </div>
-  <div id="footer" class="fixed-bottom m-3">
-    <p class="">
-      Railroad Studio is on <a href="https://github.com/scottanderson/railroad.studio">github</a> <i class="bi bi-github"></i>
-    </p>
-  </div>
-  <script src="studio.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-</body>
-
+    <div id="content" class="pt-5">
+      <div id="drop-area">
+        <form class="drop-form">
+          <p>Drag and drop a file here, or browse to select a save file.</p>
+          <input class="form-control" type="file" id="fileElem" accept=".sav" />
+          <div class="form-text">
+            Save files are located in <span class="font-monospace">%localappdata%\arr\saved\savegames</span>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="footer" class="fixed-bottom m-3">
+      <p class="">
+        Railroad Studio is on <a href="https://github.com/scottanderson/railroad.studio">github</a>
+        <i class="bi bi-github"></i>
+      </p>
+    </div>
+    <script src="studio.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
