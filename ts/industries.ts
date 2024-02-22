@@ -79,11 +79,6 @@ export const IndustryNames = [
     'WaterWell',
     'WheatFarm',
     'Woodrick',
-    'GoldDredge',
-    'GoldMine',
-    'StampMill',
-    'GoldSmelter',
-    'RailExpressAgency',
 ] as const satisfies readonly string[];
 
 /**
@@ -169,11 +164,6 @@ export const industryNames: Record<IndustryName, string> = {
     'WaterWell': 'Water Well',
     'WheatFarm': 'Wheat Farm',
     'Woodrick': 'Wood Rick',
-    'GoldDredge': 'Gold Dredge',
-    'GoldMine': 'Gold Mine',
-    'StampMill': 'Stamp Mill',
-    'GoldSmelter': 'Gold Smelter',
-    'RailExpressAgency': 'Rail Express Agency',
 };
 
 type FourStrings = [string, string, string, string];
@@ -191,10 +181,6 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
     'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
     'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
-    'GoldDredge': ['Coal', 'Tool Crates', 'Steel Pipes', input4],
-    'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
-    'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
-    'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
@@ -227,10 +213,6 @@ export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = 
     'Woodrick': ['Firewood', 'Firewood', output3, output4],
     'CattleFarm': ['Cattle', 'Cattle', output3, output4],
     'MeatPackingPlant': ['Meat', output2, output3, output4],
-    'GoldDredge': ['Gold Ore', output2, output3, output4],
-    'GoldMine': ['Gold Ore', output2, output3, output4],
-    'StampMill': ['Refined Gold', output2, output3, output4],
-    'GoldSmelter': ['Gold Ingot', output2, output3, output4],
 };
 
 export const gizmoSvgPaths = {
@@ -438,8 +420,10 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
         'building': combine(
             rect(-865, 900, 1740, -1760),
             polyRect(
-                2060, 3160, 2590, 2890,
-                3230, 4490, 2400, 4750,
+                2060, 3160,
+                2590, 2890,
+                3230, 4490,
+                2400, 4750,
             ),
         ),
         'fence': combine(
@@ -476,8 +460,10 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
         ),
         'building': combine(
             polyRect(
-                -1920, -1300, -1200, -580,
-                2700, 550, -2650, -580,
+                -1920, -1300,
+                -1200, -580,
+                2700, 550,
+                -2650, -580,
                 -2290, -1050,
             ),
         ),
@@ -486,62 +472,5 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             rect(-3800, -2850, 1980, 300),
             rect(950, -2870, 300, 550),
         ),
-    },
-    'Sandhouse': {
-        'building': rect(-270, -670, 550, 850),
-    },
-    'RailExpressAgency': {
-        'building': rect(-370, -1800, 735, 3050),
-        'platform': combine(
-            polyRect(
-                385, 1270, -370, 1510,
-                680, 200, 385,
-            ),
-        ),
-    },
-    'GoldMine': {
-        'building': rect(-2295, -445, 2000, 850),
-        'platform': rect(-595, -5715, 300, 5250),
-    },
-    'StampMill': {
-        'building':
-            polyRect(
-                -1370, 620, -180, 20,
-                1000, -1620, -1050, -1000,
-                -1050, -420,
-            ),
-        'platform': combine(
-            rect(1350, -1910, 300, 1000),
-            rect(-1870, -2850, 300, 2410),
-            rect(-1870, 810, 300, 990),
-            circle(1480, -120, 170),
-        ),
-    },
-    'GoldSmelter': {
-        'building': combine(
-            rect(-1550, -1250, 450, 2500),
-            rect(-1800, 590, 200, 250),
-            rect(-1800, -850, 200, 250),
-            polyRect(
-                -490, 3400, 500, 1800,
-                1550, -1800, 1000, -1800,
-                250, -2200, -350, -1800,
-                -1050, 1800,
-            ),
-        ),
-        'platform': combine(
-            rect(-2550, -1250, 300, 950),
-            rect(1700, -1580, 650, 3050),
-        ),
-    },
-    'GoldDredge': {
-        'building':
-            polyRect(
-                -1900, -750, 800, -250,
-                2800, 150, 800, 700,
-                -1900, 150, -2900, -250,
-            ),
-        'platform': rect(-3550, 2850, 5450, 300),
-        'walkway': rect(-950, 800, 300, 2030),
     },
 };
