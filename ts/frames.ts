@@ -1369,7 +1369,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
 };
 
-export type FrameStateMetadata = {
+type FrameStateMetadata = {
     name: string | readonly [string, string],
     type?: 'slider' | readonly string[],
     unit?: string | readonly [string, string],

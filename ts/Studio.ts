@@ -33,7 +33,7 @@ import {
     frameStateMetadata,
     hasCargoLimits,
     isCargoType,
-    isFrameType, FrameDefinition,
+    isFrameType,
 } from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
@@ -810,7 +810,7 @@ export class Studio {
             studioControls.replaceChildren(buttons);
             content.replaceChildren(table);
             this.floatHeader(false);
-            this.bulkFrames(table, btnFrames);
+            this.bulkFrames(table);
         });
         // Industries
         const btnIndustries = document.createElement('button');
@@ -1319,7 +1319,7 @@ export class Studio {
         }
     }
 
-    private bulkFrames(table: HTMLTableElement, framesButton: HTMLButtonElement) {
+    private bulkFrames(table: HTMLTableElement) {
         this.setTitle('Bulk Frames');
 
         let thead = document.createElement('thead');
@@ -1351,7 +1351,6 @@ export class Studio {
             this.railroad.frames.forEach((frame: Frame) => {
                 frame.location.z += value;
             });
-            framesButton.dispatchEvent(new Event('click'));
             return value;
         };
 
@@ -1373,8 +1372,13 @@ export class Studio {
         tr.appendChild(td);
         td = document.createElement('td');
         tr.appendChild(td);
-        const options: InputTextOptions = {min: '0'};
-        td.appendChild(editNumber(this, 0, options, liftFrames));
+        const btnLiftAll = document.createElement('button');
+        btnLiftAll.classList.add('btn', 'btn-secondary');
+        btnLiftAll.textContent = 'Lift 5m';
+        btnLiftAll.addEventListener('click', () => {
+            liftFrames(5);
+        });
+        td.appendChild(btnLiftAll);
 
         // Refill Consumables
         tr = document.createElement('tr');
@@ -1391,29 +1395,27 @@ export class Studio {
         // Refill Consumables Action
         const refillFuel = (): void => {
             this.railroad.frames.forEach((frame: Frame) => {
-                if (isFrameType(frame.type)) {
-                    const frameDef: FrameDefinition = frameDefinitions[frame.type];
-                    const {max} = frameDef;
-                    if (typeof frameDef.max?.boilerFuelAmount === 'number') {
-                        frame.state.boilerFuelAmount = (max ? max.boilerFuelAmount : undefined) ?? 0;
-                    }
-                    if (typeof frameDef.max?.tenderFuelAmount === 'number') {
-                        frame.state.tenderFuelAmount = (max ? max.tenderFuelAmount : undefined) ?? 0;
-                    }
+                if (!isFrameType(frame.type)) return;
+                const {max} = frameDefinitions[frame.type];
+                if (typeof max === 'undefined') return;
+                if (typeof max.boilerFuelAmount === 'number') {
+                    frame.state.boilerFuelAmount = (max ? max.boilerFuelAmount : undefined) ?? 0;
+                }
+                if (typeof max.tenderFuelAmount === 'number') {
+                    frame.state.tenderFuelAmount = (max ? max.tenderFuelAmount : undefined) ?? 0;
                 }
             });
         };
         const refillWater = (): void => {
             this.railroad.frames.forEach((frame: Frame) => {
-                if (isFrameType(frame.type)) {
-                    const frameDef: FrameDefinition = frameDefinitions[frame.type];
-                    const {max} = frameDef;
-                    if (typeof frameDef.max?.boilerWaterLevel === 'number') {
-                        frame.state.boilerWaterLevel = (max ? max.boilerWaterLevel : undefined) ?? 0;
-                    }
-                    if (typeof frameDef.max?.tenderWaterAmount === 'number') {
-                        frame.state.tenderWaterAmount = (max ? max.tenderWaterAmount : undefined) ?? 0;
-                    }
+                if (!isFrameType(frame.type)) return;
+                const {max} = frameDefinitions[frame.type];
+                if (typeof max === 'undefined') return;
+                if (typeof max.boilerWaterLevel === 'number') {
+                    frame.state.boilerWaterLevel = (max ? max.boilerWaterLevel : undefined) ?? 0;
+                }
+                if (typeof max.tenderWaterAmount === 'number') {
+                    frame.state.tenderWaterAmount = (max ? max.tenderWaterAmount : undefined) ?? 0;
                 }
             });
         };
@@ -1441,7 +1443,6 @@ export class Studio {
         btnFillAll.addEventListener('click', () => {
             refillWater();
             refillFuel();
-            framesButton.dispatchEvent(new Event('click'));
         });
         td.appendChild(btnFillAll);
         tr = document.createElement('tr');
@@ -1456,7 +1457,6 @@ export class Studio {
         btnFillFuel.textContent = 'Fill';
         btnFillFuel.addEventListener('click', () => {
             refillFuel();
-            framesButton.dispatchEvent(new Event('click'));
         });
         td.appendChild(btnFillFuel);
         tr = document.createElement('tr');
@@ -1471,7 +1471,6 @@ export class Studio {
         btnFillWater.textContent = 'Fill';
         btnFillWater.addEventListener('click', () => {
             refillWater();
-            framesButton.dispatchEvent(new Event('click'));
         });
         td.appendChild(btnFillWater);
     }
