@@ -3,9 +3,9 @@ import {Rotator} from './Rotator';
 import {Vector, dotProduct} from './Vector';
 
 export type RotationMatrix = {
-    forward: Vector,
-    right: Vector,
-    up: Vector,
+    forward: Vector;
+    right: Vector;
+    up: Vector;
 };
 
 /**

@@ -25,11 +25,11 @@ export const catmullRomToBezier = (spline: CatmullRomSpline, i: number) =>
     hermiteToBezier(catmullRomToHermite(spline, i));
 
 type CatmullRomOsculatingCircle = {
-    center: Vector,
-    location: Vector,
-    radius: number,
-    t: number,
-    i: number,
+    center: Vector;
+    location: Vector;
+    radius: number;
+    t: number;
+    i: number;
 };
 
 export function catmullRomMinRadius(spline: CatmullRomSpline): CatmullRomOsculatingCircle[] {

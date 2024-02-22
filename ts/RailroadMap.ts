@@ -70,7 +70,7 @@ interface MapOptions {
 export interface MapLayers {
     background: G;
     border: G;
-    bridges: G,
+    bridges: G;
     brush: G;
     controlPoints: G;
     frames: G;
@@ -1081,7 +1081,8 @@ export class RailroadMap {
                 if (this.gizmoDebugLine) this.gizmoDebugLine.remove();
                 if (this.gizmoDebugText) this.gizmoDebugText.remove();
                 this.gizmoDebugLine = gizmoG.line().addClass('ruler');
-                this.gizmoDebugText = gizmoG.text(`[${x}, ${y}]`)
+                this.gizmoDebugText = gizmoG
+                    .text(`[${x}, ${y}]`)
                     .attr('transform', `translate(${x} ${y}) rotate(90)`)
                     .addClass('frame-text');
                 this.gizmoDebugLine.plot(0, 0, x, y);
@@ -1309,11 +1310,11 @@ export class RailroadMap {
         }
         // Curvature
         const renderCurvature = (curvature: {
-            center: Vector,
-            location: Vector,
-            radius: number,
-            t: number,
-            i: number,
+            center: Vector;
+            location: Vector;
+            radius: number;
+            t: number;
+            i: number;
         }) => {
             const {center, location, radius, t, i} = curvature;
             const l = this.layers.radius;
