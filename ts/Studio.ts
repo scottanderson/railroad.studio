@@ -805,12 +805,12 @@ export class Studio {
         btnBulkFrames.textContent = 'Bulk Frames';
         btnBulkFrames.classList.add('btn', 'btn-secondary');
         btnBulkFrames.addEventListener('click', () => {
-            const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            const div = document.createElement('div');
+            div.classList.add('mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
+            content.replaceChildren(div);
             this.floatHeader(false);
-            this.bulkFrames(table);
+            this.bulkFrames(div);
         });
         // Industries
         const btnIndustries = document.createElement('button');
@@ -1319,32 +1319,8 @@ export class Studio {
         }
     }
 
-    private bulkFrames(table: HTMLTableElement) {
+    private bulkFrames(outerDiv: HTMLDivElement) {
         this.setTitle('Bulk Frames');
-
-        let thead = document.createElement('thead');
-        table.appendChild(thead);
-        let tr = document.createElement('tr');
-        thead.appendChild(tr);
-        for (const columnHeader of ['Action', 'Input']) {
-            const th = document.createElement('th');
-            th.textContent = columnHeader;
-            tr.appendChild(th);
-        }
-        const tbody = document.createElement('tbody');
-        table.appendChild(tbody);
-
-        // Move Frame
-        tr = document.createElement('tr');
-        tbody.appendChild(tr);
-        let td = document.createElement('td');
-        td.textContent = 'Move Frame';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        let table2 = document.createElement('table');
-        table2.classList.add('table', 'table-borderless', 'mb-0');
-        td.appendChild(table2);
-        tr.appendChild(td);
 
         // Move Frame Actions
         const liftFrames = (value: number) => {
@@ -1354,55 +1330,19 @@ export class Studio {
             return value;
         };
 
-        thead = document.createElement('thead');
-        table2.appendChild(thead);
-        tr = document.createElement('tr');
-        thead.appendChild(tr);
-        for (const columnHeader of ['Axis', 'Value']) {
-            const th = document.createElement('th');
-            th.textContent = columnHeader;
-            tr.appendChild(th);
-        }
-        let tbody2 = document.createElement('tbody');
-        table2.appendChild(tbody2);
-        tr = document.createElement('tr');
-        tbody2.appendChild(tr);
-        td = document.createElement('td');
-        td.textContent = 'Z';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        tr.appendChild(td);
-        const btnLiftAll = document.createElement('button');
-        btnLiftAll.classList.add('btn', 'btn-secondary');
-        btnLiftAll.textContent = 'Lift 5m';
-        btnLiftAll.addEventListener('click', () => {
-            liftFrames(5);
-        });
-        td.appendChild(btnLiftAll);
-
-        // Refill Consumables
-        tr = document.createElement('tr');
-        tbody.appendChild(tr);
-        td = document.createElement('td');
-        td.textContent = 'Refill Consumables';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        table2 = document.createElement('table');
-        table2.classList.add('table', 'table-borderless', 'mb-0');
-        td.appendChild(table2);
-        tr.appendChild(td);
-
         // Refill Consumables Action
         const refillFuel = (): void => {
             this.railroad.frames.forEach((frame: Frame) => {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
                 if (typeof max === 'undefined') return;
-                if (typeof max.boilerFuelAmount === 'number') {
-                    frame.state.boilerFuelAmount = (max ? max.boilerFuelAmount : undefined) ?? 0;
+                if (max.boilerFuelAmount && frame.state.boilerFuelAmount !== max.boilerFuelAmount) {
+                    frame.state.boilerFuelAmount = max.boilerFuelAmount;
+                    this.setMapModified();
                 }
-                if (typeof max.tenderFuelAmount === 'number') {
-                    frame.state.tenderFuelAmount = (max ? max.tenderFuelAmount : undefined) ?? 0;
+                if (max.tenderFuelAmount && frame.state.tenderFuelAmount !== max.tenderFuelAmount) {
+                    frame.state.tenderFuelAmount = max.tenderFuelAmount;
+                    this.setMapModified();
                 }
             });
         };
@@ -1411,32 +1351,41 @@ export class Studio {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
                 if (typeof max === 'undefined') return;
-                if (typeof max.boilerWaterLevel === 'number') {
-                    frame.state.boilerWaterLevel = (max ? max.boilerWaterLevel : undefined) ?? 0;
+                if (max.boilerWaterLevel && frame.state.boilerWaterLevel !== max.boilerWaterLevel) {
+                    frame.state.boilerWaterLevel = max.boilerWaterLevel;
+                    this.setMapModified();
                 }
-                if (typeof max.tenderWaterAmount === 'number') {
-                    frame.state.tenderWaterAmount = (max ? max.tenderWaterAmount : undefined) ?? 0;
+                if (max.tenderWaterAmount && frame.state.tenderWaterAmount !== max.tenderWaterAmount) {
+                    frame.state.tenderWaterAmount = max.tenderWaterAmount;
+                    this.setMapModified();
                 }
             });
         };
-        thead = document.createElement('thead');
-        table2.appendChild(thead);
-        tr = document.createElement('tr');
-        thead.appendChild(tr);
-        for (const columnHeader of ['Consumable', 'Action']) {
-            const th = document.createElement('th');
-            th.textContent = columnHeader;
-            tr.appendChild(th);
-        }
-        tbody2 = document.createElement('tbody');
-        table2.appendChild(tbody2);
-        tr = document.createElement('tr');
-        tbody2.appendChild(tr);
-        td = document.createElement('td');
-        td.textContent = 'All';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        tr.appendChild(td);
+
+        let h3 = document.createElement('h3');
+        h3.classList.add('mb-3');
+        h3.textContent = 'Move Frames';
+        outerDiv.appendChild(h3);
+
+        // Move Frame
+        let div = document.createElement('div');
+        div.classList.add('row', 'mb-3');
+        outerDiv.appendChild(div);
+        let label = document.createElement('label');
+        label.classList.add('col', 'col-3', 'col-form-label');
+        label.textContent = 'Z';
+        div.appendChild(label);
+        let innerDiv = document.createElement('div');
+        innerDiv.classList.add('col-2');
+        div.appendChild(innerDiv);
+        const btnLiftAll = document.createElement('button');
+        btnLiftAll.classList.add('btn', 'btn-secondary');
+        btnLiftAll.textContent = 'Lift 5m';
+        btnLiftAll.addEventListener('click', () => {
+            liftFrames(500);
+        });
+        innerDiv.appendChild(btnLiftAll);
+
         const btnFillAll = document.createElement('button');
         btnFillAll.classList.add('btn', 'btn-secondary');
         btnFillAll.textContent = 'Fill';
@@ -1444,35 +1393,60 @@ export class Studio {
             refillWater();
             refillFuel();
         });
-        td.appendChild(btnFillAll);
-        tr = document.createElement('tr');
-        tbody2.appendChild(tr);
-        td = document.createElement('td');
-        td.textContent = 'Fuel';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        tr.appendChild(td);
         const btnFillFuel = document.createElement('button');
         btnFillFuel.classList.add('btn', 'btn-secondary');
         btnFillFuel.textContent = 'Fill';
         btnFillFuel.addEventListener('click', () => {
             refillFuel();
         });
-        td.appendChild(btnFillFuel);
-        tr = document.createElement('tr');
-        tbody2.appendChild(tr);
-        td = document.createElement('td');
-        td.textContent = 'Water';
-        tr.appendChild(td);
-        td = document.createElement('td');
-        tr.appendChild(td);
         const btnFillWater = document.createElement('button');
         btnFillWater.classList.add('btn', 'btn-secondary');
         btnFillWater.textContent = 'Fill';
         btnFillWater.addEventListener('click', () => {
             refillWater();
         });
-        td.appendChild(btnFillWater);
+
+        // Fill Consumables
+        h3 = document.createElement('h3');
+        h3.classList.add('mb-3');
+        h3.textContent = 'Fill Consumables';
+        outerDiv.appendChild(h3);
+
+        div = document.createElement('div');
+        div.classList.add('row', 'mb-3');
+        outerDiv.appendChild(div);
+        label = document.createElement('label');
+        label.classList.add('col', 'col-3', 'col-form-label');
+        label.textContent = 'Fill All';
+        div.appendChild(label);
+        innerDiv = document.createElement('div');
+        innerDiv.classList.add('col-2');
+        div.appendChild(innerDiv);
+        innerDiv.appendChild(btnFillAll);
+
+        div = document.createElement('div');
+        div.classList.add('row', 'mb-3');
+        outerDiv.appendChild(div);
+        label = document.createElement('label');
+        label.classList.add('col', 'col-3', 'col-form-label');
+        label.textContent = 'Fill Fuel';
+        div.appendChild(label);
+        innerDiv = document.createElement('div');
+        innerDiv.classList.add('col-2');
+        div.appendChild(innerDiv);
+        innerDiv.appendChild(btnFillFuel);
+
+        div = document.createElement('div');
+        div.classList.add('row', 'mb-3');
+        outerDiv.appendChild(div);
+        label = document.createElement('label');
+        label.classList.add('col', 'col-3', 'col-form-label');
+        label.textContent = 'Fill Water';
+        div.appendChild(label);
+        innerDiv = document.createElement('div');
+        innerDiv.classList.add('col-2');
+        div.appendChild(innerDiv);
+        innerDiv.appendChild(btnFillWater);
     }
 
     private industries(table: HTMLTableElement): void {
