@@ -1323,6 +1323,7 @@ export class Studio {
 
         // Move Frame Actions
         const liftFrames = (value: number) => {
+            if (this.railroad.frames.length === 0) return;
             this.railroad.frames.forEach((frame: Frame) => {
                 frame.location.z += value;
             });
@@ -1331,6 +1332,7 @@ export class Studio {
 
         // Refill Consumables Action
         const refillFuel = (): void => {
+            if (this.railroad.frames.length === 0) return;
             this.railroad.frames.forEach((frame: Frame) => {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
@@ -1346,6 +1348,7 @@ export class Studio {
             });
         };
         const refillWater = (): void => {
+            if (this.railroad.frames.length === 0) return;
             this.railroad.frames.forEach((frame: Frame) => {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
