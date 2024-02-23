@@ -215,7 +215,7 @@ export function editString(
         // Close the edit control
         return false;
     };
-        // Layout
+    // Layout
     const form = document.createElement('form');
     form.replaceChildren(checkbox, input);
     const formatValue = () => gvasToString(value);

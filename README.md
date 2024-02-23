@@ -1,10 +1,13 @@
 # Railroad Studio
+
 This repository contains the source code for [railroad.studio](https://railroad.studio/).
 
 ## About
+
 Railroad Studio is a static HTML, JavaScript and CSS webpage used to view and modify save files for Railroads Online.
 
 ## Editing save files
+
 Most of the data contained within a .sav file can be modified through the studio
 interface, by clicking the tabs across the top of the page. The industry editor
 can be used to modify industry type, location, orientation, input and output
@@ -16,6 +19,7 @@ there are unsaved edits to the save file. This will cause web browsers to notify
 users before navigating away from the page, and make the export button yellow.
 
 ## Editing save files (advanced)
+
 While many things are exposed through the Studio Editor interface, there are
 some things where the interface to edit these values does not exist. For
 situations where you want to edit something that is not exposed through a
@@ -29,6 +33,7 @@ The following commands can be pasted into the browser's JavaScript console.
 Note that these commands will only work after loading a save file:
 
 #### Delete all rolling stock except Betsy
+
 ```js
 betsy = window.studio.railroad.frames.find((f) => f.name === 'betsy');
 window.studio.railroad.frames = [betsy];
@@ -36,6 +41,7 @@ window.studio.setMapModified();
 ```
 
 #### Reset all players money and experience
+
 ```js
 window.studio.railroad.players.forEach((p) => {
     p.xp = 0;
@@ -45,6 +51,7 @@ window.studio.setMapModified();
 ```
 
 #### Delete all old splines
+
 ```js
 window.studio.railroad.splines = []; // Catmull-rom tracks (old spline system)
 window.studio.railroad.switches = []; // Switch objects (old spline system)
@@ -55,20 +62,25 @@ window.studio.map.refreshSplines(); // Update the map view
 ## Development
 
 ### Requirements
+
 The build script uses the node package manager `npm` to manage build dependencies. See [Downloading and installing npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for more information about how to configure npm for your platform.
 
 Once installed, run `npm install` to install the necessary node package dependencies.
 
 ### Building
+
 Run `npm start` to start the webpack-dev-server.
 
 ### Testing
+
 Navigate to [http://localhost:8080/](http://localhost:8080/) to perform testing.
 
 ### Debugging
+
 Source mappings are created, so you can use the web browser's native debugger.
 
 ### Releasing
+
 To generate a minified `studio.js` for release, run `npm run build:prod`.
 
 ## Architecture
@@ -250,8 +262,7 @@ type GvasTypes =
     | ['NameProperty']
     | ['StrProperty']
     | ['StructProperty', 'DateTime']
-    | []
-    ;
+    | [];
 
 interface Gvas {
     _header: GvasHeader;
@@ -307,7 +318,9 @@ interface Railroad {
 ```
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
+
 [MIT License](LICENSE).

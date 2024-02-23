@@ -938,7 +938,7 @@ export class Studio {
         headerElement.replaceChildren(header, studioControls);
         layers
             .map((l) => l.listener)
-            .filter((item): item is (() => void) => !!item)
+            .filter(Boolean)
             .forEach((l) => l());
         // Version warning
         const saveGameVersionNumber = Number(railroad.saveGame.version);

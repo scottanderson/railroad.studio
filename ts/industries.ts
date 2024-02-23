@@ -395,12 +395,82 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'watertower_kanaskat_style3': waterTower,
     'watertower_kanaskat_style4': waterTower,
     'watertower_small': waterTower,
-    'WaterWell': waterTower,
     'engineshed_style1': largeEngineHouse,
     'engineshed_style2': largeEngineHouse,
     'engineshed_style3': largeEngineHouse,
     'engineshed_style4': largeEngineHouse,
     'Woodrick': {
         'building': rect(-130, -65, 260, 130),
+    },
+    'WaterWell': {
+        'building': combine(
+            rect(390, 140, 300, 400),
+            circle(500, -350, 325),
+        ),
+    },
+    'WheatFarm': {
+        'platform': combine(
+            rect(2990, -2300, 300, 1400),
+            rect(-1800, -2590, 300, 1190),
+            circle(-1470, 1650, 325),
+        ),
+        'walkway': combine(
+            rect(2990, 1520, 300, 1210),
+        ),
+        'building': combine(
+            rect(-865, 900, 1740, -1760),
+            polyRect(
+                2060, 3160,
+                2590, 2890,
+                3230, 4490,
+                2400, 4750,
+            ),
+        ),
+        'fence': combine(
+            rect(1160, 1310, 1800, 1450),
+            rect(1160, -530, 1800, 1450),
+        ),
+    },
+    'CattleFarm': {
+        'fence': combine(
+            rect(600, -3190, 1700, 3350),
+            rect(600, 550, 1700, 3350),
+        ),
+        'building': combine(
+            rect(-1220, 2900, 1370, 1000),
+            rect(-920, -5100, 1200, 2050),
+            circle(-1650, 1300, 190),
+        ),
+        'platform': combine(
+            rect(-2150, -2250, 300, 1230),
+            rect(-2150, 1490, 300, 1000),
+            rect(2300, -1060, 600, 300),
+            rect(2300, 2650, 600, 300),
+            circle(-1825, 0, 320),
+        ),
+    },
+    'MeatPackingPlant': {
+        'fence': combine(
+            rect(-1180, -2300, 3450, 1720),
+        ),
+        'walkway': combine(
+            rect(2290, -1800, 270, 1200),
+            rect(-2650, 550, 1900, 215),
+            rect(-1800, -2850, 300, 1250),
+        ),
+        'building': combine(
+            polyRect(
+                -1920, -1300,
+                -1200, -580,
+                2700, 550,
+                -2650, -580,
+                -2290, -1050,
+            ),
+        ),
+        'platform': combine(
+            rect(-4490, -580, 1820, 1345),
+            rect(-3800, -2850, 1980, 300),
+            rect(950, -2870, 300, 550),
+        ),
     },
 };
