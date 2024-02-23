@@ -1326,7 +1326,7 @@ export class Studio {
             this.railroad.frames.forEach((frame: Frame) => {
                 frame.location.z += value;
             });
-            return value;
+            this.setMapModified();
         };
 
         // Refill Consumables Action
