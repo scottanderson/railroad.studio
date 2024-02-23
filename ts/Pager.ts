@@ -13,7 +13,7 @@ export function createPager(
     const nav = document.createElement('nav');
     const ul = document.createElement('ul');
     ul.classList.add('pagination');
-    const page = (i: number, text?: string) =>{
+    const page = (i: number, text?: string) => {
         const li = document.createElement('li');
         li.classList.add('page-item');
         if (i === currentPage && !text) {

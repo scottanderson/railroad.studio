@@ -68,9 +68,13 @@
   --coaling-tower: #fc0;
   --building-beige: #cc9;
   --building-old: #663;
+  --fence-fill: transparent;
+  --fence-stroke: black;
+  --walkway-stroke: black;
+  --walkway-fill: #595959;
 }
 
-[data-bs-theme=dark] {
+[data-bs-theme='dark'] {
   --stroke: white;
   --stroke-inverted: black;
   --rail-deck: brown;
@@ -85,6 +89,10 @@
   --platform-stroke: plum;
   --pond-fill: darkblue;
   --pond-stroke: #66f;
+  --fence-fill: transparent;
+  --fence-stroke: white;
+  --walkway-stroke: #999;
+  --walkway-fill: #8c8c8c;
 }
 
 body {
@@ -116,7 +124,7 @@ body {
   fill: var(--tree);
   stroke: var(--tree-border);
   stroke-width: 100;
-  fill-opacity: .2;
+  fill-opacity: 0.2;
 }
 
 .map-border {
@@ -441,6 +449,16 @@ body {
   stroke: var(--platform-stroke);
 }
 
+.industry .walkway {
+  fill: var(--walkway-fill);
+  stroke: var(--walkway-stroke);
+}
+
+.industry .fence {
+  fill: var(--fence-fill);
+  stroke: var(--fence-stroke);
+}
+
 .industry .pond {
   fill: var(--pond-fill);
   stroke: var(--pond-stroke);
@@ -479,7 +497,7 @@ image {
   transition: filter var(--duration) var(--animation);
 }
 
-[data-bs-theme=dark] image {
+[data-bs-theme='dark'] image {
   --webkit-filter: invert(100%);
   filter: invert(100%);
 }

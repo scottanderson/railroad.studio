@@ -734,7 +734,6 @@ export class Studio {
         // Frames
         const btnFrames = document.createElement('button');
         btnFrames.textContent = 'Frames';
-        btnFrames.id = 'Frames';
         btnFrames.classList.add('btn', 'btn-secondary');
         let framePage = 0;
         const onFramePage = (page: number) => {
@@ -939,7 +938,7 @@ export class Studio {
         headerElement.replaceChildren(header, studioControls);
         layers
             .map((l) => l.listener)
-            .filter((item): item is (() => void) => !!item)
+            .filter(Boolean)
             .forEach((l) => l());
         // Version warning
         const saveGameVersionNumber = Number(railroad.saveGame.version);

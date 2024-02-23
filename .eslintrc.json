@@ -1,12 +1,9 @@
- {
+{
     "env": {
         "es2020": true,
         "browser": true
     },
-    "extends": [
-        "eslint:recommended",
-        "google"
-    ],
+    "extends": ["eslint:recommended", "google"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": "tsconfig.json",
@@ -19,16 +16,19 @@
         "@typescript-eslint/no-explicit-any": ["error"],
         "@typescript-eslint/no-inferrable-types": ["error"],
         "@typescript-eslint/no-require-imports": ["error"],
-        "@typescript-eslint/no-type-alias": ["error", {
-            "allowAliases": "always",
-            "allowCallbacks": "always",
-            "allowConditionalTypes": "never",
-            "allowConstructors": "never",
-            "allowGenerics": "always",
-            "allowLiterals": "always",
-            "allowMappedTypes": "never",
-            "allowTupleTypes": "always"
-        }],
+        "@typescript-eslint/no-type-alias": [
+            "error",
+            {
+                "allowAliases": "always",
+                "allowCallbacks": "always",
+                "allowConditionalTypes": "never",
+                "allowConstructors": "never",
+                "allowGenerics": "always",
+                "allowLiterals": "always",
+                "allowMappedTypes": "never",
+                "allowTupleTypes": "always"
+            }
+        ],
         "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
         "@typescript-eslint/no-unsafe-argument": ["error"],
         "@typescript-eslint/no-unsafe-assignment": ["error"],
@@ -42,15 +42,18 @@
         "@typescript-eslint/prefer-nullish-coalescing": ["error"],
         "@typescript-eslint/semi": ["error"],
         "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
-        "@typescript-eslint/type-annotation-spacing": ["error", {
-            "before": true,
-            "after": true,
-            "overrides": {
-                "colon": {
-                    "before": false
+        "@typescript-eslint/type-annotation-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true,
+                "overrides": {
+                    "colon": {
+                        "before": false
+                    }
                 }
             }
-        }],
+        ],
         "eqeqeq": "error",
         "indent": "off", // @typescript-eslint/indent
         "max-len": ["error", { "code": 120 }],
