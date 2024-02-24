@@ -286,7 +286,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 7,
         },
     },
-    
+
     'Class125_Tender': {
         coal: true,
         tender: true,
@@ -306,7 +306,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderWaterAmount: 9500,
         },
     },
-    
+
     'climax': {
         engine: true,
         length: 850,
@@ -1280,7 +1280,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
         },
     },
-    
+
     'skeletoncar': {
         freight: true,
         length: 635,

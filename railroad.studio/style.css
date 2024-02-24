@@ -72,6 +72,7 @@
   --fence-stroke: black;
   --walkway-stroke: black;
   --walkway-fill: #595959;
+  --snowgrade: #bfbfbf;
 }
 
 [data-bs-theme='dark'] {
@@ -93,6 +94,7 @@
   --fence-stroke: white;
   --walkway-stroke: #999;
   --walkway-fill: #8c8c8c;
+  --snowgrade: #bfbfbf;
 }
 
 body {
@@ -137,6 +139,7 @@ body {
 .rail-deck,
 .bumper,
 .grade,
+.snowgrade,
 .stone-wall,
 .tunnel,
 .pile-bridge-0,
@@ -197,6 +200,10 @@ body {
   stroke: var(--grade);
 }
 
+.snowgrade {
+  stroke: var(--snowgrade);
+}
+
 .bumper {
   fill: var(--engine-house-red);
 }
@@ -246,6 +253,7 @@ body {
 }
 
 .grade,
+.snowgrade,
 .stone-wall,
 .tunnel,
 .pile-bridge-1,
@@ -266,6 +274,7 @@ body {
 .rail:hover,
 .rail-deck:hover,
 .grade:hover,
+.snowgrade:hover,
 .stone-wall:hover,
 .tunnel:hover,
 .pile-bridge-1:hover,

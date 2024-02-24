@@ -1468,12 +1468,19 @@ export class RailroadMap {
             case 'ballast_h10':
                 makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
                 break;
+            case 'ballast_h01_snow':
+            case 'ballast_h05_snow':
+            case 'ballast_h10_snow':
+                makePath(this.layers.groundworks, ['snowgrade', spline.type.substring(spline.type.length - 3)]);
+                break;
             case 'rail_914':
+            case 'rail_914_snow':
                 makePath(this.layers.tracks, ['rail']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_bumper':
+            case 'rail_914_bumper_snow':
                 makePath(this.layers.tracks, ['rail']);
                 elements.push(this.layers.tracks
                     .path(rect(-90, -90, 180, 180))
@@ -1485,6 +1492,14 @@ export class RailroadMap {
             case 'rail_914_h10':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
+                makeGradeText();
+                makeRadiusText();
+                break;
+            case 'rail_914_h01_snow':
+            case 'rail_914_h05_snow':
+            case 'rail_914_h10_snow':
+                makePath(this.layers.tracks, ['rail']);
+                makePath(this.layers.groundworks, ['snowgrade', spline.type.substring(spline.type.length - 3)]);
                 makeGradeText();
                 makeRadiusText();
                 break;
@@ -1521,6 +1536,47 @@ export class RailroadMap {
                     makePath(this.layers.groundworks, ['grade']);
                     for (const leg of extraLegs) {
                         makePath(this.layers.groundworks, ['grade'], leg);
+                    }
+                }
+                makeRadiusText(bezier, this.layers.radiusSwitch);
+                for (const leg of extraLegs) {
+                    makeRadiusText(leg, this.layers.radiusSwitch);
+                }
+                break;
+            }
+            case 'rail_914_switch_3way_left_snow':
+            case 'rail_914_switch_3way_left_noballast_snow':
+            case 'rail_914_switch_3way_right_snow':
+            case 'rail_914_switch_3way_right_noballast_snow':
+            case 'rail_914_switch_cross_45_snow':
+            case 'rail_914_switch_cross_90_snow':
+            case 'rail_914_switch_left_snow':
+            case 'rail_914_switch_left_mirror_snow':
+            case 'rail_914_switch_left_mirror_noballast_snow':
+            case 'rail_914_switch_left_noballast_snow':
+            case 'rail_914_switch_right_snow':
+            case 'rail_914_switch_right_mirror_snow':
+            case 'rail_914_switch_right_mirror_noballast_snow':
+            case 'rail_914_switch_right_noballast_snow':
+            {
+                const extraLegs = switchExtraLegsWorld(spline);
+                if (extraLegs.length === 0) throw new Error(`Missing second leg for ${spline.type}`);
+                // Create the not-aligned track path first, then aligned
+                for (const aligned of [false, true]) {
+                    if (aligned === (spline.switchState === 0)) {
+                        const c = aligned ? 'aligned' : 'not-aligned';
+                        makePath(this.layers.tracks, ['switch-leg', c]);
+                    }
+                    extraLegs.forEach((leg, i) => {
+                        if (aligned !== (spline.switchState === (i + 1))) return;
+                        const c = aligned ? 'aligned' : 'not-aligned';
+                        makePath(this.layers.tracks, ['switch-leg', c], leg);
+                    });
+                }
+                if (!(spline.type.endsWith('_noballast') || spline.type.includes('_cross_'))) {
+                    makePath(this.layers.groundworks, ['snowgrade']);
+                    for (const leg of extraLegs) {
+                        makePath(this.layers.groundworks, ['snowgrade'], leg);
                     }
                 }
                 makeRadiusText(bezier, this.layers.radiusSwitch);
