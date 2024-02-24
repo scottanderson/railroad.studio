@@ -1466,14 +1466,19 @@ export class RailroadMap {
             case 'ballast_h01':
             case 'ballast_h05':
             case 'ballast_h10':
+            case 'ballast_h01_snow':
+            case 'ballast_h05_snow':
+            case 'ballast_h10_snow':
                 makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
                 break;
             case 'rail_914':
+            case 'rail_914_snow':
                 makePath(this.layers.tracks, ['rail']);
                 makeGradeText();
                 makeRadiusText();
                 break;
             case 'rail_914_bumper':
+            case 'rail_914_bumper_snow':
                 makePath(this.layers.tracks, ['rail']);
                 elements.push(this.layers.tracks
                     .path(rect(-90, -90, 180, 180))
@@ -1483,6 +1488,9 @@ export class RailroadMap {
             case 'rail_914_h01':
             case 'rail_914_h05':
             case 'rail_914_h10':
+            case 'rail_914_h01_snow':
+            case 'rail_914_h05_snow':
+            case 'rail_914_h10_snow':
                 makePath(this.layers.tracks, ['rail']);
                 makePath(this.layers.groundworks, ['grade', spline.type.substring(spline.type.length - 3)]);
                 makeGradeText();
@@ -1502,6 +1510,20 @@ export class RailroadMap {
             case 'rail_914_switch_right_mirror':
             case 'rail_914_switch_right_mirror_noballast':
             case 'rail_914_switch_right_noballast':
+            case 'rail_914_switch_3way_left_snow':
+            case 'rail_914_switch_3way_left_noballast_snow':
+            case 'rail_914_switch_3way_right_snow':
+            case 'rail_914_switch_3way_right_noballast_snow':
+            case 'rail_914_switch_cross_45_snow':
+            case 'rail_914_switch_cross_90_snow':
+            case 'rail_914_switch_left_snow':
+            case 'rail_914_switch_left_mirror_snow':
+            case 'rail_914_switch_left_mirror_noballast_snow':
+            case 'rail_914_switch_left_noballast_snow':
+            case 'rail_914_switch_right_snow':
+            case 'rail_914_switch_right_mirror_snow':
+            case 'rail_914_switch_right_mirror_noballast_snow':
+            case 'rail_914_switch_right_noballast_snow':
             {
                 const extraLegs = switchExtraLegsWorld(spline);
                 if (extraLegs.length === 0) throw new Error(`Missing second leg for ${spline.type}`);
