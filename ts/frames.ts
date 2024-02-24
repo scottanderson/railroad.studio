@@ -58,6 +58,11 @@ export const frameTypes = [
     'VentilatedBoxcarCC',
     'WaterCar',
     'waycar',
+    'Class125',
+    'Class125_Tender',
+    'SideDumpCar',
+    'DRGW_Gondola_33FT',
+    'dspp_baggage',
 ] as const satisfies ReadonlyArray<string>;
 
 type FrameType = typeof frameTypes[number];
@@ -1366,7 +1371,101 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 25,
         },
     },
-
+    'Class125': {
+        engine: true,
+        length: 1040,
+        name: 'D&RGW Class 125',
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 70,
+            boilerPressure: 160,
+            boilerWaterLevel: 5000,
+            boilerWaterTemp: 110,
+            brakeValue: 1,
+            compressorAirPressure: 100,
+            compressorValveValue: 1,
+            generatorValveValue: 1,
+            headlightType: 10,
+            paintType: 5,
+            regulatorValue: 1,
+            reverserValue: 1,
+            sanderAmount: 100,
+            smokestackType: 7,
+        },
+    },
+    'Class125_Tender': {
+        coal: true,
+        tender: true,
+        length: 650,
+        name: 'D&RGW Class 125 Tender',
+        min: {
+            headlightType: 1,
+            paintType: 5,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 3,
+            smokestackType: 1,
+            tenderFuelAmount: 7000,
+            tenderWaterAmount: 9500,
+        },
+    },
+    'SideDumpCar': {
+        length: 330,
+        name: 'Westside Lumber Co. Side Dump car',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 5,
+            smokestackType: 1,
+        },
+    },
+    'DRGW_Gondola_33FT': {
+        length: 1030,
+        name: 'D&RGW 33FT Gondola',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 4,
+            smokestackType: 1,
+        },
+    },
+    'dspp_baggage': {
+        length: 1400,
+        name: 'DSP&P Baggage Car',
+        freight: true,
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 2,
+            smokestackType: 1,
+        },
+    },
 };
 
 type FrameStateMetadata = {
@@ -1481,6 +1580,7 @@ export const cargoLimits = {
         ['EFreightType::CrateTools']: 32,
         ['EFreightType::None']: 0,
         ['EFreightType::SeedPallet']: 14,
+        ['EFreightType::Grain']: 12,
     },
     flatcar_cordwood: {
         ['EFreightType::CordWood']: 8,
@@ -1520,7 +1620,9 @@ export const cargoLimits = {
     },
     plantationcar_boxcar: {
         ['EFreightType::CrateTools']: 12,
-        ['EFreightType::CrudeOil']: 15,
+        ['EFreightType::SeedPallet']: 3,
+        ['EFreightType::OilBarrel']: 15,
+        ['EFreightType::Grain']: 4,
         ['EFreightType::None']: 0,
     },
     plantationcar_flatcar: {
@@ -1541,21 +1643,25 @@ export const cargoLimits = {
     plantationcar_flatcar_stakes_bulkhead: {
         ['EFreightType::CordWood']: 2,
         ['EFreightType::None']: 0,
+        ['EFreightType::StrawBale']: 4,
     },
     plantationcar_hopper_large: {
         ['EFreightType::Coal']: 6,
         ['EFreightType::IronOre']: 6,
         ['EFreightType::OilBarrel']: 15,
+        ['EFreightType::CrateTools']: 12,
     },
     plantationcar_hopper_medium: {
         ['EFreightType::Coal']: 3,
         ['EFreightType::IronOre']: 3,
         ['EFreightType::OilBarrel']: 15,
+        ['EFreightType::CrateTools']: 12,
     },
     plantationcar_hopper_small: {
         ['EFreightType::Coal']: 2,
         ['EFreightType::IronOre']: 2,
         ['EFreightType::OilBarrel']: 15,
+        ['EFreightType::CrateTools']: 6,
     },
     plantationcar_tanker: {
         ['EFreightType::CrudeOil']: 2,
@@ -1566,11 +1672,29 @@ export const cargoLimits = {
     },
     stockcar: {
         ['EFreightType::CrateTools']: 32,
+        ['EFreightType::Cattle']: 6,
         ['EFreightType::None']: 0,
     },
     tankcarNCO: {
         ['EFreightType::CrudeOil']: 8,
         ['EFreightType::None']: 0,
+    },
+    VentilatedBoxcarCC: {
+        ['EFreightType::Meat']: 36,
+    },
+    SideDumpCar: {
+        ['EFreightType::Coal']: 6,
+        ['EFreightType::IronOre']: 6,
+        ['EFreightType::GoldOre']: 6,
+    },
+    DRGW_Gondola_33FT: {
+        ['EFreightType::Coal']: 22,
+        ['EFreightType::IronOre']: 22,
+        ['EFreightType::GoldOre']: 22,
+    },
+    dspp_baggage: {
+        ['EFreightType::RefinedGold']: 16,
+        ['EFreightType::GoldIngot']: 5,
     },
 } as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 
@@ -1594,6 +1718,12 @@ export const cargoTypes = {
     ['EFreightType::SeedPallet']: 'Seed Pallet',
     ['EFreightType::SteelPipe']: 'Steel Pipes',
     ['EFreightType::StrawBale']: 'Straw Bale',
+    ['EFreightType::Grain']: 'Grain',
+    ['EFreightType::RefinedGold']: 'Refined Gold',
+    ['EFreightType::GoldIngot']: 'Gold Ingot',
+    ['EFreightType::GoldOre']: 'Gold Ore',
+    ['EFreightType::Cattle']: 'Cattle',
+    ['EFreightType::Meat']: 'Meat',
 } as const satisfies PRO<string, string>;
 
 export const isCargoType = (type: GvasString): type is CargoType =>
