@@ -1471,8 +1471,11 @@ export class RailroadMap {
             case 'ballast_h01_snow':
             case 'ballast_h05_snow':
             case 'ballast_h10_snow':
-                makePath(this.layers.groundworks, ['snowgrade', spline.type.substring(spline.type.length - 3)]);
+            {
+                const size = spline.type.substring(spline.type.length - 8, spline.type.length - 5);
+                makePath(this.layers.groundworks, ['grade', 'snow', size]);
                 break;
+            }
             case 'rail_914':
             case 'rail_914_snow':
                 makePath(this.layers.tracks, ['rail']);
@@ -1498,11 +1501,14 @@ export class RailroadMap {
             case 'rail_914_h01_snow':
             case 'rail_914_h05_snow':
             case 'rail_914_h10_snow':
+            {
                 makePath(this.layers.tracks, ['rail']);
-                makePath(this.layers.groundworks, ['snowgrade', spline.type.substring(spline.type.length - 3)]);
+                const size = spline.type.substring(spline.type.length - 8, spline.type.length - 5);
+                makePath(this.layers.groundworks, ['grade', 'snow', size]);
                 makeGradeText();
                 makeRadiusText();
                 break;
+            }
             case 'rail_914_switch_3way_left':
             case 'rail_914_switch_3way_left_noballast':
             case 'rail_914_switch_3way_right':
@@ -1574,9 +1580,9 @@ export class RailroadMap {
                     });
                 }
                 if (!(spline.type.endsWith('_noballast') || spline.type.includes('_cross_'))) {
-                    makePath(this.layers.groundworks, ['snowgrade']);
+                    makePath(this.layers.groundworks, ['grade', 'snow']);
                     for (const leg of extraLegs) {
-                        makePath(this.layers.groundworks, ['snowgrade'], leg);
+                        makePath(this.layers.groundworks, ['grade', 'snow'], leg);
                     }
                 }
                 makeRadiusText(bezier, this.layers.radiusSwitch);
