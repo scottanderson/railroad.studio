@@ -8,6 +8,7 @@
   --rail-deck: burlywood;
   --rail-deck-hidden: green;
   --grade: sienna;
+  --grade-snow: #bfbfbf;
   --stone-wall: darkgray;
   --tunnel: #333;
   --pile-bridge-new: #c96;
@@ -72,7 +73,6 @@
   --fence-stroke: black;
   --walkway-stroke: black;
   --walkway-fill: #595959;
-  --snowgrade: #bfbfbf;
 }
 
 [data-bs-theme='dark'] {
@@ -94,7 +94,6 @@
   --fence-stroke: white;
   --walkway-stroke: #999;
   --walkway-fill: #8c8c8c;
-  --snowgrade: #bfbfbf;
 }
 
 body {
@@ -139,7 +138,6 @@ body {
 .rail-deck,
 .bumper,
 .grade,
-.snowgrade,
 .stone-wall,
 .tunnel,
 .pile-bridge-0,
@@ -200,8 +198,8 @@ body {
   stroke: var(--grade);
 }
 
-.snowgrade {
-  stroke: var(--snowgrade);
+.grade.snow {
+  stroke: var(--grade-snow);
 }
 
 .bumper {
@@ -253,7 +251,6 @@ body {
 }
 
 .grade,
-.snowgrade,
 .stone-wall,
 .tunnel,
 .pile-bridge-1,
