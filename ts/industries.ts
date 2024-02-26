@@ -179,22 +179,25 @@ export const industryNames: Record<IndustryName, string> = {
 type FourStrings = [string, string, string, string];
 const [input2, input3, input4] = ['Unused Input Slot 2', 'Unused Input Slot 3', 'Unused Input Slot 4'];
 const [output2, output3, output4] = ['Unused Output Slot 2', 'Unused Output Slot 3', 'Unused Output Slot 4'];
+const Cordwood: FourStrings = ['Beams, Cordwood, Lumber, Logs', output2, output3, output4];
 
 export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
+    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
+    'GoldDredge': ['Coal', 'Tool Crates', 'Steel Pipes', input4],
+    'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
+    'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
+    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
+    'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
+    'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
+    'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
     'coalmine': ['Beams', 'Rails', input3, input4],
+    'coaltower': ['Coal', input2, input3, input4],
     'ironoremine': ['Lumber', 'Beams', input3, input4],
     'ironworks': ['Raw Iron', 'Coal', 'Lumber', input4],
     'oilfield': ['Steel Pipes', 'Beams', 'Tool Crates', input4],
-    'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
     'sawmill': ['Logs', input2, input3, input4],
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
-    'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
-    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
-    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
-    'GoldDredge': ['Coal', 'Tool Crates', 'Steel Pipes', input4],
-    'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
-    'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
-    'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
+    'firewooddepot': Cordwood,
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];

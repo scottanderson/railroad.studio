@@ -220,6 +220,14 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             return radiusFilter(industry.location, tree, 37_00); // 37m
         case 'CattleFarm':
             return radiusFilter(industry.location, tree, 46_00); // 46m
+        case 'GoldMine':
+            return radiusFilter(industry.location, tree, 31_00); // 31m
+        case 'StampMill':
+            return radiusFilter(industry.location, tree, 24_00); // 24m
+        case 'GoldSmelter':
+            return radiusFilter(industry.location, tree, 29_00); // 29m
+        case 'RailExpressAgency':
+            return radiusFilter(industry.location, tree, 17_00); // 17m
         case 'Woodrick':
             return radiusFilter(industry.location, tree, 5_00); // 5m
         case 'enginehouse_alpine':
