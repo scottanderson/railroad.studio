@@ -179,7 +179,6 @@ export const industryNames: Record<IndustryName, string> = {
 type FourStrings = [string, string, string, string];
 const [input2, input3, input4] = ['Unused Input Slot 2', 'Unused Input Slot 3', 'Unused Input Slot 4'];
 const [output2, output3, output4] = ['Unused Output Slot 2', 'Unused Output Slot 3', 'Unused Output Slot 4'];
-const Cordwood: FourStrings = ['Beams, Cordwood, Lumber, Logs', output2, output3, output4];
 
 export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'coalmine': ['Beams', 'Rails', input3, input4],
@@ -197,7 +196,7 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
     'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
     'coaltower': ['Coal', input2, input3, input4],
-    'firewooddepot': Cordwood,
+    'firewooddepot': ['Logs', input2, input3, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
