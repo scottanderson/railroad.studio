@@ -195,6 +195,8 @@ export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
     'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
     'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
     'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
+    'coaltower': ['Coal', input2, input3, input4],
+    'firewooddepot': ['Logs', input2, input3, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
