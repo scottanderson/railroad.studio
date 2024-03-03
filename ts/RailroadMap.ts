@@ -751,7 +751,7 @@ export class RailroadMap {
             // transform = 'matrix(-200,0,0,-200,200000,200000)';
         } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
             image = 'AuroraFallsTopo.png';
-            transform = 'matrix(-142.70,0,0,-142.70,300898,300898)';
+            transform = 'matrix(-139.13,0,0,-139.13,300900,300900)';
         } else {
             image = 'PineValleyTopo.png';
             transform = 'matrix(-96.80,0,0,-96.80,199951,199951)';
