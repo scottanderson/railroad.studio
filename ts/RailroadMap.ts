@@ -746,15 +746,15 @@ export class RailroadMap {
         let transform;
         if (this.railroad.settings.gameLevelName === 'LakeValley') {
             image = 'LakeValleyTopo.png';
-            transform = 'matrix(-92.74,0,0,-92.74,197453,197453)';
+            transform = 'matrix(-93.16,0,0,-93.16,197453,197453)';
             // image = 'LakeValleyMap2.png';
             // transform = 'matrix(-200,0,0,-200,200000,200000)';
         } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
             image = 'AuroraFallsTopo.png';
-            transform = 'matrix(-141.86,0,0,-141.86,300459,300899)';
+            transform = 'matrix(-139.13,0,0,-139.13,300900,300900)';
         } else {
             image = 'PineValleyTopo.png';
-            transform = 'matrix(-94.9,0,0,-94.9,199952,199952)';
+            transform = 'matrix(-96.80,0,0,-96.80,199951,199951)';
         }
         return this.layers.background
             .image(image)
