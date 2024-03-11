@@ -4,23 +4,12 @@ export function createFilter<C extends string>(
     onFilter: (category: C, value: boolean) => void,
     options?: [string, string][],
     onOption?: (value: string) => void,
+    checked?: { [k: string]: boolean },
+    selected?: string,
 ) {
     const form = document.createElement('form');
-    if (options && onOption) {
-        const select = document.createElement('select');
-        select.classList.add('form-select', 'mb-3');
-        for (const [value, text] of options) {
-            const option = document.createElement('option');
-            option.value = value;
-            option.textContent = text;
-            select.appendChild(option);
-        }
-        select.value = options[0][0];
-        select.addEventListener('change', () => onOption(select.value));
-        form.appendChild(select);
-    }
     const row = document.createElement('div');
-    row.classList.add('row');
+    row.classList.add('row', 'mb-3');
     categories.forEach((c: C) => {
         const col = document.createElement('div');
         col.classList.add('col-auto');
@@ -30,7 +19,7 @@ export function createFilter<C extends string>(
         input.id = `filter-${c}`;
         input.type = 'checkbox';
         input.title = c;
-        input.checked = true;
+        input.checked = (typeof checked === 'undefined') || checked[c];
         input.classList.add('form-check-input');
         input.addEventListener('click', () => {
             onFilter(c, input.checked);
@@ -45,5 +34,25 @@ export function createFilter<C extends string>(
         row.appendChild(col);
     });
     form.appendChild(row);
+    if (options && onOption) {
+        const select = document.createElement('select');
+        select.classList.add('form-select', 'mb-3');
+        for (const [value, text] of options) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            select.appendChild(option);
+        }
+        select.value = options[0][0];
+        if (typeof selected !== 'undefined') {
+            if (options.some(([k]) => k === selected) ) {
+                select.value = selected;
+            } else {
+                onOption(select.value);
+            }
+        }
+        select.addEventListener('change', () => onOption(select.value));
+        form.appendChild(select);
+    }
     return form;
 }
