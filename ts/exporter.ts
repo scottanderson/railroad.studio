@@ -63,7 +63,6 @@ const exportKeys = [
     'MarkerLightsRearRightStateArray',
     'NightLength',
     'Permissions',
-    'PlayerIds',
     'PlayerIDArray',
     'PlayerLocationArray',
     'PlayerMoneyArray',
