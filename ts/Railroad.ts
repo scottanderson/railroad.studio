@@ -1,4 +1,5 @@
 import {GvasHeader, GvasString, GvasText} from './Gvas';
+import {Permission} from './Permission';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
@@ -104,6 +105,7 @@ export interface Player {
     rotation?: number;
     money: number;
     xp: number;
+    permissions?: Permission;
 }
 
 export interface Prop {

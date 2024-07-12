@@ -1,3 +1,4 @@
+import {Permission} from './Permission';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
@@ -18,6 +19,7 @@ export interface Gvas {
     intArrays: Record<string, number[]>;
     ints: Record<string, number>;
     nameArrays: Record<string, GvasString[]>;
+    permissionArrays: Record<string, Permission[]>;
     rotatorArrays: Record<string, Rotator[]>;
     stringArrays: Record<string, GvasString[]>;
     strings: Record<string, GvasString>;
@@ -34,6 +36,7 @@ export type GvasTypes =
     | ['ArrayProperty', 'IntProperty']
     | ['ArrayProperty', 'NameProperty']
     | ['ArrayProperty', 'StrProperty']
+    | ['ArrayProperty', 'StructProperty', 'Permission']
     | ['ArrayProperty', 'StructProperty', 'Rotator']
     | ['ArrayProperty', 'StructProperty', 'Transform']
     | ['ArrayProperty', 'StructProperty', 'Vector']
