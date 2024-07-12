@@ -14,9 +14,9 @@
         "sync": "aws s3 sync railroad.studio s3://railroad.studio"
     },
     "devDependencies": {
-        "@svgdotjs/svg.js": "^3.2.0",
+        "@svgdotjs/svg.js": "^3.2.4",
         "@total-typescript/ts-reset": "^0.5.1",
-        "@typescript-eslint/eslint-plugin": "^7.11.0",
+        "@typescript-eslint/eslint-plugin": "^7.16.0",
         "eslint": "^8.57.0",
         "eslint-config-google": "^0.14.0",
         "eslint-webpack-plugin": "^4.2.0",
