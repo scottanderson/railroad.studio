@@ -11,6 +11,7 @@ import {
     FormatArgumentValue,
     gvasToString,
 } from './Gvas';
+import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
@@ -87,6 +88,7 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         intArrays: {},
         ints: {},
         nameArrays: {},
+        permissionArrays: {},
         rotatorArrays: {},
         stringArrays: {},
         strings: {},
@@ -247,6 +249,8 @@ function parseProperty(
         target.textArrays[pname] = read[4];
     } else if (read[3] !== 'StructProperty') {
         throw new Error(`Unexpected ArrayProperty type: ${read[3]}`);
+    } else if (read[4] === 'Permission') {
+        target.permissionArrays[pname] = read[5];
     } else if (read[4] === 'Vector') {
         target.vectorArrays[pname] = read[5];
     } else if (read[4] === 'Rotator') {
@@ -267,6 +271,7 @@ type ParsePropertyReturnType = (
     | [number, GvasString, 'ArrayProperty', 'IntProperty', number[]]
     | [number, GvasString, 'ArrayProperty', 'NameProperty', GvasString[]]
     | [number, GvasString, 'ArrayProperty', 'StrProperty', GvasString[]]
+    | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Permission', Permission[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Rotator', Rotator[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Transform', Transform[]]
     | [number, GvasString, 'ArrayProperty', 'StructProperty', 'Vector', Vector[]]
@@ -399,6 +404,8 @@ function readProperty(
             return [pos, pname, ptype, dtype, stype, sdata];
         } else if (stype === 'Transform') {
             return [pos, pname, ptype, dtype, stype, sdata];
+        } else if (stype === 'Permission') {
+            return [pos, pname, ptype, dtype, stype, sdata];
         } else {
             throw new Error(gvasToString(stype));
         }
@@ -450,6 +457,7 @@ type ParseStructArrayReturnType =
     | ['Rotator', Rotator[]]
     | ['Transform', Transform[]]
     | ['Vector', Vector[]]
+    | ['Permission', Permission[]]
     ;
 
 /**
@@ -568,6 +576,23 @@ function parseStructArray(
             const transform: Transform = {translation, rotation, scale3d};
             value.push(transform);
         }
+    } else if (fieldName === 'Permission') {
+        for (let i = 0; i < entryCount; i++) {
+            let pname;
+            const read = readProperty(buffer, pos, largeWorldCoords, true);
+            [pos, pname] = read;
+            if (pname !== 'Values') throw new Error(`Unexpected property entry: ${pname}`);
+
+            const none = readProperty(buffer, pos, largeWorldCoords, true);
+            [pos, pname] = none;
+            if (pname !== 'None') throw new Error(`Unexpected property entry: ${pname}`);
+
+            if (read[2] !== 'ArrayProperty') throw new Error(`Unexpected Property type: ${read[2]}`);
+            if (read[3] !== 'BoolProperty') throw new Error(`Unexpected ArrayProperty type: ${read[3]}`);
+            const values = read[4]!;
+            const permission: Permission = {values};
+            value.push(permission);
+        }
     } else {
         throw new Error(`Unknown field_name: ${fieldName}`);
     }
@@ -589,6 +614,8 @@ function parseStructArray(
         return [fieldName, value as Rotator[]];
     } else if (fieldName === 'Transform') {
         return [fieldName, value as Transform[]];
+    } else if (fieldName === 'Permission') {
+        return [fieldName, value as Permission[]];
     } else {
         throw new Error();
     }

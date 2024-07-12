@@ -9,6 +9,7 @@ import {
     GvasText,
     GvasTypes,
 } from './Gvas';
+import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Railroad} from './Railroad';
 import {Rotator} from './Rotator';
@@ -61,6 +62,8 @@ const exportKeys = [
     'MarkerLightsRearLeftStateArray',
     'MarkerLightsRearRightStateArray',
     'NightLength',
+    'Permissions',
+    'PlayerIds',
     'PlayerIDArray',
     'PlayerLocationArray',
     'PlayerMoneyArray',
@@ -172,6 +175,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
     const intArrays: Record<string, number[]> = {};
     const ints: Record<string, number> = {};
     const nameArrays: Record<string, GvasString[]> = {};
+    const permissionArrays: Record<string, Permission[]> = {};
     const rotatorArrays: Record<string, Rotator[]> = {};
     const stringArrays: Record<string, GvasString[]> = {};
     const strings: Record<string, GvasString> = {};
@@ -342,7 +346,12 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 intArrays[propertyName] = removeUndefinedTail(
                     railroad.frames.map((f) => f.state.paintType));
                 break;
+            case 'permissions':
+                permissionArrays[propertyName] = removeUndefinedTail(
+                    railroad.players.map((p) => p.permissions));
+                break;
             case 'playeridarray':
+            case 'playerids':
                 stringArrays[propertyName] = removeUndefinedTail(
                     railroad.players.map((p) => p.id));
                 break;
@@ -588,6 +597,7 @@ export function railroadToGvas(railroad: Railroad): Gvas {
         intArrays,
         ints,
         nameArrays,
+        permissionArrays,
         rotatorArrays,
         stringArrays,
         strings,
@@ -644,7 +654,9 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'markerlightsrearrightstatearray': return ['ArrayProperty', 'IntProperty'];
         case 'nightlength': return ['FloatProperty'];
         case 'painttypearray': return ['ArrayProperty', 'IntProperty'];
+        case 'permissions': return ['ArrayProperty', 'StructProperty', 'Permission'];
         case 'playeridarray': return ['ArrayProperty', 'StrProperty'];
+        case 'playerids': return ['ArrayProperty', 'StrProperty'];
         case 'playerlocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
         case 'playermoneyarray': return ['ArrayProperty', 'FloatProperty'];
         case 'playernamearray': return ['ArrayProperty', 'StrProperty'];
@@ -944,6 +956,9 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
     } else if (structType === 'Vector') {
         structs = gvas.vectorArrays[propertyName] || [];
         structSize = largeWorldCoords ? 24 : 12;
+    } else if (structType === 'Permission') {
+        structs = gvas.permissionArrays[propertyName] || [];
+        structSize = 76;
     } else {
         throw new Error('Unexpected structType: ' + structType);
     }
@@ -1001,6 +1016,18 @@ function structPropertyToBlob(structType: string, gvas: Gvas, propertyName: stri
             const v = struct as Vector;
             // Vector
             data.push(vectorToBlob(largeWorldCoords, v));
+        } else if (structType === 'Permission') {
+            const v = struct as Permission;
+            // Values
+            data.push(stringToBlob('Values'));
+            data.push(stringToBlob('ArrayProperty'));
+            data.push(new Uint32Array([4 + v.values.length, 0]));
+            data.push(stringToBlob('BoolProperty'));
+            data.push(new Uint8Array([0]));
+            data.push(new Uint32Array([v.values.length]));
+            data.push(new Uint8Array(v.values.map((v) => v ? 1 : 0)));
+            // End of properties list
+            data.push(stringToBlob('None'));
         } else {
             throw new Error(structType);
         }

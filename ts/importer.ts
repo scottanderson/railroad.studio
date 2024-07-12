@@ -257,7 +257,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const playerName = optionalMap(gvas.stringArrays, 'PlayerNameArray');
     const playerRotation = optionalMap(gvas.floatArrays, 'PlayerRotationArray');
     const playerXp = optionalMap(gvas.intArrays, 'PlayerXPArray');
-    if (playerId ?? playerLocation ?? playerMoney ?? playerName ?? playerXp) {
+    const permissions = optionalMap(gvas.permissionArrays, 'Permissions');
+    if (playerId ?? playerLocation ?? playerMoney ?? playerName ?? playerXp ?? permissions) {
         if (!playerLocation || !playerMoney || !playerName || !playerXp) {
             throw new Error('Some player values are missing');
         }
@@ -276,6 +277,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                 money: playerMoney[i],
                 rotation: optionalIndex(playerRotation, i),
                 xp: playerXp[i],
+                permissions: optionalIndex(permissions, i),
             };
             players.push(player);
         }
