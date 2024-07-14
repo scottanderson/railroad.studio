@@ -883,6 +883,7 @@ export class RailroadMap {
                                 e.preventDefault();
                                 return true;
                             }
+                            return false;
                         },
                         mousedown: (e) => {
                             if (this.toolMode === MapToolMode.tree_brush && this.brush) {
@@ -1335,7 +1336,7 @@ export class RailroadMap {
         }) => {
             const {center, location, radius, t, i} = curvature;
             const l = this.layers.radius;
-            if (radius > 120_00) return elements;
+            if (radius > 120_00) return;
             const bezier = catmullRomToBezier(spline, i);
             const cp0 = cubicBezier3(t - 0.01, bezier);
             const cp1 = cubicBezier3(t + 0.01, bezier);

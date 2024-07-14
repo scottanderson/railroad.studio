@@ -9,7 +9,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
-    // "noImplicitReturns": true,
+    "noImplicitReturns": true,
     "noImplicitThis": true,
     "noPropertyAccessFromIndexSignature": true,
     // "noUncheckedIndexedAccess": true,
