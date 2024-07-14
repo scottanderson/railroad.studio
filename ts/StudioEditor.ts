@@ -11,7 +11,7 @@ import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 export interface InputTextOptions {
     max?: string;
     min?: string;
-    step?: string;
+    step?: string | undefined;
 }
 
 export function bootstrapIcon(className: string, label: string) {

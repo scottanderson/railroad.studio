@@ -138,8 +138,8 @@ export class RailroadMap {
     private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
     private readonly setMapModified;
     private readonly setTitle: (title: string) => void;
-    private brush?: Circle;
-    private locator?: Circle;
+    private brush?: Circle | undefined;
+    private locator?: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
     private readonly mergeLimits: MergeLimits;
 
@@ -1003,8 +1003,8 @@ export class RailroadMap {
         return g;
     }
 
-    private gizmoDebugLine?: Line;
-    private gizmoDebugText?: Text;
+    private gizmoDebugLine?: Line | undefined;
+    private gizmoDebugText?: Text | undefined;
     private renderIndustry(industry: Industry) {
         const industryName = getIndustryName(industry);
         const tooltipText = isIndustryName(industryName) ?
