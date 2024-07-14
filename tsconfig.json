@@ -14,7 +14,7 @@
     "noPropertyAccessFromIndexSignature": true,
     // "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
-    // "noUnusedParameters": true,
+    "noUnusedParameters": true,
     "strict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,

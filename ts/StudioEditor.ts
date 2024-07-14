@@ -243,7 +243,7 @@ export function editNumbers(
     const vstack = document.createElement('div');
     vstack.classList.add('vstack');
     const inputs: HTMLInputElement[] = [];
-    value.forEach((v, i) => {
+    value.forEach((_, i) => {
         const input = document.createElement('input');
         inputs.push(input);
         input.type = 'number';
@@ -291,7 +291,7 @@ export function editNumbers(
 
 export function editIndustryProducts(
     studio: Studio,
-    type: string,
+    _type: string,
     labels: Quadruplet<string>,
     values: Quadruplet<number>,
     saveValue: (value: number[]) => number[],

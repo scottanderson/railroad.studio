@@ -793,7 +793,7 @@ export class RailroadMap {
     }
 
     private initPanZoom() {
-        const beforePan = (oldPan: Point, newPan: Point) => {
+        const beforePan = (_oldPan: Point, newPan: Point) => {
             const gutterWidth = 100;
             const gutterHeight = 100;
             // Computed variables

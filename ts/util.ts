@@ -39,7 +39,7 @@ export function stringToText(str: GvasString): GvasText {
     return {
         flags: 1,
         guid: RRO_TEXT_GUID,
-        pattern: lines.map((line, i) => '{' + i + '}').join('<br>'),
+        pattern: lines.map((_, i) => '{' + i + '}').join('<br>'),
         args: lines.map((line, i) => ({
             name: String(i),
             contentType: 2,
@@ -61,7 +61,7 @@ export function textToString(value: GvasText): GvasString {
         }
         if (value.pattern === null) throw new Error('Null pattern');
         return value.pattern.replace(/{(\d+)}/g,
-            (m, i) => value.args[Number(i)].values[0] ?? '');
+            (_, i) => value.args[Number(i)].values[0] ?? '');
     } else if ('key' in value) {
         // Base
         if (value.namespace !== '') throw new Error(`Unexpected unknown value: ${value.namespace}`);
