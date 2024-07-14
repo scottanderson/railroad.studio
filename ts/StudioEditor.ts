@@ -11,7 +11,7 @@ import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 export interface InputTextOptions {
     max?: string;
     min?: string;
-    step?: string;
+    step?: string | undefined;
 }
 
 export function bootstrapIcon(className: string, label: string) {
@@ -243,7 +243,7 @@ export function editNumbers(
     const vstack = document.createElement('div');
     vstack.classList.add('vstack');
     const inputs: HTMLInputElement[] = [];
-    value.forEach((v, i) => {
+    value.forEach((_, i) => {
         const input = document.createElement('input');
         inputs.push(input);
         input.type = 'number';
@@ -291,7 +291,7 @@ export function editNumbers(
 
 export function editIndustryProducts(
     studio: Studio,
-    type: string,
+    _type: string,
     labels: Quadruplet<string>,
     values: Quadruplet<number>,
     saveValue: (value: number[]) => number[],

@@ -59,7 +59,7 @@ export function gvasToString(gs: GvasString): string {
 export interface GvasHeader {
     gvasVersion: number;
     structureVersion: number;
-    unknownVersion?: number;
+    unknownVersion?: number | undefined;
     engineVersion: EngineVersion;
     customFormatVersion: number;
     customData: CustomData[];

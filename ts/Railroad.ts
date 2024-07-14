@@ -74,15 +74,15 @@ export interface NumericFrameState {
     compressorValveValue: number;
     generatorValveValue: number;
     headlightType: number;
-    markerLightsCenterState?: number;
+    markerLightsCenterState?: number | undefined;
     markerLightsFrontLeftState: number;
     markerLightsFrontRightState: number;
     markerLightsRearLeftState: number;
     markerLightsRearRightState: number;
-    paintType?: number;
+    paintType?: number | undefined;
     regulatorValue: number;
     reverserValue: number;
-    sanderAmount?: number;
+    sanderAmount?: number | undefined;
     smokestackType: number;
     tenderFuelAmount: number;
     tenderWaterAmount: number;
@@ -99,13 +99,13 @@ export interface Industry {
 }
 
 export interface Player {
-    id?: GvasString;
+    id?: GvasString | undefined;
     name: GvasString;
-    location?: Vector;
-    rotation?: number;
+    location?: Vector | undefined;
+    rotation?: number | undefined;
     money: number;
     xp: number;
-    permissions?: Permission;
+    permissions?: Permission | undefined;
 }
 
 export interface Prop {
@@ -133,14 +133,14 @@ export interface Spline {
 
 export interface SplineTrack {
     endPoint: Vector;
-    endSpline1Id?: number;
-    endSpline2Id?: number;
+    endSpline1Id?: number | undefined;
+    endSpline2Id?: number | undefined;
     endTangent: Vector;
     location: Vector;
     paintStyle: number;
     rotation: Rotator;
     startPoint: Vector;
-    startSplineId?: number;
+    startSplineId?: number | undefined;
     startTangent: Vector;
     switchState: number;
     type: GvasString;
@@ -174,7 +174,7 @@ export enum SwitchType {
 }
 
 export interface Turntable {
-    deckRotation?: Rotator;
+    deckRotation?: Rotator | undefined;
     location: Vector;
     rotator: Rotator;
     type: TurntableType | GvasString;

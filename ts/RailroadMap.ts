@@ -138,8 +138,8 @@ export class RailroadMap {
     private readonly layerVisibility = DEFAULT_LAYER_VISIBILITY;
     private readonly setMapModified;
     private readonly setTitle: (title: string) => void;
-    private brush?: Circle;
-    private locator?: Circle;
+    private brush?: Circle | undefined;
+    private locator?: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
     private readonly mergeLimits: MergeLimits;
 
@@ -793,7 +793,7 @@ export class RailroadMap {
     }
 
     private initPanZoom() {
-        const beforePan = (oldPan: Point, newPan: Point) => {
+        const beforePan = (_oldPan: Point, newPan: Point) => {
             const gutterWidth = 100;
             const gutterHeight = 100;
             // Computed variables
@@ -883,6 +883,7 @@ export class RailroadMap {
                                 e.preventDefault();
                                 return true;
                             }
+                            return false;
                         },
                         mousedown: (e) => {
                             if (this.toolMode === MapToolMode.tree_brush && this.brush) {
@@ -1003,8 +1004,8 @@ export class RailroadMap {
         return g;
     }
 
-    private gizmoDebugLine?: Line;
-    private gizmoDebugText?: Text;
+    private gizmoDebugLine?: Line | undefined;
+    private gizmoDebugText?: Text | undefined;
     private renderIndustry(industry: Industry) {
         const industryName = getIndustryName(industry);
         const tooltipText = isIndustryName(industryName) ?
@@ -1335,7 +1336,7 @@ export class RailroadMap {
         }) => {
             const {center, location, radius, t, i} = curvature;
             const l = this.layers.radius;
-            if (radius > 120_00) return elements;
+            if (radius > 120_00) return;
             const bezier = catmullRomToBezier(spline, i);
             const cp0 = cubicBezier3(t - 0.01, bezier);
             const cp1 = cubicBezier3(t + 0.01, bezier);
