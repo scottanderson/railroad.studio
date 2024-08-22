@@ -10,12 +10,26 @@
         "ecmaVersion": "latest",
         "sourceType": "script"
     },
-    "plugins": ["@typescript-eslint"],
+    "plugins": ["@stylistic/ts", "@typescript-eslint"],
     "rules": {
-        "@typescript-eslint/indent": ["error"],
-        "@typescript-eslint/no-explicit-any": ["error"],
-        "@typescript-eslint/no-inferrable-types": ["error"],
-        "@typescript-eslint/no-require-imports": ["error"],
+        "@stylistic/ts/indent": "error",
+        "@stylistic/ts/semi": "error",
+        "@stylistic/ts/space-infix-ops": ["error", { "int32Hint": false }],
+        "@stylistic/ts/type-annotation-spacing": [
+            "error",
+            {
+                "before": true,
+                "after": true,
+                "overrides": {
+                    "colon": {
+                        "before": false
+                    }
+                }
+            }
+        ],
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/no-inferrable-types": "error",
+        "@typescript-eslint/no-require-imports": "error",
         "@typescript-eslint/no-type-alias": [
             "error",
             {
@@ -29,39 +43,24 @@
                 "allowTupleTypes": "always"
             }
         ],
-        "@typescript-eslint/no-unnecessary-type-assertion": ["error"],
-        "@typescript-eslint/no-unsafe-argument": ["error"],
-        "@typescript-eslint/no-unsafe-assignment": ["error"],
-        "@typescript-eslint/no-unsafe-member-access": ["error"],
-        "@typescript-eslint/no-unused-vars": ["error"],
-        "@typescript-eslint/prefer-as-const": ["error"],
-        "@typescript-eslint/prefer-for-of": ["error"],
-        "@typescript-eslint/prefer-function-type": ["error"],
-        "@typescript-eslint/prefer-includes": ["error"],
-        "@typescript-eslint/prefer-literal-enum-member": ["error"],
-        "@typescript-eslint/prefer-nullish-coalescing": ["error"],
-        "@typescript-eslint/semi": ["error"],
-        "@typescript-eslint/space-infix-ops": ["error", { "int32Hint": false }],
-        "@typescript-eslint/type-annotation-spacing": [
-            "error",
-            {
-                "before": true,
-                "after": true,
-                "overrides": {
-                    "colon": {
-                        "before": false
-                    }
-                }
-            }
-        ],
+        "@typescript-eslint/no-unnecessary-type-assertion": "error",
+        "@typescript-eslint/no-unsafe-argument": "error",
+        "@typescript-eslint/no-unsafe-assignment": "error",
+        "@typescript-eslint/no-unsafe-member-access": "error",
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/prefer-as-const": "error",
+        "@typescript-eslint/prefer-for-of": "error",
+        "@typescript-eslint/prefer-function-type": "error",
+        "@typescript-eslint/prefer-includes": "error",
+        "@typescript-eslint/prefer-literal-enum-member": "error",
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
         "eqeqeq": "error",
-        "indent": "off", // @typescript-eslint/indent
+        "indent": "off", // @stylistic/ts/indent
         "max-len": ["error", { "code": 120 }],
         "no-constant-condition": "off",
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
         "require-jsdoc": "off",
-        "semi": "off", // @typescript-eslint/semi
-        "space-infix-ops": ["off"]
+        "space-infix-ops": "off"
     }
 }
