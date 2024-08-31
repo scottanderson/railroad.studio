@@ -1,5 +1,6 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryName, IndustryNames, IndustryType, industryNames, isIndustryName} from './industries';
+import {Permission, permissionEqual, permissionLabels, permissionToString} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
 import {Rotator} from './Rotator';
@@ -108,6 +109,76 @@ export function editNumber(
         return false;
     };
     const [pre, save, cancel] = saveContext(studio, input, onSave, onCancel, formatValue);
+    return pre;
+}
+
+export function editPermissions(
+    studio: Studio,
+    value: Permission | undefined,
+    saveValue: (value: Permission | undefined) => Permission | undefined,
+) {
+    const formatValue = () => permissionToString(value);
+    const vstack = document.createElement('div');
+    vstack.classList.add('vstack', 'gap-2');
+    const inputs: HTMLInputElement[] = [];
+    const fromValue: number = value?.values.length ?? 0;
+    const fromKnown = permissionLabels.length;
+    for (let i = 0; i < Math.max(fromValue, fromKnown); i++) {
+        const hstack = document.createElement('div');
+        hstack.classList.add('hstack', 'gap-2');
+        const input = document.createElement('input');
+        input.id = `permission${i}-${Math.random().toString(36).substr(2, 16)}`;
+        input.type = 'checkbox';
+        input.title = i < permissionLabels.length ? permissionLabels[i] : `Unknown permission ${i}`;
+        input.checked = typeof value !== 'undefined' && value.values[i];
+        input.addEventListener('keydown', (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                save();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                cancel();
+            }
+        });
+        inputs.push(input);
+        const label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.innerText = input.title;
+        hstack.replaceChildren(input, label);
+        vstack.appendChild(hstack);
+    }
+    const getValue = (): Permission | undefined => {
+        const values = inputs.map((input) => input.checked);
+        return {values};
+    };
+    const onSave = () => {
+        value = getValue();
+        value = saveValue(value);
+        return onCancel();
+    };
+    const onCancel = () => {
+        const inputValue = getValue();
+        if (inputValue !== value) {
+            // Restore the original value
+            inputs.forEach((input, i) => {
+                input.checked = typeof value !== 'undefined' && value.values[i];
+            });
+            if (permissionEqual(inputValue, getValue())) {
+                // No effect. Close the edit control
+                return false;
+            }
+            return true;
+        }
+        // Close the edit control
+        return false;
+    };
+    const preview = document.createElement('pre');
+    preview.classList.add('mb-0');
+    preview.textContent = formatValue();
+    const form = document.createElement('form');
+    form.classList.add('form-group', 'w-100');
+    form.replaceChildren(vstack);
+    const [pre, save, cancel] = saveContext(studio, form, onSave, onCancel, formatValue);
     return pre;
 }
 
