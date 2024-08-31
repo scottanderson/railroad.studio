@@ -2,6 +2,7 @@ import {createFilter} from './Filter';
 import {calculateSteepestGrade} from './Grade';
 import {GvasString, GvasText, gvasToString} from './Gvas';
 import {createPager} from './Pager';
+import {Permission} from './Permission';
 import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {Rotator} from './Rotator';
@@ -13,6 +14,7 @@ import {
     editIndustryProducts,
     editIndustryType,
     editNumber,
+    editPermissions,
     editQuaternion,
     editRotator,
     editSlider,
@@ -1533,7 +1535,10 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
-        for (const columnHeader of ['Steam ID', 'Name', 'Money', 'XP', 'Location']) {
+        const hasPermissions = this.railroad.players.some((player) => typeof player.permissions !== 'undefined');
+        const columnHeaders = ['Steam ID', 'Name', 'Money', 'XP', 'Location'];
+        if (hasPermissions) columnHeaders.push('Permissions');
+        for (const columnHeader of columnHeaders) {
             const th = document.createElement('th');
             th.textContent = columnHeader;
             tr.appendChild(th);
@@ -1571,6 +1576,13 @@ export class Studio {
                 td = document.createElement('td');
                 const setPlayerRotation = (r: number) => player.rotation = r;
                 td.replaceChildren(editNumber(this, player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
+                tr.appendChild(td);
+            }
+            // Permissions
+            if (hasPermissions) {
+                td = document.createElement('td');
+                const setPlayerPermissions = (p: Permission | undefined) => player.permissions = p;
+                td.appendChild(editPermissions(this, player.permissions, setPlayerPermissions));
                 tr.appendChild(td);
             }
         }

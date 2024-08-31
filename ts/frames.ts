@@ -1699,6 +1699,7 @@ export const cargoLimits = {
     },
     VentilatedBoxcarCC: {
         ['EFreightType::Meat']: 36,
+        ['EFreightType::None']: 0,
     },
 } as const satisfies PRO<FrameType, PRO<CargoType, number>>;
 
