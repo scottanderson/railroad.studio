@@ -16,6 +16,7 @@ import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
+import {checkSaveType} from './importer';
 
 /**
  * Parses a GVAS file stored in an ArrayBuffer and returns an object with the
@@ -75,6 +76,7 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
         customData,
         saveType,
     };
+    checkSaveType(header);
     const result: Gvas = {
         _header: header,
         _order: [],
