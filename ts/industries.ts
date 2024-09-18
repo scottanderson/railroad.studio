@@ -125,12 +125,12 @@ const legacyIndustryNames: Record<IndustryType, IndustryName> = {
  * Lookup table for legacy industry names.
  */
 const legacyIndustryMap: Record<string, IndustryName> = {
-    'SandHouse': 'Sandhouse',
-    'Waterwell': 'WaterWell',
     'enginehouse_alpine_blue': 'enginehouse_alpine',
     'enginehouse_aspen_gold': 'enginehouse_aspen',
     'enginehouse_barn_red': 'enginehouse_barn',
     'enginehouse_princes_mineral_brown': 'enginehouse_princess',
+    'SandHouse': 'Sandhouse',
+    'Waterwell': 'WaterWell',
 };
 
 export const isIndustryName = (name: IndustryType | GvasString): name is IndustryName =>
