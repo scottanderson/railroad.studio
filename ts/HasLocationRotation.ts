@@ -11,9 +11,9 @@ export interface HasLocationRotation {
 export function localToWorld(transform: HasLocationRotation, curve: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = curve;
     return {
-        startPoint: vectorSum(transform.location, rotateVector(startPoint, transform.rotation)),
         endPoint: vectorSum(transform.location, rotateVector(endPoint, transform.rotation)),
-        startTangent: rotateVector(startTangent, transform.rotation),
         endTangent: rotateVector(endTangent, transform.rotation),
+        startPoint: vectorSum(transform.location, rotateVector(startPoint, transform.rotation)),
+        startTangent: rotateVector(startTangent, transform.rotation),
     };
 }

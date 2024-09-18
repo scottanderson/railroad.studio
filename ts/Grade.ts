@@ -37,7 +37,7 @@ export function calculateGrade(controlPoints: Vector[]): Grade[] {
         const dz = controlPoints[i + 1].z - cp.z;
         const length = Math.sqrt((dx * dx) + (dy * dy));
         const grade = Math.abs(dz) / length;
-        return {length, height: dz, grade};
+        return {grade, height: dz, length};
     });
 }
 

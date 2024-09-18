@@ -746,11 +746,11 @@ export class Studio {
             isFrameType(f.type) && (frameDefinitions[f.type][c] ?? false);
         const labels = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
-            tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
-            handcar: `Handcars (${railroad.frames.filter((f) => frameInCategory(f, 'handcar')).length})`,
             freight: `Freight (${railroad.frames.filter((f) => frameInCategory(f, 'freight')).length})`,
-            passenger: `Passenger (${railroad.frames.filter((f) => frameInCategory(f, 'passenger')).length})`,
+            handcar: `Handcars (${railroad.frames.filter((f) => frameInCategory(f, 'handcar')).length})`,
             mow: `Maintenance (${railroad.frames.filter((f) => frameInCategory(f, 'mow')).length})`,
+            passenger: `Passenger (${railroad.frames.filter((f) => frameInCategory(f, 'passenger')).length})`,
+            tender: `Tenders (${railroad.frames.filter((f) => frameInCategory(f, 'tender')).length})`,
         };
         const anyInCategory = (c: typeof frameCategories[number]): boolean =>
             railroad.frames.some((f) => frameInCategory(f, c));
@@ -1020,8 +1020,8 @@ export class Studio {
                     !spline.type.includes('switch') &&
                     !spline.type.includes('bumper'))
                 .map((spline) => {
-                    const {startPoint, startTangent, endPoint, endTangent} = spline;
-                    return {startPoint, startTangent, endPoint, endTangent};
+                    const {endPoint, endTangent, startPoint, startTangent} = spline;
+                    return {endPoint, endTangent, startPoint, startTangent};
                 }),
         );
         // Calculate minimum radius
@@ -1216,8 +1216,8 @@ export class Studio {
                         tooltip = `Expected ${key} to in range [${minValue}, ${maxValue}]`;
                     }
                     const options: InputTextOptions = {
-                        min: String(minValue),
                         max: String(maxValue),
+                        min: String(minValue),
                         step: 'step' in meta && meta.step ? String(meta.step) : undefined,
                     };
                     const displayValue = (value: number) => Number.isInteger(value) ? String(value) : value.toFixed(1);
@@ -1290,7 +1290,7 @@ export class Studio {
                     const limits: Partial<Record<CargoType, number>> = cargoLimits[frame.type];
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
-                    const options: InputTextOptions = {min: '0', max};
+                    const options: InputTextOptions = {max, min: '0'};
                     const form = editNumber(this, frame.state.freightAmount, options, setAmount);
                     if (isCargoType(freightType) &&
                         typeof limits[freightType] !== 'undefined' &&
@@ -1577,7 +1577,8 @@ export class Studio {
             if (player.rotation) {
                 td = document.createElement('td');
                 const setPlayerRotation = (r: number) => player.rotation = r;
-                td.replaceChildren(editNumber(this, player.rotation, {min: '-180', max: '180'}, setPlayerRotation));
+                const options: InputTextOptions = {max: '180', min: '-180'};
+                td.replaceChildren(editNumber(this, player.rotation, options, setPlayerRotation));
                 tr.appendChild(td);
             }
             // Permissions

@@ -385,6 +385,7 @@ export function editQuaternion(
     saveValue: (value: Quaternion) => Quaternion,
 ) {
     const encode = (v: Quaternion): number[] => [v.x, v.y, v.z, v.w];
+    // eslint-disable-next-line sort-keys
     const decode = (t: number[]): Quaternion => fp32q({x: t[0], y: t[1], z: t[2], w: t[3]});
     const display = (t: number[]) => {
         const xZero = t[0] === 0;
@@ -406,6 +407,7 @@ export function editRotator(
     saveValue: (value: Rotator) => Rotator,
 ) {
     const encode = (r: Rotator): number[] => [r.roll, r.yaw, r.pitch];
+    // eslint-disable-next-line sort-keys
     const decode = (t: number[]): Rotator => fp32r({roll: t[0], yaw: t[1], pitch: t[2]});
     const display = (t: number[]) => {
         if (t[0] === 0 && t[2] === 0) {

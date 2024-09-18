@@ -139,13 +139,6 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     '622D': {
         engine: true,
         length: 760,
-        name: 'D&RGW Class 48',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -162,34 +155,34 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 144,
             tenderWaterAmount: 1600,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'D&RGW Class 48',
     },
 
     'boxcar': {
         freight: true,
         length: 822.82,
-        name: 'Boxcar',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
-    },
-
-    'caboose': {
-        length: 679,
-        name: 'Bobber Caboose',
-        passenger: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Boxcar',
+    },
+
+    'caboose': {
+        length: 679,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 50,
@@ -207,18 +200,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
             tenderFuelAmount: 15,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Bobber Caboose',
+        passenger: true,
     },
 
     'Class125': {
         engine: true,
         length: 1097,
-        name: 'D&RGW Class 125',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -236,18 +229,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 7,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'D&RGW Class 125',
     },
 
     'Class125_Tender': {
         coal: true,
-        tender: true,
         length: 720,
-        name: 'D&RGW Class 125 Tender',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 10,
@@ -256,19 +249,19 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 7000,
             tenderWaterAmount: 9500,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'D&RGW Class 125 Tender',
+        tender: true,
     },
 
     'Class47': {
         coal: true,
         engine: true,
         length: 932,
-        name: 'D&RG Class 47',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -285,18 +278,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 8,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'D&RG Class 47',
     },
 
     'Class47_Tender': {
         coal: true,
         length: 672,
-        name: 'D&RG Class 47 Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 8,
@@ -305,18 +298,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 5000,
             tenderWaterAmount: 5000,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'D&RG Class 47 Tender',
+        tender: true,
     },
 
     'class70': {
         engine: true,
-        name: 'D&RG Class 70',
         length: 892,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 100,
@@ -326,26 +319,26 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             brakeValue: 1,
             compressorAirPressure: 100,
             compressorValveValue: 1,
+            headlightType: 3,
             markerLightsFrontLeftState: 3,
             markerLightsFrontRightState: 3,
             paintType: 3,
             regulatorValue: 1,
             reverserValue: 1,
-            headlightType: 3,
             sanderAmount: 100,
             smokestackType: 3,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'D&RG Class 70',
     },
 
     'class70_tender': {
         length: 654,
-        name: 'Class 70 Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -356,18 +349,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 1350,
             tenderWaterAmount: 9500,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Class 70 Tender',
+        tender: true,
     },
 
     'climax': {
         engine: true,
         length: 850,
-        name: 'Climax',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
@@ -378,50 +371,50 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             compressorAirPressure: 100,
             compressorValveValue: 1,
             generatorValveValue: 1,
+            headlightType: 1,
             paintType: 1,
             regulatorValue: 1,
             reverserValue: 1,
-            headlightType: 1,
             sanderAmount: 100,
             smokestackType: 3,
             tenderFuelAmount: 332,
             tenderWaterAmount: 3000,
         },
-    },
-
-    'coach_dsprr_1': {
-        passenger: true,
-        length: 1420,
-        width: 300,
-        name: 'Coach DSP&P RR No. 57',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 5,
-            smokestackType: 1,
-            markerLightsCenterState: 3,
-            markerLightsFrontLeftState: 3,
-            markerLightsFrontRightState: 3,
-            markerLightsRearLeftState: 3,
-            markerLightsRearRightState: 3,
-        },
-    },
-
-    'cooke260': {
-        engine: true,
-        length: 834,
-        name: 'Cooke Mogul Wood',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Climax',
+    },
+
+    'coach_dsprr_1': {
+        length: 1420,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            markerLightsCenterState: 3,
+            markerLightsFrontLeftState: 3,
+            markerLightsFrontRightState: 3,
+            markerLightsRearLeftState: 3,
+            markerLightsRearRightState: 3,
+            paintType: 5,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Coach DSP&P RR No. 57',
+        passenger: true,
+        width: 300,
+    },
+
+    'cooke260': {
+        engine: true,
+        length: 834,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
@@ -438,19 +431,19 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 3,
         },
-    },
-
-    'cooke260_new': {
-        coal: true,
-        engine: true,
-        length: 834,
-        name: 'Cooke Mogul Coal',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Cooke Mogul Wood',
+    },
+
+    'cooke260_new': {
+        coal: true,
+        engine: true,
+        length: 834,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
@@ -468,18 +461,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 5,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Cooke Mogul Coal',
     },
 
     'cooke260_new_tender': {
         coal: true,
         length: 642,
-        name: 'Cooke Mogul Coal Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -490,39 +483,39 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 6000,
             tenderWaterAmount: 9500,
         },
-    },
-
-    'cooke260_tender': {
-        length: 642,
-        name: 'Cooke Mogul Wood Tender',
-        tender: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Cooke Mogul Coal Tender',
+        tender: true,
+    },
+
+    'cooke260_tender': {
+        length: 642,
         max: {
             brakeValue: 1,
             headlightType: 1,
             markerLightsRearLeftState: 3,
             markerLightsRearRightState: 3,
             paintType: 1,
+            smokestackType: 1,
             tenderFuelAmount: 1460,
             tenderWaterAmount: 9500,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
             smokestackType: 1,
         },
+        name: 'Cooke Mogul Wood Tender',
+        tender: true,
     },
 
     'cooke280': {
         engine: true,
-        name: 'Cooke Consolidation',
         length: 870,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -541,17 +534,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 4,
         },
-    },
-
-    'cooke280_tender': {
-        tender: true,
-        name: 'Cooke Consolidation Tender',
-        length: 616,
         min: {
             headlightType: 1,
             paintType: 1,
+            reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Cooke Consolidation',
+    },
+
+    'cooke280_tender': {
+        length: 616,
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -562,51 +555,52 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 1428,
             tenderWaterAmount: 9500,
         },
-    },
-
-    'DRGW_Gondola_33FT': {
-        length: 1030,
-        name: 'D&RGW 33FT Gondola',
-        freight: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Cooke Consolidation Tender',
+        tender: true,
+    },
+
+    'DRGW_Gondola_33FT': {
+        freight: true,
+        length: 1030,
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 4,
             smokestackType: 1,
         },
-    },
-    'dspp_baggage': {
-        length: 1400,
-        name: 'DSP&P Baggage Car',
-        freight: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'D&RGW 33FT Gondola',
+    },
+
+    'dspp_baggage': {
+        freight: true,
+        length: 1400,
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 2,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'DSP&P Baggage Car',
     },
 
     'eureka': {
         engine: true,
         length: 802.13,
-        name: 'Eureka',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -623,17 +617,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Eureka',
     },
 
     'eureka_tender': {
         length: 497,
-        name: 'Eureka Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -644,19 +638,19 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 499,
             tenderWaterAmount: 3800,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Eureka Tender',
+        tender: true,
     },
 
     'Ferries242T': {
         coal: true,
         engine: true,
         length: 872,
-        name: 'Ferries & Cliff House 2-4-2T',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -674,103 +668,103 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 7,
             tenderFuelAmount: 1000,
         },
-    },
-
-    'flatcar_cordwood': {
-        freight: true,
-        length: 785.6,
-        name: 'Flatcar Tier 3',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 7,
-            smokestackType: 1,
-        },
-    },
-
-    'flatcar_hopper': {
-        freight: true,
-        length: 785.6,
-        name: 'Hopper',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-    },
-
-    'flatcar_logs': {
-        freight: true,
-        length: 818,
-        name: 'Flatcar Tier 1',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 7,
-            smokestackType: 1,
-        },
-    },
-
-    'flatcar_stakes': {
-        freight: true,
-        length: 785.6,
-        name: 'Flatcar Tier 2',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 7,
-            smokestackType: 1,
-        },
-    },
-
-    'flatcar_tanker': {
-        freight: true,
-        length: 804,
-        name: 'Tanker',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 10,
-            smokestackType: 1,
-        },
-    },
-
-    'glenbrook': {
-        engine: true,
-        length: 837.83,
-        name: 'Glenbrook',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Ferries & Cliff House 2-4-2T',
+    },
+
+    'flatcar_cordwood': {
+        freight: true,
+        length: 785.6,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Flatcar Tier 3',
+    },
+
+    'flatcar_hopper': {
+        freight: true,
+        length: 785.6,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Hopper',
+    },
+
+    'flatcar_logs': {
+        freight: true,
+        length: 818,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Flatcar Tier 1',
+    },
+
+    'flatcar_stakes': {
+        freight: true,
+        length: 785.6,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Flatcar Tier 2',
+    },
+
+    'flatcar_tanker': {
+        freight: true,
+        length: 804,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 10,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Tanker',
+    },
+
+    'glenbrook': {
+        engine: true,
+        length: 837.83,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -787,17 +781,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 5,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Glenbrook',
     },
 
     'glenbrook_tender': {
         length: 505,
-        name: 'Glenbrook Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -806,18 +800,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 798,
             tenderWaterAmount: 3800,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Glenbrook Tender',
+        tender: true,
     },
 
     'handcar': {
         handcar: true,
         length: 235,
-        name: 'Handcar',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerPressure: 120,
             boilerWaterLevel: 100,
@@ -830,18 +824,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
             tenderFuelAmount: 20,
         },
-    },
-
-    'heisler': {
-        engine: true,
-        length: 913.73,
-        name: 'Heisler',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Handcar',
+    },
+
+    'heisler': {
+        engine: true,
+        length: 913.73,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
@@ -860,36 +854,36 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 454,
             tenderWaterAmount: 3000,
         },
-    },
-
-    'hopperBB': {
-        freight: true,
-        length: 760,
-        name: 'Carter Brothers Drop-Bottom Hopper',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 7,
-            smokestackType: 1,
-        },
-    },
-
-    'lima280': {
-        coal: true,
-        engine: true,
-        length: 950,
-        name: 'Lima 2-8-0',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Heisler',
+    },
+
+    'hopperBB': {
+        freight: true,
+        length: 760,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Carter Brothers Drop-Bottom Hopper',
+    },
+
+    'lima280': {
+        coal: true,
+        engine: true,
+        length: 950,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -904,18 +898,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 4,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Lima 2-8-0',
     },
 
     'lima280_tender': {
         coal: true,
         length: 620,
-        name: 'Lima 2-8-0 Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -924,18 +918,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 5400,
             tenderWaterAmount: 9000,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Lima 2-8-0 Tender',
+        tender: true,
     },
 
     'montezuma': {
         engine: true,
         length: 710,
-        name: 'Montezuma',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -950,17 +944,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 3,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Montezuma',
     },
 
     'montezuma_tender': {
         length: 420,
-        name: 'Montezuma Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -969,18 +963,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 470,
             tenderWaterAmount: 5900,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Montezuma Tender',
+        tender: true,
     },
 
     'mosca': {
         engine: true,
         length: 852,
-        name: 'Mosca',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -995,17 +989,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 5,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Mosca',
     },
 
     'mosca_tender': {
         length: 530,
-        name: 'Mosca Tender',
-        tender: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -1014,187 +1008,187 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 854,
             tenderWaterAmount: 3800,
         },
-    },
-
-    'OahuWaterCar': {
-        length: 428,
-        name: 'Oahu Water Car',
-        freight: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Mosca Tender',
+        tender: true,
+    },
+
+    'OahuWaterCar': {
+        freight: true,
+        length: 428,
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Oahu Water Car',
     },
 
     'plantationcar_boxcar': {
         freight: true,
         length: 420,
-        name: 'EWA Plantation Box Car',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'EWA Plantation Box Car',
     },
 
     'plantationcar_flatcar': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Cane Flat',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Cane Flat',
     },
 
     'plantationcar_flatcar_logs': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Logging Flat',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Logging Flat',
     },
 
     'plantationcar_flatcar_stakes': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Stake Flat',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Stake Flat',
     },
 
     'plantationcar_flatcar_stakes_bulkhead': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Bulkhead Flat',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Bulkhead Flat',
     },
 
     'plantationcar_hopper_large': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Lowside Gondola',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Lowside Gondola',
     },
 
     'plantationcar_hopper_medium': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Medium Gondola',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Medium Gondola',
     },
 
     'plantationcar_hopper_small': {
         freight: true,
         length: 420,
-        name: 'Gregg Sugar Cane Highside Gondola',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Gregg Sugar Cane Highside Gondola',
     },
 
     'plantationcar_tanker': {
         freight: true,
         length: 420,
-        name: 'Waualua Agricultural Tank Car',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 7,
             smokestackType: 1,
         },
-    },
-
-    'plow': {
-        length: 530,
-        name: 'Snow Plow',
-        mow: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Waualua Agricultural Tank Car',
+    },
+
+    'plow': {
+        length: 530,
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -1203,18 +1197,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             paintType: 4,
             smokestackType: 1,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        mow: true,
+        name: 'Snow Plow',
     },
 
     'porter_040': {
         engine: true,
         length: 391.2,
-        name: 'Porter',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 50,
@@ -1231,16 +1225,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 66,
             tenderWaterAmount: 800,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'Porter',
     },
 
     'porter_042': {
         engine: true,
         length: 461.35,
-        name: 'Porter 2',
-        min: {
-            paintType: 1,
-            reverserValue: -1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 50,
@@ -1257,19 +1253,17 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 164,
             tenderWaterAmount: 800,
         },
+        min: {
+            paintType: 1,
+            reverserValue: -1,
+        },
+        name: 'Porter 2',
     },
 
     'rubybasin': {
         coal: true,
         engine: true,
         length: 1029,
-        name: 'Ruby Basin',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            reverserValue: -1,
-            smokestackType: 1,
-        },
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -1287,18 +1281,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 1000,
             tenderWaterAmount: 3785,
         },
-    },
-
-    'shay': {
-        engine: true,
-        length: 804,
-        name: 'Shay',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Ruby Basin',
+    },
+
+    'shay': {
+        engine: true,
+        length: 804,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
@@ -1315,86 +1309,86 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 317,
             tenderWaterAmount: 3000,
         },
-    },
-
-    'SideDumpCar': {
-        length: 330,
-        name: 'Westside Lumber Co. Side Dump car',
-        freight: true,
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 5,
-            smokestackType: 1,
-        },
-    },
-
-    'skeletoncar': {
-        freight: true,
-        length: 635,
-        name: 'Skeleton Car',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 6,
-            smokestackType: 1,
-        },
-    },
-
-    'stockcar': {
-        freight: true,
-        length: 932,
-        name: 'Stock Car',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 7,
-            smokestackType: 1,
-        },
-    },
-
-    'tankcarNCO': {
-        freight: true,
-        length: 993,
-        name: 'Coffin Tank Car',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
-        max: {
-            brakeValue: 1,
-            headlightType: 1,
-            paintType: 5,
-            smokestackType: 1,
-        },
-    },
-
-    'tenmile': {
-        engine: true,
-        length: 1174,
-        name: 'Tenmile',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Shay',
+    },
+
+    'SideDumpCar': {
+        freight: true,
+        length: 330,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 5,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Westside Lumber Co. Side Dump car',
+    },
+
+    'skeletoncar': {
+        freight: true,
+        length: 635,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 6,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Skeleton Car',
+    },
+
+    'stockcar': {
+        freight: true,
+        length: 932,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 7,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Stock Car',
+    },
+
+    'tankcarNCO': {
+        freight: true,
+        length: 993,
+        max: {
+            brakeValue: 1,
+            headlightType: 1,
+            paintType: 5,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'Coffin Tank Car',
+    },
+
+    'tenmile': {
+        engine: true,
+        length: 1174,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -1412,19 +1406,19 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 3320,
             tenderWaterAmount: 1200,
         },
-    },
-
-    'tweetsie280': {
-        coal: true,
-        engine: true,
-        length: 914,
-        name: 'ET&WNC 2-8-0',
         min: {
             headlightType: 1,
             paintType: 1,
             reverserValue: -1,
             smokestackType: 1,
         },
+        name: 'Tenmile',
+    },
+
+    'tweetsie280': {
+        coal: true,
+        engine: true,
+        length: 914,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
@@ -1442,18 +1436,18 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             sanderAmount: 100,
             smokestackType: 3,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'ET&WNC 2-8-0',
     },
 
     'tweetsie280_tender': {
         coal: true,
-        tender: true,
         length: 669,
-        name: 'ET&WNC 2-8-0 Tender',
-        min: {
-            headlightType: 1,
-            paintType: 1,
-            smokestackType: 1,
-        },
         max: {
             brakeValue: 1,
             headlightType: 1,
@@ -1462,51 +1456,51 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             tenderFuelAmount: 6000,
             tenderWaterAmount: 9500,
         },
-    },
-
-    'VentilatedBoxcarCC': {
-        length: 916,
-        name: 'Ventilated Boxcar',
-        freight: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'ET&WNC 2-8-0 Tender',
+        tender: true,
+    },
+
+    'VentilatedBoxcarCC': {
+        freight: true,
+        length: 916,
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 6,
             smokestackType: 1,
         },
-    },
-
-    'WaterCar': {
-        length: 876,
-        name: 'Water Car',
-        freight: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Ventilated Boxcar',
+    },
+
+    'WaterCar': {
+        freight: true,
+        length: 876,
         max: {
             brakeValue: 1,
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
-    },
-
-    'waycar': {
-        length: 615,
-        name: 'DSP&P Waycar',
-        passenger: true,
         min: {
             headlightType: 1,
             paintType: 1,
             smokestackType: 1,
         },
+        name: 'Water Car',
+    },
+
+    'waycar': {
+        length: 615,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 50,
@@ -1523,6 +1517,13 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
             tenderFuelAmount: 25,
         },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'DSP&P Waycar',
+        passenger: true,
     },
 };
 
@@ -1560,8 +1561,8 @@ export const frameStateMetadata = {
     },
     brakeValue: {
         name: 'Brake',
-        type: 'slider',
         step: 0.01,
+        type: 'slider',
     },
     compressorAirPressure: {
         name: 'Compressor Air Pressure',
@@ -1570,13 +1571,13 @@ export const frameStateMetadata = {
     },
     compressorValveValue: {
         name: 'Compressor',
-        type: 'slider',
         step: 0.01,
+        type: 'slider',
     },
     generatorValveValue: {
         name: 'Generator',
-        type: 'slider',
         step: 0.01,
+        type: 'slider',
     },
     headlightType: {
         name: 'Headlight',
@@ -1606,13 +1607,13 @@ export const frameStateMetadata = {
     },
     regulatorValue: {
         name: 'Regulator',
-        type: 'slider',
         step: 0.01,
+        type: 'slider',
     },
     reverserValue: {
         name: 'Reverser',
-        type: 'slider',
         step: 0.01,
+        type: 'slider',
     },
     sanderAmount: {
         name: 'Sand',
@@ -1688,9 +1689,9 @@ export const cargoLimits = {
     plantationcar_boxcar: {
         ['EFreightType::CrateTools']: 12,
         ['EFreightType::Grain']: 4,
-        ['EFreightType::SeedPallet']: 3,
-        ['EFreightType::OilBarrel']: 15,
         ['EFreightType::None']: 0,
+        ['EFreightType::OilBarrel']: 15,
+        ['EFreightType::SeedPallet']: 3,
     },
     plantationcar_flatcar: {
         ['EFreightType::CrateTools']: 6,
@@ -1713,20 +1714,20 @@ export const cargoLimits = {
         ['EFreightType::StrawBale']: 4,
     },
     plantationcar_hopper_large: {
-        ['EFreightType::CrateTools']: 12,
         ['EFreightType::Coal']: 6,
+        ['EFreightType::CrateTools']: 12,
         ['EFreightType::IronOre']: 6,
         ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_hopper_medium: {
-        ['EFreightType::CrateTools']: 12,
         ['EFreightType::Coal']: 3,
+        ['EFreightType::CrateTools']: 12,
         ['EFreightType::IronOre']: 3,
         ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_hopper_small: {
-        ['EFreightType::CrateTools']: 6,
         ['EFreightType::Coal']: 2,
+        ['EFreightType::CrateTools']: 6,
         ['EFreightType::IronOre']: 2,
         ['EFreightType::OilBarrel']: 15,
     },
@@ -1743,8 +1744,8 @@ export const cargoLimits = {
         ['EFreightType::None']: 0,
     },
     stockcar: {
-        ['EFreightType::CrateTools']: 32,
         ['EFreightType::Cattle']: 6,
+        ['EFreightType::CrateTools']: 32,
         ['EFreightType::None']: 0,
     },
     tankcarNCO: {

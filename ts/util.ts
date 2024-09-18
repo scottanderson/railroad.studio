@@ -17,13 +17,13 @@ export function fp32(n: number): number {
 }
 
 export function fp32q(q: Quaternion): Quaternion {
-    const [x, y, z, w] = new Float32Array([q.x, q.y, q.z, q.w]);
-    return {x, y, z, w};
+    const [w, x, y, z] = new Float32Array([q.w, q.x, q.y, q.z]);
+    return {w, x, y, z};
 }
 
 export function fp32r(r: Rotator): Rotator {
-    const [roll, pitch, yaw] = new Float32Array([r.roll, r.pitch, r.yaw]);
-    return {roll, pitch, yaw};
+    const [pitch, roll, yaw] = new Float32Array([r.pitch, r.roll, r.yaw]);
+    return {pitch, roll, yaw};
 }
 
 export function fp32v(v: Vector): Vector {
@@ -37,14 +37,14 @@ export function stringToText(str: GvasString): GvasText {
     if (lines.length === 0) return {flags: 0, values: []};
     if (lines.length === 1) return {flags: 0, values: [str]};
     return {
+        args: lines.map((line, i) => ({
+            contentType: 2,
+            name: String(i),
+            values: line ? [line] : [],
+        })),
         flags: 1,
         guid: RRO_TEXT_GUID,
         pattern: lines.map((_, i) => '{' + i + '}').join('<br>'),
-        args: lines.map((line, i) => ({
-            name: String(i),
-            contentType: 2,
-            values: line ? [line] : [],
-        })),
     };
 }
 

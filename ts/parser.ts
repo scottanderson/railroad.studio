@@ -68,13 +68,13 @@ export function parseGvas(buffer: ArrayBuffer): Gvas {
     let saveType;
     [pos, saveType] = parseString(buffer, pos);
     const header: GvasHeader = {
+        customData,
+        customFormatVersion,
+        engineVersion,
         gvasVersion,
+        saveType,
         structureVersion,
         unknownVersion,
-        engineVersion,
-        customFormatVersion,
-        customData,
-        saveType,
     };
     checkSaveType(header);
     const result: Gvas = {
@@ -124,11 +124,11 @@ function parseEngineVersion(buffer: ArrayBuffer, pos: number): [number, EngineVe
     let engineVersionBuildID;
     [pos, engineVersionBuildID] = parseString(buffer, pos);
     const engineVersion: EngineVersion = {
+        build: engineVersionBuild,
+        buildID: engineVersionBuildID,
         major: engineVersionMajor,
         minor: engineVersionMinor,
         patch: engineVersionPatch,
-        build: engineVersionBuild,
-        buildID: engineVersionBuildID,
     };
     return [pos, engineVersion];
 }
@@ -151,7 +151,7 @@ function parseQuat(
     const structSize = largeWorldCoords ? 32 : 16;
     const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
     const [x, y, z, w] = values;
-    const result = {x, y, z, w};
+    const result = {w, x, y, z};
     return [pos + structSize, result];
 }
 
@@ -162,11 +162,8 @@ function parseRotator(
 ): [number, Rotator] {
     const structSize = largeWorldCoords ? 24 : 12;
     const values = new (largeWorldCoords ? Float64Array : Float32Array)(buffer.slice(pos, pos + structSize));
-    const result: Rotator = ({
-        pitch: values[0], // y (need to confirm)
-        yaw: values[1], // Rotation around the Z axis
-        roll: values[2], // x (need to confirm)
-    });
+    const [pitch, yaw, roll] = values;
+    const result: Rotator = {pitch, roll, yaw};
     return [pos + structSize, result];
 }
 
@@ -575,7 +572,7 @@ function parseStructArray(
             if (!translation) throw new Error('Did not find translation');
             if (!rotation) throw new Error('Did not find translation');
             if (!scale3d) throw new Error('Did not find translation');
-            const transform: Transform = {translation, rotation, scale3d};
+            const transform: Transform = {rotation, scale3d, translation};
             value.push(transform);
         }
     } else if (fieldName === 'Permission') {
@@ -659,7 +656,7 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
             [pos, namespace] = parseString(buffer, pos);
             [pos, key] = parseString(buffer, pos);
             [pos, value] = parseString(buffer, pos);
-            const values: GvasTextBase = {flags, namespace, key, value};
+            const values: GvasTextBase = {flags, key, namespace, value};
             array.push(values);
         } else if (componentType === 3) {
             // text_rich:
@@ -728,9 +725,9 @@ function parseTextArray(buffer: ArrayBuffer): [number, GvasText[]] {
                     [pos, value] = parseString(buffer, pos);
                     values.push(value);
                 }
-                args.push({name, contentType, values});
+                args.push({contentType, name, values});
             }
-            const values: GvasTextArgumentFormat = {flags, guid, pattern, args};
+            const values: GvasTextArgumentFormat = {args, flags, guid, pattern};
             array.push(values);
         } else {
             throw new Error(`Unexpected component type ${componentType} with flags ${flags}`);

@@ -164,7 +164,6 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                 name: frameName[i],
                 number: frameNumber[i],
                 rotation: frameRotation[i],
-                type: frameType[i],
                 state: {
                     boilerFireTemp: boilerFireTemp[i],
                     boilerFuelAmount: boilerFuelAmount[i],
@@ -195,6 +194,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
                     tenderFuelAmount: tenderFuelAmount[i],
                     tenderWaterAmount: tenderWaterAmount[i],
                 },
+                type: frameType[i],
             };
             frames.push(frame);
         }
@@ -233,14 +233,14 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
             const industryTypeTemp = industryType[i];
             if (industryTypeTemp === null) throw new Error('Null industryType');
             const industry: Industry = {
-                location: industryLocation[i],
-                rotation: industryRotation[i],
                 inputs: [
                     industryStorageEduct1[i], industryStorageEduct2[i],
                     industryStorageEduct3[i], industryStorageEduct4[i]],
+                location: industryLocation[i],
                 outputs: [
                     industryStorageProduct1[i], industryStorageProduct2[i],
                     industryStorageProduct3[i], industryStorageProduct4[i]],
+                rotation: industryRotation[i],
                 type: industryTypeTemp,
             };
             if (typeof industry.type === 'number' && industry.type > IndustryType.wood_rick) {
@@ -272,12 +272,12 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         for (let i = 0; i < playerName.length; i++) {
             const player: Player = {
                 id: optionalIndex(playerId, i),
-                name: playerName[i],
                 location: optionalIndex(playerLocation, i),
                 money: playerMoney[i],
+                name: playerName[i],
+                permissions: optionalIndex(permissions, i),
                 rotation: optionalIndex(playerRotation, i),
                 xp: playerXp[i],
-                permissions: optionalIndex(permissions, i),
             };
             players.push(player);
         }
@@ -295,8 +295,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         for (let i = 0; i < propNames.length; i++) {
             const prop: Prop = {
                 name: propNames[i],
-                transform: propTransforms[i],
                 text: propText[i],
+                transform: propTransforms[i],
             };
             props.push(prop);
         }
@@ -544,8 +544,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         sandhouses,
         saveGame,
         settings,
-        splineTracks,
         splines,
+        splineTracks,
         switches,
         turntables,
         vegetation,
