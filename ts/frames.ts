@@ -210,6 +210,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     },
 
     'Class125': {
+        coal: true,
         engine: true,
         length: 1097,
         max: {
