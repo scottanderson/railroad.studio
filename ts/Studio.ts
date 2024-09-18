@@ -51,7 +51,6 @@ import {
     getIndustryName,
     industryInputLabels,
     industryOutputLabels,
-    isIndustryName,
 } from './industries';
 import {VegetationUtil} from './VegetationUtil';
 
@@ -1498,13 +1497,16 @@ export class Studio {
             if (typeof industry.type === 'number') {
                 const setIndustryType = (type: IndustryType) => industry.type = type;
                 td.replaceChildren(editIndustryType(this, industry.type, setIndustryType));
-            } else if (isIndustryName(industry.type)) {
-                const setIndustryName = (name: IndustryName) => industry.type = name;
-                td.replaceChildren(editIndustryName(this, industry.type, setIndustryName));
             } else {
-                const setIndustryName = (name: GvasString) => industry.type = name;
-                td.replaceChildren(editString(this, industry.type, setIndustryName));
-                td.classList.add('table-warning');
+                const industryName = getIndustryName(industry);
+                if (industryName !== null) {
+                    const setIndustryName = (name: IndustryName) => industry.type = name;
+                    td.replaceChildren(editIndustryName(this, industryName, setIndustryName));
+                } else {
+                    const setIndustryName = (name: GvasString) => industry.type = name;
+                    td.replaceChildren(editString(this, industry.type, setIndustryName));
+                    td.classList.add('table-warning');
+                }
             }
             tr.appendChild(td);
             // Inputs

@@ -56,15 +56,20 @@ export const IndustryNames = [
     'engineshed_style4',
     'firewooddepot',
     'freightdepot',
+    'GoldDredge',
+    'GoldMine',
+    'GoldSmelter',
     'ironoremine',
     'ironworks',
     'logcamp',
     'MeatPackingPlant',
     'oilfield',
+    'RailExpressAgency',
     'Refinery',
     'Sandhouse',
     'sawmill',
     'smelter',
+    'StampMill',
     'telegraphoffice',
     'watertower_1870_style1',
     'watertower_1870_style2',
@@ -79,11 +84,6 @@ export const IndustryNames = [
     'WaterWell',
     'WheatFarm',
     'Woodrick',
-    'GoldDredge',
-    'GoldMine',
-    'StampMill',
-    'GoldSmelter',
-    'RailExpressAgency',
 ] as const satisfies readonly string[];
 
 /**
@@ -121,6 +121,18 @@ export const legacyIndustryNames: Record<IndustryType, IndustryName> = {
     [IndustryType.wood_rick]: 'Woodrick',
 };
 
+/**
+ * Lookup table for legacy industry names.
+ */
+const legacyIndustryMap: Record<string, IndustryName> = {
+    'enginehouse_alpine_blue': 'enginehouse_alpine',
+    'enginehouse_aspen_gold': 'enginehouse_aspen',
+    'enginehouse_barn_red': 'enginehouse_barn',
+    'enginehouse_princes_mineral_brown': 'enginehouse_princess',
+    'SandHouse': 'Sandhouse',
+    'Waterwell': 'WaterWell',
+};
+
 export const isIndustryName = (name: IndustryType | GvasString): name is IndustryName =>
     !!name && (typeof name === 'string') && IndustryNames.includes(name);
 
@@ -129,6 +141,9 @@ export type IndustryName = typeof IndustryNames[number];
 export function getIndustryName(industry: Industry): IndustryName | null {
     if (typeof industry.type === 'number') return legacyIndustryNames[industry.type];
     if (isIndustryName(industry.type)) return industry.type;
+    if (industry.type === null) return null;
+    if (industry.type in legacyIndustryMap) return legacyIndustryMap[industry.type];
+    console.warn(`Unrecognized industry type ${industry.type}`);
     return null;
 }
 
