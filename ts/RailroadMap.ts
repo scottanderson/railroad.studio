@@ -274,7 +274,7 @@ export class RailroadMap {
         const pitch = radiansToDegrees(Math.atan2(direction.z,
             Math.sqrt(direction.x * direction.x + direction.y * direction.y)));
         const location = vectorSum({x: 0, y: 0, z: 100}, point);
-        const rotation = {yaw, pitch, roll: 0};
+        const rotation = {pitch, roll: 0, yaw};
         return {location, rotation};
     }
 
@@ -631,26 +631,26 @@ export class RailroadMap {
         const vertical = unknownProperty(ml, 'vertical');
         const defaultNumber = (option: unknown, n: number) => typeof option === 'undefined' ? n : Number(option);
         return {
+            mergeLimits: {
+                bearing: defaultNumber(bearing, 10),
+                horizontal: defaultNumber(horizontal, 10),
+                inclination: defaultNumber(inclination, 2.5),
+                vertical: defaultNumber(vertical, 1),
+            },
             pan: {
                 x: defaultNumber(x, 0),
                 y: defaultNumber(y, 0),
             },
             zoom: defaultNumber(zoom, 1),
-            mergeLimits: {
-                bearing: defaultNumber(bearing, 10),
-                inclination: defaultNumber(inclination, 2.5),
-                horizontal: defaultNumber(horizontal, 10),
-                vertical: defaultNumber(vertical, 1),
-            },
         };
     }
 
     writeOptions() {
         const key = `railroadstudio.${this.railroad.saveGame.uniqueWorldId}`;
         const options: MapOptions = {
+            mergeLimits: this.mergeLimits,
             pan: this.panFrom(),
             zoom: this.panZoom.getZoom(),
-            mergeLimits: this.mergeLimits,
         };
         localStorage.setItem(key, JSON.stringify(options));
     }
@@ -824,11 +824,14 @@ export class RailroadMap {
 
         let listeners: { [key: string]: (e: Event) => unknown };
         return svgPanZoom(this.svg.node, {
-            zoomScaleSensitivity: 0.5,
-            minZoom: 0.5,
-            maxZoom: 500,
             beforePan: beforePan,
             customEventsHandler: {
+                destroy: () => {
+                    // Unregister listeners
+                    for (const eventName of Object.keys(listeners)) {
+                        this.svg.node.removeEventListener(eventName, listeners[eventName]);
+                    }
+                },
                 haltEventListeners: [],
                 init: (options) => {
                     let mouseDown = false;
@@ -933,15 +936,12 @@ export class RailroadMap {
                         options.svgElement.addEventListener(eventName, listeners[eventName]);
                     }
                 },
-                destroy: () => {
-                    // Unregister listeners
-                    for (const eventName of Object.keys(listeners)) {
-                        this.svg.node.removeEventListener(eventName, listeners[eventName]);
-                    }
-                },
             },
+            maxZoom: 500,
+            minZoom: 0.5,
             onPan: onPanZoom,
             onZoom: onPanZoom,
+            zoomScaleSensitivity: 0.5,
         });
     }
 
@@ -1806,7 +1806,7 @@ export class RailroadMap {
                     const bezier = hermiteToBezier(spline);
                     const sharpest = cubicBezierMinRadius(bezier);
                     const length = cubicBezierLength(bezier);
-                    console.log({index, sharpest, spline, steepest, length});
+                    console.log({index, length, sharpest, spline, steepest});
                 }
                 break;
             case MapToolMode.delete:
@@ -1892,7 +1892,7 @@ export class RailroadMap {
                     const {location, rotation} = this.rerailLocation(e, spline, this.toolFrame);
                     const {name, number, type, state} = this.toolFrame;
                     // Copy the frame to the new location
-                    const frame: Frame = {location, name, number, rotation, type, state};
+                    const frame: Frame = {location, name, number, rotation, state, type};
                     this.railroad.frames.push(frame);
                     this.setMapModified(true);
                     // Update the map

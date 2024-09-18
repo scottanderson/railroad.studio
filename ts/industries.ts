@@ -146,15 +146,20 @@ export const industryNames: Record<IndustryName, string> = {
     'engineshed_style4': 'Large Engine House (Old)',
     'firewooddepot': 'Firewood Camp',
     'freightdepot': 'Freight Depot',
+    'GoldDredge': 'Gold Dredge',
+    'GoldMine': 'Gold Mine',
+    'GoldSmelter': 'Gold Smelter',
     'ironoremine': 'Iron Mine',
     'ironworks': 'Ironworks',
     'logcamp': 'Logging Camp',
     'MeatPackingPlant': 'Meat Packing Plant',
     'oilfield': 'Oil Field',
+    'RailExpressAgency': 'Rail Express Agency',
     'Refinery': 'Refinery',
     'Sandhouse': 'Sandhouse',
     'sawmill': 'Sawmill',
     'smelter': 'Smelter',
+    'StampMill': 'Stamp Mill',
     'telegraphoffice': 'Telegraph Office',
     'watertower_1870_style1': '1870 Water Tower (Red)',
     'watertower_1870_style2': '1870 Water Tower (Brown)',
@@ -169,11 +174,6 @@ export const industryNames: Record<IndustryName, string> = {
     'WaterWell': 'Water Well',
     'WheatFarm': 'Wheat Farm',
     'Woodrick': 'Wood Rick',
-    'GoldDredge': 'Gold Dredge',
-    'GoldMine': 'Gold Mine',
-    'StampMill': 'Stamp Mill',
-    'GoldSmelter': 'Gold Smelter',
-    'RailExpressAgency': 'Rail Express Agency',
 };
 
 type FourStrings = [string, string, string, string];
@@ -181,38 +181,44 @@ const [input2, input3, input4] = ['Unused Input Slot 2', 'Unused Input Slot 3', 
 const [output2, output3, output4] = ['Unused Output Slot 2', 'Unused Output Slot 3', 'Unused Output Slot 4'];
 
 export const industryInputLabels: Partial<Record<IndustryName, FourStrings>> = {
+    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
     'coalmine': ['Beams', 'Rails', input3, input4],
+    'coaltower': ['Coal', input2, input3, input4],
+    'firewooddepot': ['Logs', input2, input3, input4],
+    'GoldDredge': ['Coal', 'Tool Crates', 'Steel Pipes', input4],
+    'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
+    'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
     'ironoremine': ['Lumber', 'Beams', input3, input4],
     'ironworks': ['Raw Iron', 'Coal', 'Lumber', input4],
+    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
     'oilfield': ['Steel Pipes', 'Beams', 'Tool Crates', input4],
     'Refinery': ['Crude Oil', 'Steel Pipes', 'Lumber', input4],
     'sawmill': ['Logs', input2, input3, input4],
     'smelter': ['Cordwood', 'Iron Ore', input3, input4],
-    'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
-    'CattleFarm': ['Grain', 'Water', 'Straw Bale', input4],
-    'MeatPackingPlant': ['Cattle', 'Coal', input2, input4],
-    'GoldDredge': ['Coal', 'Tool Crates', 'Steel Pipes', input4],
-    'GoldMine': ['Coal', 'Beams', 'Rails', 'Tool Crates'],
     'StampMill': ['Gold Ore', 'water', 'Coal', 'Cordwood'],
-    'GoldSmelter': ['Refined Gold', 'Coal', input3, input4],
-    'coaltower': ['Coal', input2, input3, input4],
-    'firewooddepot': ['Logs', input2, input3, input4],
+    'WheatFarm': ['Seed Pallet', 'Water', input3, input4],
 };
 
 const water: FourStrings = ['Water', output2, output3, output4];
 export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = {
+    'CattleFarm': ['Cattle', 'Cattle', output3, output4],
     'coalmine': ['Coal', output2, output3, output4],
     'coaltower': ['Coal', output2, output3, output4],
     'firewooddepot': ['Firewood', 'Firewood', 'Firewood', 'Firewood'],
     'freightdepot': ['Seed Pallet', output2, output3, output4],
+    'GoldDredge': ['Gold Ore', output2, output3, output4],
+    'GoldMine': ['Gold Ore', output2, output3, output4],
+    'GoldSmelter': ['Gold Ingot', output2, output3, output4],
     'ironoremine': ['Iron Ore', output2, output3, output4],
     'ironworks': ['Steel Pipes', 'Tool Crates', output3, output4],
     'logcamp': ['Logs', 'Cordwood', output3, output4],
+    'MeatPackingPlant': ['Meat', output2, output3, output4],
     'oilfield': ['Crude Oil', output2, output3, output4],
     'Refinery': ['Oil Barrel', output2, output3, output4],
     'Sandhouse': ['Sand', output2, output3, output4],
     'sawmill': ['Lumber', 'Beams', output3, output4],
     'smelter': ['Raw Iron', 'Rails', output3, output4],
+    'StampMill': ['Refined Gold', output2, output3, output4],
     'telegraphoffice': ['Unknown', output2, output3, output4],
     'watertower_1870_style1': water,
     'watertower_1870_style2': water,
@@ -227,12 +233,6 @@ export const industryOutputLabels: Partial<Record<IndustryName, FourStrings>> = 
     'WaterWell': water,
     'WheatFarm': ['Grain', 'Straw Bale', output3, output4],
     'Woodrick': ['Firewood', 'Firewood', output3, output4],
-    'CattleFarm': ['Cattle', 'Cattle', output3, output4],
-    'MeatPackingPlant': ['Meat', output2, output3, output4],
-    'GoldDredge': ['Gold Ore', output2, output3, output4],
-    'GoldMine': ['Gold Ore', output2, output3, output4],
-    'StampMill': ['Refined Gold', output2, output3, output4],
-    'GoldSmelter': ['Gold Ingot', output2, output3, output4],
 };
 
 export const gizmoSvgPaths = {
@@ -254,210 +254,15 @@ const waterTower = {
 };
 
 export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathArrayAlias>>> = {
-    'logcamp': {
-        'platform': combine(
-            rect(530, 1440, 300, 1250),
-            rect(2570, -1390, 2360 - 2570, 250 + 1390),
-        ),
-        'building': combine(
-            rect(-150, 580, -630, 950),
-            rect(3800, -2500, -600, 2100),
-            rect(2400, -4690, -980, 1220),
-            rect(2140, -3110, -920, 810),
-            rect(2400, -2090, -1540, 2370),
-            rect(2380, 660, -1370, 870),
-            rect(2610, 2250, -1490, 1940),
-            rect(-480, -3680, -370, 660),
-            rect(-230, -2500, -610, 620),
-            rect(-220, -900, -1060, 1000),
-            rect(-150, 580, -630, 950),
-        ),
-    },
-    'sawmill': {
-        'pond': [
-            ['M', 2800, 980],
-            ['C', 2010, 640, 1600, 500, 1180, 420],
-            ['S', 580, 500, -270, 1100],
-            ['S', -800, 1420, -1280, 2270],
-            ['S', -1330, 3170, -980, 4170],
-            ['S', -320, 4910, 570, 5220],
-            ['S', 1250, 5940, 2100, 5840],
-            ['S', 2640, 5310, 2750, 4360],
-            ['Z'],
-        ] as PathCommand[],
-        'platform': combine(
-            rect(-3900, -4000, 300, 4500),
-            rect(2600, 600, 300, 4200),
-        ),
-        'building': combine(
-            polyRect(-1000, -2800,
-                900, -2600,
-                2600, -1600,
-                1050, -200,
-                300, 1200,
-                -200, -200,
-                -1000, -1500,
-                -3500, -2200,
-                -1000,
-            ).concat([['Z']]),
-        ),
-    },
-    'smelter': {
-        'platform': combine(
-            rect(3400, 600, 300, -4000),
-            rect(-3600, 1500, 300, -2050),
-            rect(-2900, -1875, 300, -2050),
-        ),
-        'building': polyRectRel(-550, -4000,
-            1500, 1000,
-            500, 2575,
-            -500, 425,
-            -2250, -1700,
-            750, -2300),
-    },
-    'ironworks': {
-        'platform': combine(
-            rect(-4000, 2800, 2500, -300),
-            rect(-200, 2800, 1200, -300),
-            rect(-4530, -2780, 1080, -300),
-            rect(-2800, -2780, 4500, -300),
-        ),
-        'building': polyRectRel(3100, 1300,
-            -6800, -2600,
-            5800, -1000,
-            1000),
-    },
-    'oilfield': {
-        'platform': combine(
-            rect(-3500, 950, 2300, 300),
-            rect(-5500, 950, 1200, 300),
-            rect(-1400, -800, 1600, 300),
-        ),
-        'building': combine(
-            circle(1250, 1750, 700),
-            circle(-250, 1750, 700),
-            rect(-3200, 2400, 2050, 750),
-            rotatedRect(-5250, 4400, 750, 2000, 10),
-            rotatedRect(1740, 3640, 750, 2000, -5),
-            rotatedRect(8860, 4150, 750, 2000, -60),
-            rotatedRect(-2500, 7150, 750, 2000, -50),
-            rect(-3200, -5700, 2000, 750),
-            rect(1600, -3550, 2000, 750),
-            rect(-5200, -4400, 750, 2000),
-        ),
-    },
-    'Refinery': {
-        'platform': combine(
-            rect(1750, -2450, 300, 2200),
-            rect(-3050, -700, 300, 2200),
-            rect(-2450, 2000, 300, 2200),
-            rect(-1900, 4750, 300, 1100),
-        ),
-        'building': combine(
-            circle(-2220, 1180, 600),
-            circle(-2260, -90, 600),
-            rect(-2620, -2370, 1070, 1420),
-            rect(-1510, -3470, 980, 1160),
-            rect(500, -3000, 1400, 2500),
-            rect(-1350, -500, 1850, 900),
-            rect(-1400, 1700, 1800, 900),
-        ),
-    },
-    'coalmine': {
-        'platform': combine(
-            rect(-250, 2050, 300, -1050),
-            rect(-275, -1050, 300, -2050),
-        ),
-        'building': combine(
-            rect(-180, -230, 2320, 790),
-            rect(3320, -180, 1080, 760),
-        ),
-    },
-    'ironoremine': {
-        'platform': combine(
-            rect(-200, 200, 300, -400),
-            rect(-200, 4600, 300, -3000),
-        ),
-        'building': combine(
-            rotatedRect(650, -1670, 500, 750, 43),
-            polyRect(0, -500,
-                500, -150,
-                2200, 350,
-                500, 1500),
-        ),
-    },
-    'freightdepot': {
-        'platform': polyRect(2200, -1000,
-            -3300, -700,
-            -2300, 1000),
-        'building': rectAbs(2100, -900, -2200, 900),
-    },
-    'firewooddepot': {
-        'building': rect(150, 1000, 950, -1700),
-    },
-    'enginehouse_alpine': engineHouse,
-    'enginehouse_aspen': engineHouse,
-    'enginehouse_barn': engineHouse,
-    'enginehouse_princess': engineHouse,
-    'coaltower': {
-        'building': rect(50, -900, 600, 600),
-    },
-    'telegraphoffice': {
-        'building': rect(-200, -150, 400, 300),
-    },
-    'watertower_1870_style1': waterTower,
-    'watertower_1870_style2': waterTower,
-    'watertower_1870_style3': waterTower,
-    'watertower_1870_style4': waterTower,
-    'watertower_drgw': waterTower,
-    'watertower_kanaskat_style1': waterTower,
-    'watertower_kanaskat_style2': waterTower,
-    'watertower_kanaskat_style3': waterTower,
-    'watertower_kanaskat_style4': waterTower,
-    'watertower_small': waterTower,
-    'engineshed_style1': largeEngineHouse,
-    'engineshed_style2': largeEngineHouse,
-    'engineshed_style3': largeEngineHouse,
-    'engineshed_style4': largeEngineHouse,
-    'Woodrick': {
-        'building': rect(-130, -65, 260, 130),
-    },
-    'WaterWell': {
-        'building': combine(
-            rect(390, 140, 300, 400),
-            circle(500, -350, 325),
-        ),
-    },
-    'WheatFarm': {
-        'platform': combine(
-            rect(2990, -2300, 300, 1400),
-            rect(-1800, -2590, 300, 1190),
-            circle(-1470, 1650, 325),
-        ),
-        'walkway': combine(
-            rect(2990, 1520, 300, 1210),
-        ),
-        'building': combine(
-            rect(-865, 900, 1740, -1760),
-            polyRect(
-                2060, 3160, 2590, 2890,
-                3230, 4490, 2400, 4750,
-            ),
-        ),
-        'fence': combine(
-            rect(1160, 1310, 1800, 1450),
-            rect(1160, -530, 1800, 1450),
-        ),
-    },
     'CattleFarm': {
-        'fence': combine(
-            rect(600, -3190, 1700, 3350),
-            rect(600, 550, 1700, 3350),
-        ),
         'building': combine(
             rect(-1220, 2900, 1370, 1000),
             rect(-920, -5100, 1200, 2050),
             circle(-1650, 1300, 190),
+        ),
+        'fence': combine(
+            rect(600, -3190, 1700, 3350),
+            rect(600, 550, 1700, 3350),
         ),
         'platform': combine(
             rect(-2150, -2250, 300, 1230),
@@ -467,57 +272,49 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             circle(-1825, 0, 320),
         ),
     },
-    'MeatPackingPlant': {
-        'fence': combine(
-            rect(-1180, -2300, 3450, 1720),
-        ),
-        'walkway': combine(
-            rect(2290, -1800, 270, 1200),
-            rect(-2650, 550, 1900, 215),
-            rect(-1800, -2850, 300, 1250),
-        ),
+    'coalmine': {
         'building': combine(
-            polyRect(
-                -1920, -1300, -1200, -580,
-                2700, 550, -2650, -580,
-                -2290, -1050,
-            ),
+            rect(-180, -230, 2320, 790),
+            rect(3320, -180, 1080, 760),
         ),
         'platform': combine(
-            rect(-4490, -580, 1820, 1345),
-            rect(-3800, -2850, 1980, 300),
-            rect(950, -2870, 300, 550),
+            rect(-250, 2050, 300, -1050),
+            rect(-275, -1050, 300, -2050),
         ),
     },
-    'Sandhouse': {
-        'building': rect(-270, -670, 550, 850),
+    'coaltower': {
+        'building': rect(50, -900, 600, 600),
     },
-    'RailExpressAgency': {
-        'building': rect(-370, -1800, 735, 3050),
-        'platform': combine(
+    'enginehouse_alpine': engineHouse,
+    'enginehouse_aspen': engineHouse,
+    'enginehouse_barn': engineHouse,
+    'enginehouse_princess': engineHouse,
+    'engineshed_style1': largeEngineHouse,
+    'engineshed_style2': largeEngineHouse,
+    'engineshed_style3': largeEngineHouse,
+    'engineshed_style4': largeEngineHouse,
+    'firewooddepot': {
+        'building': rect(150, 1000, 950, -1700),
+    },
+    'freightdepot': {
+        'building': rectAbs(2100, -900, -2200, 900),
+        'platform': polyRect(2200, -1000,
+            -3300, -700,
+            -2300, 1000),
+    },
+    'GoldDredge': {
+        'building':
             polyRect(
-                385, 1270, -370, 1510,
-                680, 200, 385,
+                -1900, -750, 800, -250,
+                2800, 150, 800, 700,
+                -1900, 150, -2900, -250,
             ),
-        ),
+        'platform': rect(-3550, 2850, 5450, 300),
+        'walkway': rect(-950, 800, 300, 2030),
     },
     'GoldMine': {
         'building': rect(-2295, -445, 2000, 850),
         'platform': rect(-595, -5715, 300, 5250),
-    },
-    'StampMill': {
-        'building':
-            polyRect(
-                -1370, 620, -180, 20,
-                1000, -1620, -1050, -1000,
-                -1050, -420,
-            ),
-        'platform': combine(
-            rect(1350, -1910, 300, 1000),
-            rect(-1870, -2850, 300, 2410),
-            rect(-1870, 810, 300, 990),
-            circle(1480, -120, 170),
-        ),
     },
     'GoldSmelter': {
         'building': combine(
@@ -536,14 +333,217 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             rect(1700, -1580, 650, 3050),
         ),
     },
-    'GoldDredge': {
+    'ironoremine': {
+        'building': combine(
+            rotatedRect(650, -1670, 500, 750, 43),
+            polyRect(0, -500,
+                500, -150,
+                2200, 350,
+                500, 1500),
+        ),
+        'platform': combine(
+            rect(-200, 200, 300, -400),
+            rect(-200, 4600, 300, -3000),
+        ),
+    },
+    'ironworks': {
+        'building': polyRectRel(3100, 1300,
+            -6800, -2600,
+            5800, -1000,
+            1000),
+        'platform': combine(
+            rect(-4000, 2800, 2500, -300),
+            rect(-200, 2800, 1200, -300),
+            rect(-4530, -2780, 1080, -300),
+            rect(-2800, -2780, 4500, -300),
+        ),
+    },
+    'logcamp': {
+        'building': combine(
+            rect(-150, 580, -630, 950),
+            rect(3800, -2500, -600, 2100),
+            rect(2400, -4690, -980, 1220),
+            rect(2140, -3110, -920, 810),
+            rect(2400, -2090, -1540, 2370),
+            rect(2380, 660, -1370, 870),
+            rect(2610, 2250, -1490, 1940),
+            rect(-480, -3680, -370, 660),
+            rect(-230, -2500, -610, 620),
+            rect(-220, -900, -1060, 1000),
+            rect(-150, 580, -630, 950),
+        ),
+        'platform': combine(
+            rect(530, 1440, 300, 1250),
+            rect(2570, -1390, 2360 - 2570, 250 + 1390),
+        ),
+    },
+    'MeatPackingPlant': {
+        'building': combine(
+            polyRect(
+                -1920, -1300, -1200, -580,
+                2700, 550, -2650, -580,
+                -2290, -1050,
+            ),
+        ),
+        'fence': combine(
+            rect(-1180, -2300, 3450, 1720),
+        ),
+        'platform': combine(
+            rect(-4490, -580, 1820, 1345),
+            rect(-3800, -2850, 1980, 300),
+            rect(950, -2870, 300, 550),
+        ),
+        'walkway': combine(
+            rect(2290, -1800, 270, 1200),
+            rect(-2650, 550, 1900, 215),
+            rect(-1800, -2850, 300, 1250),
+        ),
+    },
+    'oilfield': {
+        'building': combine(
+            circle(1250, 1750, 700),
+            circle(-250, 1750, 700),
+            rect(-3200, 2400, 2050, 750),
+            rotatedRect(-5250, 4400, 750, 2000, 10),
+            rotatedRect(1740, 3640, 750, 2000, -5),
+            rotatedRect(8860, 4150, 750, 2000, -60),
+            rotatedRect(-2500, 7150, 750, 2000, -50),
+            rect(-3200, -5700, 2000, 750),
+            rect(1600, -3550, 2000, 750),
+            rect(-5200, -4400, 750, 2000),
+        ),
+        'platform': combine(
+            rect(-3500, 950, 2300, 300),
+            rect(-5500, 950, 1200, 300),
+            rect(-1400, -800, 1600, 300),
+        ),
+    },
+    'RailExpressAgency': {
+        'building': rect(-370, -1800, 735, 3050),
+        'platform': combine(
+            polyRect(
+                385, 1270, -370, 1510,
+                680, 200, 385,
+            ),
+        ),
+    },
+    'Refinery': {
+        'building': combine(
+            circle(-2220, 1180, 600),
+            circle(-2260, -90, 600),
+            rect(-2620, -2370, 1070, 1420),
+            rect(-1510, -3470, 980, 1160),
+            rect(500, -3000, 1400, 2500),
+            rect(-1350, -500, 1850, 900),
+            rect(-1400, 1700, 1800, 900),
+        ),
+        'platform': combine(
+            rect(1750, -2450, 300, 2200),
+            rect(-3050, -700, 300, 2200),
+            rect(-2450, 2000, 300, 2200),
+            rect(-1900, 4750, 300, 1100),
+        ),
+    },
+    'Sandhouse': {
+        'building': rect(-270, -670, 550, 850),
+    },
+    'sawmill': {
+        'building': combine(
+            polyRect(-1000, -2800,
+                900, -2600,
+                2600, -1600,
+                1050, -200,
+                300, 1200,
+                -200, -200,
+                -1000, -1500,
+                -3500, -2200,
+                -1000,
+            ).concat([['Z']]),
+        ),
+        'platform': combine(
+            rect(-3900, -4000, 300, 4500),
+            rect(2600, 600, 300, 4200),
+        ),
+        'pond': [
+            ['M', 2800, 980],
+            ['C', 2010, 640, 1600, 500, 1180, 420],
+            ['S', 580, 500, -270, 1100],
+            ['S', -800, 1420, -1280, 2270],
+            ['S', -1330, 3170, -980, 4170],
+            ['S', -320, 4910, 570, 5220],
+            ['S', 1250, 5940, 2100, 5840],
+            ['S', 2640, 5310, 2750, 4360],
+            ['Z'],
+        ] as PathCommand[],
+    },
+    'smelter': {
+        'building': polyRectRel(-550, -4000,
+            1500, 1000,
+            500, 2575,
+            -500, 425,
+            -2250, -1700,
+            750, -2300),
+        'platform': combine(
+            rect(3400, 600, 300, -4000),
+            rect(-3600, 1500, 300, -2050),
+            rect(-2900, -1875, 300, -2050),
+        ),
+    },
+    'StampMill': {
         'building':
             polyRect(
-                -1900, -750, 800, -250,
-                2800, 150, 800, 700,
-                -1900, 150, -2900, -250,
+                -1370, 620, -180, 20,
+                1000, -1620, -1050, -1000,
+                -1050, -420,
             ),
-        'platform': rect(-3550, 2850, 5450, 300),
-        'walkway': rect(-950, 800, 300, 2030),
+        'platform': combine(
+            rect(1350, -1910, 300, 1000),
+            rect(-1870, -2850, 300, 2410),
+            rect(-1870, 810, 300, 990),
+            circle(1480, -120, 170),
+        ),
+    },
+    'telegraphoffice': {
+        'building': rect(-200, -150, 400, 300),
+    },
+    'watertower_1870_style1': waterTower,
+    'watertower_1870_style2': waterTower,
+    'watertower_1870_style3': waterTower,
+    'watertower_1870_style4': waterTower,
+    'watertower_drgw': waterTower,
+    'watertower_kanaskat_style1': waterTower,
+    'watertower_kanaskat_style2': waterTower,
+    'watertower_kanaskat_style3': waterTower,
+    'watertower_kanaskat_style4': waterTower,
+    'watertower_small': waterTower,
+    'WaterWell': {
+        'building': combine(
+            rect(390, 140, 300, 400),
+            circle(500, -350, 325),
+        ),
+    },
+    'WheatFarm': {
+        'building': combine(
+            rect(-865, 900, 1740, -1760),
+            polyRect(
+                2060, 3160, 2590, 2890,
+                3230, 4490, 2400, 4750,
+            ),
+        ),
+        'fence': combine(
+            rect(1160, 1310, 1800, 1450),
+            rect(1160, -530, 1800, 1450),
+        ),
+        'platform': combine(
+            rect(2990, -2300, 300, 1400),
+            rect(-1800, -2590, 300, 1190),
+            circle(-1470, 1650, 325),
+        ),
+        'walkway': combine(
+            rect(2990, 1520, 300, 1210),
+        ),
+    },
+    'Woodrick': {
+        'building': rect(-130, -65, 260, 130),
     },
 };

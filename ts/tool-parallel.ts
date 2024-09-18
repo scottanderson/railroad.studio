@@ -16,20 +16,20 @@ export function parallelSpline(spline: Spline, offset: number): [Spline, Spline]
     const a = spline.controlPoints.map(mapper(offset));
     const b = spline.controlPoints.map(mapper(-offset));
     return [{
-        segmentsVisible: spline.segmentsVisible.concat(),
         controlPoints: a,
         location: a[0],
+        segmentsVisible: spline.segmentsVisible.concat(),
         type: spline.type,
     }, {
-        segmentsVisible: spline.segmentsVisible.concat(),
         controlPoints: b,
         location: b[0],
+        segmentsVisible: spline.segmentsVisible.concat(),
         type: spline.type,
     }];
 }
 
 export function parallelSplineTrack(spline: SplineTrack, offset: number): SplineTrack[] {
-    const yaw90 = {pitch: 0, yaw: 90, roll: 0};
+    const yaw90 = {pitch: 0, roll: 0, yaw: 90};
     const endDirXY = {x: spline.endTangent.x, y: spline.endTangent.y, z: 0};
     const endOffset = rotateVector(normalizeVector(endDirXY, offset), yaw90);
     const endPointD = vectorDifference(spline.endPoint, endOffset);

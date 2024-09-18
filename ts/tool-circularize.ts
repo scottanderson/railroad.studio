@@ -18,10 +18,10 @@ import {fp32v} from './util';
 export function circularizeCurve(hermite: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = hermite;
     const withTangentLength = (tangentLength: number) => ({
-        startPoint,
         endPoint,
-        startTangent: fp32v(normalizeVector(startTangent, tangentLength)),
         endTangent: fp32v(normalizeVector(endTangent, tangentLength)),
+        startPoint,
+        startTangent: fp32v(normalizeVector(startTangent, tangentLength)),
     });
     // Calculate the angle between the start and end tangent.
     const angle = angleBetweenVectors(startTangent, endTangent);

@@ -377,8 +377,8 @@ function reverseSpline(spline: Spline): Spline {
     const segmentsVisible = spline.segmentsVisible.slice().reverse();
     return {
         controlPoints: controlPoints,
-        segmentsVisible: segmentsVisible,
         location: controlPoints[0],
+        segmentsVisible: segmentsVisible,
         type: spline.type,
     };
 }

@@ -55,31 +55,31 @@ export enum SplineTrackType {
 }
 
 const secondLegSwitchLeft = {
-    startPoint: {x: 0, y: 0, z: 0},
-    startTangent: {x: 1879.3, y: 0, z: 0},
     endPoint: {x: 1879.3, y: 0, z: 0},
     endTangent: {x: 1879.3, y: 0, z: 0},
+    startPoint: {x: 0, y: 0, z: 0},
+    startTangent: {x: 1879.3, y: 0, z: 0},
 };
 
 const secondLegSwitchRight = {
-    startPoint: {x: 0, y: 0, z: 0},
-    startTangent: {x: 2153.67, y: 0, z: 0},
     endPoint: {x: 1863.4, y: 184.8, z: 0},
     endTangent: {x: 2125.36, y: 348.04, z: 0},
+    startPoint: {x: 0, y: 0, z: 0},
+    startTangent: {x: 2153.67, y: 0, z: 0},
 };
 
 const switchCross45 = {
-    startPoint: {x: 87.9, y: 212.1, z: 0},
-    startTangent: {x: 424.2, y: -424.2, z: 0},
     endPoint: {x: 512.1, y: -212.1, z: 0},
     endTangent: {x: 424.2, y: -424.2, z: 0},
+    startPoint: {x: 87.9, y: 212.1, z: 0},
+    startTangent: {x: 424.2, y: -424.2, z: 0},
 };
 
 const switchCross90 = {
-    startPoint: {x: 191.2, y: -191.2, z: 0},
-    startTangent: {x: 0, y: 382.4, z: 0},
     endPoint: {x: 191.2, y: 191.2, z: 0},
     endTangent: {x: 0, y: 382.4, z: 0},
+    startPoint: {x: 191.2, y: -191.2, z: 0},
+    startTangent: {x: 0, y: 382.4, z: 0},
 };
 
 export const switchExtraLegs: Partial<Record<SplineTrackType, HermiteCurve[]>> = {

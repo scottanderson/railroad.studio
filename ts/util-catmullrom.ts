@@ -18,7 +18,7 @@ export function catmullRomToHermite(spline: CatmullRomSpline, i: number, scale =
     // Convert catmull-rom segment to hermite form
     const startTangent = scaleVector(vectorDifference(endPoint, prevPoint), scale);
     const endTangent = scaleVector(vectorDifference(nextPoint, startPoint), scale);
-    return {startPoint, startTangent, endPoint, endTangent};
+    return {endPoint, endTangent, startPoint, startTangent};
 }
 
 export const catmullRomToBezier = (spline: CatmullRomSpline, i: number) =>
@@ -36,7 +36,7 @@ export function catmullRomMinRadius(spline: CatmullRomSpline): CatmullRomOsculat
     const getSegmentResult = (i: number) => {
         const bezier = catmullRomToBezier(spline, i);
         const {center, location, radius, t} = cubicBezierMinRadius(bezier);
-        const result = {center, location, radius, t, i};
+        const result = {center, i, location, radius, t};
         return result;
     };
     return Object.entries(spline.segmentsVisible)
