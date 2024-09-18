@@ -1335,8 +1335,9 @@ export class Studio {
         };
 
         // Refill Consumables Action
-        const refillFuel = (): void => {
-            if (this.railroad.frames.length === 0) return;
+        const refillFuel = (): number => {
+            if (this.railroad.frames.length === 0) return 0;
+            let modificationCount = 0;
             this.railroad.frames.forEach((frame: Frame) => {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
@@ -1344,15 +1345,19 @@ export class Studio {
                 if (max.boilerFuelAmount && frame.state.boilerFuelAmount !== max.boilerFuelAmount) {
                     frame.state.boilerFuelAmount = max.boilerFuelAmount;
                     this.setMapModified();
+                    modificationCount++;
                 }
                 if (max.tenderFuelAmount && frame.state.tenderFuelAmount !== max.tenderFuelAmount) {
                     frame.state.tenderFuelAmount = max.tenderFuelAmount;
                     this.setMapModified();
+                    modificationCount++;
                 }
             });
+            return modificationCount;
         };
-        const refillWater = (): void => {
-            if (this.railroad.frames.length === 0) return;
+        const refillWater = (): number => {
+            if (this.railroad.frames.length === 0) return 0;
+            let modificationCount = 0;
             this.railroad.frames.forEach((frame: Frame) => {
                 if (!isFrameType(frame.type)) return;
                 const {max} = frameDefinitions[frame.type];
@@ -1360,12 +1365,15 @@ export class Studio {
                 if (max.boilerWaterLevel && frame.state.boilerWaterLevel !== max.boilerWaterLevel) {
                     frame.state.boilerWaterLevel = max.boilerWaterLevel;
                     this.setMapModified();
+                    modificationCount++;
                 }
                 if (max.tenderWaterAmount && frame.state.tenderWaterAmount !== max.tenderWaterAmount) {
                     frame.state.tenderWaterAmount = max.tenderWaterAmount;
                     this.setMapModified();
+                    modificationCount++;
                 }
             });
+            return modificationCount;
         };
 
         let h3 = document.createElement('h3');
@@ -1396,20 +1404,34 @@ export class Studio {
         btnFillAll.classList.add('btn', 'btn-secondary');
         btnFillAll.textContent = 'Fill';
         btnFillAll.addEventListener('click', () => {
-            refillWater();
-            refillFuel();
+            const w = refillWater();
+            const f = refillFuel();
+            const modificationCount = w + f;
+            if (modificationCount > 0) {
+                console.log(`Added fuel to ${f} frames`);
+                console.log(`Added water to ${w} frames`);
+                this.setTitle(`Added consumables to ${modificationCount} frames`);
+            }
         });
         const btnFillFuel = document.createElement('button');
         btnFillFuel.classList.add('btn', 'btn-secondary');
         btnFillFuel.textContent = 'Fill';
         btnFillFuel.addEventListener('click', () => {
-            refillFuel();
+            const modificationCount = refillFuel();
+            if (modificationCount > 0) {
+                console.log(`Added fuel to ${modificationCount} frames`);
+                this.setTitle(`Added fuel to ${modificationCount} frames`);
+            }
         });
         const btnFillWater = document.createElement('button');
         btnFillWater.classList.add('btn', 'btn-secondary');
         btnFillWater.textContent = 'Fill';
         btnFillWater.addEventListener('click', () => {
-            refillWater();
+            const modificationCount = refillWater();
+            if (modificationCount > 0) {
+                console.log(`Added water to ${modificationCount} frames`);
+                this.setTitle(`Added water to ${modificationCount} frames`);
+            }
         });
 
         // Fill Consumables
