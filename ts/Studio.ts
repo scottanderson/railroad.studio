@@ -1535,8 +1535,10 @@ export class Studio {
         table.appendChild(thead);
         let tr = document.createElement('tr');
         thead.appendChild(tr);
+        const hasRotations = this.railroad.players.some((player) => typeof player.rotation !== 'undefined');
         const hasPermissions = this.railroad.players.some((player) => typeof player.permissions !== 'undefined');
         const columnHeaders = ['Steam ID', 'Name', 'Money', 'XP', 'Location'];
+        if (hasRotations) columnHeaders.push('Rotation');
         if (hasPermissions) columnHeaders.push('Permissions');
         for (const columnHeader of columnHeaders) {
             const th = document.createElement('th');

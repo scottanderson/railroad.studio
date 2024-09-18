@@ -271,9 +271,9 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         },
         max: {
             boilerFireTemp: 400,
-            boilerFuelAmount: 65,
+            boilerFuelAmount: 70,
             boilerPressure: 130,
-            boilerWaterLevel: 2000,
+            boilerWaterLevel: 5000,
             boilerWaterTemp: 170,
             brakeValue: 1,
             compressorAirPressure: 100,
@@ -303,6 +303,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             paintType: 4,
             smokestackType: 1,
             tenderFuelAmount: 5000,
+            tenderWaterAmount: 5000,
         },
     },
 
