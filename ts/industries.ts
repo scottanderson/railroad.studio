@@ -89,7 +89,7 @@ export const IndustryNames = [
 /**
  * Lookup table for converting legacy industry types to names.
  */
-const legacyIndustryNames: Record<IndustryType, IndustryName> = {
+export const legacyIndustryNames: Record<IndustryType, IndustryName> = {
     [IndustryType.coal_mine]: 'coalmine',
     [IndustryType.coaling_tower]: 'coaltower',
     [IndustryType.engine_house_brown]: 'enginehouse_princess',

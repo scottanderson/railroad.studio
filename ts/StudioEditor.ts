@@ -1,5 +1,5 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {IndustryName, IndustryNames, IndustryType, industryNames, isIndustryName} from './industries';
+import {IndustryName, IndustryType, industryNames, isIndustryName, legacyIndustryNames} from './industries';
 import {Permission, permissionEqual, permissionLabels, permissionToString} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Quadruplet} from './Railroad';
@@ -457,9 +457,11 @@ export function editIndustryType(
     type: IndustryType,
     saveValue: (value: IndustryType) => void,
 ): Node {
-    const options: {[key: string]: string} = {};
-    for (const key of IndustryNames) {
-        options[key] = isIndustryName(key) ? industryNames[key] : key;
+    const options: {[key: number]: string} = {};
+    for (const [key, value] of Object.entries(legacyIndustryNames)) {
+        const type: IndustryType = Number(key);
+        const name = value;
+        options[type] = isIndustryName(name) ? industryNames[name] : name;
     }
     const save = (value: string) => saveValue(Number(value) as IndustryType);
     return editDropdown(studio, String(type), options, save);
