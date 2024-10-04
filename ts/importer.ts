@@ -55,8 +55,10 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
     const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
     const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
+    const serverOwnerPlayerIndex = optionalMap(gvas.ints, 'ServerOwnerPlayerIndex') ?? undefined;
     const saveGame = {
         date: saveGameDate,
+        serverOwner: serverOwnerPlayerIndex,
         uniqueId: saveGameUniqueID,
         uniqueWorldId: saveGameUniqueWorldID,
         version: saveGameVersion,

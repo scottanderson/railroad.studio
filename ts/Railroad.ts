@@ -21,6 +21,7 @@ export interface Railroad {
     sandhouses: Sandhouse[];
     saveGame: {
         date: GvasString;
+        serverOwner: number | undefined;
         uniqueId: GvasString;
         uniqueWorldId: GvasString;
         version: GvasString;

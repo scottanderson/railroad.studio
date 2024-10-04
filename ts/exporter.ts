@@ -83,6 +83,7 @@ const exportKeys = [
     'SaveGameUniqueID',
     'SaveGameUniqueWorldID',
     'SaveGameVersion',
+    'ServerOwnerPlayerIndex',
     'SmokestackTypeArray',
     'SplineControlPointsArray',
     'SplineControlPointsindexendArray',
@@ -417,6 +418,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'savegameversion':
                 strings[propertyName] = railroad.saveGame.version;
                 break;
+            case 'serverownerplayerindex':
+                if (typeof railroad.saveGame.serverOwner !== 'undefined') {
+                    ints[propertyName] = railroad.saveGame.serverOwner;
+                }
+                break;
             case 'smokestacktypearray':
                 intArrays[propertyName] = railroad.frames.map((f) => f.state.smokestackType);
                 break;
@@ -681,6 +687,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'savegameversion': return ['StrProperty'];
         case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinecontrolpointsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'serverownerplayerindex': return ['IntProperty'];
         case 'splinecontrolpointsindexendarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinecontrolpointsindexstartarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
