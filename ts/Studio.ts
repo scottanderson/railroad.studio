@@ -741,9 +741,15 @@ export class Studio {
             framePage = page;
             resetFramePage();
         };
-        const frameInCategory = (f: Frame, c: typeof frameCategories[number]) =>
-            isFrameType(f.type) && (frameDefinitions[f.type][c] ?? false);
-        const labels = {
+        const frameInCategory = (f: Frame, c: typeof frameCategories[number] | 'unknown') => {
+            if (c === 'unknown') return !isFrameType(f.type);
+            if (!isFrameType(f.type)) return false;
+            return (frameDefinitions[f.type][c] ?? false);
+        };
+        const numFramesWithUnknownTypes = railroad.frames
+            .filter((f) => !isFrameType(f.type))
+            .length;
+        const labels: Record<string, string> = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
             freight: `Freight (${railroad.frames.filter((f) => frameInCategory(f, 'freight')).length})`,
             handcar: `Handcars (${railroad.frames.filter((f) => frameInCategory(f, 'handcar')).length})`,
@@ -754,23 +760,30 @@ export class Studio {
         const anyInCategory = (c: typeof frameCategories[number]): boolean =>
             railroad.frames.some((f) => frameInCategory(f, c));
         const checked = Object.fromEntries(frameCategories.map((c) => [c, anyInCategory(c)]));
-        const onFrameFilter = (category: typeof frameCategories[number], value: boolean): void => {
+        const onFrameFilter = (category: typeof frameCategories[number] | 'unknown', value: boolean): void => {
             checked[category] = value;
             resetFramePage();
         };
-        const categories = frameCategories.filter(anyInCategory);
+        const categories: (typeof frameCategories[number] | 'unknown')[] = frameCategories.filter(anyInCategory);
         let frameSelect = 'all';
         const onOption = (value: string) => {
             frameSelect = value;
             resetFramePage();
         };
+        if (numFramesWithUnknownTypes > 0) {
+            labels['unknown'] = `Unknown (${numFramesWithUnknownTypes})`;
+            checked['unknown'] = true;
+            categories.push('unknown');
+        }
         const resetFramePage = () => {
+            const displayUnknownFrameTypes = numFramesWithUnknownTypes > 0 && checked['unknown'];
             const pageSize = 20;
             const filteredCategory = railroad.frames.filter((f) => {
-                if (!isFrameType(f.type)) return false;
+                if (!isFrameType(f.type)) return displayUnknownFrameTypes;
                 const d = frameDefinitions[f.type];
                 return frameCategories.every((c) => !d[c] || checked[c]);
             });
+            // Create a dropdown entry for each known frame type
             const options = Object.entries(frameDefinitions)
                 .filter(([type]) => filteredCategory.some((f) => f.type === type))
                 .map(([type, fd]) => {
@@ -778,6 +791,19 @@ export class Studio {
                     const text = count === 1 ? fd.name : `${fd.name} (${count})`;
                     return [type, text] as [string, string];
                 });
+            // Create a dropdown entry for each unknown frame type
+            if (displayUnknownFrameTypes) {
+                const unknownTypes = filteredCategory
+                    .map((f) => f.type)
+                    .filter((v, i, a) => a.indexOf(v) === i)
+                    .filter((t) => !isFrameType(t))
+                    .filter(Boolean)
+                    .sort((a, b) => -a.toLowerCase().localeCompare(b.toLowerCase()));
+                for (const unknownType of unknownTypes) {
+                    options.unshift([unknownType, `Unknown type: ${unknownType}`]);
+                }
+            }
+            // Create a dropdown entry for all
             options.unshift(['all', `All (${filteredCategory.length})`]);
             const filterNav = createFilter(categories, labels, onFrameFilter, options, onOption, checked, frameSelect);
             filterNav.classList.add('mt-5');
@@ -1153,7 +1179,12 @@ export class Studio {
             tbody.appendChild(tr);
             // Type
             let td = document.createElement('td');
-            td.textContent = isFrameType(frame.type) ? frameDefinitions[frame.type].name : '';
+            if (isFrameType(frame.type)) {
+                td.textContent = frameDefinitions[frame.type].name;
+            } else {
+                td.textContent = frame.type;
+                td.classList.add('table-warning');
+            }
             tr.appendChild(td);
             // Name
             td = document.createElement('td');
