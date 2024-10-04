@@ -55,8 +55,10 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
     const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
     const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
+    const serverOwnerPlayerIndex = optionalMap(gvas.ints, 'ServerOwnerPlayerIndex') ?? undefined;
     const saveGame = {
         date: saveGameDate,
+        serverOwner: serverOwnerPlayerIndex,
         uniqueId: saveGameUniqueID,
         uniqueWorldId: saveGameUniqueWorldID,
         version: saveGameVersion,
@@ -284,7 +286,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read props
     const props: Prop[] = [];
-    const propNames = optionalMap(gvas.stringArrays, 'PropsNameArray');
+    const propNames = 'PropsNames' in gvas.nameArrays ?
+        optionalMap(gvas.nameArrays, 'PropsNames') :
+        optionalMap(gvas.stringArrays, 'PropsNameArray');
     const propTransforms = optionalMap(gvas.transformArrays, 'PropsTransformArray');
     const propText = optionalMap(gvas.textArrays, 'PropsTextArray');
     if (propNames ?? propTransforms ?? propText) {

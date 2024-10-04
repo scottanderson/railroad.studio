@@ -26,8 +26,8 @@ const exportKeys = [
     'BoilerWaterLevelArray',
     'BoilerWaterTempArray',
     'BrakeValueArray',
-    'CompressorValveValueArray',
     'CompressorairPressureArray',
+    'CompressorValveValueArray',
     'CouplerFrontStateArray',
     'CouplerrearStateArray',
     'DayLength',
@@ -42,8 +42,8 @@ const exportKeys = [
     'GameLevelName',
     'GeneratorValveValueArray',
     'HeadlightFrontStateArray',
-    'HeadlightTypeArray',
     'HeadlightrearStateArray',
+    'HeadlightTypeArray',
     'IndustryLocationArray',
     'IndustryNameArray',
     'IndustryRotationArray',
@@ -69,7 +69,6 @@ const exportKeys = [
     'PlayerNameArray',
     'PlayerRotationArray',
     'PlayerXPArray',
-    'PropsNameArray',
     'PropsTextArray',
     'PropsTransformArray',
     'RegulatorValueArray',
@@ -83,6 +82,7 @@ const exportKeys = [
     'SaveGameUniqueID',
     'SaveGameUniqueWorldID',
     'SaveGameVersion',
+    'ServerOwnerPlayerIndex',
     'SmokestackTypeArray',
     'SplineControlPointsArray',
     'SplineControlPointsindexendArray',
@@ -114,8 +114,8 @@ const exportKeys = [
     'TurntableRotatorArray',
     'TurntableTypeArray',
     'TurntableTypes',
-    'VegetationISMCompNameArray',
     'VegetationInstanceIndexArray',
+    'VegetationISMCompNameArray',
     'WatertowerLocationArray',
     'WatertowerRotationArray',
     'WatertowerTypeArray',
@@ -374,6 +374,9 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'propsnamearray':
                 stringArrays[propertyName] = railroad.props.map((p) => p.name);
                 break;
+            case 'propsnames':
+                nameArrays[propertyName] = railroad.props.map((p) => p.name);
+                break;
             case 'propstextarray':
                 textArrays[propertyName] = railroad.props.map((p) => p.text);
                 break;
@@ -413,6 +416,11 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 break;
             case 'savegameversion':
                 strings[propertyName] = railroad.saveGame.version;
+                break;
+            case 'serverownerplayerindex':
+                if (typeof railroad.saveGame.serverOwner !== 'undefined') {
+                    ints[propertyName] = railroad.saveGame.serverOwner;
+                }
                 break;
             case 'smokestacktypearray':
                 intArrays[propertyName] = railroad.frames.map((f) => f.state.smokestackType);
@@ -662,6 +670,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
         case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
         case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'propsnames': return ['ArrayProperty', 'NameProperty'];
         case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
         case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
         case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
@@ -677,6 +686,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'savegameversion': return ['StrProperty'];
         case 'smokestacktypearray': return ['ArrayProperty', 'IntProperty'];
         case 'splinecontrolpointsarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
+        case 'serverownerplayerindex': return ['IntProperty'];
         case 'splinecontrolpointsindexendarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinecontrolpointsindexstartarray': return ['ArrayProperty', 'IntProperty'];
         case 'splinelocationarray': return ['ArrayProperty', 'StructProperty', 'Vector'];
