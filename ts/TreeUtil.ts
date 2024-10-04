@@ -190,21 +190,21 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
     const name = getIndustryName(industry);
     if (!name) return false;
     switch (name) {
-        case 'logcamp':
+        case 'LogCamp':
             return radiusFilter(industry.location, tree, 45_00); // 45m
-        case 'sawmill':
+        case 'Sawmill':
             return radiusFilter(industry.location, tree, 60_00); // 60m
         case 'smelter':
             return radiusFilter(industry.location, tree, 40_00); // 40m
-        case 'ironworks':
+        case 'IronWorks':
             return radiusFilter(industry.location, tree, 40_00); // 40m
         case 'oilfield':
             return radiusFilter(industry.location, tree, 100_00); // 100m
         case 'Refinery':
             return radiusFilter(industry.location, tree, 45_00); // 45m
-        case 'coalmine':
+        case 'Coalmine':
             return radiusFilter(industry.location, tree, 40_00); // 40m
-        case 'ironoremine':
+        case 'IronOreMine':
             return radiusFilter(industry.location, tree, 30_00); // 30m
         case 'freightdepot':
             return radiusFilter(industry.location, tree, 35_00); // 35m
@@ -241,19 +241,19 @@ function industryFilter(industry: Industry, tree: Vector): boolean {
             const p1 = vectorSum(industry.location, rotateVector(p1local, industry.rotation));
             return pillFilter(tree, p0, p1, 10_00);
         }
-        case 'coaltower':
+        case 'CoalTower':
             return radiusFilter(industry.location, tree, 15_00); // 15m
         case 'telegraphoffice':
         case 'watertower_1870_style1':
         case 'watertower_1870_style2':
         case 'watertower_1870_style3':
         case 'watertower_1870_style4':
-        case 'watertower_drgw':
+        case 'WaterTower_DRGW':
         case 'watertower_kanaskat_style1':
         case 'watertower_kanaskat_style2':
         case 'watertower_kanaskat_style3':
         case 'watertower_kanaskat_style4':
-        case 'watertower_small':
+        case 'WaterTower_Small':
             return radiusFilter(industry.location, tree, 10_00); // 10m
         case 'engineshed_style1':
         case 'engineshed_style2':
