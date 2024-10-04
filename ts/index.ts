@@ -12,11 +12,16 @@ declare global {
     }
 }
 
+// Webpack substitutions
+declare const BUILD_DATE: string;
+declare const VERSION: string;
+
 // Set up dark mode before doing anything else
 activateTheme();
 
 // Main app entry point
 window.onload = () => {
+    console.log('Loading Railroad Studio\nversion ' + VERSION + '\nbuilt ' + BUILD_DATE);
     const url = new URLSearchParams(window.location.search).get('url');
     if (url) return handleUrl(url);
     // Configure the drop area
