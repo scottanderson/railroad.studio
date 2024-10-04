@@ -418,8 +418,8 @@ export function railroadToGvas(railroad: Railroad): Gvas {
                 strings[propertyName] = railroad.saveGame.version;
                 break;
             case 'serverownerplayerindex':
-                if (typeof railroad.saveGame.serverOwner !== 'undefined') {
-                    ints[propertyName] = railroad.saveGame.serverOwner;
+                if (typeof railroad.settings.serverOwnerPlayerIndex !== 'undefined') {
+                    ints[propertyName] = railroad.settings.serverOwnerPlayerIndex;
                 }
                 break;
             case 'smokestacktypearray':

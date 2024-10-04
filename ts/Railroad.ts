@@ -21,7 +21,6 @@ export interface Railroad {
     sandhouses: Sandhouse[];
     saveGame: {
         date: GvasString;
-        serverOwner: number | undefined;
         uniqueId: GvasString;
         uniqueWorldId: GvasString;
         version: GvasString;
@@ -32,11 +31,12 @@ export interface Railroad {
         dayLength: number | undefined;
         gameLevelName: GvasString;
         nightLength: number | undefined;
+        serverOwnerPlayerIndex: number | undefined;
         timeOfDay: number | bigint | undefined;
-        weatherType: number | undefined;
         weatherChangeIntervalMax: number | undefined;
         weatherChangeIntervalMin: number | undefined;
         weatherTransitionTime: number | undefined;
+        weatherType: number | undefined;
     };
     splineTracks: SplineTrack[];
     splines: Spline[];
