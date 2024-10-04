@@ -54,6 +54,7 @@ export function textToString(value: GvasText): GvasString {
         // ArgumentFormat
         switch (value.guid) {
             case RRO_TEXT_GUID:
+            case '1428110346E6AD292230C4AA503E3FE9':
             case '69981E2B47B2AABC01CE39842FB03A96':
                 break;
             default:
