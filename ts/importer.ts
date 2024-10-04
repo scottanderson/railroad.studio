@@ -55,10 +55,8 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const saveGameDate = optionalMap(gvas.strings, 'SaveGameDate');
     const saveGameUniqueID = optionalMap(gvas.strings, 'SaveGameUniqueID');
     const saveGameUniqueWorldID = optionalMap(gvas.strings, 'SaveGameUniqueWorldID');
-    const serverOwnerPlayerIndex = optionalMap(gvas.ints, 'ServerOwnerPlayerIndex') ?? undefined;
     const saveGame = {
         date: saveGameDate,
-        serverOwner: serverOwnerPlayerIndex,
         uniqueId: saveGameUniqueID,
         uniqueWorldId: saveGameUniqueWorldID,
         version: saveGameVersion,
@@ -69,12 +67,12 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     const dayLength = optionalMap(gvas.floats, 'DayLength') ?? undefined;
     const gameLevelName = optionalMap(gvas.strings, 'GameLevelName');
     const nightLength = optionalMap(gvas.floats, 'NightLength') ?? undefined;
+    const serverOwnerPlayerIndex = optionalMap(gvas.ints, 'ServerOwnerPlayerIndex') ?? undefined;
     const timeOfDay =
         (isNovemberUpdate ?
             optionalMap(gvas.dateTimes, 'TimeOfDay') :
             optionalMap(gvas.floats, 'TimeOfDay')
         ) ?? undefined;
-
     const weatherChangeIntervalMax = optionalMap(gvas.floats, 'WeatherChangeIntervalMax') ?? undefined;
     const weatherChangeIntervalMin = optionalMap(gvas.floats, 'WeatherChangeIntervalMin') ?? undefined;
     const weatherTransitionTime = optionalMap(gvas.floats, 'WeatherTransitionTime') ?? undefined;
@@ -85,6 +83,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         dayLength,
         gameLevelName,
         nightLength,
+        serverOwnerPlayerIndex,
         timeOfDay,
         weatherChangeIntervalMax,
         weatherChangeIntervalMin,

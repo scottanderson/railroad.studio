@@ -471,6 +471,18 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
         'building': rect(-270, -670, 550, 850),
     },
     'Sawmill': {
+        'pond': [
+            ['M', 2800, 980],
+            ['C', 2010, 640, 1600, 500, 1180, 420],
+            ['S', 580, 500, -270, 1100],
+            ['S', -800, 1420, -1280, 2270],
+            ['S', -1330, 3170, -980, 4170],
+            ['S', -320, 4910, 570, 5220],
+            ['S', 1250, 5940, 2100, 5840],
+            ['S', 2640, 5310, 2750, 4360],
+            ['Z'],
+        ] as PathCommand[],
+        // eslint-disable-next-line sort-keys
         'building': combine(
             polyRect(-1000, -2800,
                 900, -2600,
@@ -487,17 +499,6 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             rect(-3900, -4000, 300, 4500),
             rect(2600, 600, 300, 4200),
         ),
-        'pond': [
-            ['M', 2800, 980],
-            ['C', 2010, 640, 1600, 500, 1180, 420],
-            ['S', 580, 500, -270, 1100],
-            ['S', -800, 1420, -1280, 2270],
-            ['S', -1330, 3170, -980, 4170],
-            ['S', -320, 4910, 570, 5220],
-            ['S', 1250, 5940, 2100, 5840],
-            ['S', 2640, 5310, 2750, 4360],
-            ['Z'],
-        ] as PathCommand[],
     },
     'smelter': {
         'building': polyRectRel(-550, -4000,
