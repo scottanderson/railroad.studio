@@ -12,7 +12,7 @@ export const frameTypes = [
     'class70',
     'class70_tender',
     'climax',
-    'coach_dsprr_1',
+    'Coach_DSPRR_1',
     'cooke260',
     'cooke260_new',
     'cooke260_new_tender',
@@ -20,19 +20,19 @@ export const frameTypes = [
     'cooke280',
     'cooke280_tender',
     'DRGW_Gondola_33FT',
-    'dspp_baggage',
+    'DSPP_baggage',
     'eureka',
     'eureka_tender',
     'Ferries242T',
     'flatcar_cordwood',
     'flatcar_hopper',
-    'flatcar_logs',
-    'flatcar_stakes',
-    'flatcar_tanker',
+    'FlatCar_Logs',
+    'FlatCar_Stakes',
+    'FlatCar_Tanker',
     'glenbrook',
     'glenbrook_tender',
     'handcar',
-    'heisler',
+    'Heisler',
     'hopperBB',
     'lima280',
     'lima280_tender',
@@ -51,15 +51,15 @@ export const frameTypes = [
     'plantationcar_hopper_small',
     'plantationcar_tanker',
     'plow',
-    'porter_040',
-    'porter_042',
-    'rubybasin',
+    'Porter_040',
+    'Porter_042',
+    'Rubybasin',
     'shay',
     'SideDumpCar',
-    'skeletoncar',
-    'stockcar',
+    'SkeletonCar',
+    'StockCar',
     'tankcarNCO',
-    'tenmile',
+    'Tenmile',
     'tweetsie280',
     'tweetsie280_tender',
     'VentilatedBoxcarCC',
@@ -67,10 +67,38 @@ export const frameTypes = [
     'waycar',
 ] as const satisfies ReadonlyArray<string>;
 
+/**
+ * Lookup table for legacy frame types.
+ */
+const legacyFrameMap: Record<string, FrameType> = {
+    'class47_tender': 'Class47_Tender',
+    'coach_dsprr_1': 'Coach_DSPRR_1',
+    'drgw_gondola_33ft': 'DRGW_Gondola_33FT',
+    'dspp_baggage': 'DSPP_baggage',
+    'flatcar_logs': 'FlatCar_Logs',
+    'flatcar_stakes': 'FlatCar_Stakes',
+    'flatcar_tanker': 'FlatCar_Tanker',
+    'heisler': 'Heisler',
+    'porter_040': 'Porter_040',
+    'porter_042': 'Porter_042',
+    'rubybasin': 'Rubybasin',
+    'skeletoncar': 'SkeletonCar',
+    'stockcar': 'StockCar',
+    'tenmile': 'Tenmile',
+};
+
 type FrameType = typeof frameTypes[number];
 
 export const isFrameType = (type: GvasString): type is FrameType =>
     type ? frameTypes.includes(type) : false;
+
+export function getFrameType(type: GvasString): FrameType | null {
+    if (isFrameType(type)) return type;
+    if (type === null) return null;
+    if (type in legacyFrameMap) return legacyFrameMap[type];
+    console.warn(`Unrecognized frame type ${type}`);
+    return null;
+}
 
 export const frameCategories = ['engine', 'tender', 'freight', 'passenger', 'mow', 'handcar'] as const;
 
@@ -390,7 +418,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Climax',
     },
 
-    'coach_dsprr_1': {
+    'Coach_DSPRR_1': {
         length: 1420,
         max: {
             brakeValue: 1,
@@ -582,7 +610,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'D&RGW 33FT Gondola',
     },
 
-    'dspp_baggage': {
+    'DSPP_baggage': {
         freight: true,
         length: 1400,
         max: {
@@ -712,7 +740,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Hopper',
     },
 
-    'flatcar_logs': {
+    'FlatCar_Logs': {
         freight: true,
         length: 818,
         max: {
@@ -729,7 +757,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Flatcar Tier 1',
     },
 
-    'flatcar_stakes': {
+    'FlatCar_Stakes': {
         freight: true,
         length: 785.6,
         max: {
@@ -746,7 +774,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Flatcar Tier 2',
     },
 
-    'flatcar_tanker': {
+    'FlatCar_Tanker': {
         freight: true,
         length: 804,
         max: {
@@ -834,7 +862,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Handcar',
     },
 
-    'heisler': {
+    'Heisler': {
         engine: true,
         length: 913.73,
         max: {
@@ -1207,7 +1235,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Snow Plow',
     },
 
-    'porter_040': {
+    'Porter_040': {
         engine: true,
         length: 391.2,
         max: {
@@ -1235,7 +1263,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Porter',
     },
 
-    'porter_042': {
+    'Porter_042': {
         engine: true,
         length: 461.35,
         max: {
@@ -1261,7 +1289,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Porter 2',
     },
 
-    'rubybasin': {
+    'Rubybasin': {
         coal: true,
         engine: true,
         length: 1029,
@@ -1336,7 +1364,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Westside Lumber Co. Side Dump car',
     },
 
-    'skeletoncar': {
+    'SkeletonCar': {
         freight: true,
         length: 635,
         max: {
@@ -1353,7 +1381,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Skeleton Car',
     },
 
-    'stockcar': {
+    'StockCar': {
         freight: true,
         length: 932,
         max: {
@@ -1387,7 +1415,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Coffin Tank Car',
     },
 
-    'tenmile': {
+    'Tenmile': {
         engine: true,
         length: 1174,
         max: {
@@ -1647,7 +1675,7 @@ export const cargoLimits = {
         ['EFreightType::GoldOre']: 22,
         ['EFreightType::IronOre']: 22,
     },
-    dspp_baggage: {
+    DSPP_baggage: {
         ['EFreightType::GoldIngot']: 5,
         ['EFreightType::RefinedGold']: 16,
     },
@@ -1662,19 +1690,19 @@ export const cargoLimits = {
         ['EFreightType::IronOre']: 10,
         ['EFreightType::None']: 0,
     },
-    flatcar_logs: {
+    FlatCar_Logs: {
         ['EFreightType::Log']: 6,
         ['EFreightType::None']: 0,
         ['EFreightType::SteelPipe']: 9,
     },
-    flatcar_stakes: {
+    FlatCar_Stakes: {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 6,
         ['EFreightType::None']: 0,
         ['EFreightType::Rail']: 10,
         ['EFreightType::RawIron']: 3,
     },
-    flatcar_tanker: {
+    FlatCar_Tanker: {
         ['EFreightType::CrudeOil']: 12,
         ['EFreightType::None']: 0,
     },
@@ -1740,11 +1768,11 @@ export const cargoLimits = {
         ['EFreightType::GoldOre']: 6,
         ['EFreightType::IronOre']: 6,
     },
-    skeletoncar: {
+    SkeletonCar: {
         ['EFreightType::Log']: 5,
         ['EFreightType::None']: 0,
     },
-    stockcar: {
+    StockCar: {
         ['EFreightType::Cattle']: 6,
         ['EFreightType::CrateTools']: 32,
         ['EFreightType::None']: 0,

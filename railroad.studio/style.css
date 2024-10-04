@@ -68,7 +68,7 @@
   --telegraph-office: #fc0;
   --coaling-tower: #fc0;
   --building-beige: #cc9;
-  --building-old: #663;
+  --building-old: #669;
   --fence-fill: transparent;
   --fence-stroke: black;
   --walkway-stroke: black;
@@ -362,17 +362,17 @@ body {
 
 .frame.boxcar { fill: var(--boxcar); }
 .frame.boxcar.cargo-loaded { fill: var(--boxcar-loaded); }
-.frame.coach_dsprr_1 { fill: var(--coach); }
+.frame.Coach_DSPRR_1 { fill: var(--coach); }
 .frame.flatcar_cordwood { fill: var(--flatcar-cordwood); }
 .frame.flatcar_cordwood.cargo-loaded { fill: var(--flatcar-cordwood-loaded); }
 .frame.flatcar_hopper { fill: var(--flatcar-hopper); }
 .frame.flatcar_hopper.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
-.frame.flatcar_logs { fill: var(--flatcar-logs); }
-.frame.flatcar_logs.cargo-loaded { fill: var(--flatcar-logs-loaded); }
-.frame.flatcar_stakes { fill: var(--flatcar-stakes); }
-.frame.flatcar_stakes.cargo-loaded { fill: var(--flatcar-stakes-loaded); }
-.frame.flatcar_tanker { fill: var(--flatcar-tanker); }
-.frame.flatcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
+.frame.FlatCar_Logs { fill: var(--flatcar-logs); }
+.frame.FlatCar_Logs.cargo-loaded { fill: var(--flatcar-logs-loaded); }
+.frame.FlatCar_Stakes { fill: var(--flatcar-stakes); }
+.frame.FlatCar_Stakes.cargo-loaded { fill: var(--flatcar-stakes-loaded); }
+.frame.FlatCar_Tanker { fill: var(--flatcar-tanker); }
+.frame.FlatCar_Tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.hopperBB { fill: var(--flatcar-hopper); }
 .frame.hopperBB.cargo-loaded { fill: var(--flatcar-hopper-loaded); }
 .frame.OahuWaterCar { fill: var(--flatcar-tanker); }
@@ -396,10 +396,10 @@ body {
 .frame.plantationcar_tanker { fill: var(--flatcar-tanker); }
 .frame.plantationcar_tanker.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.plow { fill: var(--plow); }
-.frame.skeletoncar { fill: var(--flatcar-logs); }
-.frame.skeletoncar.cargo-loaded { fill: var(--flatcar-logs-loaded); }
-.frame.stockcar { fill: var(--boxcar); }
-.frame.stockcar.cargo-loaded { fill: var(--boxcar-loaded); }
+.frame.SkeletonCar { fill: var(--flatcar-logs); }
+.frame.SkeletonCar.cargo-loaded { fill: var(--flatcar-logs-loaded); }
+.frame.StockCar { fill: var(--boxcar); }
+.frame.StockCar.cargo-loaded { fill: var(--boxcar-loaded); }
 .frame.tankcarNCO { fill: var(--flatcar-tanker); }
 .frame.tankcarNCO.cargo-loaded { fill: var(--flatcar-tanker-loaded); }
 .frame.VentilatedBoxcarCC { fill: var(--boxcar); }
@@ -469,7 +469,7 @@ body {
   stroke: var(--pond-stroke);
 }
 
-.industry.coaltower .building { fill: var(--coaling-tower); }
+.industry.CoalTower .building { fill: var(--coaling-tower); }
 .industry.enginehouse_alpine .building { fill: var(--engine-house-lightblue); }
 .industry.enginehouse_aspen .building { fill: var(--engine-house-gold); }
 .industry.enginehouse_barn .building { fill: var(--engine-house-red); }
@@ -488,6 +488,7 @@ body {
 .industry.watertower_kanaskat_style2 .building { fill: var(--engine-house-brown); }
 .industry.watertower_kanaskat_style3 .building { fill: var(--building-beige); }
 .industry.watertower_kanaskat_style4 .building { fill: var(--building-old); }
+.industry.WaterTower_Small .building { fill: var(--building-beige); }
 
 .gizmo .x { fill: var(--engine-house-red); }
 .gizmo .y { fill: var(--boxcar); }
