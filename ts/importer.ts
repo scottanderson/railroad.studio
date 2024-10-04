@@ -284,7 +284,9 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
     }
     // Read props
     const props: Prop[] = [];
-    const propNames = optionalMap(gvas.stringArrays, 'PropsNameArray');
+    const propNames = 'PropsNames' in gvas.nameArrays ?
+        optionalMap(gvas.nameArrays, 'PropsNames') :
+        optionalMap(gvas.stringArrays, 'PropsNameArray');
     const propTransforms = optionalMap(gvas.transformArrays, 'PropsTransformArray');
     const propText = optionalMap(gvas.textArrays, 'PropsTextArray');
     if (propNames ?? propTransforms ?? propText) {

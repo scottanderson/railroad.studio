@@ -69,7 +69,7 @@ const exportKeys = [
     'PlayerNameArray',
     'PlayerRotationArray',
     'PlayerXPArray',
-    'PropsNameArray',
+    'PropsNames',
     'PropsTextArray',
     'PropsTransformArray',
     'RegulatorValueArray',
@@ -374,6 +374,9 @@ export function railroadToGvas(railroad: Railroad): Gvas {
             case 'propsnamearray':
                 stringArrays[propertyName] = railroad.props.map((p) => p.name);
                 break;
+            case 'propsnames':
+                nameArrays[propertyName] = railroad.props.map((p) => p.name);
+                break;
             case 'propstextarray':
                 textArrays[propertyName] = railroad.props.map((p) => p.text);
                 break;
@@ -662,6 +665,7 @@ function getPropertyType(gvas: Gvas, propertyName: string): GvasTypes {
         case 'playerrotationarray': return ['ArrayProperty', 'FloatProperty'];
         case 'playerxparray': return ['ArrayProperty', 'IntProperty'];
         case 'propsnamearray': return ['ArrayProperty', 'StrProperty'];
+        case 'propsnames': return ['ArrayProperty', 'NameProperty'];
         case 'propstextarray': return ['ArrayProperty', 'TextProperty'];
         case 'propstransformarray': return ['ArrayProperty', 'StructProperty', 'Transform'];
         case 'regulatorvaluearray': return ['ArrayProperty', 'FloatProperty'];
