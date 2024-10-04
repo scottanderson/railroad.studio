@@ -69,7 +69,6 @@ const exportKeys = [
     'PlayerNameArray',
     'PlayerRotationArray',
     'PlayerXPArray',
-    'PropsNames',
     'PropsTextArray',
     'PropsTransformArray',
     'RegulatorValueArray',
