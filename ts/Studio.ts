@@ -33,9 +33,9 @@ import {
     frameCategories,
     frameDefinitions,
     frameStateMetadata,
+    getFrameType,
     hasCargoLimits,
     isCargoType,
-    isFrameType,
 } from './frames';
 import {SplineTrackType} from './SplineTrackType';
 import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
@@ -308,16 +308,19 @@ export class Studio {
         grpFrameList.classList.add('dropdown');
         grpFrameList.replaceChildren(btnFrameList, lstFrameList);
         lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
-            if (!isFrameType(a.type)) return isFrameType(b.type) ? 1 : 0;
-            if (!isFrameType(b.type)) return -1;
-            const ad = frameDefinitions[a.type];
-            const bd = frameDefinitions[b.type];
+            const aType = getFrameType(a.type);
+            const bType = getFrameType(b.type);
+            if (aType === null) return bType === null ? 1 : 0;
+            if (bType === null) return -1;
+            const ad = frameDefinitions[aType];
+            const bd = frameDefinitions[bType];
             return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
         }).flatMap((frame, i, a) => {
             const btnFrame = document.createElement('button');
             const imgFrame = document.createElement('i');
+            const frameType = getFrameType(frame.type);
             const text =
-                (isFrameType(frame.type) ? frameDefinitions[frame.type].name + ' ' : '') +
+                (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
                 (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
                 (frame.name ? gvasToString(textToString(frame.name)) : '');
             const txtFrame = document.createTextNode(` ${text} `);
@@ -331,9 +334,10 @@ export class Studio {
                 if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
             });
             const prevFrame = i > 0 ? a[i - 1] : undefined;
-            if (prevFrame && isFrameType(frame.type) && isFrameType(prevFrame.type)) {
-                const prevFrameDef = frameDefinitions[prevFrame.type];
-                const frameDef = frameDefinitions[frame.type];
+            const prevFrameType = getFrameType(prevFrame?.type ?? null);
+            if (prevFrame && frameType !== null && prevFrameType !== null) {
+                const prevFrameDef = frameDefinitions[prevFrameType];
+                const frameDef = frameDefinitions[frameType];
                 if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
                     const li = document.createElement('li');
                     const hr = document.createElement('hr');
@@ -742,12 +746,13 @@ export class Studio {
             resetFramePage();
         };
         const frameInCategory = (f: Frame, c: typeof frameCategories[number] | 'unknown') => {
-            if (c === 'unknown') return !isFrameType(f.type);
-            if (!isFrameType(f.type)) return false;
-            return (frameDefinitions[f.type][c] ?? false);
+            const frameType = getFrameType(f.type);
+            if (c === 'unknown') return frameType === null;
+            if (frameType === null) return false;
+            return (frameDefinitions[frameType][c] ?? false);
         };
         const numFramesWithUnknownTypes = railroad.frames
-            .filter((f) => !isFrameType(f.type))
+            .filter((f) => getFrameType(f.type) === null)
             .length;
         const labels: Record<string, string> = {
             engine: `Engines (${railroad.frames.filter((f) => frameInCategory(f, 'engine')).length})`,
@@ -779,8 +784,9 @@ export class Studio {
             const displayUnknownFrameTypes = numFramesWithUnknownTypes > 0 && checked['unknown'];
             const pageSize = 20;
             const filteredCategory = railroad.frames.filter((f) => {
-                if (!isFrameType(f.type)) return displayUnknownFrameTypes;
-                const d = frameDefinitions[f.type];
+                const fType = getFrameType(f.type);
+                if (fType === null) return displayUnknownFrameTypes;
+                const d = frameDefinitions[fType];
                 return frameCategories.every((c) => !d[c] || checked[c]);
             });
             // Create a dropdown entry for each known frame type
@@ -796,7 +802,7 @@ export class Studio {
                 const unknownTypes = filteredCategory
                     .map((f) => f.type)
                     .filter((v, i, a) => a.indexOf(v) === i)
-                    .filter((t) => !isFrameType(t))
+                    .filter((t) => getFrameType(t) === null)
                     .filter(Boolean)
                     .sort((a, b) => -a.toLowerCase().localeCompare(b.toLowerCase()));
                 for (const unknownType of unknownTypes) {
@@ -1179,8 +1185,9 @@ export class Studio {
             tbody.appendChild(tr);
             // Type
             let td = document.createElement('td');
-            if (isFrameType(frame.type)) {
-                td.textContent = frameDefinitions[frame.type].name;
+            const frameType = getFrameType(frame.type);
+            if (frameType !== null) {
+                td.textContent = frameDefinitions[frameType].name;
             } else {
                 td.textContent = frame.type;
                 td.classList.add('table-warning');
@@ -1227,8 +1234,8 @@ export class Studio {
             const setFrameRotation = (rotation: Rotator) => frame.rotation = rotation;
             addStat('Rotation', editRotator(this, frame.rotation, setFrameRotation));
             // Frame state
-            if (isFrameType(frame.type)) {
-                const frameDef = frameDefinitions[frame.type];
+            if (frameType !== null) {
+                const frameDef = frameDefinitions[frameType];
                 const editNumericState = (frame: Frame, key: keyof NumericFrameState) => {
                     if (typeof frame.state[key] === 'undefined') return;
                     const meta = frameStateMetadata[key];
@@ -1314,10 +1321,10 @@ export class Studio {
                 editNumericState(frame, 'markerLightsRearLeftState');
                 editNumericState(frame, 'markerLightsRearRightState');
                 // Freight
-                if (hasCargoLimits(frame.type)) {
+                if (hasCargoLimits(frameType)) {
                     const freightType = frame.state.freightType ?? '';
                     const setAmount = (amount: number) => frame.state.freightAmount = amount;
-                    const limits: Partial<Record<CargoType, number>> = cargoLimits[frame.type];
+                    const limits: Partial<Record<CargoType, number>> = cargoLimits[frameType];
                     const limit = isCargoType(freightType) ? limits[freightType] ?? 0 : 0;
                     const max = String(limit);
                     const options: InputTextOptions = {max, min: '0'};
@@ -1342,7 +1349,7 @@ export class Studio {
                         const form = editDropdown(this, freightType, typeOptions, setFreightType);
                         addStat('Freight Type', form);
                     } else {
-                        const title = `Unexpected freight type ${freightType} for ${frame.type}`;
+                        const title = `Unexpected freight type ${freightType} for ${frameType}`;
                         const c = 'table-warning';
                         const form = editString(this, freightType, setFreightType);
                         addStat('Freight Type', form, title, c);
@@ -1369,8 +1376,9 @@ export class Studio {
             if (this.railroad.frames.length === 0) return 0;
             let modificationCount = 0;
             this.railroad.frames.forEach((frame: Frame) => {
-                if (!isFrameType(frame.type)) return;
-                const {max} = frameDefinitions[frame.type];
+                const frameType = getFrameType(frame.type);
+                if (frameType === null) return;
+                const {max} = frameDefinitions[frameType];
                 if (typeof max === 'undefined') return;
                 if (max.boilerFuelAmount && frame.state.boilerFuelAmount !== max.boilerFuelAmount) {
                     frame.state.boilerFuelAmount = max.boilerFuelAmount;
@@ -1389,8 +1397,9 @@ export class Studio {
             if (this.railroad.frames.length === 0) return 0;
             let modificationCount = 0;
             this.railroad.frames.forEach((frame: Frame) => {
-                if (!isFrameType(frame.type)) return;
-                const {max} = frameDefinitions[frame.type];
+                const frameType = getFrameType(frame.type);
+                if (frameType === null) return;
+                const {max} = frameDefinitions[frameType];
                 if (typeof max === 'undefined') return;
                 if (max.boilerWaterLevel && frame.state.boilerWaterLevel !== max.boilerWaterLevel) {
                     frame.state.boilerWaterLevel = max.boilerWaterLevel;
