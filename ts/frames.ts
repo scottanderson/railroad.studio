@@ -53,6 +53,8 @@ export const frameTypes = [
     'plow',
     'Porter_040',
     'Porter_042',
+    'RGS_Rotary',
+    'RGS_Rotary_Tender',
     'Rubybasin',
     'shay',
     'SideDumpCar',
@@ -1287,6 +1289,51 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             reverserValue: -1,
         },
         name: 'Porter 2',
+    },
+
+    'RGS_Rotary': {
+        coal: true,
+        engine: true,
+        length: 1213,
+        max: {
+            boilerFireTemp: 400,
+            boilerFuelAmount: 70,
+            boilerPressure: 130,
+            boilerWaterLevel: 2000,
+            boilerWaterTemp: 170,
+            brakeValue: 1,
+            compressorAirPressure: 100,
+            compressorValveValue: 1,
+            headlightType: 1,
+            paintType: 4,
+            reverserValue: 1,
+            smokestackType: 1,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            reverserValue: -1,
+            smokestackType: 1,
+        },
+        name: 'RGS Rotary Snowplow No. 2',
+    },
+
+    'RGS_Rotary_Tender': {
+        coal: true,
+        length: 700,
+        max: {
+            headlightType: 1,
+            paintType: 4,
+            smokestackType: 1,
+            tenderFuelAmount: 7000,
+        },
+        min: {
+            headlightType: 1,
+            paintType: 1,
+            smokestackType: 1,
+        },
+        name: 'RGS Rotary Snowplow No. 2 Tender',
+        tender: true,
     },
 
     'Rubybasin': {
