@@ -469,13 +469,17 @@ body {
   stroke: var(--pond-stroke);
 }
 
-.industry.firewooddepot .building { fill: var(--firewood-camp); }
+.industry.coaltower .building { fill: var(--coaling-tower); }
 .industry.enginehouse_alpine .building { fill: var(--engine-house-lightblue); }
 .industry.enginehouse_aspen .building { fill: var(--engine-house-gold); }
 .industry.enginehouse_barn .building { fill: var(--engine-house-red); }
 .industry.enginehouse_princess .building { fill: var(--engine-house-brown); }
+.industry.engineshed_style1 .building { fill: var(--engine-house-red); }
+.industry.engineshed_style2 .building { fill: var(--engine-house-brown); }
+.industry.engineshed_style3 .building { fill: var(--building-beige); }
+.industry.engineshed_style4 .building { fill: var(--building-old); }
+.industry.firewooddepot .building { fill: var(--firewood-camp); }
 .industry.telegraphoffice .building { fill: var(--telegraph-office); }
-.industry.coaltower .building { fill: var(--coaling-tower); }
 .industry.watertower_1870_style1 .building { fill: var(--engine-house-red); }
 .industry.watertower_1870_style2 .building { fill: var(--engine-house-brown); }
 .industry.watertower_1870_style3 .building { fill: var(--building-beige); }
@@ -484,10 +488,6 @@ body {
 .industry.watertower_kanaskat_style2 .building { fill: var(--engine-house-brown); }
 .industry.watertower_kanaskat_style3 .building { fill: var(--building-beige); }
 .industry.watertower_kanaskat_style4 .building { fill: var(--building-old); }
-.industry.engineshed_style1 .building { fill: var(--engine-house-red); }
-.industry.engineshed_style2 .building { fill: var(--engine-house-brown); }
-.industry.engineshed_style3 .building { fill: var(--building-beige); }
-.industry.engineshed_style4 .building { fill: var(--building-old); }
 
 .gizmo .x { fill: var(--engine-house-red); }
 .gizmo .y { fill: var(--boxcar); }
