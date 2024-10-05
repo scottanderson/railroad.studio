@@ -21,7 +21,7 @@ import {gvasToString} from './Gvas';
 import {Vector, scaleVector, vectorSum, distanceSquared, normalizeVector, distance} from './Vector';
 import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
 import {flattenSpline} from './tool-flatten';
-import {CargoType, cargoLimits, frameDefinitions, hasCargoLimits, isCargoType, isFrameType} from './frames';
+import {CargoType, cargoLimits, frameDefinitions, getFrameType, hasCargoLimits, isCargoType} from './frames';
 import {handleError} from './index';
 import {parallelSpline, parallelSplineTrack} from './tool-parallel';
 import {asyncForEach} from './util-async';
@@ -946,11 +946,9 @@ export class RailroadMap {
     }
 
     private renderFrame(frame: Frame) {
-        if (!isFrameType(frame.type)) {
-            console.log(`Unknown frame type ${frame.type}`);
-            return;
-        }
-        const definition = frameDefinitions[frame.type];
+        const frameType = getFrameType(frame.type);
+        if (frameType === null) return;
+        const definition = frameDefinitions[frameType];
         const g = this.layers.frames.group()
             .attr('transform', makeTransform(frame.location.x, frame.location.y, frame.rotation.yaw));
         // Frame outline
@@ -960,7 +958,7 @@ export class RailroadMap {
             .center(0, 0)
             .on('click', onClick)
             .addClass('frame')
-            .addClass(frame.type);
+            .addClass(frameType);
         if (frame.state.brakeValue > 0) {
             f.addClass('brakes-applied');
         }

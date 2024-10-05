@@ -136,8 +136,15 @@ const legacyIndustryMap: Record<string, IndustryName> = {
     'logcamp': 'LogCamp',
     'SandHouse': 'Sandhouse',
     'sawmill': 'Sawmill',
+    'telegraphoffice_foundation': 'telegraphoffice',
+    'watertower_1870_style2_foundation': 'watertower_1870_style2',
+    'watertower_1870_style3_foundation': 'watertower_1870_style3',
+    'watertower_1870_style4_foundation': 'watertower_1870_style4',
     'watertower_drgw': 'WaterTower_DRGW',
+    'watertower_kanaskat_style1_foundation': 'watertower_kanaskat_style1',
+    'watertower_kanaskat_style2_foundation': 'watertower_kanaskat_style2',
     'watertower_small': 'WaterTower_Small',
+    'watertower_small_foundation': 'WaterTower_Small',
     'Waterwell': 'WaterWell',
 };
 
@@ -274,6 +281,18 @@ const largeEngineHouse = {
 
 const waterTower = {
     'building': rect(250, 250, 500, -500),
+};
+
+const waterTowerSmall = {
+    'building': rect(200, 200, 400, -400),
+};
+
+const waterTowerKanaskat = {
+    'building': rect(250, 150, 500, -300),
+};
+
+const waterTowerDrgw = {
+    'building': circle(550, 0, 400),
 };
 
 export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathArrayAlias>>> = {
@@ -534,12 +553,12 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
     'watertower_1870_style2': waterTower,
     'watertower_1870_style3': waterTower,
     'watertower_1870_style4': waterTower,
-    'WaterTower_DRGW': waterTower,
-    'watertower_kanaskat_style1': waterTower,
-    'watertower_kanaskat_style2': waterTower,
-    'watertower_kanaskat_style3': waterTower,
-    'watertower_kanaskat_style4': waterTower,
-    'WaterTower_Small': waterTower,
+    'WaterTower_DRGW': waterTowerDrgw,
+    'watertower_kanaskat_style1': waterTowerKanaskat,
+    'watertower_kanaskat_style2': waterTowerKanaskat,
+    'watertower_kanaskat_style3': waterTowerKanaskat,
+    'watertower_kanaskat_style4': waterTowerKanaskat,
+    'WaterTower_Small': waterTowerSmall,
     'WaterWell': {
         'building': combine(
             rect(390, 140, 300, 400),
