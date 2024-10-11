@@ -933,9 +933,14 @@ export class Studio {
         btnDownload.appendChild(imgDownload);
         btnDownload.classList.add('btn', 'btn-secondary');
         btnDownload.addEventListener('click', () => {
+            if (this.modified) {
+                console.log('Exporting', this.railroad);
+            }
             const gvas = railroadToGvas(this.railroad);
+            console.log('Exported', gvas);
             const blob = gvasToBlob(gvas);
             const url = URL.createObjectURL(blob);
+            console.log('Serialized', blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = this.exportFileName();
