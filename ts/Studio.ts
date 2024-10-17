@@ -791,9 +791,9 @@ export class Studio {
             });
             // Create a dropdown entry for each known frame type
             const options = Object.entries(frameDefinitions)
-                .filter(([type]) => filteredCategory.some((f) => f.type === type))
+                .filter(([type]) => filteredCategory.some((f) => getFrameType(f.type) === type))
                 .map(([type, fd]) => {
-                    const count = filteredCategory.filter((f) => f.type === type).length;
+                    const count = filteredCategory.filter((f) => getFrameType(f.type) === type).length;
                     const text = count === 1 ? fd.name : `${fd.name} (${count})`;
                     return [type, text] as [string, string];
                 });
