@@ -94,6 +94,7 @@ function handleDrop(e: DragEvent) {
 
 function handleFile(file?: File): void {
     if (!file) return;
+    console.log('Parsing', file);
     file.arrayBuffer()
         .then((buffer) => handleArrayBuffer(buffer, file.name))
         .catch(handleError);
@@ -111,6 +112,7 @@ function handleUrl(url: string) {
                 console.log(response);
                 throw new Error(`Fetch failed: ${url} ${response.status} ${response.statusText}`);
             }
+            console.log('Parsing', response);
             return response.arrayBuffer();
         })
         .then((buffer) => handleArrayBuffer(buffer, filename))
@@ -137,7 +139,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     return new Promise<void>((resolve, reject) => {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
-            console.log(gvas);
+            console.log('Parsed', gvas);
             titleText.textContent = 'Importing ' + filename;
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
@@ -148,7 +150,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                     // Initialize the Studio UI
                     window.studio = new Studio(filename, railroad, header, content);
                     document.title = filename + ' - Railroad Studio';
-                    console.log(railroad);
+                    console.log('Imported', railroad);
                     resolve();
                 }), 10);
             }), 10);
