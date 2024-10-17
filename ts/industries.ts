@@ -137,6 +137,7 @@ const legacyIndustryMap: Record<string, IndustryName> = {
     'SandHouse': 'Sandhouse',
     'sawmill': 'Sawmill',
     'telegraphoffice_foundation': 'telegraphoffice',
+    'TelegraphOffice_Foundation': 'telegraphoffice',
     'watertower_1870_style2_foundation': 'watertower_1870_style2',
     'watertower_1870_style3_foundation': 'watertower_1870_style3',
     'watertower_1870_style4_foundation': 'watertower_1870_style4',
@@ -145,6 +146,7 @@ const legacyIndustryMap: Record<string, IndustryName> = {
     'watertower_kanaskat_style2_foundation': 'watertower_kanaskat_style2',
     'watertower_small': 'WaterTower_Small',
     'watertower_small_foundation': 'WaterTower_Small',
+    'WaterTower_Small_Foundation': 'WaterTower_Small',
     'Waterwell': 'WaterWell',
 };
 

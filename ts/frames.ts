@@ -177,7 +177,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             boilerWaterTemp: 170,
             brakeValue: 1,
             headlightType: 2,
-            paintType: 2,
+            paintType: 3,
             regulatorValue: 1,
             reverserValue: 1,
             sanderAmount: 100,
@@ -479,7 +479,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             boilerFireTemp: 400,
             boilerFuelAmount: 80,
             boilerPressure: 150,
-            boilerWaterLevel: 4500,
+            boilerWaterLevel: 5000,
             boilerWaterTemp: 182,
             brakeValue: 1,
             compressorAirPressure: 100,
@@ -487,7 +487,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             headlightType: 5,
             markerLightsFrontLeftState: 3,
             markerLightsFrontRightState: 3,
-            paintType: 6,
+            paintType: 7,
             reverserValue: 1,
             sanderAmount: 100,
             smokestackType: 5,
@@ -509,7 +509,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             headlightType: 1,
             markerLightsRearLeftState: 3,
             markerLightsRearRightState: 3,
-            paintType: 6,
+            paintType: 7,
             smokestackType: 1,
             tenderFuelAmount: 6000,
             tenderWaterAmount: 9500,
@@ -614,10 +614,14 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
 
     'DSPP_baggage': {
         freight: true,
-        length: 1400,
+        length: 1430,
         max: {
             brakeValue: 1,
             headlightType: 1,
+            markerLightsCenterState: 3,
+            markerLightsFrontLeftState: 3,
+            markerLightsFrontRightState: 3,
+            markerLightsRearLeftState: 3,
             paintType: 2,
             smokestackType: 1,
         },
@@ -1299,7 +1303,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
             boilerPressure: 130,
-            boilerWaterLevel: 2000,
+            boilerWaterLevel: 4000,
             boilerWaterTemp: 170,
             brakeValue: 1,
             compressorAirPressure: 100,
@@ -1326,6 +1330,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             paintType: 4,
             smokestackType: 1,
             tenderFuelAmount: 7000,
+            tenderWaterAmount: 9500,
         },
         min: {
             headlightType: 1,
@@ -1350,7 +1355,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             compressorAirPressure: 100,
             compressorValveValue: 1,
             headlightType: 6,
-            paintType: 5,
+            paintType: 6,
             reverserValue: 1,
             sanderAmount: 100,
             smokestackType: 5,
@@ -1564,7 +1569,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         max: {
             brakeValue: 1,
             headlightType: 1,
-            paintType: 1,
+            paintType: 7,
             smokestackType: 1,
         },
         min: {
@@ -1721,9 +1726,11 @@ export const cargoLimits = {
         ['EFreightType::Coal']: 22,
         ['EFreightType::GoldOre']: 22,
         ['EFreightType::IronOre']: 22,
+        ['EFreightType::None']: 0,
     },
     DSPP_baggage: {
         ['EFreightType::GoldIngot']: 5,
+        ['EFreightType::None']: 0,
         ['EFreightType::RefinedGold']: 16,
     },
     flatcar_cordwood: {
@@ -1781,6 +1788,7 @@ export const cargoLimits = {
     plantationcar_flatcar_stakes: {
         ['EFreightType::Beam']: 3,
         ['EFreightType::Lumber']: 3,
+        ['EFreightType::None']: 0,
         ['EFreightType::Rail']: 4,
         ['EFreightType::RawIron']: 3,
     },
@@ -1805,6 +1813,7 @@ export const cargoLimits = {
         ['EFreightType::Coal']: 2,
         ['EFreightType::CrateTools']: 6,
         ['EFreightType::IronOre']: 2,
+        ['EFreightType::None']: 0,
         ['EFreightType::OilBarrel']: 15,
     },
     plantationcar_tanker: {
@@ -1814,6 +1823,7 @@ export const cargoLimits = {
         ['EFreightType::Coal']: 6,
         ['EFreightType::GoldOre']: 6,
         ['EFreightType::IronOre']: 6,
+        ['EFreightType::None']: 0,
     },
     SkeletonCar: {
         ['EFreightType::Log']: 5,
