@@ -814,7 +814,7 @@ export class Studio {
             const filterNav = createFilter(categories, labels, onFrameFilter, options, onOption, checked, frameSelect);
             filterNav.classList.add('mt-5');
             const filtered = (frameSelect && frameSelect !== 'all') ?
-                filteredCategory.filter((f) => f.type === frameSelect) :
+                filteredCategory.filter((f) => getFrameType(f.type) === frameSelect) :
                 filteredCategory;
             const numPages = Math.ceil(filtered.length / pageSize);
             framePage = clamp(framePage, 0, numPages - 1);
