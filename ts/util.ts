@@ -1,4 +1,4 @@
-import {GvasString, GvasText} from './Gvas';
+import {FormatArgumentValueMap, GvasString, GvasText, GvasTextArgumentFormat} from './Gvas';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {Vector} from './Vector';
@@ -38,35 +38,51 @@ export function stringToText(str: GvasString): GvasText {
     if (lines.length === 1) return {flags: 0, values: [str]};
     return {
         args: lines.map((line, i) => ({
-            contentType: 2,
             name: String(i),
-            values: line ? [line] : [],
-        })),
+            value: ['Text', {
+                flags: 2,
+                values: line ? [line] : [],
+            }],
+        } satisfies FormatArgumentValueMap)),
         flags: 1,
-        guid: RRO_TEXT_GUID,
-        pattern: lines.map((_, i) => '{' + i + '}').join('<br>'),
-    };
+        sourceFormat: {
+            flags: 8,
+            key: RRO_TEXT_GUID,
+            namespace: null,
+            value: lines.map((_, i) => '{' + i + '}').join('<br>'),
+        },
+    } satisfies GvasTextArgumentFormat;
 }
 
 export function textToString(value: GvasText): GvasString {
     if (value === null) return null;
-    if ('pattern' in value) {
-        // ArgumentFormat
-        switch (value.guid) {
+    if ('key' in value) {
+        // Base (0)
+        if (value.namespace !== '') throw new Error(`Unexpected unknown value: ${value.namespace}`);
+        return value.value;
+    } else if ('args' in value) {
+        // ArgumentFormat (3)
+        const sourceFormat = value.sourceFormat;
+        if (!('key' in sourceFormat)) throw new Error('Unexpected sourceFormat');
+        switch (sourceFormat.key) {
             case RRO_TEXT_GUID:
             case '1428110346E6AD292230C4AA503E3FE9':
             case '69981E2B47B2AABC01CE39842FB03A96':
                 break;
             default:
-                throw new Error(`Unexpected GUID: ${value.guid}`);
+                throw new Error(`Unexpected GUID: ${sourceFormat.key}`);
         }
-        if (value.pattern === null) throw new Error('Null pattern');
-        return value.pattern.replace(/{(\d+)}/g,
-            (_, i) => value.args[Number(i)].values[0] ?? '');
-    } else if ('key' in value) {
-        // Base
-        if (value.namespace !== '') throw new Error(`Unexpected unknown value: ${value.namespace}`);
-        return value.value;
+        const pattern = sourceFormat.value;
+        if (pattern === null) throw new Error('Null pattern');
+        return pattern.replace(/{(\d+)}/g,
+            (_, i) => {
+                const v = value.args[Number(i)].value;
+                if (v[0] !== 'Text') throw new Error('Unexpected formatArgumentValue');
+                return textToString(v[1]) ?? '';
+            });
+    } else if ('sourceValue' in value) {
+        // AsNumber (4)
+        throw new Error('AsNumber cannot be converted to string');
     } else {
         // None
         if (0 === value.values.length) return null;

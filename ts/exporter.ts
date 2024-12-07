@@ -3,6 +3,7 @@ import {
     CustomData,
     EngineVersion,
     FormatArgumentValue,
+    FormatArgumentValueMap,
     Gvas,
     GvasHeader,
     GvasString,
@@ -1180,23 +1181,16 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint8Array([0]),
             new Blob([text.namespace, text.key, text.value].map(stringToBlob)),
         ]);
-    } else if ('pattern' in text) {
+    } else if ('args' in text) {
         // (u32) Flags
-        // (u8)  Component Type (Argument Format = 3)
-        // (u8)  Unknown (8)
-        // (u32) Unknown (0)
-        // (str) Unknown
-        // (str) GUID
-        // (str) Pattern
+        // (u8)  Component Type (ArgumentFormat = 3)
+        // (txt) Source Format
         // (u32) TextFormat Count
         // (...) TextFormat Array
         return new Blob([
             new Uint32Array([text.flags]),
             new Uint8Array([3]),
-            new Uint8Array([8, 0, 0, 0, 0]),
-            stringToBlob(largeWorldCoords ? '' : null),
-            stringToBlob(text.guid),
-            stringToBlob(text.pattern),
+            textToBlob(text.sourceFormat, largeWorldCoords),
             new Uint32Array([text.args.length]),
             new Blob(text.args.map(rtfToBlob)),
         ]);
@@ -1205,7 +1199,7 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
     }
 }
 
-function rtfToBlob(rtf: FormatArgumentValue): BlobPart {
+function rtfToBlob(rtf: FormatArgumentValueMap): BlobPart {
     // TextFormat:
     // (str)  Format Key
     // (u8)   Unknown (4)
@@ -1215,12 +1209,27 @@ function rtfToBlob(rtf: FormatArgumentValue): BlobPart {
     // (str*) Values Array
     return new Blob([
         stringToBlob(rtf.name),
-        new Uint8Array([4]),
-        new Uint32Array([rtf.contentType]),
-        new Uint8Array([255]),
-        new Uint32Array([rtf.values.length]),
-        new Blob(rtf.values.map(stringToBlob)),
+        formatArgumentValueToBlob(rtf.value),
     ]);
+}
+
+function formatArgumentValueToBlob(value: FormatArgumentValue): BlobPart {
+    const largeWorldCoords = true; // FIXME
+    if (value[0] === 'Int') {
+        // Int (0)
+        return new Blob([
+            new Uint8Array([0]),
+            new Int32Array([value[1]]),
+        ]);
+    } else if (value[0] === 'Text') {
+        // Text (4)
+        return new Blob([
+            new Uint8Array([4]),
+            textToBlob(value[1], largeWorldCoords),
+        ]);
+    } else {
+        throw new Error(`Unexpected FormatArgumentValue ${value}`);
+    }
 }
 
 function dateTimeToBlob(dateTime: bigint): BlobPart {
