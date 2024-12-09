@@ -12,6 +12,8 @@ import {
     gvasToString,
     GvasTextAsNumber,
     FormatArgumentValueMap,
+    NumberFormattingOptions,
+    RoundingMode,
 } from './Gvas';
 import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
@@ -690,25 +692,28 @@ function parseText(buffer: ArrayBuffer, pos = 0): [number, GvasText] {
         const value: GvasTextArgumentFormat = {args, flags, sourceFormat};
         return [pos, value];
     } else if (componentType === 4) { // AsNumber
+        // (FAV) Source Value
         let sourceValue: FormatArgumentValue;
         [pos, sourceValue] = parseFormatArgumentValue(buffer, pos);
 
-        // let formatOptions: NumberFormattingOptions | undefined;
+        // (b32) Has Number Formatting Options
+        let formatOptions: NumberFormattingOptions | undefined;
         const hasFormatOptions = new Uint32Array(buffer.slice(pos, pos + 4))[0];
         pos += 4;
         if (hasFormatOptions === 0) {
             // Nothing to do
         } else if (hasFormatOptions === 1) {
-            throw new Error('Unimplemented');
+            // (NFO) Number Formatting Options
+            [pos, formatOptions] = parseNumberFormattingOptions(buffer, pos);
         } else {
             throw new Error(`Unexpected hasFormatOptions ${hasFormatOptions}`);
         }
 
+        // (str) Target Culture
         let targetCulture: GvasString;
         [pos, targetCulture] = parseString(buffer, pos);
 
-        // const value: GvasTextAsNumber = {flags, formatOptions, sourceValue, targetCulture};
-        const value: GvasTextAsNumber = {flags, sourceValue, targetCulture};
+        const value: GvasTextAsNumber = {flags, formatOptions, sourceValue, targetCulture};
         // array.push(value);
         return [pos, value];
     } else {
@@ -719,8 +724,9 @@ function parseText(buffer: ArrayBuffer, pos = 0): [number, GvasText] {
 function parseFormatArgumentValue(buffer: ArrayBuffer, pos: number): [number, FormatArgumentValue] {
     const type = new Uint8Array(buffer, pos++, 1)[0];
     if (type === 0) {
-        const value = new Int32Array(buffer.slice(pos, pos + 4))[0];
-        pos += 4;
+        const [value, extra] = new Int32Array(buffer.slice(pos, pos + 8));
+        pos += 8;
+        if (extra !== 0) throw new Error('Overflow');
         return [pos, ['Int', value]];
     } else if (type === 4) {
         let text;
@@ -729,4 +735,40 @@ function parseFormatArgumentValue(buffer: ArrayBuffer, pos: number): [number, Fo
     } else {
         throw new Error(`Unknown FormatArgumentValue type ${type}`);
     }
+}
+
+function parseNumberFormattingOptions(buffer: ArrayBuffer, pos: number): [number, NumberFormattingOptions] {
+    // (b32) Always Include Sign
+    // (b32) Use Grouping
+    // (e8)  Rounding Mode
+    // (i32) Minimum Integral Digits
+    // (i32) Maximum Integral Digits
+    // (i32) Minimum Fractional Digits
+    // (i32) Maximum Fractional Digits
+
+    const uint32s = new Uint32Array(buffer.slice(pos, pos + 8));
+    const u8s = new Uint8Array(buffer, pos + 8, 1);
+    const int32s = new Int32Array(buffer.slice(pos + 9, pos + 25));
+
+    if (u8s[0] > RoundingMode.ToPositiveInfinity) {
+        throw new Error(`Invalid RoundingMode ${u8s[0]}`);
+    }
+
+    const alwaysIncludeSign = Boolean(uint32s[0]);
+    const useGrouping = Boolean(uint32s[1]);
+    const roundingMode: RoundingMode = u8s[0];
+    const minimumIntegralDigits = int32s[0];
+    const maximumIntegralDigits = int32s[1];
+    const minimumFractionalDigits = int32s[2];
+    const maximumFractionalDigits = int32s[3];
+
+    return [pos + 25, {
+        alwaysIncludeSign,
+        maximumFractionalDigits,
+        maximumIntegralDigits,
+        minimumFractionalDigits,
+        minimumIntegralDigits,
+        roundingMode,
+        useGrouping,
+    }];
 }

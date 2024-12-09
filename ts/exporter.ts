@@ -3,12 +3,12 @@ import {
     CustomData,
     EngineVersion,
     FormatArgumentValue,
-    FormatArgumentValueMap,
     Gvas,
     GvasHeader,
     GvasString,
     GvasText,
     GvasTypes,
+    NumberFormattingOptions,
 } from './Gvas';
 import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
@@ -1160,10 +1160,11 @@ function stringToBlob(str: GvasString): BlobPart {
 
 function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
     if ('values' in text) {
+        if (text.values.length > 1) throw new Error('Only zero or one values are allowed');
         // (u32)  Flags
         // (u8)   Component Type (None = 255)
-        // (u32)  Component Count
-        // (str*) Component Array
+        // (b32)  Has Culture Invariant String
+        // (str?) Culture Invariant String
         return new Blob([
             new Uint32Array([text.flags]),
             new Uint8Array([255]),
@@ -1192,25 +1193,32 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             new Uint8Array([3]),
             textToBlob(text.sourceFormat, largeWorldCoords),
             new Uint32Array([text.args.length]),
-            new Blob(text.args.map(rtfToBlob)),
+            new Blob(text.args.map((favm) => new Blob([
+                stringToBlob(favm.name),
+                formatArgumentValueToBlob(favm.value),
+            ]))),
+        ]);
+    } else if ('targetCulture' in text) {
+        // (u32) Flags
+        // (u8)  Component Type (AsNumber = 4)
+        // (FAV) Source Value
+        // (b32) Has Number Formatting Options
+        // (NFO?) Number Formatting Options
+        // (str) Target Culture
+        const formatOptions = [text.formatOptions]
+            .filter(Boolean)
+            .map(numberFormattingOptionsToBlob);
+        return new Blob([
+            new Uint32Array([text.flags]),
+            new Uint8Array([4]),
+            formatArgumentValueToBlob(text.sourceValue),
+            new Uint32Array([formatOptions.length]),
+            ...formatOptions,
+            stringToBlob(text.targetCulture),
         ]);
     } else {
         throw new Error('Unexpected text type');
     }
-}
-
-function rtfToBlob(rtf: FormatArgumentValueMap): BlobPart {
-    // TextFormat:
-    // (str)  Format Key
-    // (u8)   Unknown (4)
-    // (u32)  Content Type
-    // (u8)   Unknown (255)
-    // (u32)  Values Count
-    // (str*) Values Array
-    return new Blob([
-        stringToBlob(rtf.name),
-        formatArgumentValueToBlob(rtf.value),
-    ]);
 }
 
 function formatArgumentValueToBlob(value: FormatArgumentValue): BlobPart {
@@ -1219,7 +1227,7 @@ function formatArgumentValueToBlob(value: FormatArgumentValue): BlobPart {
         // Int (0)
         return new Blob([
             new Uint8Array([0]),
-            new Int32Array([value[1]]),
+            new Int32Array([value[1], 0]),
         ]);
     } else if (value[0] === 'Text') {
         // Text (4)
@@ -1230,6 +1238,24 @@ function formatArgumentValueToBlob(value: FormatArgumentValue): BlobPart {
     } else {
         throw new Error(`Unexpected FormatArgumentValue ${value}`);
     }
+}
+
+function numberFormattingOptionsToBlob(value: NumberFormattingOptions): BlobPart {
+    return new Blob([
+        new Uint32Array([
+            value.alwaysIncludeSign ? 1 : 0,
+            value.useGrouping ? 1 : 0,
+        ]),
+        new Uint8Array([
+            value.roundingMode,
+        ]),
+        new Int32Array([
+            value.minimumIntegralDigits,
+            value.maximumIntegralDigits,
+            value.minimumFractionalDigits,
+            value.maximumFractionalDigits,
+        ]),
+    ]);
 }
 
 function dateTimeToBlob(dateTime: bigint): BlobPart {

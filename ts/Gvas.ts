@@ -111,6 +111,7 @@ export interface GvasTextArgumentFormat {
 export interface GvasTextAsNumber {
     flags: number;
     sourceValue: FormatArgumentValue;
+    formatOptions?: NumberFormattingOptions | undefined;
     targetCulture: GvasString;
 }
 
@@ -123,3 +124,23 @@ export type FormatArgumentValue =
     | ['Int', number]
     | ['Text', GvasText]
     ;
+
+export interface NumberFormattingOptions {
+    alwaysIncludeSign: boolean;
+    useGrouping: boolean;
+    roundingMode: RoundingMode;
+    minimumIntegralDigits: number;
+    maximumIntegralDigits: number;
+    minimumFractionalDigits: number;
+    maximumFractionalDigits: number;
+}
+
+export enum RoundingMode {
+    HalfToEven = 0,
+    HalfFromZero = 1,
+    HalfToZero = 2,
+    FromZero = 3,
+    ToZero = 4,
+    ToNegativeInfinity = 5,
+    ToPositiveInfinity = 6,
+}

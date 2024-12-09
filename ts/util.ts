@@ -48,7 +48,7 @@ export function stringToText(str: GvasString): GvasText {
         sourceFormat: {
             flags: 8,
             key: RRO_TEXT_GUID,
-            namespace: null,
+            namespace: '',
             value: lines.map((_, i) => '{' + i + '}').join('<br>'),
         },
     } satisfies GvasTextArgumentFormat;
@@ -82,7 +82,13 @@ export function textToString(value: GvasText): GvasString {
             });
     } else if ('sourceValue' in value) {
         // AsNumber (4)
-        throw new Error('AsNumber cannot be converted to string');
+        if (value.sourceValue[0] === 'Int') {
+            return String(value.sourceValue[1]);
+        } else if (value.sourceValue[0] === 'Text') {
+            return textToString(value.sourceValue[1]);
+        } else {
+            throw new Error(`Unknown Source Value ${value}`);
+        }
     } else {
         // None
         if (0 === value.values.length) return null;
