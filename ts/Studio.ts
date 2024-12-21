@@ -56,6 +56,7 @@ import {VegetationUtil} from './VegetationUtil';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
+const INVERT_BEFORE_SAVE_GAME_VERSION = 231117;
 
 /**
  * Web UI for editing a Railroad object.
@@ -95,7 +96,8 @@ export class Studio {
             this.floatHeader(true);
         });
         content.replaceChildren(mapDiv);
-        this.map = new RailroadMap(this, mapDiv);
+        const useLegacyRotation = this.isLegacyRotationSaveGame();
+        this.map = new RailroadMap(this, mapDiv, useLegacyRotation);
 
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
@@ -455,25 +457,6 @@ export class Studio {
             return btnAction;
         }));
 
-        // Rotate 180 Button for legacy version maps
-        const btnLegacyRotate = document.createElement('button');
-        btnLegacyRotate.textContent = 'Legacy Rotation 180°';
-        if (this.map.isInLegacyOrientationMode()) {
-            btnLegacyRotate.classList.add('active', 'btn-danger');
-        } else {
-            btnLegacyRotate.classList.add('btn', 'btn-secondary');
-        }
-        btnLegacyRotate.addEventListener('click', () => {
-            const legacyRotateEnabled = this.map.toggleLegacyRotate();
-            if (legacyRotateEnabled) {
-                btnLegacyRotate.classList.add('active', 'btn-danger');
-                btnLegacyRotate.classList.remove('btn-secondary');
-            } else {
-                btnLegacyRotate.classList.remove('active', 'btn-danger');
-                btnLegacyRotate.classList.add('btn-secondary');
-            }
-        });
-
         // Rerail frame tool
         const btnRerail = document.createElement('button');
         const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
@@ -717,12 +700,6 @@ export class Studio {
             grpLayers,
             btnDelete,
         );
-        if (this.map.isLegacyRotationSaveGame()) {
-            // show rotate button only for legacy maps
-            [
-                btnLegacyRotate,
-            ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
-        }
         if (hasFrames) {
             // Enable tools that work on frames
             [
@@ -1733,5 +1710,10 @@ export class Studio {
             td.replaceChildren(editVector(this, prop.transform.scale3d, setPropScale));
             tr.appendChild(td);
         }
+    }
+
+    isLegacyRotationSaveGame(): boolean {
+        const currentVersion = Number(this.railroad.saveGame.version);
+        return currentVersion < INVERT_BEFORE_SAVE_GAME_VERSION;
     }
 }

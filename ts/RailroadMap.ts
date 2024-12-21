@@ -115,9 +115,6 @@ const DEFAULT_LAYER_VISIBILITY: MapLayerVisibility = {
     turntables: true,
 };
 
-// this is just a guess and could be determined with binary search given enough old savegames
-const ROTATION_FIX_SAVE_GAME_VERSION = 231117;
-
 /**
  * The RailroadMap class is used to create a visual representation of a Railroad
  * object on a web page and provide tools for interacting with it. It can render
@@ -433,18 +430,8 @@ export class RailroadMap {
         return this.layerVisibility[layer];
     }
 
-    toggleLegacyRotate(): boolean {
-        this.legacyRotate = !this.legacyRotate;
-        this.refresh();
-        return this.legacyRotate;
-    }
-
     isInverted(): boolean {
         return this.inverted;
-    }
-    isLegacyRotationSaveGame(): boolean {
-        const currentVersion = Number(this.railroad.saveGame.version);
-        return currentVersion < ROTATION_FIX_SAVE_GAME_VERSION;
     }
 
     private parallelToolTracksFlag = false;
@@ -682,7 +669,7 @@ export class RailroadMap {
 
     private createLayers(): MapLayers {
         const group = this.svg.group()
-            .rotate(this.legacyRotate ? 180 : 0)
+            .rotate(this.inverted ? 180 : 0)
             .font('family', 'sans-serif')
             .font('size', 500);
         // The z-order of these groups is the order they are created
