@@ -145,16 +145,13 @@ export class RailroadMap {
     private locator?: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
     private readonly mergeLimits: MergeLimits;
+    private readonly inverted: boolean;
 
-    // required for later beta and release maps of RRO
-    // older maps should still be 180 degrees rotated to match the in-game map
-    private legacyRotate = false;
-
-    constructor(studio: Studio, element: HTMLElement) {
+    constructor(studio: Studio, element: HTMLElement, inverted: boolean) {
         this.setMapModified = (affectsSplines = false) => studio.setMapModified(affectsSplines);
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
-        this.legacyRotate = this.isLegacyRotationSaveGame();
+        this.inverted = inverted;
         this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
             if (this.remainingTreesAppender) await this.renderTreeArray(changed);
             if (before === after) {
@@ -441,11 +438,9 @@ export class RailroadMap {
         this.refresh();
         return this.legacyRotate;
     }
-    isInLegacyOrientationMode(): boolean {
-        // it may be more appropriate to merge legacyRotate and isInLegacyOrientationMode
-        // into a public property
-        // DISCLAIMER I am neither a typescript nor js guy, so tell me what you think
-        return this.legacyRotate;
+
+    isInverted(): boolean {
+        return this.inverted;
     }
     isLegacyRotationSaveGame(): boolean {
         const currentVersion = Number(this.railroad.saveGame.version);
