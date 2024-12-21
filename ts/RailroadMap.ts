@@ -744,17 +744,18 @@ export class RailroadMap {
     private renderBackground(): Element {
         let image;
         let transform;
-        if (this.railroad.settings.gameLevelName === 'LakeValley') {
-            image = 'LakeValleyTopo.png';
-            transform = 'matrix(-93.16,0,0,-93.16,197453,197453)';
-            // image = 'LakeValleyMap2.png';
-            // transform = 'matrix(-200,0,0,-200,200000,200000)';
+        if (this.railroad.settings.gameLevelName === 'MesaPlains') {
+            image = 'MesaPlainsTopo.png';
+            transform = 'matrix(140.9,0,0,140.9,-300899.5,-300459.5)';
         } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
             image = 'AuroraFallsTopo.png';
-            transform = 'matrix(-139.13,0,0,-139.13,300900,300900)';
+            transform = 'matrix(140.9,0,0,140.9,-300899.5,-300459.5)';
+        } else if (this.railroad.settings.gameLevelName === 'LakeValley') {
+            image = 'LakeValleyTopo.png';
+            transform = 'matrix(92.5,0,0,92.5,-197454,-197454)';
         } else {
             image = 'PineValleyTopo.png';
-            transform = 'matrix(-96.80,0,0,-96.80,199951,199951)';
+            transform = 'matrix(93.81,0,0,93.81,-199953,-199953)';
         }
         return this.layers.background
             .image(image)
@@ -765,21 +766,27 @@ export class RailroadMap {
         // Border
         if (this.railroad.settings.gameLevelName === 'LakeValley') {
             return this.layers.border
-                .rect(4_000_00, 4_000_00)
-                .translate(-2_000_00, -2_000_00)
-                .radius(100_00)
+                .rect(3_949_00, 3_949_00)
+                .translate(-1_974_54, -1_974_54)
+                .radius(0)
                 .addClass('map-border');
         } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
             return this.layers.border
-                .rect(6_000_00, 6_000_00)
-                .translate(-3_000_00, -3_000_00)
-                .radius(100_00)
+                .rect(6_018_59, 6_009_59)
+                .translate(-3_009_60, -3_005_20)
+                .radius(0)
+                .addClass('map-border');
+        } else if (this.railroad.settings.gameLevelName === 'MesaPlains') {
+            return this.layers.border
+                .rect(6_018_59, 6_009_59)
+                .translate(-3_009_60, -3_005_20)
+                .radius(0)
                 .addClass('map-border');
         } else {
             return this.layers.border
                 .rect(4_000_00, 4_000_00)
                 .translate(-2_000_00, -2_000_00)
-                .radius(100_00)
+                .radius(0)
                 .addClass('map-border');
         }
     }
