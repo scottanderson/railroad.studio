@@ -1313,7 +1313,6 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .rotate(this.inverted ? 180 : 0)
                 .attr('transform', makeTransformT(cp0, cp1))
                 .on('click', clickHandler)
                 .addClass(c);
