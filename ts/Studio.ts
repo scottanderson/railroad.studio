@@ -455,7 +455,6 @@ export class Studio {
             btnAction.addEventListener('click', action.onClick);
             return btnAction;
         }));
-
         // Rerail frame tool
         const btnRerail = document.createElement('button');
         const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
