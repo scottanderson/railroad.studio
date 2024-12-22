@@ -96,9 +96,8 @@ export class Studio {
             this.floatHeader(true);
         });
         content.replaceChildren(mapDiv);
-        const useLegacyRotation = this.isLegacyRotationSaveGame();
-        this.map = new RailroadMap(this, mapDiv, useLegacyRotation);
-
+        const mapInverted = this.isMapInverted();
+        this.map = new RailroadMap(this, mapDiv, mapInverted);
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
         const imgLayers = bootstrapIcon('bi-layers', 'Layers Dropdown');
