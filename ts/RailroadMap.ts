@@ -1127,9 +1127,10 @@ export class RailroadMap {
         if (!prop.name) return;
         const string = textToString(prop.text);
         if (!string) return;
+        const rotation = this.inverted ? 180 : 0;
         return this.layers.props
             .text(gvasToString(string))
-            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, 180))
+            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, rotation))
             .addClass('prop');
     }
 
