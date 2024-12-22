@@ -1116,9 +1116,10 @@ export class RailroadMap {
     private renderPlayer(player: Player) {
         if (!player.name) return;
         if (!player.location) return;
+        const rotation = this.inverted ? 180 : 0;
         return this.layers.players
             .text(player.name)
-            .attr('transform', makeTransform(player.location.x, player.location.y, 180))
+            .attr('transform', makeTransform(player.location.x, player.location.y, rotation))
             .addClass('player');
     }
 
