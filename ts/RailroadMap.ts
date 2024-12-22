@@ -1028,7 +1028,7 @@ export class RailroadMap {
             const paths = Object.entries(industrySvgPaths[industryName] ?? {});
             paths.forEach(renderPath(g));
         } else {
-            g.text(String(industry.type))
+            g.text(String(industry.type)) // embix: how to enable/test this?
                 .attr('transform', 'rotate(90)')
                 .addClass('frame-text');
         }
@@ -1105,7 +1105,7 @@ export class RailroadMap {
                 if (this.gizmoDebugText) this.gizmoDebugText.remove();
                 this.gizmoDebugLine = gizmoG.line().addClass('ruler');
                 this.gizmoDebugText = gizmoG
-                    .text(`[${x}, ${y}]`)
+                    .text(`[${x}, ${y}]`) // embix: how to enable/test this?
                     .attr('transform', `translate(${x} ${y}) rotate(90)`)
                     .addClass('frame-text');
                 this.gizmoDebugLine.plot(0, 0, x, y);
