@@ -1313,7 +1313,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(cp0, cp1))
+                .attr('transform', makeTransformT(cp0, cp1)) // embix: how?
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
@@ -1463,7 +1463,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(startPoint, endPoint))
+                .attr('transform', makeTransformT(startPoint, endPoint)) // embix: how?
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
