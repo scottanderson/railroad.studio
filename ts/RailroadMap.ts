@@ -993,7 +993,8 @@ export class RailroadMap {
         if (frameText) {
             const yaw = normalizeAngle(frame.rotation.yaw);
             const flip = (yaw > -90) && (yaw < 90);
-            const transform = flip ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
+            const needsRotate = (this.inverted && flip) || (!this.inverted && !flip);
+            const transform = needsRotate ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
             const text = g
                 .text(gvasToString(frameText))
                 .attr('transform', transform)
