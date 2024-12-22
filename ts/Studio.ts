@@ -1710,7 +1710,7 @@ export class Studio {
         }
     }
 
-    isLegacyRotationSaveGame(): boolean {
+    isMapInverted(): boolean {
         const currentVersion = Number(this.railroad.saveGame.version);
         return currentVersion < INVERT_BEFORE_SAVE_GAME_VERSION;
     }
