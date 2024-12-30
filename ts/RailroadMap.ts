@@ -1312,7 +1312,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(cp0, cp1)) // embix: how?
+                .attr('transform', makeTransformT(cp0, cp1, this.inverted))
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
@@ -1462,7 +1462,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(startPoint, endPoint)) // embix: how?
+                .attr('transform', makeTransformT(startPoint, endPoint, this.inverted))
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
@@ -1964,13 +1964,13 @@ function makeTransform(inx: number, iny: number, yaw: number) {
     return `translate(${x} ${y}) rotate(${degrees})`;
 }
 
-function makeTransformF(location: Point, heading: number) {
+function makeTransformF(location: Point, heading: number, invert: boolean) {
     const degrees = heading > 0 ? heading + 90 : heading - 90;
-    return makeTransform(location.x, location.y, degrees);
+    return makeTransform(location.x, location.y, invert ? degrees + 180 : degrees);
 }
 
-function makeTransformT(startPoint: Vector, endPoint: Vector) {
+function makeTransformT(startPoint: Vector, endPoint: Vector, invert: boolean) {
     const midPoint = scaleVector(vectorSum(startPoint, endPoint), 0.5);
     const heading = vectorHeading(startPoint, endPoint);
-    return makeTransformF(midPoint, heading);
+    return makeTransformF(midPoint, heading, invert);
 }
