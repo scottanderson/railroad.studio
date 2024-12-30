@@ -992,9 +992,8 @@ export class RailroadMap {
         const frameText = textToString(frame.number);
         if (frameText) {
             const yaw = normalizeAngle(frame.rotation.yaw);
-            const flip = (yaw > -90) && (yaw < 90);
-            const needsRotate = (this.inverted && flip) || (!this.inverted && !flip);
-            const transform = needsRotate ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
+            const flip = ((yaw > -90) && (yaw < 90)) === this.inverted;
+            const transform = flip ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
             const text = g
                 .text(gvasToString(frameText))
                 .attr('transform', transform)
@@ -1105,7 +1104,7 @@ export class RailroadMap {
                 if (this.gizmoDebugText) this.gizmoDebugText.remove();
                 this.gizmoDebugLine = gizmoG.line().addClass('ruler');
                 this.gizmoDebugText = gizmoG
-                    .text(`[${x}, ${y}]`) // embix: how to enable/test this?
+                    .text(`[${x}, ${y}]`)
                     .attr('transform', `translate(${x} ${y}) rotate(90)`)
                     .addClass('frame-text');
                 this.gizmoDebugLine.plot(0, 0, x, y);
