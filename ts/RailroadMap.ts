@@ -1028,8 +1028,8 @@ export class RailroadMap {
             const paths = Object.entries(industrySvgPaths[industryName] ?? {});
             paths.forEach(renderPath(g));
         } else {
-            g.text(String(industry.type)) // embix: how to enable/test this?
-                .attr('transform', 'rotate(90)')
+            g.text(String(industry.type))
+                .attr('transform', this.inverted ? 'rotate(90)' : 'rotate(-90)')
                 .addClass('frame-text');
         }
         const gizmoG = this.layers.gizmo
