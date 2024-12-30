@@ -1966,7 +1966,7 @@ function makeTransform(inx: number, iny: number, yaw: number) {
 
 function makeTransformF(location: Point, heading: number, invert: boolean) {
     const degrees = heading > 0 ? heading + 90 : heading - 90;
-    return makeTransform(location.x, location.y, invert ? degrees + 180 : degrees);
+    return makeTransform(location.x, location.y, invert ? degrees : degrees + 180);
 }
 
 function makeTransformT(startPoint: Vector, endPoint: Vector, invert: boolean) {
