@@ -746,16 +746,16 @@ export class RailroadMap {
         let transform;
         if (this.railroad.settings.gameLevelName === 'MesaPlains') {
             image = 'MesaPlainsTopo.png';
-            transform = 'matrix(140.89,0,0,140.89,-300899.55,-300459.55)';
+            transform = 'matrix(140.89,0,0,140.89,-300899.87,-300459.45)';
         } else if (this.railroad.settings.gameLevelName === 'AuroraFalls') {
             image = 'AuroraFallsTopo.png';
-            transform = 'matrix(140.40,0,0,140.40,-300459.79,-300899.79)';
+            transform = 'matrix(139.91,0,0,139.91,-300460.04,-300900.04)';
         } else if (this.railroad.settings.gameLevelName === 'LakeValley') {
             image = 'LakeValleyTopo.png';
             transform = 'matrix(91.88,0,0,91.88,-197454.05,-197454.05)';
         } else {
             image = 'PineValleyTopo.png';
-            transform = 'matrix(93.37,0,0,93.37,-199953.31,-199953.31)';
+            transform = 'matrix(92.95,0,0,92.95,-199953.52,-199953.52)';
         }
         return this.layers.background
             .image(image)
