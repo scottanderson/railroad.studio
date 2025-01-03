@@ -1105,7 +1105,7 @@ export class RailroadMap {
                 this.gizmoDebugLine = gizmoG.line().addClass('ruler');
                 this.gizmoDebugText = gizmoG
                     .text(`[${x}, ${y}]`)
-                    .attr('transform', `translate(${x} ${y}) rotate(90)`)
+                    .attr('transform', `translate(${x} ${y}) rotate(${this.inverted ? 90 : -90})`)
                     .addClass('frame-text');
                 this.gizmoDebugLine.plot(0, 0, x, y);
             });
