@@ -56,6 +56,7 @@ import {VegetationUtil} from './VegetationUtil';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
+const INVERT_BEFORE_SAVE_GAME_VERSION = 231117;
 
 /**
  * Web UI for editing a Railroad object.
@@ -95,7 +96,8 @@ export class Studio {
             this.floatHeader(true);
         });
         content.replaceChildren(mapDiv);
-        this.map = new RailroadMap(this, mapDiv);
+        const mapInverted = this.isMapInverted();
+        this.map = new RailroadMap(this, mapDiv, mapInverted);
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
         const imgLayers = bootstrapIcon('bi-layers', 'Layers Dropdown');
@@ -1706,5 +1708,10 @@ export class Studio {
             td.replaceChildren(editVector(this, prop.transform.scale3d, setPropScale));
             tr.appendChild(td);
         }
+    }
+
+    isMapInverted(): boolean {
+        const currentVersion = Number(this.railroad.saveGame.version);
+        return currentVersion < INVERT_BEFORE_SAVE_GAME_VERSION;
     }
 }

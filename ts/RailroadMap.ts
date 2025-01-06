@@ -142,11 +142,13 @@ export class RailroadMap {
     private locator?: Circle | undefined;
     private remainingTreesAppender?: (trees: Vector[]) => Promise<void>;
     private readonly mergeLimits: MergeLimits;
+    private readonly inverted: boolean;
 
-    constructor(studio: Studio, element: HTMLElement) {
+    constructor(studio: Studio, element: HTMLElement, inverted: boolean) {
         this.setMapModified = (affectsSplines = false) => studio.setMapModified(affectsSplines);
         this.setTitle = (title) => studio.setTitle(title);
         this.railroad = studio.railroad;
+        this.inverted = inverted;
         this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
             if (this.remainingTreesAppender) await this.renderTreeArray(changed);
             if (before === after) {
@@ -428,6 +430,10 @@ export class RailroadMap {
         return this.layerVisibility[layer];
     }
 
+    isInverted(): boolean {
+        return this.inverted;
+    }
+
     private parallelToolTracksFlag = false;
     toggleParallelTool(): boolean {
         if (this.toolMode === MapToolMode.parallel) {
@@ -663,7 +669,7 @@ export class RailroadMap {
 
     private createLayers(): MapLayers {
         const group = this.svg.group()
-            .rotate(180)
+            .rotate(this.inverted ? 180 : 0)
             .font('family', 'sans-serif')
             .font('size', 500);
         // The z-order of these groups is the order they are created
@@ -986,7 +992,7 @@ export class RailroadMap {
         const frameText = textToString(frame.number);
         if (frameText) {
             const yaw = normalizeAngle(frame.rotation.yaw);
-            const flip = (yaw > -90) && (yaw < 90);
+            const flip = ((yaw > -90) && (yaw < 90)) === this.inverted;
             const transform = flip ? 'rotate(180) translate(0 25)' : 'translate(0 25)';
             const text = g
                 .text(gvasToString(frameText))
@@ -1022,7 +1028,7 @@ export class RailroadMap {
             paths.forEach(renderPath(g));
         } else {
             g.text(String(industry.type))
-                .attr('transform', 'rotate(90)')
+                .attr('transform', this.inverted ? 'rotate(90)' : 'rotate(-90)')
                 .addClass('frame-text');
         }
         const gizmoG = this.layers.gizmo
@@ -1099,7 +1105,7 @@ export class RailroadMap {
                 this.gizmoDebugLine = gizmoG.line().addClass('ruler');
                 this.gizmoDebugText = gizmoG
                     .text(`[${x}, ${y}]`)
-                    .attr('transform', `translate(${x} ${y}) rotate(90)`)
+                    .attr('transform', `translate(${x} ${y}) rotate(${this.inverted ? 90 : -90})`)
                     .addClass('frame-text');
                 this.gizmoDebugLine.plot(0, 0, x, y);
             });
@@ -1109,9 +1115,10 @@ export class RailroadMap {
     private renderPlayer(player: Player) {
         if (!player.name) return;
         if (!player.location) return;
+        const rotation = this.inverted ? 180 : 0;
         return this.layers.players
             .text(player.name)
-            .attr('transform', makeTransform(player.location.x, player.location.y, 180))
+            .attr('transform', makeTransform(player.location.x, player.location.y, rotation))
             .addClass('player');
     }
 
@@ -1119,9 +1126,10 @@ export class RailroadMap {
         if (!prop.name) return;
         const string = textToString(prop.text);
         if (!string) return;
+        const rotation = this.inverted ? 180 : 0;
         return this.layers.props
             .text(gvasToString(string))
-            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, 180))
+            .attr('transform', makeTransform(prop.transform.translation.x, prop.transform.translation.y, rotation))
             .addClass('prop');
     }
 
@@ -1304,7 +1312,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(cp0, cp1))
+                .attr('transform', makeTransformT(cp0, cp1, this.inverted))
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
@@ -1454,7 +1462,7 @@ export class RailroadMap {
                 .text((block) => block
                     .text(str)
                     .dx(300))
-                .attr('transform', makeTransformT(startPoint, endPoint))
+                .attr('transform', makeTransformT(startPoint, endPoint, this.inverted))
                 .on('click', clickHandler)
                 .addClass(c);
             elements.push(text);
@@ -1956,13 +1964,13 @@ function makeTransform(inx: number, iny: number, yaw: number) {
     return `translate(${x} ${y}) rotate(${degrees})`;
 }
 
-function makeTransformF(location: Point, heading: number) {
+function makeTransformF(location: Point, heading: number, invert: boolean) {
     const degrees = heading > 0 ? heading + 90 : heading - 90;
-    return makeTransform(location.x, location.y, degrees);
+    return makeTransform(location.x, location.y, invert ? degrees : degrees + 180);
 }
 
-function makeTransformT(startPoint: Vector, endPoint: Vector) {
+function makeTransformT(startPoint: Vector, endPoint: Vector, invert: boolean) {
     const midPoint = scaleVector(vectorSum(startPoint, endPoint), 0.5);
     const heading = vectorHeading(startPoint, endPoint);
-    return makeTransformF(midPoint, heading);
+    return makeTransformF(midPoint, heading, invert);
 }
