@@ -9,12 +9,12 @@ import {dotProduct} from './Vector';
  * rotations in 3D space, as they are more efficient and numerically stable than
  * other methods such as Euler angles or rotation matrices.
  */
-export interface Quaternion {
+export type Quaternion = {
     w: number;
     x: number;
     y: number;
     z: number;
-}
+};
 
 export function fromRotator(rotator: Rotator): Quaternion {
     const pitch = degreesToRadians(rotator.pitch) * -0.5;

@@ -13,10 +13,10 @@ type Callback<T> = (value: T) => unknown;
 
 type OnTreesChangedCallback = (before: number, after: number, trees: Vector[], dryrun?: boolean) => Promise<unknown>;
 
-export interface Point {
+export type Point = {
     x: number;
     y: number;
-}
+};
 
 export class TreeUtil {
     private readonly railroad: Railroad;

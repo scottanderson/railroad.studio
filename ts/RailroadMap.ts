@@ -58,16 +58,16 @@ enum MapToolMode {
     measure,
 }
 
-interface MapOptions {
+type MapOptions = {
     pan: {
         x: number;
         y: number;
     };
     zoom: number;
     mergeLimits: MergeLimits;
-}
+};
 
-export interface MapLayers {
+export type MapLayers = {
     background: G;
     border: G;
     bridges: G;
@@ -88,7 +88,7 @@ export interface MapLayers {
     tracksHidden: G;
     trees: G;
     turntables: G;
-}
+};
 
 type MapLayerVisibility = Record<keyof MapLayers, boolean>;
 

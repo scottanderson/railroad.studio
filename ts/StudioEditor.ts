@@ -9,11 +9,11 @@ import {Studio} from './Studio';
 import {Vector} from './Vector';
 import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 
-export interface InputTextOptions {
+export type InputTextOptions = {
     max?: string;
     min?: string;
     step?: string | undefined;
-}
+};
 
 export function bootstrapIcon(className: string, label: string) {
     const i = document.createElement('i');

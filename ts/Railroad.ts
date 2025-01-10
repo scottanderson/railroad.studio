@@ -10,7 +10,7 @@ import {IndustryType} from './industries';
  *
  * Can be created from or converted to a {@link Gvas} for serializaiton.
  */
-export interface Railroad {
+export type Railroad = {
     _header: GvasHeader;
     _order: string[];
     frames: Frame[];
@@ -44,27 +44,27 @@ export interface Railroad {
     turntables: Turntable[];
     vegetation: Vegeation[];
     watertowers: Watertower[];
-}
+};
 
-export interface Frame {
+export type Frame = {
     location: Vector;
     name: GvasText;
     number: GvasText;
     rotation: Rotator;
     type: GvasString;
     state: FrameState;
-}
+};
 
-export interface FrameState extends NumericFrameState {
+export type FrameState = {
     couplerFrontState: boolean;
     couplerRearState: boolean;
     freightAmount: number;
     freightType: GvasString;
     headlightFrontState: boolean;
     headlightRearState: boolean;
-}
+} & NumericFrameState;
 
-export interface NumericFrameState {
+export type NumericFrameState = {
     boilerFireTemp: number;
     boilerFuelAmount: number;
     boilerPressure: number;
@@ -87,19 +87,19 @@ export interface NumericFrameState {
     smokestackType: number;
     tenderFuelAmount: number;
     tenderWaterAmount: number;
-}
+};
 
 export type Quadruplet<T> = [T, T, T, T];
 
-export interface Industry {
+export type Industry = {
     location: Vector;
     rotation: Rotator;
     inputs: Quadruplet<number>;
     outputs: Quadruplet<number>;
     type: IndustryType | GvasString;
-}
+};
 
-export interface Player {
+export type Player = {
     id?: GvasString | undefined;
     name: GvasString;
     location?: Vector | undefined;
@@ -107,32 +107,32 @@ export interface Player {
     money: number;
     xp: number;
     permissions?: Permission | undefined;
-}
+};
 
-export interface Prop {
+export type Prop = {
     name: GvasString;
     text: GvasText;
     transform: Transform;
-}
+};
 
-export interface Sandhouse {
+export type Sandhouse = {
     location: Vector;
     rotation: Rotator;
     type: SandhouseType;
-}
+};
 
 export enum SandhouseType {
     sandhouse = 0,
 }
 
-export interface Spline {
+export type Spline = {
     controlPoints: Vector[];
     location: Vector;
     segmentsVisible: boolean[];
     type: SplineType;
-}
+};
 
-export interface SplineTrack {
+export type SplineTrack = {
     endPoint: Vector;
     endSpline1Id?: number | undefined;
     endSpline2Id?: number | undefined;
@@ -145,7 +145,7 @@ export interface SplineTrack {
     startTangent: Vector;
     switchState: number;
     type: GvasString;
-}
+};
 
 export enum SplineType {
     rail = 0,
@@ -159,12 +159,12 @@ export enum SplineType {
     steel_truss = 8,
 }
 
-export interface Switch {
+export type Switch = {
     location: Vector;
     rotation: Rotator;
     state: number;
     type: SwitchType;
-}
+};
 
 export enum SwitchType {
     leftSwitchLeft = 0,
@@ -174,26 +174,26 @@ export enum SwitchType {
     diamond = 6,
 }
 
-export interface Turntable {
+export type Turntable = {
     deckRotation?: Rotator | undefined;
     location: Vector;
     rotator: Rotator;
     type: TurntableType | GvasString;
-}
+};
 
 export enum TurntableType {
     dark = 0,
     light = 1,
 }
 
-export interface Vegeation {
+export type Vegeation = {
     instanceIndex: number;
     ismCompName: GvasString;
-}
+};
 
-export interface Watertower {
+export type Watertower = {
     location: Vector;
     rotation: Rotator;
     waterlevel: number;
     type: number;
-}
+};

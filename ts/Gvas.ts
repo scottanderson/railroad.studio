@@ -6,7 +6,7 @@ import {Vector} from './Vector';
 /**
  * Stores the data from a GVAS '.sav' file.
  */
-export interface Gvas {
+export type Gvas = {
     _header: GvasHeader;
     _order: string[];
     boolArrays: Record<string, boolean[]>;
@@ -26,7 +26,7 @@ export interface Gvas {
     textArrays: Record<string, GvasText[]>;
     transformArrays: Record<string, Transform[]>;
     vectorArrays: Record<string, Vector[]>;
-}
+};
 
 export type GvasTypes =
     | ['ArrayProperty', 'BoolProperty']
@@ -56,7 +56,7 @@ export function gvasToString(gs: GvasString): string {
     return (gs === null) ? 'null' : (gs.replace(/<br>/g, '\n').trimEnd() || '[blank]');
 }
 
-export interface GvasHeader {
+export type GvasHeader = {
     gvasVersion: number;
     structureVersion: number;
     unknownVersion?: number | undefined;
@@ -64,20 +64,20 @@ export interface GvasHeader {
     customFormatVersion: number;
     customData: CustomData[];
     saveType: GvasString;
-}
+};
 
-export interface EngineVersion {
+export type EngineVersion = {
     major: number;
     minor: number;
     patch: number;
     build: number;
     buildID: GvasString;
-}
+};
 
-export interface CustomData {
+export type CustomData = {
     guid: number[];
     value: number;
-}
+};
 
 export type GvasText =
     | GvasTextNone
@@ -87,45 +87,45 @@ export type GvasText =
     ;
 
 // Component type 255
-export interface GvasTextNone {
+export type GvasTextNone = {
     flags: number;
     values: GvasString[];
-}
+};
 
 // Component type 0
-export interface GvasTextBase {
+export type GvasTextBase = {
     flags: number;
     namespace: GvasString;
     key: GvasString;
     value: GvasString;
-}
+};
 
 // Component type 3
-export interface GvasTextArgumentFormat {
+export type GvasTextArgumentFormat = {
     flags: number;
     sourceFormat: GvasText;
     args: FormatArgumentValueMap[];
-}
+};
 
 // Component type 4
-export interface GvasTextAsNumber {
+export type GvasTextAsNumber = {
     flags: number;
     sourceValue: FormatArgumentValue;
     formatOptions?: NumberFormattingOptions | undefined;
     targetCulture: GvasString;
-}
+};
 
-export interface FormatArgumentValueMap {
+export type FormatArgumentValueMap = {
     name: GvasString;
     value: FormatArgumentValue;
-}
+};
 
 export type FormatArgumentValue =
     | ['Int', number]
     | ['Text', GvasText]
     ;
 
-export interface NumberFormattingOptions {
+export type NumberFormattingOptions = {
     alwaysIncludeSign: boolean;
     useGrouping: boolean;
     roundingMode: RoundingMode;
@@ -133,7 +133,7 @@ export interface NumberFormattingOptions {
     maximumIntegralDigits: number;
     minimumFractionalDigits: number;
     maximumFractionalDigits: number;
-}
+};
 
 export enum RoundingMode {
     HalfToEven = 0,
