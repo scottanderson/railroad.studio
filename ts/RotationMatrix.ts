@@ -1,6 +1,6 @@
+import {Vector, dotProduct} from './Vector';
 import {fromRotator, toRotationMatrix} from './Quaternion';
 import {Rotator} from './Rotator';
-import {Vector, dotProduct} from './Vector';
 
 export type RotationMatrix = {
     forward: Vector;

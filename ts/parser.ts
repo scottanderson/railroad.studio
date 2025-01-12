@@ -1,19 +1,19 @@
 import {
     CustomData,
     EngineVersion,
+    FormatArgumentValue,
+    FormatArgumentValueMap,
     Gvas,
     GvasHeader,
     GvasString,
     GvasText,
     GvasTextArgumentFormat,
+    GvasTextAsNumber,
     GvasTextBase,
     GvasTextNone,
-    FormatArgumentValue,
-    gvasToString,
-    GvasTextAsNumber,
-    FormatArgumentValueMap,
     NumberFormattingOptions,
     RoundingMode,
+    gvasToString,
 } from './Gvas';
 import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';

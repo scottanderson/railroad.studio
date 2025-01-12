@@ -1,8 +1,8 @@
 import {Railroad} from './Railroad';
 import {Studio} from './Studio';
+import {activateTheme} from './themes';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
-import {activateTheme} from './themes';
 
 // Expose `window.studio` in the global context for advanced users to inspect or modify application state.
 declare global {

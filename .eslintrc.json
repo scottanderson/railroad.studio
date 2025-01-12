@@ -65,6 +65,7 @@
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
         "require-jsdoc": "off",
+        "sort-imports": "error",
         "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false, "minKeys": 2 }],
         "space-infix-ops": "off"
     }

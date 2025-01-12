@@ -1,5 +1,5 @@
+import {Rotator, degreesToRadians} from './Rotator';
 import {RotationMatrix} from './RotationMatrix';
-import {degreesToRadians, Rotator} from './Rotator';
 import {dotProduct} from './Vector';
 
 /**

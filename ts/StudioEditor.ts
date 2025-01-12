@@ -1,13 +1,13 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryName, IndustryType, industryNames, isIndustryName, legacyIndustryNames} from './industries';
 import {Permission, permissionEqual, permissionLabels, permissionToString} from './Permission';
-import {Quaternion} from './Quaternion';
+import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 import {Quadruplet} from './Railroad';
+import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {SplineTrackType} from './SplineTrackType';
 import {Studio} from './Studio';
 import {Vector} from './Vector';
-import {fp32q, fp32r, fp32v, stringToText, textToString} from './util';
 
 export type InputTextOptions = {
     max?: string;

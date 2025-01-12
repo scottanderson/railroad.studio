@@ -1,8 +1,8 @@
 import {Spline, SplineTrack} from './Railroad';
-import {rotateVector} from './RotationMatrix';
 import {Vector, normalizeVector, vectorDifference, vectorSum} from './Vector';
-import {splineHeading} from './splines';
 import {circularizeCurve} from './tool-circularize';
+import {rotateVector} from './RotationMatrix';
+import {splineHeading} from './splines';
 
 export function parallelSpline(spline: Spline, offset: number): [Spline, Spline] {
     const mapper = (offset: number) => (cp: Vector, i: number) => {

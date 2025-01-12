@@ -1,7 +1,7 @@
-import {rotateVector} from './RotationMatrix';
-import {Rotator} from './Rotator';
-import {HermiteCurve} from './util-bezier';
 import {Vector, vectorSum} from './Vector';
+import {HermiteCurve} from './util-bezier';
+import {Rotator} from './Rotator';
+import {rotateVector} from './RotationMatrix';
 
 export type HasLocationRotation = {
     location: Vector;

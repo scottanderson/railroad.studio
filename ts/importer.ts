@@ -1,4 +1,3 @@
-import {Gvas, GvasHeader} from './Gvas';
 import {
     Frame,
     Industry,
@@ -13,6 +12,7 @@ import {
     Vegeation,
     Watertower,
 } from './Railroad';
+import {Gvas, GvasHeader} from './Gvas';
 import {IndustryType} from './industries';
 
 export function checkSaveType(header: GvasHeader): boolean {

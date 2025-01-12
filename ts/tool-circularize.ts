@@ -1,5 +1,6 @@
 import {angleBetweenVectors, distance, normalizeVector} from './Vector';
-import {HermiteCurve, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {HermiteCurve} from './util-bezier';
 import {fp32v} from './util';
 
 /**

@@ -1,9 +1,9 @@
 import {GvasHeader, GvasString, GvasText} from './Gvas';
+import {IndustryType} from './industries';
 import {Permission} from './Permission';
 import {Rotator} from './Rotator';
 import {Transform} from './Transform';
 import {Vector} from './Vector';
-import {IndustryType} from './industries';
 
 /**
  * A simplified save state that can be modified in Railroad Studio.

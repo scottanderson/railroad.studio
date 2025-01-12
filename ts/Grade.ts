@@ -1,4 +1,4 @@
-import {cubicBezier3, HermiteCurve, hermiteToBezier} from './util-bezier';
+import {HermiteCurve, cubicBezier3, hermiteToBezier} from './util-bezier';
 import {Vector} from './Vector';
 
 type Grade = {

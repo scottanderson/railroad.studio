@@ -1,13 +1,13 @@
 import {Industry, Railroad, Sandhouse, Spline, SplineTrack, Switch, Turntable, Watertower} from './Railroad';
-import {Studio} from './Studio';
 import {Vector, vectorSum} from './Vector';
-import {VectorSet} from './VectorSet';
-import {handleError} from './index';
-import {clamp} from './math';
-import {asyncFilter} from './util-async';
 import {cubicBezier3, hermiteToBezier} from './util-bezier';
-import {rotateVector} from './RotationMatrix';
+import {Studio} from './Studio';
+import {VectorSet} from './VectorSet';
+import {asyncFilter} from './util-async';
+import {clamp} from './math';
 import {getIndustryName} from './industries';
+import {handleError} from './index';
+import {rotateVector} from './RotationMatrix';
 
 type Callback<T> = (value: T) => unknown;
 
