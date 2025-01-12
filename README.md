@@ -312,7 +312,7 @@ interface Railroad {
     splines: Spline[];
     switches: Switch[];
     turntables: Turntable[];
-    vegetation: Vegeation[];
+    vegetation: Vegetation[];
     watertowers: Watertower[];
 }
 ```

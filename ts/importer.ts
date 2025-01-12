@@ -9,7 +9,7 @@ import {
     SplineTrack,
     Switch,
     Turntable,
-    Vegeation,
+    Vegetation,
     Watertower,
 } from './Railroad';
 import {Gvas, GvasHeader} from './Gvas';
@@ -371,7 +371,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         }
     }
     // Read vegetation
-    const vegetation: Vegeation[] = [];
+    const vegetation: Vegetation[] = [];
     const vegetationInstanceIndexArray = optionalMap(gvas.intArrays, 'VegetationInstanceIndexArray');
     const vegetationIsmCompNameArray = optionalMap(gvas.stringArrays, 'VegetationISMCompNameArray');
     if (vegetationInstanceIndexArray ?? vegetationIsmCompNameArray) {
@@ -380,7 +380,7 @@ export function gvasToRailroad(gvas: Gvas): Railroad {
         }
         enforceEqualLengths([vegetationInstanceIndexArray, vegetationIsmCompNameArray]);
         for (let i = 0; i < vegetationInstanceIndexArray.length; i++) {
-            const v: Vegeation = {
+            const v: Vegetation = {
                 instanceIndex: vegetationInstanceIndexArray[i],
                 ismCompName: vegetationIsmCompNameArray[i],
             };
