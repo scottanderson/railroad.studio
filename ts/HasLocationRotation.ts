@@ -1,12 +1,12 @@
-import {rotateVector} from './RotationMatrix';
-import {Rotator} from './Rotator';
-import {HermiteCurve} from './util-bezier';
 import {Vector, vectorSum} from './Vector';
+import {HermiteCurve} from './util-bezier';
+import {Rotator} from './Rotator';
+import {rotateVector} from './RotationMatrix';
 
-export interface HasLocationRotation {
+export type HasLocationRotation = {
     location: Vector;
     rotation: Rotator;
-}
+};
 
 export function localToWorld(transform: HasLocationRotation, curve: HermiteCurve): HermiteCurve {
     const {startPoint, endPoint, startTangent, endTangent} = curve;

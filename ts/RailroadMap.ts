@@ -1,4 +1,14 @@
 import * as svgPanZoom from 'svg-pan-zoom';
+import {
+    BezierCurve,
+    cubicBezier,
+    cubicBezier3,
+    cubicBezierLength,
+    cubicBezierMinRadius,
+    cubicBezierTangent3,
+    hermiteToBezier,
+} from './util-bezier';
+import {CargoType, cargoLimits, frameDefinitions, getFrameType, hasCargoLimits, isCargoType} from './frames';
 // eslint-disable-next-line no-redeclare
 import {Circle, Element, G, Line, Matrix, PathArrayAlias, PathCommand, Svg, Text} from '@svgdotjs/svg.js';
 import {
@@ -14,37 +24,27 @@ import {
     SwitchType,
     Turntable,
 } from './Railroad';
-import {Studio} from './Studio';
-import {Point, TreeUtil, radiusFilter} from './TreeUtil';
-import {calculateGrade, calculateSteepestGrade} from './Grade';
-import {gvasToString} from './Gvas';
-import {Vector, scaleVector, vectorSum, distanceSquared, normalizeVector, distance} from './Vector';
-import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
-import {flattenSpline} from './tool-flatten';
-import {CargoType, cargoLimits, frameDefinitions, getFrameType, hasCargoLimits, isCargoType} from './frames';
-import {handleError} from './index';
-import {parallelSpline, parallelSplineTrack} from './tool-parallel';
-import {asyncForEach} from './util-async';
-import {
-    BezierCurve,
-    cubicBezier,
-    cubicBezier3,
-    cubicBezierLength,
-    cubicBezierMinRadius,
-    cubicBezierTangent3,
-    hermiteToBezier,
-} from './util-bezier';
-import {circularizeCurve, goldenSection} from './tool-circularize';
-import {degreesToRadians, radiansToDegrees} from './Rotator';
-import {clamp, lerp} from './math';
-import {SplineTrackType, switchExtraLegs} from './SplineTrackType';
-import {HasLocationRotation, localToWorld} from './HasLocationRotation';
-import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
-import {rect} from './util-path';
 import {GizmoDirection, gizmoDirection} from './Gizmo';
-import {textToString, unknownProperty} from './util';
+import {HasLocationRotation, localToWorld} from './HasLocationRotation';
+import {MergeLimits, normalizeAngle, splineHeading, vectorHeading} from './splines';
+import {Point, TreeUtil, radiusFilter} from './TreeUtil';
+import {SplineTrackType, switchExtraLegs} from './SplineTrackType';
+import {Vector, distance, distanceSquared, normalizeVector, scaleVector, vectorSum} from './Vector';
+import {calculateGrade, calculateSteepestGrade} from './Grade';
+import {catmullRomMinRadius, catmullRomToBezier} from './util-catmullrom';
+import {circularizeCurve, goldenSection} from './tool-circularize';
+import {clamp, lerp} from './math';
+import {degreesToRadians, radiansToDegrees} from './Rotator';
 import {getIndustryName, gizmoSvgPaths, industryNames, industrySvgPaths, isIndustryName} from './industries';
+import {parallelSpline, parallelSplineTrack} from './tool-parallel';
+import {textToString, unknownProperty} from './util';
+import {Studio} from './Studio';
 import {angleBetweenRotators} from './Quaternion';
+import {asyncForEach} from './util-async';
+import {flattenSpline} from './tool-flatten';
+import {gvasToString} from './Gvas';
+import {handleError} from './index';
+import {rect} from './util-path';
 
 enum MapToolMode {
     pan_zoom,
@@ -58,16 +58,16 @@ enum MapToolMode {
     measure,
 }
 
-interface MapOptions {
+type MapOptions = {
     pan: {
         x: number;
         y: number;
     };
     zoom: number;
     mergeLimits: MergeLimits;
-}
+};
 
-export interface MapLayers {
+export type MapLayers = {
     background: G;
     border: G;
     bridges: G;
@@ -88,7 +88,7 @@ export interface MapLayers {
     tracksHidden: G;
     trees: G;
     turntables: G;
-}
+};
 
 type MapLayerVisibility = Record<keyof MapLayers, boolean>;
 

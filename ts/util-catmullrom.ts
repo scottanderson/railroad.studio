@@ -1,5 +1,5 @@
-import {Vector, vectorSum, vectorDifference, scaleVector} from './Vector';
-import {cubicBezierMinRadius, HermiteCurve, hermiteToBezier} from './util-bezier';
+import {HermiteCurve, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {Vector, scaleVector, vectorDifference, vectorSum} from './Vector';
 
 export type CatmullRomSpline = {
     controlPoints: Vector[];

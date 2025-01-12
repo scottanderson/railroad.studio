@@ -5,7 +5,7 @@ import {clamp} from './math';
  *
  * {@link https://docs.unrealengine.com/4.26/en-US/API/Runtime/Core/Math/FVector/}
  */
-export interface Vector {
+export type Vector = {
     /**
      * Centimeters west of the origin.
      */
@@ -18,7 +18,7 @@ export interface Vector {
      * Centimeters above the origin.
      */
     z: number;
-}
+};
 
 /**
  * Calculates the sum of two vectors by adding their corresponding x, y and z values.

@@ -1,7 +1,7 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
+import {arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
 import {GvasString} from './Gvas';
 import {Industry} from './Railroad';
-import {arrow, circle, rect, combine, polyRect, polyRectRel, rotatedRect, rectAbs} from './util-path';
 
 /**
  * Industry type ids, corresponding to the legacy `IndustryTypeArray` property.

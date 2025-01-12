@@ -3,10 +3,10 @@
  * @param appender {(a: T[]) => Promise<void>} - A function to add more elements to the array
  * @param promise {Promise<void>} - A promise that resolves when the loop has completed
  */
-export interface AsyncForEachResult<T> {
+export type AsyncForEachResult<T> = {
     appender: (a: T[]) => Promise<void>;
     promise: Promise<void>;
-}
+};
 
 /**
  * A function that is called after each batch of work in an asynchronous for-each loop to provide progress updates.

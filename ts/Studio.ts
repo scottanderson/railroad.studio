@@ -1,11 +1,23 @@
-import {createFilter} from './Filter';
-import {calculateSteepestGrade} from './Grade';
+import {
+    CargoType,
+    cargoLimits,
+    cargoTypes,
+    frameCategories,
+    frameDefinitions,
+    frameStateMetadata,
+    getFrameType,
+    hasCargoLimits,
+    isCargoType,
+} from './frames';
+import {Frame, NumericFrameState, Quadruplet, Railroad, SplineType} from './Railroad';
 import {GvasString, GvasText, gvasToString} from './Gvas';
-import {createPager} from './Pager';
-import {Permission} from './Permission';
-import {Frame, NumericFrameState, Railroad, SplineType, Quadruplet} from './Railroad';
-import {MapLayers, RailroadMap} from './RailroadMap';
-import {Rotator} from './Rotator';
+import {
+    IndustryName,
+    IndustryType,
+    getIndustryName,
+    industryInputLabels,
+    industryOutputLabels,
+} from './industries';
 import {
     InputTextOptions,
     bootstrapIcon,
@@ -23,36 +35,24 @@ import {
     editTrackType,
     editVector,
 } from './StudioEditor';
-import {Vector} from './Vector';
-import {simplifySplines} from './splines';
+import {MapLayers, RailroadMap} from './RailroadMap';
+import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {
-    CargoType,
-    cargoLimits,
-    cargoTypes,
-    frameCategories,
-    frameDefinitions,
-    frameStateMetadata,
-    getFrameType,
-    hasCargoLimits,
-    isCargoType,
-} from './frames';
-import {SplineTrackType} from './SplineTrackType';
-import {hermiteToBezier, cubicBezierMinRadius} from './util-bezier';
-import {handleError} from './index';
-import {clamp} from './math';
-import {toggleDarkMode} from './themes';
-import {catmullRomToHermite} from './util-catmullrom';
+import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
-import {textToString} from './util';
-import {
-    IndustryName,
-    IndustryType,
-    getIndustryName,
-    industryInputLabels,
-    industryOutputLabels,
-} from './industries';
+import {Rotator} from './Rotator';
+import {SplineTrackType} from './SplineTrackType';
+import {Vector} from './Vector';
 import {VegetationUtil} from './VegetationUtil';
+import {calculateSteepestGrade} from './Grade';
+import {catmullRomToHermite} from './util-catmullrom';
+import {clamp} from './math';
+import {createFilter} from './Filter';
+import {createPager} from './Pager';
+import {handleError} from './index';
+import {simplifySplines} from './splines';
+import {textToString} from './util';
+import {toggleDarkMode} from './themes';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;

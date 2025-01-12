@@ -1,6 +1,6 @@
-export interface Permission {
+export type Permission = {
     values: boolean[];
-}
+};
 
 export const permissionLabels = [
     'Build',

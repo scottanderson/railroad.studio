@@ -1,11 +1,11 @@
-import {cubicBezier3, HermiteCurve, hermiteToBezier} from './util-bezier';
+import {HermiteCurve, cubicBezier3, hermiteToBezier} from './util-bezier';
 import {Vector} from './Vector';
 
-interface Grade {
+type Grade = {
     length: number;
     height: number;
     grade: number;
-}
+};
 
 /**
  * Calculates the grade of a spline represented by a set of control points.

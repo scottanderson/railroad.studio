@@ -1,8 +1,8 @@
 import {Railroad, Spline, SplineType} from './Railroad';
+import {degreesToRadians, radiansToDegrees} from './Rotator';
 import {Point} from './TreeUtil';
 import {Vector} from './Vector';
 import {findLastIndex} from './util';
-import {degreesToRadians, radiansToDegrees} from './Rotator';
 
 export type MergeLimits = {
     /** Bearing limit for merging control points (degrees). */
