@@ -84,6 +84,7 @@ export type GvasText =
     | GvasTextBase
     | GvasTextArgumentFormat
     | GvasTextAsNumber
+    | GvasTextStringTableEntry
     ;
 
 // Component type 255
@@ -113,6 +114,13 @@ export type GvasTextAsNumber = {
     sourceValue: FormatArgumentValue;
     formatOptions?: NumberFormattingOptions | undefined;
     targetCulture: GvasString;
+};
+
+// Component type 11
+export type GvasTextStringTableEntry = {
+    flags: number;
+    tableId: GvasString;
+    tableKey: GvasString;
 };
 
 export type FormatArgumentValueMap = {
