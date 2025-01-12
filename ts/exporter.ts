@@ -1216,6 +1216,17 @@ function textToBlob(text: GvasText, largeWorldCoords: boolean): BlobPart {
             ...formatOptions,
             stringToBlob(text.targetCulture),
         ]);
+    } else if ('tableId' in text) {
+        // (u32) Flags
+        // (u8)  Component Type (StringTableEntry = 11)
+        // (str) Table ID
+        // (str) Table Key
+        return new Blob([
+            new Uint32Array([text.flags]),
+            new Uint8Array([11]),
+            stringToBlob(text.tableId),
+            stringToBlob(text.tableKey),
+        ]);
     } else {
         throw new Error('Unexpected text type');
     }

@@ -11,6 +11,7 @@ import {
     GvasTextAsNumber,
     GvasTextBase,
     GvasTextNone,
+    GvasTextStringTableEntry,
     NumberFormattingOptions,
     RoundingMode,
     gvasToString,
@@ -715,6 +716,15 @@ function parseText(buffer: ArrayBuffer, pos = 0): [number, GvasText] {
 
         const value: GvasTextAsNumber = {flags, formatOptions, sourceValue, targetCulture};
         // array.push(value);
+        return [pos, value];
+    } else if (componentType === 11) { // StringTableEntry
+        let tableId: GvasString;
+        [pos, tableId] = parseString(buffer, pos);
+
+        let tableKey: GvasString;
+        [pos, tableKey] = parseString(buffer, pos);
+
+        const value: GvasTextStringTableEntry = {flags, tableId, tableKey};
         return [pos, value];
     } else {
         throw new Error(`Unexpected component type ${componentType} with flags ${flags}`);

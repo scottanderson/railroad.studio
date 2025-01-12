@@ -89,6 +89,9 @@ export function textToString(value: GvasText): GvasString {
         } else {
             throw new Error(`Unknown Source Value ${value}`);
         }
+    } else if ('tableId' in value) {
+        // StringTableEntry (11)
+        return `Table Entry:\n${value.tableId}\n${value.tableKey}`;
     } else {
         // None
         if (0 === value.values.length) return null;
