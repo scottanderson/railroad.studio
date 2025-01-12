@@ -28,8 +28,10 @@
             }
         ],
         "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+        "@typescript-eslint/no-duplicate-enum-values": "error",
         "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/no-inferrable-types": "error",
+        "@typescript-eslint/no-mixed-enums": "error",
         "@typescript-eslint/no-require-imports": "error",
         "@typescript-eslint/no-type-alias": [
             "error",
@@ -59,6 +61,7 @@
         "indent": "off", // @stylistic/ts/indent
         "max-len": ["error", { "code": 120 }],
         "no-constant-condition": "off",
+        "no-loss-of-precision": "error",
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
         "require-jsdoc": "off",
