@@ -98,615 +98,32 @@ export class Studio {
         content.replaceChildren(mapDiv);
         const mapInverted = this.isMapInverted();
         this.map = new RailroadMap(this, mapDiv, mapInverted);
-        // Layers dropdown
-        const txtLayers = document.createTextNode(' Layers ');
-        const imgLayers = bootstrapIcon('bi-layers', 'Layers Dropdown');
-        const btnLayers = document.createElement('button');
-        btnLayers.id = 'btnLayers';
-        btnLayers.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnLayers.setAttribute('aria-expanded', 'false');
-        btnLayers.setAttribute('data-bs-auto-close', 'outside');
-        btnLayers.setAttribute('data-bs-toggle', 'dropdown');
-        btnLayers.replaceChildren(imgLayers, txtLayers);
-        btnLayers.addEventListener('click', () => {
-            // Update layer toggle state
-            layers.forEach((l) => l.listener ? l.listener() : undefined);
-        });
-        const lstLayers = document.createElement('ul');
-        lstLayers.classList.add('dropdown-menu');
-        const grpLayers = document.createElement('div');
-        grpLayers.setAttribute('aria-labelledby', btnLayers.id);
-        grpLayers.classList.add('dropdown');
-        grpLayers.replaceChildren(btnLayers, lstLayers);
-        let layers: {
-            key: keyof MapLayers;
-            name: string;
-            listener?: () => void;
-        }[] = [
-            {
-                key: 'border',
-                name: 'World Border',
-            },
-            {
-                key: 'background',
-                name: 'Topographical Map',
-            },
-            {
-                key: 'controlPoints',
-                name: 'Control Points',
-            },
-            {
-                key: 'frames',
-                name: 'Frames',
-            },
-            {
-                key: 'grades',
-                name: 'Grade %',
-            },
-            {
-                key: 'radius',
-                name: 'Curve radius',
-            },
-            {
-                key: 'radiusSwitch',
-                name: 'Switch turnout radius',
-            },
-            {
-                key: 'bridges',
-                name: 'Bridges and Walls',
-            },
-            {
-                key: 'groundworks',
-                name: 'Fill',
-            },
-            {
-                key: 'groundworksHidden',
-                name: 'Groundwork and Bridge Hidden Segments',
-            },
-            {
-                key: 'props',
-                name: 'Props',
-            },
-            {
-                key: 'industries',
-                name: 'Industries',
-            },
-            {
-                key: 'gizmo',
-                name: 'Industry measurement tool',
-            },
-            {
-                key: 'players',
-                name: 'Players',
-            },
-            {
-                key: 'tracks',
-                name: 'Tracks',
-            },
-            {
-                key: 'tracksHidden',
-                name: 'Track Hidden Segments',
-            },
-            {
-                key: 'trees',
-                name: 'Trees',
-            },
-            {
-                key: 'turntables',
-                name: 'Turntables',
-            },
-        ];
-        // Hide layers that don't apply to the current map
+        // Map toolbar
+        const mapButtons = document.createElement('div');
+        mapButtons.classList.add('hstack', 'gap-2');
+        const btnDelete = this.createDeleteToolButton();
+        const {grpLayers, layers} = this.createLayersDropdown();
+        mapButtons.replaceChildren(
+            grpLayers,
+            btnDelete,
+        );
         const hasFrames = railroad.frames.length > 0;
         const hasIndustries = railroad.industries.length > 0;
         const hasPlayers = railroad.players.length > 0;
         const hasProps = railroad.props.length > 0;
         const hasSplineTracks = railroad.splineTracks.length > 0;
         const hasSplines = railroad.splines.length > 0;
-        const hasTurntables = railroad.turntables.length > 0;
-        if (!hasFrames) {
-            layers = layers.filter((layer) => layer.key !== 'frames');
-        }
-        if (this.railroad.settings.gameLevelName !== null) {
-            layers = layers.filter((layer) => layer.key !== 'trees');
-        }
-        if (!hasIndustries) {
-            // Hide layers that only apply to industries
-            layers = layers.filter((layer) => {
-                switch (layer.key) {
-                    case 'industries':
-                    case 'gizmo':
-                        return false;
-                }
-                return true;
-            });
-        }
-        if (!hasPlayers) {
-            layers = layers.filter((layer) => layer.key !== 'players');
-        }
-        if (!hasProps) {
-            layers = layers.filter((layer) => layer.key !== 'props');
-        }
-        if (!hasSplines) {
-            // Hide layers that only apply to old splines
-            layers = layers.filter((layer) => {
-                switch (layer.key) {
-                    case 'groundworksHidden':
-                    case 'tracksHidden':
-                        return false;
-                }
-                return true;
-            });
-        }
-        if (!hasSplineTracks) {
-            // Hide layers that only apply to new splines
-            layers = layers.filter((layer) => {
-                switch (layer.key) {
-                    case 'radiusSwitch':
-                    case 'groundworksHidden':
-                    case 'tracksHidden':
-                        return false;
-                }
-                return true;
-            });
-        }
-        if (!hasSplines && !hasSplineTracks) {
-            // Hide layers that only apply to splines
-            layers = layers.filter((layer) => {
-                switch (layer.key) {
-                    case 'controlPoints':
-                    case 'grades':
-                    case 'radius':
-                    case 'bridges':
-                    case 'groundworks':
-                    case 'tracks':
-                        return false;
-                }
-                return true;
-            });
-        }
-        if (!hasTurntables) {
-            // Hide layers that only apply to turntables
-            layers = layers.filter((layer) => layer.key !== 'turntables');
-        }
-        lstLayers.replaceChildren(...layers.map((layer) => {
-            const btnToggleLayer = document.createElement('button');
-            const imgToggleLayer = document.createElement('i');
-            const txtToggleLayer = document.createTextNode(` ${layer.name} `);
-            imgToggleLayer.classList.add('bi', 'bi-toggle-off');
-            btnToggleLayer.classList.add('dropdown-item', 'text-nowrap');
-            btnToggleLayer.replaceChildren(imgToggleLayer, txtToggleLayer);
-            layer.listener = () => {
-                if (this.map.getLayerVisibility(layer.key)) {
-                    imgToggleLayer.classList.replace('bi-toggle-off', 'bi-toggle-on');
-                } else {
-                    imgToggleLayer.classList.replace('bi-toggle-on', 'bi-toggle-off');
-                }
-            };
-            btnToggleLayer.addEventListener('click', () => {
-                this.map.toggleLayerVisibility(layer.key);
-                if (layer.listener) {
-                    layer.listener();
-                }
-            });
-            return btnToggleLayer;
-        }));
-        // Find rolling stock dropdown
-        const txtFrameList = document.createTextNode(' Frames ');
-        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
-        const btnFrameList = document.createElement('button');
-        btnFrameList.id = 'btnFrameList';
-        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnFrameList.setAttribute('aria-expanded', 'false');
-        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
-        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
-        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
-        const lstFrameList = document.createElement('ul');
-        lstFrameList.classList.add('dropdown-menu');
-        lstFrameList.style.maxHeight = '50rem';
-        lstFrameList.style.overflowY = 'auto';
-        const grpFrameList = document.createElement('div');
-        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
-        grpFrameList.classList.add('dropdown');
-        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        lstFrameList.replaceChildren(...railroad.frames.slice().sort((a, b) => {
-            const aType = getFrameType(a.type);
-            const bType = getFrameType(b.type);
-            if (aType === null) return bType === null ? 1 : 0;
-            if (bType === null) return -1;
-            const ad = frameDefinitions[aType];
-            const bd = frameDefinitions[bType];
-            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
-        }).flatMap((frame, i, a) => {
-            const btnFrame = document.createElement('button');
-            const imgFrame = document.createElement('i');
-            const frameType = getFrameType(frame.type);
-            const text =
-                (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
-                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
-                (frame.name ? gvasToString(textToString(frame.name)) : '');
-            const txtFrame = document.createTextNode(` ${text} `);
-            imgFrame.classList.add('bi', 'bi-geo');
-            btnFrame.classList.add('dropdown-item', 'text-nowrap');
-            btnFrame.replaceChildren(imgFrame, txtFrame);
-            btnFrame.addEventListener('click', () => {
-                // Center vewport on frame location
-                this.map.panTo(frame.location);
-                // Show frames
-                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
-            });
-            const prevFrame = i > 0 ? a[i - 1] : undefined;
-            const prevFrameType = getFrameType(prevFrame?.type ?? null);
-            if (prevFrame && frameType !== null && prevFrameType !== null) {
-                const prevFrameDef = frameDefinitions[prevFrameType];
-                const frameDef = frameDefinitions[frameType];
-                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
-                    const li = document.createElement('li');
-                    const hr = document.createElement('hr');
-                    hr.classList.add('dropdown-divider');
-                    li.appendChild(hr);
-                    return [li, btnFrame];
-                }
-            }
-            return btnFrame;
-        }));
-        // Trees dropdown
-        const txtTrees = document.createTextNode(' Trees ');
-        const imgTrees = bootstrapIcon('bi-tree', 'Trees Dropdown');
-        const btnTrees = document.createElement('button');
-        btnTrees.id = 'btnTrees';
-        btnTrees.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnTrees.setAttribute('aria-expanded', 'false');
-        btnTrees.setAttribute('data-bs-auto-close', 'true');
-        btnTrees.setAttribute('data-bs-toggle', 'dropdown');
-        btnTrees.replaceChildren(imgTrees, txtTrees);
-        const lstTrees = document.createElement('ul');
-        lstTrees.classList.add('dropdown-menu');
-        const grpTrees = document.createElement('div');
-        grpTrees.setAttribute('aria-labelledby', btnTrees.id);
-        grpTrees.classList.add('dropdown');
-        grpTrees.replaceChildren(btnTrees, lstTrees);
-        const treeActions: {
-            name: string;
-            onClick: () => void;
-        }[] = [
-            {
-                name: 'Cut All Trees (increases save file size)',
-                onClick: () => this.map.getTreeUtil().cutAll().catch(handleError),
-            },
-            {
-                name: 'Plant all trees (dangerous!)',
-                onClick: () => this.map.getTreeUtil().plantAll().catch(handleError),
-            },
-            {
-                name: 'Smart plant trees',
-                onClick: () => this.map.getTreeUtil().smartPlant().catch(handleError),
-            },
-            {
-                name: 'Smart cut trees (preview)',
-                onClick: () => this.map.previewSmartPlant().catch(handleError),
-            },
-            {
-                name: 'Smart cut trees',
-                onClick: () => this.map.getTreeUtil().smartCut().catch(handleError),
-            },
-        ];
-        lstTrees.replaceChildren(...treeActions.map((action) => {
-            const btnAction = document.createElement('button');
-            const txtAction = document.createTextNode(` ${action.name} `);
-            btnAction.classList.add('dropdown-item', 'text-nowrap');
-            btnAction.replaceChildren(txtAction);
-            btnAction.addEventListener('click', action.onClick);
-            return btnAction;
-        }));
-        // Tree brush
-        const btnTreeBrush = document.createElement('button');
-        const imgTreeBrush = bootstrapIcon('bi-tree-fill', 'Tree Brush');
-        const txtTreeBrush = document.createTextNode(' Tree Brush ');
-        btnTreeBrush.classList.add('btn', 'btn-secondary');
-        btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
-        btnTreeBrush.setAttribute('data-bs-toggle', 'tooltip');
-        btnTreeBrush.title = '[LMB] Plant trees\n[RMB] Cut trees\n[MMB] Pan\n[Scroll wheel] Change brush size';
-        btnTreeBrush.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleTreeBrush();
-            if (toolEnabled) {
-                btnTreeBrush.classList.add('active', 'btn-danger');
-                btnTreeBrush.classList.remove('btn-secondary');
-            } else {
-                btnTreeBrush.classList.remove('active', 'btn-danger');
-                btnTreeBrush.classList.add('btn-secondary');
-            }
-        });
-        // Vegetation dropdown
-        const txtVegetation = document.createTextNode(' Vegetation ');
-        const imgVegetation = bootstrapIcon('bi-tree', 'Vegetation Dropdown');
-        const btnVegetation = document.createElement('button');
-        btnVegetation.id = 'btnVegetation';
-        btnVegetation.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnVegetation.setAttribute('aria-expanded', 'false');
-        btnVegetation.setAttribute('data-bs-auto-close', 'true');
-        btnVegetation.setAttribute('data-bs-toggle', 'dropdown');
-        btnVegetation.replaceChildren(imgVegetation, txtVegetation);
-        const lstVegetation = document.createElement('ul');
-        lstVegetation.classList.add('dropdown-menu');
-        const grpVegetation = document.createElement('div');
-        grpVegetation.setAttribute('aria-labelledby', btnVegetation.id);
-        grpVegetation.classList.add('dropdown');
-        grpVegetation.replaceChildren(btnVegetation, lstVegetation);
-        const vegetationActions: {
-            name: string;
-            onClick: () => void;
-        }[] = [
-            {
-                name: 'Plant all vegetation',
-                onClick: () => this.vegetationUtil.plantAll().then(() => {
-                    if (!this.railroad.settings.gameLevelName) {
-                        // Enable legacy tree tools based on railroad.removedVegetationAssets
-                        grpVegetation.replaceWith(grpTrees, btnTreeBrush);
-                    }
-                }),
-            },
-        ];
-        lstVegetation.replaceChildren(...vegetationActions.map((action) => {
-            const btnAction = document.createElement('button');
-            const txtAction = document.createTextNode(` ${action.name} `);
-            btnAction.classList.add('dropdown-item', 'text-nowrap');
-            btnAction.replaceChildren(txtAction);
-            btnAction.addEventListener('click', action.onClick);
-            return btnAction;
-        }));
-        // Rerail frame tool
-        const btnRerail = document.createElement('button');
-        const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
-        const txtRerail = document.createTextNode(' Rerail ');
-        btnRerail.classList.add('btn', 'btn-secondary');
-        btnRerail.replaceChildren(imgRerail, txtRerail);
-        btnRerail.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleRerailTool();
-            if (toolEnabled) {
-                btnRerail.classList.add('active', 'btn-danger');
-                btnRerail.classList.remove('btn-secondary');
-            } else {
-                btnRerail.classList.remove('active', 'btn-danger');
-                btnRerail.classList.add('btn-secondary');
-            }
-        });
-        // Duplicate frame tool
-        const btnDuplicate = document.createElement('button');
-        const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Frame Tool');
-        const txtDuplicate = document.createTextNode(' Duplicate ');
-        btnDuplicate.classList.add('btn', 'btn-secondary');
-        btnDuplicate.replaceChildren(imgDuplicate, txtDuplicate);
-        btnDuplicate.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleDuplicateTool();
-            if (toolEnabled) {
-                btnDuplicate.classList.add('active', 'btn-danger');
-                btnDuplicate.classList.remove('btn-secondary');
-            } else {
-                btnDuplicate.classList.remove('active', 'btn-danger');
-                btnDuplicate.classList.add('btn-secondary');
-            }
-        });
-        // Measure frame tool
-        const btnMeasure = document.createElement('button');
-        const imgMeasure = bootstrapIcon('bi-rulers', 'Measure Frame Tool');
-        const txtMeasure = document.createTextNode(' Measure ');
-        btnMeasure.classList.add('btn', 'btn-secondary');
-        btnMeasure.replaceChildren(imgMeasure, txtMeasure);
-        btnMeasure.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleMeasureTool();
-            if (toolEnabled) {
-                btnMeasure.classList.add('active', 'btn-danger');
-                btnMeasure.classList.remove('btn-secondary');
-            } else {
-                btnMeasure.classList.remove('active', 'btn-danger');
-                btnMeasure.classList.add('btn-secondary');
-            }
-        });
-        // Delete tool
-        const btnDelete = document.createElement('button');
-        const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
-        const txtDelete = document.createTextNode(' Delete ');
-        btnDelete.classList.add('btn', 'btn-secondary');
-        btnDelete.replaceChildren(imgDelete, txtDelete);
-        btnDelete.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleDeleteTool();
-            if (toolEnabled) {
-                btnDelete.classList.add('active', 'btn-danger');
-                btnDelete.classList.remove('btn-secondary');
-            } else {
-                btnDelete.classList.remove('active', 'btn-danger');
-                btnDelete.classList.add('btn-secondary');
-            }
-        });
-        // Flatten spline tool
-        const btnFlattenSpline = document.createElement('button');
-        const imgFlattenSpline = bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
-        const txtFlattenSpline = document.createTextNode(' Flatten ');
-        btnFlattenSpline.classList.add('btn', 'btn-secondary');
-        btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
-        btnFlattenSpline.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleFlattenTool();
-            if (toolEnabled) {
-                btnFlattenSpline.classList.add('active', 'btn-danger');
-                btnFlattenSpline.classList.remove('btn-secondary');
-            } else {
-                btnFlattenSpline.classList.remove('active', 'btn-danger');
-                btnFlattenSpline.classList.add('btn-secondary');
-            }
-        });
-        // Parallel spline tool
-        const btnParallelSpline = document.createElement('button');
-        const imgParallelSpline = bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
-        const txtParallelSpline = document.createTextNode(' Parallel ');
-        btnParallelSpline.classList.add('btn', 'btn-secondary');
-        btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
-        btnParallelSpline.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleParallelTool();
-            if (toolEnabled) {
-                btnParallelSpline.classList.add('active', 'btn-danger');
-                btnParallelSpline.classList.remove('btn-secondary');
-            } else {
-                btnParallelSpline.classList.remove('active', 'btn-danger');
-                btnParallelSpline.classList.add('btn-secondary');
-            }
-        });
-        // Circularize spline tool
-        const btnCircularizeSpline = document.createElement('button');
-        const imgCircularizeSpline = bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
-        const txtCircularizeSpline = document.createTextNode(' Circularize ');
-        btnCircularizeSpline.classList.add('btn', 'btn-secondary');
-        btnCircularizeSpline.replaceChildren(imgCircularizeSpline, txtCircularizeSpline);
-        btnCircularizeSpline.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleCircularizeTool();
-            if (toolEnabled) {
-                btnCircularizeSpline.classList.add('active', 'btn-danger');
-                btnCircularizeSpline.classList.remove('btn-secondary');
-            } else {
-                btnCircularizeSpline.classList.remove('active', 'btn-danger');
-                btnCircularizeSpline.classList.add('btn-secondary');
-            }
-        });
-        // Minimize segment count
-        const btnMinimizeSegments = document.createElement('button');
-        const imgMinimizeSegments = bootstrapIcon('bi-binoculars', 'Minimize segment count');
-        const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
-        btnMinimizeSegments.classList.add('btn', 'btn-secondary');
-        btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
-        const fmtPercent = (n: number, d: number) => {
-            if (n === d) return `unchanged (${n})`;
-            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
-            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
-        };
-        btnMinimizeSegments.addEventListener('click', () => {
-            this.railroad.splines = simplifySplines(this.railroad, this.map.getMergeLimits());
-            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
-            if (segmentCountAfter > this.originalSegmentCount) {
-                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
-            } else if (segmentCountAfter < this.originalSegmentCount) {
-                this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
-                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
-            }
-            this.setMapModified(true);
-            this.map.refreshSplines().then(() => {
-                if (segmentCountAfter < this.originalSegmentCount) {
-                    this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
-                }
-            });
-        });
-        // Minimize segment count configuration dropdown
-        const grpMinimizeSegments = document.createElement('div');
-        {
-            const drpMinimizeSegments = document.createElement('button');
-            drpMinimizeSegments.classList.add('btn', 'btn-secondary', 'dropdown-toggle', 'dropdown-toggle-split');
-            drpMinimizeSegments.setAttribute('aria-expanded', 'false');
-            drpMinimizeSegments.setAttribute('data-bs-auto-close', 'outside');
-            drpMinimizeSegments.setAttribute('data-bs-toggle', 'dropdown');
-            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => unknown) => {
-                const cfgInput = document.createElement('input');
-                cfgInput.id = id;
-                cfgInput.min = '0';
-                cfgInput.step = 'any';
-                cfgInput.type = type;
-                cfgInput.classList.add('form-control');
-                cfgInput.value = value;
-                cfgInput.addEventListener('input', cb);
-                return cfgInput;
-            };
-            const inputBearing = makeInput(
-                'inputBearing',
-                'number',
-                String(this.map.getMergeLimits().bearing),
-                (ev) => {
-                    this.map.getMergeLimits().bearing = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputInclination = makeInput(
-                'inputInclination',
-                'number',
-                String(this.map.getMergeLimits().inclination),
-                (ev) => {
-                    this.map.getMergeLimits().inclination = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputHorizontal = makeInput(
-                'inputHorizontal',
-                'number',
-                String(this.map.getMergeLimits().horizontal),
-                (ev) => {
-                    this.map.getMergeLimits().horizontal = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputVertical = makeInput(
-                'inputVertical',
-                'number',
-                String(this.map.getMergeLimits().vertical),
-                (ev) => {
-                    this.map.getMergeLimits().vertical = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const btnDefaults = document.createElement('button');
-            btnDefaults.type = 'button';
-            btnDefaults.classList.add('btn', 'btn-warning');
-            btnDefaults.textContent = 'Load defaults';
-            btnDefaults.addEventListener('click', () => {
-                inputBearing.value = '10';
-                inputInclination.value = '2.5';
-                inputHorizontal.value = '10';
-                inputVertical.value = '1';
-            });
-            const wrapInput = (cfgInput: HTMLInputElement, label: string, text: string) => {
-                const cfgLabel = document.createElement('label');
-                cfgLabel.setAttribute('for', cfgInput.id);
-                cfgLabel.classList.add('form-label');
-                cfgLabel.textContent = label;
-                const cfgText = document.createElement('div');
-                cfgText.classList.add('form-text');
-                cfgText.textContent = text;
-                const frmDivOne = document.createElement('div');
-                frmDivOne.classList.add('mb-3');
-                frmDivOne.replaceChildren(cfgLabel, cfgInput, cfgText);
-                return frmDivOne;
-            };
-            const frmMinimizeSegments = document.createElement('form');
-            frmMinimizeSegments.classList.add('px-4', 'py-3');
-            frmMinimizeSegments.replaceChildren(
-                wrapInput(inputBearing, 'Bearing limit',
-                    'Maximum difference between segment headings for spline merging, in degrees.'),
-                wrapInput(inputInclination, 'Inclination limit',
-                    'Maximum difference between segment inclinations for spline merging, in degrees.'),
-                wrapInput(inputHorizontal, 'Horizontal limit',
-                    'Maximum distance between control points for spline merging, in centimeters.'),
-                wrapInput(inputVertical, 'Vertical limit',
-                    'Maximum distance between control points for spline merging, in centimeters.'),
-                btnDefaults,
-            );
-            const mnuMinimizeSegments = document.createElement('div');
-            mnuMinimizeSegments.classList.add('dropdown-menu', 'dropdown-menu-end');
-            mnuMinimizeSegments.replaceChildren(frmMinimizeSegments);
-            grpMinimizeSegments.classList.add('btn-group');
-            grpMinimizeSegments.replaceChildren(btnMinimizeSegments, drpMinimizeSegments, mnuMinimizeSegments);
-        }
-        // Map toolbar
-        const mapButtons = document.createElement('div');
-        mapButtons.classList.add('hstack', 'gap-2');
-        mapButtons.replaceChildren(
-            grpLayers,
-            btnDelete,
-        );
         if (hasFrames) {
             // Enable tools that work on frames
             [
-                grpFrameList,
-                btnRerail,
-                btnDuplicate,
-                btnMeasure,
+                this.createFrameLocatorToolDropdown(),
+                this.createRerailToolButton(),
+                this.createDuplicateFrameToolButton(),
+                this.createMeasureFrameToolButton(),
             ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
+        const grpTrees = this.createTreesDropdown();
+        const btnTreeBrush = this.createTreeBrushToolButton();
         if (!this.railroad.settings.gameLevelName && this.railroad.vegetation.length === 0) {
             // Enable legacy tree tools based on railroad.removedVegetationAssets
             [
@@ -716,26 +133,26 @@ export class Studio {
         } else {
             // Enable vegetation tools based on railroad.vegetation
             [
-                grpVegetation,
+                this.createVegetationDropdown(grpTrees, btnTreeBrush),
             ].forEach((e) => mapButtons.insertBefore(e, btnDelete));
         }
         if (hasSplines) {
             // Enable tools that only work for old splines
             [
-                btnFlattenSpline,
-                grpMinimizeSegments,
+                this.createFlattenSplineToolButton(),
+                this.createMinimizeSegmentCountConfigDropdown(),
             ].forEach((e) => mapButtons.appendChild(e));
         }
         if (hasSplineTracks) {
             // Enable tools that only work for new splines
             [
-                btnCircularizeSpline,
+                this.createCircularizeSplineToolButton(),
             ].forEach((e) => mapButtons.appendChild(e));
         }
         if (hasSplines || hasSplineTracks) {
             // Enable tools that work for any splines
             [
-                btnParallelSpline,
+                this.createParallelSplineToolButton(),
             ].forEach((e) => mapButtons.appendChild(e));
         }
         // Frames
@@ -996,6 +413,648 @@ export class Studio {
             headerElement.insertBefore(headerWarning, studioControls);
             // headerElement.replaceChildren(header, headerWarning, studioControls);
         }
+    }
+
+    private createMinimizeSegmentCountButton() {
+        // Minimize segment count
+        const btnMinimizeSegments = document.createElement('button');
+        const imgMinimizeSegments = bootstrapIcon('bi-binoculars', 'Minimize segment count');
+        const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
+        btnMinimizeSegments.classList.add('btn', 'btn-secondary');
+        btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
+        const fmtPercent = (n: number, d: number) => {
+            if (n === d) return `unchanged (${n})`;
+            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
+            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
+        };
+        btnMinimizeSegments.addEventListener('click', () => {
+            this.railroad.splines = simplifySplines(this.railroad, this.map.getMergeLimits());
+            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
+            if (segmentCountAfter > this.originalSegmentCount) {
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
+            } else if (segmentCountAfter < this.originalSegmentCount) {
+                this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
+            }
+            this.setMapModified(true);
+            this.map.refreshSplines().then(() => {
+                if (segmentCountAfter < this.originalSegmentCount) {
+                    this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
+                }
+            });
+        });
+        return btnMinimizeSegments;
+    }
+
+    private createMinimizeSegmentCountConfigDropdown() {
+        // Minimize segment count configuration dropdown
+        const grpMinimizeSegments = document.createElement('div');
+        {
+            const drpMinimizeSegments = document.createElement('button');
+            drpMinimizeSegments.classList.add('btn', 'btn-secondary', 'dropdown-toggle', 'dropdown-toggle-split');
+            drpMinimizeSegments.setAttribute('aria-expanded', 'false');
+            drpMinimizeSegments.setAttribute('data-bs-auto-close', 'outside');
+            drpMinimizeSegments.setAttribute('data-bs-toggle', 'dropdown');
+            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => unknown) => {
+                const cfgInput = document.createElement('input');
+                cfgInput.id = id;
+                cfgInput.min = '0';
+                cfgInput.step = 'any';
+                cfgInput.type = type;
+                cfgInput.classList.add('form-control');
+                cfgInput.value = value;
+                cfgInput.addEventListener('input', cb);
+                return cfgInput;
+            };
+            const inputBearing = makeInput(
+                'inputBearing',
+                'number',
+                String(this.map.getMergeLimits().bearing),
+                (ev) => {
+                    this.map.getMergeLimits().bearing = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputInclination = makeInput(
+                'inputInclination',
+                'number',
+                String(this.map.getMergeLimits().inclination),
+                (ev) => {
+                    this.map.getMergeLimits().inclination = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputHorizontal = makeInput(
+                'inputHorizontal',
+                'number',
+                String(this.map.getMergeLimits().horizontal),
+                (ev) => {
+                    this.map.getMergeLimits().horizontal = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputVertical = makeInput(
+                'inputVertical',
+                'number',
+                String(this.map.getMergeLimits().vertical),
+                (ev) => {
+                    this.map.getMergeLimits().vertical = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const btnDefaults = document.createElement('button');
+            btnDefaults.type = 'button';
+            btnDefaults.classList.add('btn', 'btn-warning');
+            btnDefaults.textContent = 'Load defaults';
+            btnDefaults.addEventListener('click', () => {
+                inputBearing.value = '10';
+                inputInclination.value = '2.5';
+                inputHorizontal.value = '10';
+                inputVertical.value = '1';
+            });
+            const wrapInput = (cfgInput: HTMLInputElement, label: string, text: string) => {
+                const cfgLabel = document.createElement('label');
+                cfgLabel.setAttribute('for', cfgInput.id);
+                cfgLabel.classList.add('form-label');
+                cfgLabel.textContent = label;
+                const cfgText = document.createElement('div');
+                cfgText.classList.add('form-text');
+                cfgText.textContent = text;
+                const frmDivOne = document.createElement('div');
+                frmDivOne.classList.add('mb-3');
+                frmDivOne.replaceChildren(cfgLabel, cfgInput, cfgText);
+                return frmDivOne;
+            };
+            const frmMinimizeSegments = document.createElement('form');
+            frmMinimizeSegments.classList.add('px-4', 'py-3');
+            frmMinimizeSegments.replaceChildren(
+                wrapInput(inputBearing, 'Bearing limit',
+                    'Maximum difference between segment headings for spline merging, in degrees.'),
+                wrapInput(inputInclination, 'Inclination limit',
+                    'Maximum difference between segment inclinations for spline merging, in degrees.'),
+                wrapInput(inputHorizontal, 'Horizontal limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
+                wrapInput(inputVertical, 'Vertical limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
+                btnDefaults,
+            );
+            const mnuMinimizeSegments = document.createElement('div');
+            mnuMinimizeSegments.classList.add('dropdown-menu', 'dropdown-menu-end');
+            mnuMinimizeSegments.replaceChildren(frmMinimizeSegments);
+            grpMinimizeSegments.classList.add('btn-group');
+            const btnMinimizeSegments = this.createMinimizeSegmentCountButton();
+            grpMinimizeSegments.replaceChildren(btnMinimizeSegments, drpMinimizeSegments, mnuMinimizeSegments);
+        }
+        return grpMinimizeSegments;
+    }
+
+    private createLayersDropdown() {
+        // Layers dropdown
+        const txtLayers = document.createTextNode(' Layers ');
+        const imgLayers = bootstrapIcon('bi-layers', 'Layers Dropdown');
+        const btnLayers = document.createElement('button');
+        btnLayers.id = 'btnLayers';
+        btnLayers.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnLayers.setAttribute('aria-expanded', 'false');
+        btnLayers.setAttribute('data-bs-auto-close', 'outside');
+        btnLayers.setAttribute('data-bs-toggle', 'dropdown');
+        btnLayers.replaceChildren(imgLayers, txtLayers);
+        btnLayers.addEventListener('click', () => {
+            // Update layer toggle state
+            layers.forEach((l) => l.listener ? l.listener() : undefined);
+        });
+        const lstLayers = document.createElement('ul');
+        lstLayers.classList.add('dropdown-menu');
+        const grpLayers = document.createElement('div');
+        grpLayers.setAttribute('aria-labelledby', btnLayers.id);
+        grpLayers.classList.add('dropdown');
+        grpLayers.replaceChildren(btnLayers, lstLayers);
+        let layers: {
+            key: keyof MapLayers;
+            name: string;
+            listener?: () => void;
+        }[] = [
+            {
+                key: 'border',
+                name: 'World Border',
+            },
+            {
+                key: 'background',
+                name: 'Topographical Map',
+            },
+            {
+                key: 'controlPoints',
+                name: 'Control Points',
+            },
+            {
+                key: 'frames',
+                name: 'Frames',
+            },
+            {
+                key: 'grades',
+                name: 'Grade %',
+            },
+            {
+                key: 'radius',
+                name: 'Curve radius',
+            },
+            {
+                key: 'radiusSwitch',
+                name: 'Switch turnout radius',
+            },
+            {
+                key: 'bridges',
+                name: 'Bridges and Walls',
+            },
+            {
+                key: 'groundworks',
+                name: 'Fill',
+            },
+            {
+                key: 'groundworksHidden',
+                name: 'Groundwork and Bridge Hidden Segments',
+            },
+            {
+                key: 'props',
+                name: 'Props',
+            },
+            {
+                key: 'industries',
+                name: 'Industries',
+            },
+            {
+                key: 'gizmo',
+                name: 'Industry measurement tool',
+            },
+            {
+                key: 'players',
+                name: 'Players',
+            },
+            {
+                key: 'tracks',
+                name: 'Tracks',
+            },
+            {
+                key: 'tracksHidden',
+                name: 'Track Hidden Segments',
+            },
+            {
+                key: 'trees',
+                name: 'Trees',
+            },
+            {
+                key: 'turntables',
+                name: 'Turntables',
+            },
+        ];
+        // Hide layers that don't apply to the current map
+        const hasFrames = this.railroad.frames.length > 0;
+        const hasIndustries = this.railroad.industries.length > 0;
+        const hasPlayers = this.railroad.players.length > 0;
+        const hasProps = this.railroad.props.length > 0;
+        const hasSplineTracks = this.railroad.splineTracks.length > 0;
+        const hasSplines = this.railroad.splines.length > 0;
+        const hasTurntables = this.railroad.turntables.length > 0;
+        if (!hasFrames) {
+            layers = layers.filter((layer) => layer.key !== 'frames');
+        }
+        if (this.railroad.settings.gameLevelName !== null) {
+            layers = layers.filter((layer) => layer.key !== 'trees');
+        }
+        if (!hasIndustries) {
+            // Hide layers that only apply to industries
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'industries':
+                    case 'gizmo':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasPlayers) {
+            layers = layers.filter((layer) => layer.key !== 'players');
+        }
+        if (!hasProps) {
+            layers = layers.filter((layer) => layer.key !== 'props');
+        }
+        if (!hasSplines) {
+            // Hide layers that only apply to old splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'groundworksHidden':
+                    case 'tracksHidden':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasSplineTracks) {
+            // Hide layers that only apply to new splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'radiusSwitch':
+                    case 'groundworksHidden':
+                    case 'tracksHidden':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasSplines && !hasSplineTracks) {
+            // Hide layers that only apply to splines
+            layers = layers.filter((layer) => {
+                switch (layer.key) {
+                    case 'controlPoints':
+                    case 'grades':
+                    case 'radius':
+                    case 'bridges':
+                    case 'groundworks':
+                    case 'tracks':
+                        return false;
+                }
+                return true;
+            });
+        }
+        if (!hasTurntables) {
+            // Hide layers that only apply to turntables
+            layers = layers.filter((layer) => layer.key !== 'turntables');
+        }
+        lstLayers.replaceChildren(...layers.map((layer) => {
+            const btnToggleLayer = document.createElement('button');
+            const imgToggleLayer = document.createElement('i');
+            const txtToggleLayer = document.createTextNode(` ${layer.name} `);
+            imgToggleLayer.classList.add('bi', 'bi-toggle-off');
+            btnToggleLayer.classList.add('dropdown-item', 'text-nowrap');
+            btnToggleLayer.replaceChildren(imgToggleLayer, txtToggleLayer);
+            layer.listener = () => {
+                if (this.map.getLayerVisibility(layer.key)) {
+                    imgToggleLayer.classList.replace('bi-toggle-off', 'bi-toggle-on');
+                } else {
+                    imgToggleLayer.classList.replace('bi-toggle-on', 'bi-toggle-off');
+                }
+            };
+            btnToggleLayer.addEventListener('click', () => {
+                this.map.toggleLayerVisibility(layer.key);
+                if (layer.listener) {
+                    layer.listener();
+                }
+            });
+            return btnToggleLayer;
+        }));
+        return {grpLayers, layers};
+    }
+
+    private createTreesDropdown() {
+        const txtTrees = document.createTextNode(' Trees ');
+        const imgTrees = bootstrapIcon('bi-tree', 'Trees Dropdown');
+        const btnTrees = document.createElement('button');
+        btnTrees.id = 'btnTrees';
+        btnTrees.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnTrees.setAttribute('aria-expanded', 'false');
+        btnTrees.setAttribute('data-bs-auto-close', 'true');
+        btnTrees.setAttribute('data-bs-toggle', 'dropdown');
+        btnTrees.replaceChildren(imgTrees, txtTrees);
+        const lstTrees = document.createElement('ul');
+        lstTrees.classList.add('dropdown-menu');
+        const grpTrees = document.createElement('div');
+        grpTrees.setAttribute('aria-labelledby', btnTrees.id);
+        grpTrees.classList.add('dropdown');
+        grpTrees.replaceChildren(btnTrees, lstTrees);
+        const treeActions: {
+            name: string;
+            onClick: () => void;
+        }[] = [
+            {
+                name: 'Cut All Trees (increases save file size)',
+                onClick: () => this.map.getTreeUtil().cutAll().catch(handleError),
+            },
+            {
+                name: 'Plant all trees (dangerous!)',
+                onClick: () => this.map.getTreeUtil().plantAll().catch(handleError),
+            },
+            {
+                name: 'Smart plant trees',
+                onClick: () => this.map.getTreeUtil().smartPlant().catch(handleError),
+            },
+            {
+                name: 'Smart cut trees (preview)',
+                onClick: () => this.map.previewSmartPlant().catch(handleError),
+            },
+            {
+                name: 'Smart cut trees',
+                onClick: () => this.map.getTreeUtil().smartCut().catch(handleError),
+            },
+        ];
+        lstTrees.replaceChildren(...treeActions.map((action) => {
+            const btnAction = document.createElement('button');
+            const txtAction = document.createTextNode(` ${action.name} `);
+            btnAction.classList.add('dropdown-item', 'text-nowrap');
+            btnAction.replaceChildren(txtAction);
+            btnAction.addEventListener('click', action.onClick);
+            return btnAction;
+        }));
+        return grpTrees;
+    }
+
+    private createTreeBrushToolButton() {
+        const btnTreeBrush = document.createElement('button');
+        const imgTreeBrush = bootstrapIcon('bi-tree-fill', 'Tree Brush');
+        const txtTreeBrush = document.createTextNode(' Tree Brush ');
+        btnTreeBrush.classList.add('btn', 'btn-secondary');
+        btnTreeBrush.replaceChildren(imgTreeBrush, txtTreeBrush);
+        btnTreeBrush.setAttribute('data-bs-toggle', 'tooltip');
+        btnTreeBrush.title = '[LMB] Plant trees\n[RMB] Cut trees\n[MMB] Pan\n[Scroll wheel] Change brush size';
+        btnTreeBrush.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleTreeBrush();
+            if (toolEnabled) {
+                btnTreeBrush.classList.add('active', 'btn-danger');
+                btnTreeBrush.classList.remove('btn-secondary');
+            } else {
+                btnTreeBrush.classList.remove('active', 'btn-danger');
+                btnTreeBrush.classList.add('btn-secondary');
+            }
+        });
+        return btnTreeBrush;
+    }
+
+    private createVegetationDropdown(grpTrees: HTMLDivElement, btnTreeBrush: HTMLButtonElement) {
+        // Vegetation dropdown
+        const txtVegetation = document.createTextNode(' Vegetation ');
+        const imgVegetation = bootstrapIcon('bi-tree', 'Vegetation Dropdown');
+        const btnVegetation = document.createElement('button');
+        btnVegetation.id = 'btnVegetation';
+        btnVegetation.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnVegetation.setAttribute('aria-expanded', 'false');
+        btnVegetation.setAttribute('data-bs-auto-close', 'true');
+        btnVegetation.setAttribute('data-bs-toggle', 'dropdown');
+        btnVegetation.replaceChildren(imgVegetation, txtVegetation);
+        const lstVegetation = document.createElement('ul');
+        lstVegetation.classList.add('dropdown-menu');
+        const grpVegetation = document.createElement('div');
+        grpVegetation.setAttribute('aria-labelledby', btnVegetation.id);
+        grpVegetation.classList.add('dropdown');
+        grpVegetation.replaceChildren(btnVegetation, lstVegetation);
+        const vegetationActions: {
+            name: string;
+            onClick: () => void;
+        }[] = [
+            {
+                name: 'Plant all vegetation',
+                onClick: () => this.vegetationUtil.plantAll().then(() => {
+                    if (!this.railroad.settings.gameLevelName) {
+                        // Enable legacy tree tools based on railroad.removedVegetationAssets
+                        grpVegetation.replaceWith(grpTrees, btnTreeBrush);
+                    }
+                }),
+            },
+        ];
+        lstVegetation.replaceChildren(...vegetationActions.map((action) => {
+            const btnAction = document.createElement('button');
+            const txtAction = document.createTextNode(` ${action.name} `);
+            btnAction.classList.add('dropdown-item', 'text-nowrap');
+            btnAction.replaceChildren(txtAction);
+            btnAction.addEventListener('click', action.onClick);
+            return btnAction;
+        }));
+        return grpVegetation;
+    }
+
+    private createMeasureFrameToolButton() {
+        const btnMeasure = document.createElement('button');
+        const imgMeasure = bootstrapIcon('bi-rulers', 'Measure Frame Tool');
+        const txtMeasure = document.createTextNode(' Measure ');
+        btnMeasure.classList.add('btn', 'btn-secondary');
+        btnMeasure.replaceChildren(imgMeasure, txtMeasure);
+        btnMeasure.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleMeasureTool();
+            if (toolEnabled) {
+                btnMeasure.classList.add('active', 'btn-danger');
+                btnMeasure.classList.remove('btn-secondary');
+            } else {
+                btnMeasure.classList.remove('active', 'btn-danger');
+                btnMeasure.classList.add('btn-secondary');
+            }
+        });
+        return btnMeasure;
+    }
+
+    private createFrameLocatorToolDropdown() {
+        const txtFrameList = document.createTextNode(' Frames ');
+        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
+        const btnFrameList = document.createElement('button');
+        btnFrameList.id = 'btnFrameList';
+        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnFrameList.setAttribute('aria-expanded', 'false');
+        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
+        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
+        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
+        const lstFrameList = document.createElement('ul');
+        lstFrameList.classList.add('dropdown-menu');
+        lstFrameList.style.maxHeight = '50rem';
+        lstFrameList.style.overflowY = 'auto';
+        const grpFrameList = document.createElement('div');
+        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
+        grpFrameList.classList.add('dropdown');
+        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
+        lstFrameList.replaceChildren(...this.railroad.frames.slice().sort((a, b) => {
+            const aType = getFrameType(a.type);
+            const bType = getFrameType(b.type);
+            if (aType === null) return bType === null ? 1 : 0;
+            if (bType === null) return -1;
+            const ad = frameDefinitions[aType];
+            const bd = frameDefinitions[bType];
+            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
+        }).flatMap((frame, i, a) => {
+            const btnFrame = document.createElement('button');
+            const imgFrame = document.createElement('i');
+            const frameType = getFrameType(frame.type);
+            const text = (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
+                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
+                (frame.name ? gvasToString(textToString(frame.name)) : '');
+            const txtFrame = document.createTextNode(` ${text} `);
+            imgFrame.classList.add('bi', 'bi-geo');
+            btnFrame.classList.add('dropdown-item', 'text-nowrap');
+            btnFrame.replaceChildren(imgFrame, txtFrame);
+            btnFrame.addEventListener('click', () => {
+                // Center vewport on frame location
+                this.map.panTo(frame.location);
+                // Show frames
+                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
+            });
+            const prevFrame = i > 0 ? a[i - 1] : undefined;
+            const prevFrameType = getFrameType(prevFrame?.type ?? null);
+            if (prevFrame && frameType !== null && prevFrameType !== null) {
+                const prevFrameDef = frameDefinitions[prevFrameType];
+                const frameDef = frameDefinitions[frameType];
+                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
+                    const li = document.createElement('li');
+                    const hr = document.createElement('hr');
+                    hr.classList.add('dropdown-divider');
+                    li.appendChild(hr);
+                    return [li, btnFrame];
+                }
+            }
+            return btnFrame;
+        }));
+        return grpFrameList;
+    }
+
+    private createRerailToolButton() {
+        const btnRerail = document.createElement('button');
+        const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
+        const txtRerail = document.createTextNode(' Rerail ');
+        btnRerail.classList.add('btn', 'btn-secondary');
+        btnRerail.replaceChildren(imgRerail, txtRerail);
+        btnRerail.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleRerailTool();
+            if (toolEnabled) {
+                btnRerail.classList.add('active', 'btn-danger');
+                btnRerail.classList.remove('btn-secondary');
+            } else {
+                btnRerail.classList.remove('active', 'btn-danger');
+                btnRerail.classList.add('btn-secondary');
+            }
+        });
+        return btnRerail;
+    }
+
+    private createDuplicateFrameToolButton() {
+        const btnDuplicate = document.createElement('button');
+        const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Frame Tool');
+        const txtDuplicate = document.createTextNode(' Duplicate ');
+        btnDuplicate.classList.add('btn', 'btn-secondary');
+        btnDuplicate.replaceChildren(imgDuplicate, txtDuplicate);
+        btnDuplicate.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleDuplicateTool();
+            if (toolEnabled) {
+                btnDuplicate.classList.add('active', 'btn-danger');
+                btnDuplicate.classList.remove('btn-secondary');
+            } else {
+                btnDuplicate.classList.remove('active', 'btn-danger');
+                btnDuplicate.classList.add('btn-secondary');
+            }
+        });
+        return btnDuplicate;
+    }
+
+    private createDeleteToolButton() {
+        const btnDelete = document.createElement('button');
+        const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
+        const txtDelete = document.createTextNode(' Delete ');
+        btnDelete.classList.add('btn', 'btn-secondary');
+        btnDelete.replaceChildren(imgDelete, txtDelete);
+        btnDelete.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleDeleteTool();
+            if (toolEnabled) {
+                btnDelete.classList.add('active', 'btn-danger');
+                btnDelete.classList.remove('btn-secondary');
+            } else {
+                btnDelete.classList.remove('active', 'btn-danger');
+                btnDelete.classList.add('btn-secondary');
+            }
+        });
+        return btnDelete;
+    }
+
+    private createFlattenSplineToolButton() {
+        // Flatten spline tool
+        const btnFlattenSpline = document.createElement('button');
+        const imgFlattenSpline = bootstrapIcon('bi-arrows-collapse', 'Flatten Spline Tool');
+        const txtFlattenSpline = document.createTextNode(' Flatten ');
+        btnFlattenSpline.classList.add('btn', 'btn-secondary');
+        btnFlattenSpline.replaceChildren(imgFlattenSpline, txtFlattenSpline);
+        btnFlattenSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleFlattenTool();
+            if (toolEnabled) {
+                btnFlattenSpline.classList.add('active', 'btn-danger');
+                btnFlattenSpline.classList.remove('btn-secondary');
+            } else {
+                btnFlattenSpline.classList.remove('active', 'btn-danger');
+                btnFlattenSpline.classList.add('btn-secondary');
+            }
+        });
+        return btnFlattenSpline;
+    }
+
+    private createParallelSplineToolButton() {
+        // Parallel spline tool
+        const btnParallelSpline = document.createElement('button');
+        const imgParallelSpline = bootstrapIcon('bi-distribute-horizontal', 'Parallel Spline Tool');
+        const txtParallelSpline = document.createTextNode(' Parallel ');
+        btnParallelSpline.classList.add('btn', 'btn-secondary');
+        btnParallelSpline.replaceChildren(imgParallelSpline, txtParallelSpline);
+        btnParallelSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleParallelTool();
+            if (toolEnabled) {
+                btnParallelSpline.classList.add('active', 'btn-danger');
+                btnParallelSpline.classList.remove('btn-secondary');
+            } else {
+                btnParallelSpline.classList.remove('active', 'btn-danger');
+                btnParallelSpline.classList.add('btn-secondary');
+            }
+        });
+        return btnParallelSpline;
+    }
+
+    private createCircularizeSplineToolButton() {
+        // Circularize spline tool
+        const btnCircularizeSpline = document.createElement('button');
+        const imgCircularizeSpline = bootstrapIcon('bi-rainbow', 'Circularize Spline Tool');
+        const txtCircularizeSpline = document.createTextNode(' Circularize ');
+        btnCircularizeSpline.classList.add('btn', 'btn-secondary');
+        btnCircularizeSpline.replaceChildren(imgCircularizeSpline, txtCircularizeSpline);
+        btnCircularizeSpline.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleCircularizeTool();
+            if (toolEnabled) {
+                btnCircularizeSpline.classList.add('active', 'btn-danger');
+                btnCircularizeSpline.classList.remove('btn-secondary');
+            } else {
+                btnCircularizeSpline.classList.remove('active', 'btn-danger');
+                btnCircularizeSpline.classList.add('btn-secondary');
+            }
+        });
+        return btnCircularizeSpline;
     }
 
     private exportFileName() {
