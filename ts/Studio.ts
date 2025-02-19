@@ -415,139 +415,6 @@ export class Studio {
         }
     }
 
-    private createMinimizeSegmentCountButton() {
-        // Minimize segment count
-        const btnMinimizeSegments = document.createElement('button');
-        const imgMinimizeSegments = bootstrapIcon('bi-binoculars', 'Minimize segment count');
-        const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
-        btnMinimizeSegments.classList.add('btn', 'btn-secondary');
-        btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
-        const fmtPercent = (n: number, d: number) => {
-            if (n === d) return `unchanged (${n})`;
-            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
-            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
-        };
-        btnMinimizeSegments.addEventListener('click', () => {
-            this.railroad.splines = simplifySplines(this.railroad, this.map.getMergeLimits());
-            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
-            if (segmentCountAfter > this.originalSegmentCount) {
-                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
-            } else if (segmentCountAfter < this.originalSegmentCount) {
-                this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
-                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
-            }
-            this.setMapModified(true);
-            this.map.refreshSplines().then(() => {
-                if (segmentCountAfter < this.originalSegmentCount) {
-                    this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
-                }
-            });
-        });
-        return btnMinimizeSegments;
-    }
-
-    private createMinimizeSegmentCountConfigDropdown() {
-        // Minimize segment count configuration dropdown
-        const grpMinimizeSegments = document.createElement('div');
-        {
-            const drpMinimizeSegments = document.createElement('button');
-            drpMinimizeSegments.classList.add('btn', 'btn-secondary', 'dropdown-toggle', 'dropdown-toggle-split');
-            drpMinimizeSegments.setAttribute('aria-expanded', 'false');
-            drpMinimizeSegments.setAttribute('data-bs-auto-close', 'outside');
-            drpMinimizeSegments.setAttribute('data-bs-toggle', 'dropdown');
-            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => unknown) => {
-                const cfgInput = document.createElement('input');
-                cfgInput.id = id;
-                cfgInput.min = '0';
-                cfgInput.step = 'any';
-                cfgInput.type = type;
-                cfgInput.classList.add('form-control');
-                cfgInput.value = value;
-                cfgInput.addEventListener('input', cb);
-                return cfgInput;
-            };
-            const inputBearing = makeInput(
-                'inputBearing',
-                'number',
-                String(this.map.getMergeLimits().bearing),
-                (ev) => {
-                    this.map.getMergeLimits().bearing = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputInclination = makeInput(
-                'inputInclination',
-                'number',
-                String(this.map.getMergeLimits().inclination),
-                (ev) => {
-                    this.map.getMergeLimits().inclination = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputHorizontal = makeInput(
-                'inputHorizontal',
-                'number',
-                String(this.map.getMergeLimits().horizontal),
-                (ev) => {
-                    this.map.getMergeLimits().horizontal = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const inputVertical = makeInput(
-                'inputVertical',
-                'number',
-                String(this.map.getMergeLimits().vertical),
-                (ev) => {
-                    this.map.getMergeLimits().vertical = Number((ev.target as HTMLInputElement).value);
-                    this.map.writeOptions();
-                },
-            );
-            const btnDefaults = document.createElement('button');
-            btnDefaults.type = 'button';
-            btnDefaults.classList.add('btn', 'btn-warning');
-            btnDefaults.textContent = 'Load defaults';
-            btnDefaults.addEventListener('click', () => {
-                inputBearing.value = '10';
-                inputInclination.value = '2.5';
-                inputHorizontal.value = '10';
-                inputVertical.value = '1';
-            });
-            const wrapInput = (cfgInput: HTMLInputElement, label: string, text: string) => {
-                const cfgLabel = document.createElement('label');
-                cfgLabel.setAttribute('for', cfgInput.id);
-                cfgLabel.classList.add('form-label');
-                cfgLabel.textContent = label;
-                const cfgText = document.createElement('div');
-                cfgText.classList.add('form-text');
-                cfgText.textContent = text;
-                const frmDivOne = document.createElement('div');
-                frmDivOne.classList.add('mb-3');
-                frmDivOne.replaceChildren(cfgLabel, cfgInput, cfgText);
-                return frmDivOne;
-            };
-            const frmMinimizeSegments = document.createElement('form');
-            frmMinimizeSegments.classList.add('px-4', 'py-3');
-            frmMinimizeSegments.replaceChildren(
-                wrapInput(inputBearing, 'Bearing limit',
-                    'Maximum difference between segment headings for spline merging, in degrees.'),
-                wrapInput(inputInclination, 'Inclination limit',
-                    'Maximum difference between segment inclinations for spline merging, in degrees.'),
-                wrapInput(inputHorizontal, 'Horizontal limit',
-                    'Maximum distance between control points for spline merging, in centimeters.'),
-                wrapInput(inputVertical, 'Vertical limit',
-                    'Maximum distance between control points for spline merging, in centimeters.'),
-                btnDefaults,
-            );
-            const mnuMinimizeSegments = document.createElement('div');
-            mnuMinimizeSegments.classList.add('dropdown-menu', 'dropdown-menu-end');
-            mnuMinimizeSegments.replaceChildren(frmMinimizeSegments);
-            grpMinimizeSegments.classList.add('btn-group');
-            const btnMinimizeSegments = this.createMinimizeSegmentCountButton();
-            grpMinimizeSegments.replaceChildren(btnMinimizeSegments, drpMinimizeSegments, mnuMinimizeSegments);
-        }
-        return grpMinimizeSegments;
-    }
-
     private createLayersDropdown() {
         // Layers dropdown
         const txtLayers = document.createTextNode(' Layers ');
@@ -860,87 +727,8 @@ export class Studio {
         return grpVegetation;
     }
 
-    private createMeasureFrameToolButton() {
-        const btnMeasure = document.createElement('button');
-        const imgMeasure = bootstrapIcon('bi-rulers', 'Measure Frame Tool');
-        const txtMeasure = document.createTextNode(' Measure ');
-        btnMeasure.classList.add('btn', 'btn-secondary');
-        btnMeasure.replaceChildren(imgMeasure, txtMeasure);
-        btnMeasure.addEventListener('click', () => {
-            const toolEnabled = this.map.toggleMeasureTool();
-            if (toolEnabled) {
-                btnMeasure.classList.add('active', 'btn-danger');
-                btnMeasure.classList.remove('btn-secondary');
-            } else {
-                btnMeasure.classList.remove('active', 'btn-danger');
-                btnMeasure.classList.add('btn-secondary');
-            }
-        });
-        return btnMeasure;
-    }
-
-    private createFrameLocatorToolDropdown() {
-        const txtFrameList = document.createTextNode(' Frames ');
-        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
-        const btnFrameList = document.createElement('button');
-        btnFrameList.id = 'btnFrameList';
-        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnFrameList.setAttribute('aria-expanded', 'false');
-        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
-        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
-        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
-        const lstFrameList = document.createElement('ul');
-        lstFrameList.classList.add('dropdown-menu');
-        lstFrameList.style.maxHeight = '50rem';
-        lstFrameList.style.overflowY = 'auto';
-        const grpFrameList = document.createElement('div');
-        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
-        grpFrameList.classList.add('dropdown');
-        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        lstFrameList.replaceChildren(...this.railroad.frames.slice().sort((a, b) => {
-            const aType = getFrameType(a.type);
-            const bType = getFrameType(b.type);
-            if (aType === null) return bType === null ? 1 : 0;
-            if (bType === null) return -1;
-            const ad = frameDefinitions[aType];
-            const bd = frameDefinitions[bType];
-            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
-        }).flatMap((frame, i, a) => {
-            const btnFrame = document.createElement('button');
-            const imgFrame = document.createElement('i');
-            const frameType = getFrameType(frame.type);
-            const text = (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
-                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
-                (frame.name ? gvasToString(textToString(frame.name)) : '');
-            const txtFrame = document.createTextNode(` ${text} `);
-            imgFrame.classList.add('bi', 'bi-geo');
-            btnFrame.classList.add('dropdown-item', 'text-nowrap');
-            btnFrame.replaceChildren(imgFrame, txtFrame);
-            btnFrame.addEventListener('click', () => {
-                // Center vewport on frame location
-                this.map.panTo(frame.location);
-                // Show frames
-                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
-            });
-            const prevFrame = i > 0 ? a[i - 1] : undefined;
-            const prevFrameType = getFrameType(prevFrame?.type ?? null);
-            if (prevFrame && frameType !== null && prevFrameType !== null) {
-                const prevFrameDef = frameDefinitions[prevFrameType];
-                const frameDef = frameDefinitions[frameType];
-                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
-                    const li = document.createElement('li');
-                    const hr = document.createElement('hr');
-                    hr.classList.add('dropdown-divider');
-                    li.appendChild(hr);
-                    return [li, btnFrame];
-                }
-            }
-            return btnFrame;
-        }));
-        return grpFrameList;
-    }
-
     private createRerailToolButton() {
+        // Rerail frame tool
         const btnRerail = document.createElement('button');
         const imgRerail = bootstrapIcon('bi-train-front', 'Rerail Frame Tool');
         const txtRerail = document.createTextNode(' Rerail ');
@@ -960,6 +748,7 @@ export class Studio {
     }
 
     private createDuplicateFrameToolButton() {
+        // Duplicate frame tool
         const btnDuplicate = document.createElement('button');
         const imgDuplicate = bootstrapIcon('bi-copy', 'Duplicate Frame Tool');
         const txtDuplicate = document.createTextNode(' Duplicate ');
@@ -978,7 +767,28 @@ export class Studio {
         return btnDuplicate;
     }
 
+    private createMeasureFrameToolButton() {
+        // Measure frame tool
+        const btnMeasure = document.createElement('button');
+        const imgMeasure = bootstrapIcon('bi-rulers', 'Measure Frame Tool');
+        const txtMeasure = document.createTextNode(' Measure ');
+        btnMeasure.classList.add('btn', 'btn-secondary');
+        btnMeasure.replaceChildren(imgMeasure, txtMeasure);
+        btnMeasure.addEventListener('click', () => {
+            const toolEnabled = this.map.toggleMeasureTool();
+            if (toolEnabled) {
+                btnMeasure.classList.add('active', 'btn-danger');
+                btnMeasure.classList.remove('btn-secondary');
+            } else {
+                btnMeasure.classList.remove('active', 'btn-danger');
+                btnMeasure.classList.add('btn-secondary');
+            }
+        });
+        return btnMeasure;
+    }
+
     private createDeleteToolButton() {
+        // Delete tool
         const btnDelete = document.createElement('button');
         const imgDelete = bootstrapIcon('bi-eraser-fill', 'Delete Tool');
         const txtDelete = document.createTextNode(' Delete ');
@@ -1056,6 +866,201 @@ export class Studio {
         });
         return btnCircularizeSpline;
     }
+
+    private createMinimizeSegmentCountButton() {
+        // Minimize segment count
+        const btnMinimizeSegments = document.createElement('button');
+        const imgMinimizeSegments = bootstrapIcon('bi-binoculars', 'Minimize segment count');
+        const txtMinimizeSegments = document.createTextNode(' Minimize segment count ');
+        btnMinimizeSegments.classList.add('btn', 'btn-secondary');
+        btnMinimizeSegments.replaceChildren(imgMinimizeSegments, txtMinimizeSegments);
+        const fmtPercent = (n: number, d: number) => {
+            if (n === d) return `unchanged (${n})`;
+            const pct = Math.abs(100 * (1 - (n / d))).toFixed(2);
+            return (n > d) ? `increased from ${d} to ${n} (+${pct}%)` : `decreased from ${d} to ${n} (-${pct}%)`;
+        };
+        btnMinimizeSegments.addEventListener('click', () => {
+            this.railroad.splines = simplifySplines(this.railroad, this.map.getMergeLimits());
+            const segmentCountAfter = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
+            if (segmentCountAfter > this.originalSegmentCount) {
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-danger');
+            } else if (segmentCountAfter < this.originalSegmentCount) {
+                this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
+                btnMinimizeSegments.classList.replace('btn-secondary', 'btn-success');
+            }
+            this.setMapModified(true);
+            this.map.refreshSplines().then(() => {
+                if (segmentCountAfter < this.originalSegmentCount) {
+                    this.setTitle(`Segment count ${fmtPercent(segmentCountAfter, this.originalSegmentCount)}`);
+                }
+            });
+        });
+        return btnMinimizeSegments;
+    }
+
+    private createMinimizeSegmentCountConfigDropdown() {
+        // Minimize segment count configuration dropdown
+        const grpMinimizeSegments = document.createElement('div');
+        {
+            const drpMinimizeSegments = document.createElement('button');
+            drpMinimizeSegments.classList.add('btn', 'btn-secondary', 'dropdown-toggle', 'dropdown-toggle-split');
+            drpMinimizeSegments.setAttribute('aria-expanded', 'false');
+            drpMinimizeSegments.setAttribute('data-bs-auto-close', 'outside');
+            drpMinimizeSegments.setAttribute('data-bs-toggle', 'dropdown');
+            const makeInput = (id: string, type: string, value: string, cb: (ev: Event) => unknown) => {
+                const cfgInput = document.createElement('input');
+                cfgInput.id = id;
+                cfgInput.min = '0';
+                cfgInput.step = 'any';
+                cfgInput.type = type;
+                cfgInput.classList.add('form-control');
+                cfgInput.value = value;
+                cfgInput.addEventListener('input', cb);
+                return cfgInput;
+            };
+            const inputBearing = makeInput(
+                'inputBearing',
+                'number',
+                String(this.map.getMergeLimits().bearing),
+                (ev) => {
+                    this.map.getMergeLimits().bearing = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputInclination = makeInput(
+                'inputInclination',
+                'number',
+                String(this.map.getMergeLimits().inclination),
+                (ev) => {
+                    this.map.getMergeLimits().inclination = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputHorizontal = makeInput(
+                'inputHorizontal',
+                'number',
+                String(this.map.getMergeLimits().horizontal),
+                (ev) => {
+                    this.map.getMergeLimits().horizontal = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const inputVertical = makeInput(
+                'inputVertical',
+                'number',
+                String(this.map.getMergeLimits().vertical),
+                (ev) => {
+                    this.map.getMergeLimits().vertical = Number((ev.target as HTMLInputElement).value);
+                    this.map.writeOptions();
+                },
+            );
+            const btnDefaults = document.createElement('button');
+            btnDefaults.type = 'button';
+            btnDefaults.classList.add('btn', 'btn-warning');
+            btnDefaults.textContent = 'Load defaults';
+            btnDefaults.addEventListener('click', () => {
+                inputBearing.value = '10';
+                inputInclination.value = '2.5';
+                inputHorizontal.value = '10';
+                inputVertical.value = '1';
+            });
+            const wrapInput = (cfgInput: HTMLInputElement, label: string, text: string) => {
+                const cfgLabel = document.createElement('label');
+                cfgLabel.setAttribute('for', cfgInput.id);
+                cfgLabel.classList.add('form-label');
+                cfgLabel.textContent = label;
+                const cfgText = document.createElement('div');
+                cfgText.classList.add('form-text');
+                cfgText.textContent = text;
+                const frmDivOne = document.createElement('div');
+                frmDivOne.classList.add('mb-3');
+                frmDivOne.replaceChildren(cfgLabel, cfgInput, cfgText);
+                return frmDivOne;
+            };
+            const frmMinimizeSegments = document.createElement('form');
+            frmMinimizeSegments.classList.add('px-4', 'py-3');
+            frmMinimizeSegments.replaceChildren(
+                wrapInput(inputBearing, 'Bearing limit',
+                    'Maximum difference between segment headings for spline merging, in degrees.'),
+                wrapInput(inputInclination, 'Inclination limit',
+                    'Maximum difference between segment inclinations for spline merging, in degrees.'),
+                wrapInput(inputHorizontal, 'Horizontal limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
+                wrapInput(inputVertical, 'Vertical limit',
+                    'Maximum distance between control points for spline merging, in centimeters.'),
+                btnDefaults,
+            );
+            const mnuMinimizeSegments = document.createElement('div');
+            mnuMinimizeSegments.classList.add('dropdown-menu', 'dropdown-menu-end');
+            mnuMinimizeSegments.replaceChildren(frmMinimizeSegments);
+            grpMinimizeSegments.classList.add('btn-group');
+            const btnMinimizeSegments = this.createMinimizeSegmentCountButton();
+            grpMinimizeSegments.replaceChildren(btnMinimizeSegments, drpMinimizeSegments, mnuMinimizeSegments);
+        }
+        return grpMinimizeSegments;
+    }
+
+    private createFrameLocatorToolDropdown() {
+        const txtFrameList = document.createTextNode(' Frames ');
+        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
+        const btnFrameList = document.createElement('button');
+        btnFrameList.id = 'btnFrameList';
+        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnFrameList.setAttribute('aria-expanded', 'false');
+        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
+        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
+        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
+        const lstFrameList = document.createElement('ul');
+        lstFrameList.classList.add('dropdown-menu');
+        lstFrameList.style.maxHeight = '50rem';
+        lstFrameList.style.overflowY = 'auto';
+        const grpFrameList = document.createElement('div');
+        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
+        grpFrameList.classList.add('dropdown');
+        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
+        lstFrameList.replaceChildren(...this.railroad.frames.slice().sort((a, b) => {
+            const aType = getFrameType(a.type);
+            const bType = getFrameType(b.type);
+            if (aType === null) return bType === null ? 1 : 0;
+            if (bType === null) return -1;
+            const ad = frameDefinitions[aType];
+            const bd = frameDefinitions[bType];
+            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
+        }).flatMap((frame, i, a) => {
+            const btnFrame = document.createElement('button');
+            const imgFrame = document.createElement('i');
+            const frameType = getFrameType(frame.type);
+            const text = (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
+                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
+                (frame.name ? gvasToString(textToString(frame.name)) : '');
+            const txtFrame = document.createTextNode(` ${text} `);
+            imgFrame.classList.add('bi', 'bi-geo');
+            btnFrame.classList.add('dropdown-item', 'text-nowrap');
+            btnFrame.replaceChildren(imgFrame, txtFrame);
+            btnFrame.addEventListener('click', () => {
+                // Center vewport on frame location
+                this.map.panTo(frame.location);
+                // Show frames
+                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
+            });
+            const prevFrame = i > 0 ? a[i - 1] : undefined;
+            const prevFrameType = getFrameType(prevFrame?.type ?? null);
+            if (prevFrame && frameType !== null && prevFrameType !== null) {
+                const prevFrameDef = frameDefinitions[prevFrameType];
+                const frameDef = frameDefinitions[frameType];
+                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
+                    const li = document.createElement('li');
+                    const hr = document.createElement('hr');
+                    hr.classList.add('dropdown-divider');
+                    li.appendChild(hr);
+                    return [li, btnFrame];
+                }
+            }
+            return btnFrame;
+        }));
+        return grpFrameList;
+    }
+
 
     private exportFileName() {
         const appendModified = this.modified && !this.filename.match(/modified/);
