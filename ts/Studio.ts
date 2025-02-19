@@ -98,6 +98,12 @@ export class Studio {
         content.replaceChildren(mapDiv);
         const mapInverted = this.isMapInverted();
         this.map = new RailroadMap(this, mapDiv, mapInverted);
+        const hasFrames = railroad.frames.length > 0;
+        const hasIndustries = railroad.industries.length > 0;
+        const hasPlayers = railroad.players.length > 0;
+        const hasProps = railroad.props.length > 0;
+        const hasSplineTracks = railroad.splineTracks.length > 0;
+        const hasSplines = railroad.splines.length > 0;
         // Map toolbar
         const mapButtons = document.createElement('div');
         mapButtons.classList.add('hstack', 'gap-2');
@@ -107,12 +113,6 @@ export class Studio {
             grpLayers,
             btnDelete,
         );
-        const hasFrames = railroad.frames.length > 0;
-        const hasIndustries = railroad.industries.length > 0;
-        const hasPlayers = railroad.players.length > 0;
-        const hasProps = railroad.props.length > 0;
-        const hasSplineTracks = railroad.splineTracks.length > 0;
-        const hasSplines = railroad.splines.length > 0;
         if (hasFrames) {
             // Enable tools that work on frames
             [
