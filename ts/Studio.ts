@@ -612,6 +612,68 @@ export class Studio {
         return {grpLayers, layers};
     }
 
+    private createFrameLocatorToolDropdown() {
+        // Find rolling stock dropdown
+        const txtFrameList = document.createTextNode(' Frames ');
+        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
+        const btnFrameList = document.createElement('button');
+        btnFrameList.id = 'btnFrameList';
+        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
+        btnFrameList.setAttribute('aria-expanded', 'false');
+        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
+        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
+        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
+        const lstFrameList = document.createElement('ul');
+        lstFrameList.classList.add('dropdown-menu');
+        lstFrameList.style.maxHeight = '50rem';
+        lstFrameList.style.overflowY = 'auto';
+        const grpFrameList = document.createElement('div');
+        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
+        grpFrameList.classList.add('dropdown');
+        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
+        lstFrameList.replaceChildren(...this.railroad.frames.slice().sort((a, b) => {
+            const aType = getFrameType(a.type);
+            const bType = getFrameType(b.type);
+            if (aType === null) return bType === null ? 1 : 0;
+            if (bType === null) return -1;
+            const ad = frameDefinitions[aType];
+            const bd = frameDefinitions[bType];
+            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
+        }).flatMap((frame, i, a) => {
+            const btnFrame = document.createElement('button');
+            const imgFrame = document.createElement('i');
+            const frameType = getFrameType(frame.type);
+            const text = (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
+                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
+                (frame.name ? gvasToString(textToString(frame.name)) : '');
+            const txtFrame = document.createTextNode(` ${text} `);
+            imgFrame.classList.add('bi', 'bi-geo');
+            btnFrame.classList.add('dropdown-item', 'text-nowrap');
+            btnFrame.replaceChildren(imgFrame, txtFrame);
+            btnFrame.addEventListener('click', () => {
+                // Center vewport on frame location
+                this.map.panTo(frame.location);
+                // Show frames
+                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
+            });
+            const prevFrame = i > 0 ? a[i - 1] : undefined;
+            const prevFrameType = getFrameType(prevFrame?.type ?? null);
+            if (prevFrame && frameType !== null && prevFrameType !== null) {
+                const prevFrameDef = frameDefinitions[prevFrameType];
+                const frameDef = frameDefinitions[frameType];
+                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
+                    const li = document.createElement('li');
+                    const hr = document.createElement('hr');
+                    hr.classList.add('dropdown-divider');
+                    li.appendChild(hr);
+                    return [li, btnFrame];
+                }
+            }
+            return btnFrame;
+        }));
+        return grpFrameList;
+    }
+
     private createTreesDropdown() {
         const txtTrees = document.createTextNode(' Trees ');
         const imgTrees = bootstrapIcon('bi-tree', 'Trees Dropdown');
@@ -999,68 +1061,6 @@ export class Studio {
         }
         return grpMinimizeSegments;
     }
-
-    private createFrameLocatorToolDropdown() {
-        const txtFrameList = document.createTextNode(' Frames ');
-        const imgFrameList = bootstrapIcon('bi-car-front-fill', 'Find rolling stock');
-        const btnFrameList = document.createElement('button');
-        btnFrameList.id = 'btnFrameList';
-        btnFrameList.classList.add('btn', 'btn-secondary', 'dropdown-toggle');
-        btnFrameList.setAttribute('aria-expanded', 'false');
-        btnFrameList.setAttribute('data-bs-auto-close', 'outside');
-        btnFrameList.setAttribute('data-bs-toggle', 'dropdown');
-        btnFrameList.replaceChildren(imgFrameList, txtFrameList);
-        const lstFrameList = document.createElement('ul');
-        lstFrameList.classList.add('dropdown-menu');
-        lstFrameList.style.maxHeight = '50rem';
-        lstFrameList.style.overflowY = 'auto';
-        const grpFrameList = document.createElement('div');
-        grpFrameList.setAttribute('aria-labelledby', btnFrameList.id);
-        grpFrameList.classList.add('dropdown');
-        grpFrameList.replaceChildren(btnFrameList, lstFrameList);
-        lstFrameList.replaceChildren(...this.railroad.frames.slice().sort((a, b) => {
-            const aType = getFrameType(a.type);
-            const bType = getFrameType(b.type);
-            if (aType === null) return bType === null ? 1 : 0;
-            if (bType === null) return -1;
-            const ad = frameDefinitions[aType];
-            const bd = frameDefinitions[bType];
-            return frameCategories.reduceRight((p, c) => ad[c] === bd[c] ? p : ad[c] ? -1 : 1, 0);
-        }).flatMap((frame, i, a) => {
-            const btnFrame = document.createElement('button');
-            const imgFrame = document.createElement('i');
-            const frameType = getFrameType(frame.type);
-            const text = (frameType !== null ? frameDefinitions[frameType].name + ' ' : '') +
-                (frame.number ? '#' + gvasToString(textToString(frame.number)) + ' ' : '') +
-                (frame.name ? gvasToString(textToString(frame.name)) : '');
-            const txtFrame = document.createTextNode(` ${text} `);
-            imgFrame.classList.add('bi', 'bi-geo');
-            btnFrame.classList.add('dropdown-item', 'text-nowrap');
-            btnFrame.replaceChildren(imgFrame, txtFrame);
-            btnFrame.addEventListener('click', () => {
-                // Center vewport on frame location
-                this.map.panTo(frame.location);
-                // Show frames
-                if (!this.map.getLayerVisibility('frames')) this.map.toggleLayerVisibility('frames');
-            });
-            const prevFrame = i > 0 ? a[i - 1] : undefined;
-            const prevFrameType = getFrameType(prevFrame?.type ?? null);
-            if (prevFrame && frameType !== null && prevFrameType !== null) {
-                const prevFrameDef = frameDefinitions[prevFrameType];
-                const frameDef = frameDefinitions[frameType];
-                if (frameCategories.some((key) => prevFrameDef[key] !== frameDef[key])) {
-                    const li = document.createElement('li');
-                    const hr = document.createElement('hr');
-                    hr.classList.add('dropdown-divider');
-                    li.appendChild(hr);
-                    return [li, btnFrame];
-                }
-            }
-            return btnFrame;
-        }));
-        return grpFrameList;
-    }
-
 
     private exportFileName() {
         const appendModified = this.modified && !this.filename.match(/modified/);
