@@ -60,6 +60,8 @@
         "eqeqeq": "error",
         "indent": "off", // @stylistic/ts/indent
         "max-len": ["error", { "code": 120 }],
+        "max-lines": ["error", { "max": 2000, "skipBlankLines": true, "skipComments": true }],
+        "max-lines-per-function": ["error", { "max": 508 }],
         "no-constant-condition": "off",
         "no-loss-of-precision": "error",
         "no-undef": "error",
