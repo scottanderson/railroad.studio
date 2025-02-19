@@ -190,8 +190,10 @@ export class RailroadMap {
     panTo(point: Point, animationTime = 1000) {
         if (animationTime < 1) {
             const sizes = this.panZoom.getSizes();
-            const endX = (point.x * sizes.realZoom) + (sizes.width / 2);
-            const endY = (point.y * sizes.realZoom) + (sizes.height / 2);
+            const x = this.inverted ? point.x : -point.x;
+            const y = this.inverted ? point.y : -point.y;
+            const endX = (x * sizes.realZoom) + (sizes.width / 2);
+            const endY = (y * sizes.realZoom) + (sizes.height / 2);
             this.panZoom.pan({x: endX, y: endY});
             return;
         }
@@ -203,6 +205,7 @@ export class RailroadMap {
             const x = lerp(start.x, point.x, a);
             const y = lerp(start.y, point.y, a);
             this.panTo({x, y}, 0);
+            // Animate the locator
             if (this.locator) {
                 const r = lerp(startRadius, endRadius, t);
                 this.locator
@@ -219,13 +222,14 @@ export class RailroadMap {
                 const t = animationStep++ / (animationSteps - 1);
                 animate(t);
             } else {
+                // Hide the locator
                 this.layers.locator.hide();
                 // Cancel interval
                 clearInterval(this.animationInterval);
                 this.animationInterval = 0;
             }
         }, animationStepTime);
-        // Animate the locator
+        // Show the locator
         if (this.locator) {
             this.layers.locator.show();
             this.locator
@@ -240,6 +244,7 @@ export class RailroadMap {
         const pan = this.panZoom.getPan();
         const x = (pan.x - (sizes.width / 2)) / sizes.realZoom;
         const y = (pan.y - (sizes.height / 2)) / sizes.realZoom;
+        if (!this.inverted) return {x: -x, y: -y};
         return {x, y};
     }
 

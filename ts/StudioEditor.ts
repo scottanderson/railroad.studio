@@ -26,7 +26,7 @@ export function bootstrapIcon(className: string, label: string) {
 export function saveContext(
     studio: Studio,
     input: Node,
-    saveAction: () => boolean | void,
+    saveAction: () => boolean,
     cancelAction: () => boolean,
     formatValue: () => string,
 ): [Node, () => void, () => void] {
@@ -127,7 +127,7 @@ export function editPermissions(
         const hstack = document.createElement('div');
         hstack.classList.add('hstack', 'gap-2');
         const input = document.createElement('input');
-        input.id = `permission${i}-${Math.random().toString(36).substr(2, 16)}`;
+        input.id = `permission${i}-${Math.random().toString(36).substring(2, 15)}`;
         input.type = 'checkbox';
         input.title = i < permissionLabels.length ? permissionLabels[i] : `Unknown permission ${i}`;
         input.checked = typeof value !== 'undefined' && value.values[i];
@@ -273,6 +273,7 @@ export function editString(
     const onSave = () => {
         value = checkbox.checked ? null : input.value;
         saveValue(value);
+        return true;
     };
     const onCancel = () => {
         const newValue = checkbox.checked ? null : input.value;
@@ -506,6 +507,7 @@ export function editDropdown(
     const onSave = () => {
         value = select.value;
         saveValue(value);
+        return true;
     };
     const onCancel = () => {
         if (select.value !== value) {
