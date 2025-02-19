@@ -190,8 +190,10 @@ export class RailroadMap {
     panTo(point: Point, animationTime = 1000) {
         if (animationTime < 1) {
             const sizes = this.panZoom.getSizes();
-            const endX = (-point.x * sizes.realZoom) + (sizes.width / 2);
-            const endY = (-point.y * sizes.realZoom) + (sizes.height / 2);
+            const x = this.inverted ? point.x : -point.x;
+            const y = this.inverted ? point.y : -point.y;
+            const endX = (x * sizes.realZoom) + (sizes.width / 2);
+            const endY = (y * sizes.realZoom) + (sizes.height / 2);
             this.panZoom.pan({x: endX, y: endY});
             return;
         }
@@ -240,8 +242,9 @@ export class RailroadMap {
     panFrom(): Point {
         const sizes = this.panZoom.getSizes();
         const pan = this.panZoom.getPan();
-        const x = (-pan.x - (sizes.width / 2)) / sizes.realZoom;
-        const y = (-pan.y - (sizes.height / 2)) / sizes.realZoom;
+        const x = (pan.x - (sizes.width / 2)) / sizes.realZoom;
+        const y = (pan.y - (sizes.height / 2)) / sizes.realZoom;
+        if (!this.inverted) return {x: -x, y: -y};
         return {x, y};
     }
 
