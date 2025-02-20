@@ -34,6 +34,30 @@ export const rotatedRect = (x: number, y: number, width: number, height: number,
         ['Z']];
 };
 
+export const annularSector = (
+    x: number, y: number,
+    r1: number, r2: number,
+    direction1: number, direction2: number,
+): PathCommand[] => {
+    const theta1 = degreesToRadians(direction1);
+    const cos1 = Math.cos(theta1);
+    const sin1 = Math.sin(theta1);
+    const theta2 = degreesToRadians(direction2);
+    const cos2 = Math.cos(theta2);
+    const sin2 = Math.sin(theta2);
+    const [x1, y1] = [Math.round(x + r1 * cos1), Math.round(y + r1 * sin1)];
+    const [x2, y2] = [Math.round(x + r2 * cos1), Math.round(y + r2 * sin1)];
+    const [x3, y3] = [Math.round(x + r2 * cos2), Math.round(y + r2 * sin2)];
+    const [x4, y4] = [Math.round(x + r1 * cos2), Math.round(y + r1 * sin2)];
+    return [
+        ['M', x1, y1],
+        ['L', x2, y2],
+        ['A', r2, r2, 0, 0, 1, x3, y3],
+        ['L', x4, y4],
+        ['A', r1, r1, 0, 0, 0, x1, y1],
+    ];
+};
+
 export const poly = (points: [number, number][]): PathCommand[] =>
     points.map(([x, y], i) => [i === 0 ? 'M' : 'L', x, y]);
 
