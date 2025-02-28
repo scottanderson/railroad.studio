@@ -1,5 +1,5 @@
 import {PathArrayAlias, PathCommand} from '@svgdotjs/svg.js';
-import {arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
+import {annularSector, arrow, circle, combine, polyRect, polyRectRel, rect, rectAbs, rotatedRect} from './util-path';
 import {GvasString} from './Gvas';
 import {Industry} from './Railroad';
 
@@ -64,6 +64,7 @@ export const IndustryNames = [
     'LogCamp',
     'MeatPackingPlant',
     'oilfield',
+    'PineValleyEngineHouse',
     'RailExpressAgency',
     'Refinery',
     'Sandhouse',
@@ -135,9 +136,11 @@ const legacyIndustryMap: Record<string, IndustryName> = {
     'ironworks': 'IronWorks',
     'logcamp': 'LogCamp',
     'SandHouse': 'Sandhouse',
+    'SandHouse_Foundation': 'Sandhouse',
     'sawmill': 'Sawmill',
     'telegraphoffice_foundation': 'telegraphoffice',
     'TelegraphOffice_Foundation': 'telegraphoffice',
+    'watertower_1870_style1_foundation': 'watertower_1870_style1',
     'watertower_1870_style2_foundation': 'watertower_1870_style2',
     'watertower_1870_style3_foundation': 'watertower_1870_style3',
     'watertower_1870_style4_foundation': 'watertower_1870_style4',
@@ -186,6 +189,7 @@ export const industryNames: Record<IndustryName, string> = {
     'LogCamp': 'Logging Camp',
     'MeatPackingPlant': 'Meat Packing Plant',
     'oilfield': 'Oil Field',
+    'PineValleyEngineHouse': 'Pine Valley Engine House',
     'RailExpressAgency': 'Rail Express Agency',
     'Refinery': 'Refinery',
     'Sandhouse': 'Sandhouse',
@@ -279,6 +283,10 @@ const engineHouse = {
 
 const largeEngineHouse = {
     'building': rect(0, -490, 2100, 980),
+};
+
+const pineValleyEngineHouse = {
+    'building': annularSector(970, -20, 1600, 3500, 170, 245),
 };
 
 const waterTower = {
@@ -462,6 +470,7 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             rect(-1400, -800, 1600, 300),
         ),
     },
+    'PineValleyEngineHouse': pineValleyEngineHouse,
     'RailExpressAgency': {
         'building': rect(-370, -1800, 735, 3050),
         'platform': combine(

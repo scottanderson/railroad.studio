@@ -966,7 +966,7 @@ export class RailroadMap {
         const onClick = () => this.onClickFrame(frame, g);
         const f = g
             .rect(definition.length, definition.width ?? 250)
-            .center(0, 0)
+            .center(definition.offset ?? 0, 0)
             .on('click', onClick)
             .addClass('frame')
             .addClass(frameType);

@@ -158,6 +158,7 @@ type CategoryFlags = {
 
 export type FrameDefinition = CategoryFlags & {
     length: number,
+    offset?: number,
     width?: number,
     name: string,
     min?: PRO<keyof NumericFrameState, number>,
@@ -659,6 +660,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
         },
         name: 'Eureka',
+        offset: 191.1,
     },
 
     'eureka_tender': {
@@ -1344,7 +1346,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'Rubybasin': {
         coal: true,
         engine: true,
-        length: 1029,
+        length: 970,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
