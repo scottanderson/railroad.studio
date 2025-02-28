@@ -1346,7 +1346,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
     'Rubybasin': {
         coal: true,
         engine: true,
-        length: 1029,
+        length: 970,
         max: {
             boilerFireTemp: 400,
             boilerFuelAmount: 70,
