@@ -158,6 +158,7 @@ type CategoryFlags = {
 
 export type FrameDefinition = CategoryFlags & {
     length: number,
+    offset?: number,
     width?: number,
     name: string,
     min?: PRO<keyof NumericFrameState, number>,
@@ -659,6 +660,7 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
             smokestackType: 1,
         },
         name: 'Eureka',
+        offset: 191.1,
     },
 
     'eureka_tender': {
