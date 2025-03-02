@@ -9,6 +9,12 @@
             "options": {
                 "tabWidth": 2
             }
+        },
+        {
+            "files": ["*.js", "*.mjs", "*.ts"],
+            "options": {
+                "quoteProps": "consistent"
+            }
         }
     ]
 }

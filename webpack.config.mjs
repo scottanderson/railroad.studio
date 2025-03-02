@@ -1,5 +1,5 @@
 import ESLintPlugin from 'eslint-webpack-plugin';
-import {fileURLToPath} from 'node:url';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
