@@ -11,7 +11,6 @@ const mjsConfig = {
         sourceType: 'module',
     },
     rules: {
-        ...js.configs.recommended.rules,
         'eqeqeq': 'error',
         'indent': 'error',
         'no-undef': 'error',
