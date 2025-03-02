@@ -1,5 +1,6 @@
 {
     "printWidth": 120,
+    "quoteProps": "consistent",
     "singleQuote": true,
     "tabWidth": 4,
     "trailingComma": "all",
@@ -8,12 +9,6 @@
             "files": ["*.css", "*.html", "*.yml", "tsconfig.json"],
             "options": {
                 "tabWidth": 2
-            }
-        },
-        {
-            "files": ["*.js", "*.mjs", "*.ts"],
-            "options": {
-                "quoteProps": "consistent"
             }
         }
     ]

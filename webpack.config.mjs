@@ -13,14 +13,15 @@ export default {
     module: {
         rules: [
             {
+                exclude: /node_modules/,
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/,
             },
         ],
     },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+    output: {
+        filename: 'studio.js',
+        path: path.resolve(__dirname, 'railroad.studio'),
     },
     plugins: [
         new ESLintPlugin({
@@ -28,8 +29,7 @@ export default {
             // failOnError: false,
         }),
     ],
-    output: {
-        filename: 'studio.js',
-        path: path.resolve(__dirname, 'railroad.studio'),
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
     },
 };

@@ -8,18 +8,16 @@ const mjsConfig = {
     files: ['*.config.mjs'],
     languageOptions: {
         ecmaVersion: 'latest',
-        globals: globals.browser,
         sourceType: 'module',
     },
     rules: {
         ...js.configs.recommended.rules,
-        // "comma-dangle": ["error", "always"],
         'eqeqeq': 'error',
         'indent': 'error',
         'no-undef': 'error',
         'no-unused-vars': 'error',
         'sort-imports': 'error',
-        // "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false, "minKeys": 2 }],
+        'sort-keys': ['error', 'asc', { caseSensitive: false, minKeys: 2, natural: false }],
         'space-infix-ops': ['error', { int32Hint: false }],
     },
 };
@@ -27,12 +25,12 @@ const mjsConfig = {
 const tsConfig = {
     files: ['ts/**/*.ts'],
     languageOptions: {
+        ecmaVersion: 'latest',
         globals: globals.browser,
         parser: tsParser,
         parserOptions: {
             project: 'tsconfig.json',
         },
-        ecmaVersion: 'latest',
         sourceType: 'script',
     },
     plugins: {
@@ -46,8 +44,8 @@ const tsConfig = {
         '@stylistic/ts/type-annotation-spacing': [
             'error',
             {
-                before: true,
                 after: true,
+                before: true,
                 overrides: {
                     colon: {
                         before: false,
@@ -85,7 +83,6 @@ const tsConfig = {
         '@typescript-eslint/prefer-includes': 'error',
         '@typescript-eslint/prefer-literal-enum-member': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
-        // "comma-dangle": ["error", "always"],
         'eqeqeq': 'error',
         'indent': 'off', // @stylistic/ts/indent
         'max-len': ['error', { code: 120 }],
@@ -96,7 +93,7 @@ const tsConfig = {
         'no-undef': 'error',
         'no-unused-vars': 'off', // @typescript-eslint/no-unused-vars
         'sort-imports': 'error',
-        'sort-keys': ['error', 'asc', { caseSensitive: false, natural: false, minKeys: 2 }],
+        'sort-keys': ['error', 'asc', { caseSensitive: false, minKeys: 2, natural: false }],
         'space-infix-ops': 'off',
     },
 };
