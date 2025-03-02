@@ -1,7 +1,11 @@
-const path = require('path');
-const ESLintPlugin = require('eslint-webpack-plugin');
+import ESLintPlugin from 'eslint-webpack-plugin';
+import {fileURLToPath} from 'node:url';
+import path from 'path';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
     devServer: {
         static: path.resolve(__dirname, 'railroad.studio'),
     },
@@ -20,7 +24,7 @@ module.exports = {
     },
     plugins: [
         new ESLintPlugin({
-            context: 'ts/*.ts',
+            context: __dirname,
             // failOnError: false,
         }),
     ],

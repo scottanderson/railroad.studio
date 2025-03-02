@@ -1,16 +1,44 @@
-{
-    "env": {
-        "es2020": true,
-        "browser": true
+import globals from "globals";
+import js from "@eslint/js";
+import stylisticTs from "@stylistic/eslint-plugin-ts";
+import tsParser from "@typescript-eslint/parser";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+
+const mjsConfig = {
+    "files": ["*.config.mjs"],
+    "languageOptions": {
+        "ecmaVersion": "latest",
+        "globals": globals.browser,
+        "sourceType": "module"
     },
-    "extends": ["eslint:recommended", "google"],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "project": "tsconfig.json",
+    "rules": {
+        ...js.configs.recommended.rules,
+        // "comma-dangle": ["error", "always"],
+        "eqeqeq": "error",
+        "indent": "error",
+        "no-undef": "error",
+        "no-unused-vars": "error",
+        "sort-imports": "error",
+        // "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false, "minKeys": 2 }],
+        "space-infix-ops": ["error", { "int32Hint": false }],
+    }
+};
+
+const tsConfig = {
+    "files": ["ts/**/*.ts"],
+    "languageOptions": {
+        "globals": globals.browser,
+        "parser": tsParser,
+        "parserOptions": {
+            "project": "tsconfig.json",
+        },
         "ecmaVersion": "latest",
         "sourceType": "script"
     },
-    "plugins": ["@stylistic/ts", "@typescript-eslint"],
+    "plugins": {
+        "@stylistic/ts": stylisticTs,
+        "@typescript-eslint": typescriptEslint,
+    },
     "rules": {
         "@stylistic/ts/indent": "error",
         "@stylistic/ts/semi": "error",
@@ -57,6 +85,7 @@
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/prefer-literal-enum-member": "error",
         "@typescript-eslint/prefer-nullish-coalescing": "error",
+        // "comma-dangle": ["error", "always"],
         "eqeqeq": "error",
         "indent": "off", // @stylistic/ts/indent
         "max-len": ["error", { "code": 120 }],
@@ -66,9 +95,10 @@
         "no-loss-of-precision": "error",
         "no-undef": "error",
         "no-unused-vars": "off", // @typescript-eslint/no-unused-vars
-        "require-jsdoc": "off",
         "sort-imports": "error",
         "sort-keys": ["error", "asc", { "caseSensitive": false, "natural": false, "minKeys": 2 }],
         "space-infix-ops": "off"
     }
-}
+};
+
+export default [js.configs.recommended, mjsConfig, tsConfig];

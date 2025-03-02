@@ -218,6 +218,7 @@ function segmentsOverlap(a: Spline, i: number, b: Spline, j: number): boolean {
     const cpb1 = b.controlPoints[j + 1];
     const limit2 = 10 * 10; // 10cm
     const pointsAdjacent = (a: Vector, b: Vector) => delta2(a, b) < limit2;
+    // eslint-disable-next-line no-constant-binary-expression
     return false ||
         (pointsAdjacent(cpa0, cpb0) && pointsAdjacent(cpa1, cpb1)) ||
         (pointsAdjacent(cpa0, cpb1) && pointsAdjacent(cpa1, cpb0));
@@ -493,7 +494,7 @@ function circularMean(...args: number[]): number {
  * @param {number[]} rads - an array of angles to average (in radians)
  * @return {number} the circular mean of angles (in radians)
  */
-function circularMeanRadians(rads: number[]) {
+function circularMeanRadians(rads: number[]): number {
     const x = rads.map(Math.sin).reduce((a, e) => a + e, 0);
     const y = rads.map(Math.cos).reduce((a, e) => a + e, 0);
     return Math.atan2(x, y);
@@ -505,7 +506,7 @@ function circularMeanRadians(rads: number[]) {
  * @param {vector} vb - target vector
  * @return {number} the heading from a to b (in degrees)
  */
-export function vectorHeading(va: Point, vb: Point) {
+export function vectorHeading(va: Point, vb: Point): number {
     const dx = (vb.x - va.x); // positive is west
     const dy = (vb.y - va.y); // positive is south
     return Math.atan2(-dy, -dx) * 180 / Math.PI;
@@ -517,7 +518,7 @@ export function vectorHeading(va: Point, vb: Point) {
  * @param {vector} vb - target vector
  * @return {number} the inclination from a to b (in degrees)
  */
-function vectorInclination(va: Vector, vb: Vector) {
+function vectorInclination(va: Vector, vb: Vector): number {
     const dx = (vb.x - va.x); // positive is west
     const dy = (vb.y - va.y); // positive is south
     const dz = (vb.z - va.z); // positive is up
