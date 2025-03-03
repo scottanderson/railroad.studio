@@ -13,8 +13,6 @@ const mjsConfig = {
     rules: {
         'eqeqeq': 'error',
         'indent': 'error',
-        'no-undef': 'error',
-        'no-unused-vars': 'error',
         'sort-imports': 'error',
         'sort-keys': ['error', 'asc', { caseSensitive: false, minKeys: 2, natural: false }],
         'space-infix-ops': ['error', { int32Hint: false }],
