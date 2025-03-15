@@ -12,11 +12,21 @@ declare global {
     }
 }
 
+// Webpack substitutions
+declare const BUILD_DATE: string;
+declare const FULL_HASH: string;
+declare const SHORT_HASH: string;
+declare const VERSION: string;
+
 // Set up dark mode before doing anything else
 activateTheme();
 
 // Main app entry point
 window.onload = () => {
+    console.log(
+        'Railroad Studio version ' + VERSION + ' (' + SHORT_HASH + ')\n' +
+        'Compiled ' + BUILD_DATE + '\n' +
+        'https://github.com/scottanderson/railroad.studio/commit/' + FULL_HASH);
     const url = new URLSearchParams(window.location.search).get('url');
     if (url) return handleUrl(url);
     // Configure the drop area
@@ -146,6 +156,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
             titleText.textContent = 'Importing ' + filename;
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
+                console.log('Imported', railroad);
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
@@ -153,7 +164,6 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                     // Initialize the Studio UI
                     window.studio = new Studio(filename, railroad, header, content);
                     document.title = filename + ' - Railroad Studio';
-                    console.log('Imported', railroad);
                     resolve();
                 }), 10);
             }), 10);
