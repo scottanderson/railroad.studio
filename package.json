@@ -26,7 +26,7 @@
         "svg-pan-zoom": "^3.6.1",
         "ts-loader": "^9.5.1",
         "typescript": "^5.8.2",
-        "webpack-cli": "^5.1.4",
+        "webpack-cli": "^6.0.1",
         "webpack-dev-server": "^5.2.0"
     }
 }
