@@ -1,5 +1,5 @@
-import { execSync } from 'child_process';
 import ESLintPlugin from 'eslint-webpack-plugin';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'path';
 import webpack from 'webpack';

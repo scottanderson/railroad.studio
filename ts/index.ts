@@ -11,12 +11,13 @@ declare global {
         studio: Studio;
     }
 
-    // Webpack substitutions
-    const BUILD_DATE: string;
-    const FULL_HASH: string;
-    const SHORT_HASH: string;
-    const VERSION: string;
 }
+
+// Webpack substitutions
+declare const BUILD_DATE: string;
+declare const FULL_HASH: string;
+declare const SHORT_HASH: string;
+declare const VERSION: string;
 
 // Set up dark mode before doing anything else
 activateTheme();
