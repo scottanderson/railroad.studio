@@ -4,8 +4,8 @@ import {activateTheme} from './themes';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
 
-// Expose `window.studio` in the global context for advanced users to inspect or modify application state.
 declare global {
+    // Expose `window.studio` in the global context for advanced users to inspect or modify application state.
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Window {
         studio: Studio;
@@ -155,6 +155,7 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
             titleText.textContent = 'Importing ' + filename;
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
+                console.log('Imported', railroad);
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
@@ -162,7 +163,6 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                     // Initialize the Studio UI
                     window.studio = new Studio(filename, railroad, header, content);
                     document.title = filename + ' - Railroad Studio';
-                    console.log('Imported', railroad);
                     resolve();
                 }), 10);
             }), 10);
