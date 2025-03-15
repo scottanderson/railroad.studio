@@ -10,18 +10,22 @@ declare global {
     interface Window {
         studio: Studio;
     }
-}
 
-// Webpack substitutions
-declare const BUILD_DATE: string;
-declare const VERSION: string;
+    // Webpack substitutions
+    const BUILD_DATE: string;
+    const FULL_HASH: string;
+    const SHORT_HASH: string;
+    const VERSION: string;
+}
 
 // Set up dark mode before doing anything else
 activateTheme();
 
 // Main app entry point
 window.onload = () => {
-    console.log('Loading Railroad Studio\nversion ' + VERSION + '\nbuilt ' + BUILD_DATE);
+    console.log('Railroad Studio version ' + VERSION + ' (' + SHORT_HASH + ')\n' +
+                'Compiled ' + BUILD_DATE + '\n' +
+                'https://github.com/scottanderson/railroad.studio/commit/' + FULL_HASH);
     const url = new URLSearchParams(window.location.search).get('url');
     if (url) return handleUrl(url);
     // Configure the drop area

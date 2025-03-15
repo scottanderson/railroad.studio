@@ -5,10 +5,9 @@ import path from 'path';
 import webpack from 'webpack';
 
 const buildDate = new Date().toString().trim();
-
-const commitCount = execSync('git rev-list --count HEAD').toString().trim();
-const gitHash = execSync('git rev-parse --short HEAD').toString().trim();
-const version = `${commitCount}-${gitHash}`;
+const   fullHash = execSync('git rev-parse HEAD').toString().trim();
+const  shortHash = execSync('git rev-parse --short HEAD').toString().trim();
+const commitCount = execSync('git rev-list HEAD --count').toString().trim();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,7 +37,9 @@ export default {
         }),
         new webpack.DefinePlugin({
             BUILD_DATE: JSON.stringify(buildDate),
-            VERSION: JSON.stringify(version),
+            FULL_HASH: JSON.stringify(fullHash),
+            SHORT_HASH: JSON.stringify(shortHash),
+            VERSION: JSON.stringify(commitCount),
         }),
     ],
     resolve: {
