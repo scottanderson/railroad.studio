@@ -4,8 +4,8 @@ import {activateTheme} from './themes';
 import {gvasToRailroad} from './importer';
 import {parseGvas} from './parser';
 
+// Expose `window.studio` in the global context for advanced users to inspect or modify application state.
 declare global {
-    // Expose `window.studio` in the global context for advanced users to inspect or modify application state.
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
     interface Window {
         studio: Studio;
