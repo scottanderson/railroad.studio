@@ -370,7 +370,17 @@ export function editIndustryProducts(
     const display = (value: number[]) => {
         const zeroPredicate = (v: number): boolean => v === 0;
         if (value.every(zeroPredicate)) return '[Empty]';
-        return String(value).replace(/(,0)+$/g, '');
+        const amounts: Record<string, number> = {};
+        for (let i = 0; i < 4; i++) {
+            const amount = amounts[labels[i]] ?? 0;
+            amounts[labels[i]] = amount + value[i];
+        }
+        const entries = Object.entries(amounts).filter(([_, v]) => v !== 0);
+        const maxLength = Math.max(...entries.map(([_, v]) => String(v).length));
+        return entries
+            .map(([k, v]) => String(v).padStart(maxLength) + ' ' + k)
+            .map((v) => v.padStart(maxLength, ' '))
+            .join('\n');
     };
     const options = {
         min: '0',
