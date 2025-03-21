@@ -376,9 +376,7 @@ export function editIndustryProducts(
             const amount = amounts[labels[i]] ?? 0;
             amounts[labels[i]] = amount + value[i];
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const entries = Object.entries(amounts).filter(([_, v]) => v !== 0);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const maxLength = Math.max(...entries.map(([_, v]) => String(v).length));
         return entries
             .map(([k, v]) => String(v).padStart(maxLength) + ' ' + k)
