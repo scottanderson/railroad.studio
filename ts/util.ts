@@ -10,24 +10,27 @@ export function findLastIndex<T>(array: T[], predicate: (value: T, index: number
     return (index >= 0) ? (array.length - 1 - index) : index;
 }
 
-export function fp32(n: number): number {
-    const float = new Float32Array(1);
-    float[0] = n;
+export function toFloatingPoint(n: number): number {
+    const largeWorldCoords = (window.studio.railroad._header.gvasVersion > 2);
+    const float = new (largeWorldCoords ? Float64Array : Float32Array)([n]);
     return float[0];
 }
 
-export function fp32q(q: Quaternion): Quaternion {
-    const [w, x, y, z] = new Float32Array([q.w, q.x, q.y, q.z]);
+export function toFloatingPointQuat(q: Quaternion): Quaternion {
+    const largeWorldCoords = (window.studio.railroad._header.gvasVersion > 2);
+    const [w, x, y, z] = new (largeWorldCoords ? Float64Array : Float32Array)([q.w, q.x, q.y, q.z]);
     return {w, x, y, z};
 }
 
-export function fp32r(r: Rotator): Rotator {
-    const [pitch, roll, yaw] = new Float32Array([r.pitch, r.roll, r.yaw]);
+export function toFloatingPointRot(r: Rotator): Rotator {
+    const largeWorldCoords = (window.studio.railroad._header.gvasVersion > 2);
+    const [pitch, roll, yaw] = new (largeWorldCoords ? Float64Array : Float32Array)([r.pitch, r.roll, r.yaw]);
     return {pitch, roll, yaw};
 }
 
-export function fp32v(v: Vector): Vector {
-    const [x, y, z] = new Float32Array([v.x, v.y, v.z]);
+export function toFloatingPointVec(v: Vector): Vector {
+    const largeWorldCoords = (window.studio.railroad._header.gvasVersion > 2);
+    const [x, y, z] = new (largeWorldCoords ? Float64Array : Float32Array)([v.x, v.y, v.z]);
     return {x, y, z};
 }
 
