@@ -1,5 +1,5 @@
-import {angleBetweenVectors, distance, normalizeVector} from './Vector';
 import {HermiteCurve, cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
+import {angleBetweenVectors, distance, normalizeVector} from './Vector';
 import {toFloatingPointVec} from './util';
 
 /**

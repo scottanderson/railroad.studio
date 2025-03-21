@@ -1,7 +1,7 @@
+import {findLastIndex, toFloatingPoint} from './util';
 import {Spline} from './Railroad';
 import {Vector} from './Vector';
 import {calculateGrade} from './Grade';
-import {findLastIndex, toFloatingPoint} from './util';
 
 export function flattenSpline(spline: Spline): Vector[] {
     // Find first and last visible segments

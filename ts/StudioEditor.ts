@@ -1,7 +1,7 @@
 import {GvasString, GvasText, gvasToString} from './Gvas';
 import {IndustryName, IndustryType, industryNames, isIndustryName, legacyIndustryNames} from './industries';
 import {Permission, permissionEqual, permissionLabels, permissionToString} from './Permission';
-import {toFloatingPointQuat, toFloatingPointRot, toFloatingPointVec, stringToText, textToString} from './util';
+import {stringToText, textToString, toFloatingPointQuat, toFloatingPointRot, toFloatingPointVec} from './util';
 import {Quadruplet} from './Railroad';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
