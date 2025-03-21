@@ -42,9 +42,9 @@ export function saveContext(
     btnSave.appendChild(bootstrapIcon('bi-save', 'Save'));
     const save = () => {
         const stayOpen = saveAction();
+        if (stayOpen) return;
         studio.setMapModified();
         pre.textContent = formatValue();
-        if (typeof stayOpen === 'boolean' && stayOpen) return;
         // Close the edit control
         div.parentElement?.replaceChildren(pre);
     };
@@ -54,7 +54,8 @@ export function saveContext(
     btnCancel.classList.add('btn', 'btn-danger');
     btnCancel.appendChild(bootstrapIcon('bi-x-circle', 'Cancel'));
     const cancel = () => {
-        if (cancelAction()) return;
+        const stayOpen = cancelAction();
+        if (stayOpen) return;
         // Close the edit control
         div.parentElement?.replaceChildren(pre);
     };
@@ -273,7 +274,7 @@ export function editString(
     const onSave = () => {
         value = checkbox.checked ? null : input.value;
         saveValue(value);
-        return true;
+        return onCancel();
     };
     const onCancel = () => {
         const newValue = checkbox.checked ? null : input.value;
@@ -517,7 +518,7 @@ export function editDropdown(
     const onSave = () => {
         value = select.value;
         saveValue(value);
-        return true;
+        return onCancel();
     };
     const onCancel = () => {
         if (select.value !== value) {
