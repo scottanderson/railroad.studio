@@ -41,7 +41,8 @@ export function saveContext(
     btnSave.classList.add('btn', 'btn-success');
     btnSave.appendChild(bootstrapIcon('bi-save', 'Save'));
     const save = () => {
-        if (saveAction()) return;
+        const stayOpen = saveAction();
+        if (stayOpen) return;
         studio.setMapModified();
         pre.textContent = formatValue();
         // Close the edit control
@@ -53,7 +54,8 @@ export function saveContext(
     btnCancel.classList.add('btn', 'btn-danger');
     btnCancel.appendChild(bootstrapIcon('bi-x-circle', 'Cancel'));
     const cancel = () => {
-        if (cancelAction()) return;
+        const stayOpen = cancelAction();
+        if (stayOpen) return;
         // Close the edit control
         div.parentElement?.replaceChildren(pre);
     };
