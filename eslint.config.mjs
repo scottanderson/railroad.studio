@@ -82,6 +82,7 @@ const tsConfig = {
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
         'eqeqeq': 'error',
         'indent': 'off', // @stylistic/ts/indent
+        'max-depth': ['error', { max: 5 }],
         'max-len': ['error', { code: 120 }],
         'max-lines': ['error', { max: 2000, skipBlankLines: true, skipComments: true }],
         'max-lines-per-function': ['error', { max: 508 }],
