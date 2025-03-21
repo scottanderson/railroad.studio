@@ -32,7 +32,7 @@
     "sourceMap": true,
     "sourceRoot": "./ts/",
 
-    // Langugae and Environment
+    // Language and Environment
     "target": "ES2020"
   },
   "include": [
