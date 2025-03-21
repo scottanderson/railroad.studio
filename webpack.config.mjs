@@ -15,7 +15,9 @@ export default {
     devServer: {
         static: path.resolve(__dirname, 'railroad.studio'),
     },
-    entry: './ts/index.ts',
+    entry: {
+        studio: './ts/index.ts',
+    },
     module: {
         rules: [
             {
@@ -26,7 +28,7 @@ export default {
         ],
     },
     output: {
-        filename: 'studio.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'railroad.studio'),
     },
     plugins: [

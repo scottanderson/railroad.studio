@@ -1,16 +1,5 @@
 import {Railroad} from './Railroad';
-import {Studio} from './Studio';
 import {activateTheme} from './themes';
-import {gvasToRailroad} from './importer';
-import {parseGvas} from './parser';
-
-// Expose `window.studio` in the global context for advanced users to inspect or modify application state.
-declare global {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-    interface Window {
-        studio: Studio;
-    }
-}
 
 // Webpack substitutions
 declare const BUILD_DATE: string;
@@ -131,7 +120,7 @@ function handleUrl(url: string) {
         .catch(handleError);
 }
 
-function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
+async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     const header = document.getElementById('header');
     if (!header) throw new Error('Missing header');
     const content = document.getElementById('content');
@@ -148,6 +137,8 @@ function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
             reject(e);
         }
     };
+
+    const {parseGvas, gvasToRailroad, Studio} = await import('./index-imports');
     return new Promise<void>((resolve, reject) => {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
