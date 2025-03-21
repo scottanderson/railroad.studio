@@ -24,7 +24,7 @@ activateTheme();
 // Main app entry point
 window.onload = () => {
     console.log(
-        'Railroad Studio version ' + VERSION + ' (' + SHORT_HASH + ')\n' +
+        'Railroad Studio version ' + SHORT_HASH + '\n' +
         'Compiled ' + BUILD_DATE + '\n' +
         'https://github.com/scottanderson/railroad.studio/commit/' + FULL_HASH);
     const url = new URLSearchParams(window.location.search).get('url');

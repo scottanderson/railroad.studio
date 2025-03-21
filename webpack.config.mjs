@@ -7,7 +7,6 @@ import webpack from 'webpack';
 const buildDate = new Date().toString().trim();
 const fullHash = execSync('git rev-parse HEAD').toString().trim();
 const shortHash = execSync('git rev-parse --short HEAD').toString().trim();
-const version = execSync('git rev-list HEAD --count').toString().trim();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,7 +38,6 @@ export default {
             BUILD_DATE: JSON.stringify(buildDate),
             FULL_HASH: JSON.stringify(fullHash),
             SHORT_HASH: JSON.stringify(shortHash),
-            VERSION: JSON.stringify(version),
         }),
     ],
     resolve: {
