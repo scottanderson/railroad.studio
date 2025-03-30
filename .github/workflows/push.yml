@@ -26,6 +26,5 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npx webpack --mode=production
-      - run: aws s3 rm s3://railroad.studio/ --recursive --exclude '*' --include '*.js'
-      - run: aws s3 sync railroad.studio s3://railroad.studio --size-only
+      - run: aws s3 sync railroad.studio s3://railroad.studio --delete
       - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_ID }} --paths '/*'
