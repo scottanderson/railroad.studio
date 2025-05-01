@@ -20,7 +20,7 @@
         "@typescript-eslint/eslint-plugin": "^8.25.0",
         "eslint": "^9.21.0",
         "eslint-config-google": "^0.14.0",
-        "eslint-webpack-plugin": "^5.0.0",
+        "eslint-webpack-plugin": "^5.0.1",
         "globals": "^16.0.0",
         "svg-pan-zoom": "^3.6.1",
         "ts-loader": "^9.5.1",
