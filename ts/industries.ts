@@ -66,6 +66,7 @@ export const IndustryNames = [
     'oilfield',
     'PineValleyEngineHouse',
     'RailExpressAgency',
+    'RedMountainDepot',  // Pioneer DLC
     'Refinery',
     'Sandhouse',
     'Sawmill',
@@ -189,8 +190,9 @@ export const industryNames: Record<IndustryName, string> = {
     'LogCamp': 'Logging Camp',
     'MeatPackingPlant': 'Meat Packing Plant',
     'oilfield': 'Oil Field',
-    'PineValleyEngineHouse': 'Pine Valley Engine House',
+    'PineValleyEngineHouse': '4 Stall Roundhouse',
     'RailExpressAgency': 'Rail Express Agency',
+    'RedMountainDepot': 'Red Mountain Depot',       // Pioneer DLC
     'Refinery': 'Refinery',
     'Sandhouse': 'Sandhouse',
     'Sawmill': 'Sawmill',
@@ -477,6 +479,15 @@ export const industrySvgPaths: Partial<Record<IndustryName, Record<string, PathA
             polyRect(
                 385, 1270, -370, 1510,
                 680, 200, 385,
+            ),
+        ),
+    },
+    'RedMountainDepot': {
+        'building': rect(-260, -700, 510, 1400),
+        'platform': combine(
+            polyRect(
+                500, -900, -400, -200,
+                100, 1270,
             ),
         ),
     },
