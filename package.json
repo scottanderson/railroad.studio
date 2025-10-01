@@ -13,7 +13,7 @@
         "build:prod": "webpack --mode=production"
     },
     "devDependencies": {
-        "@eslint/js": "^9.21.0",
+        "@eslint/js": "^9.36.0",
         "@stylistic/eslint-plugin-ts": "^4.1.0",
         "@svgdotjs/svg.js": "^3.2.4",
         "@total-typescript/ts-reset": "^0.6.0",
