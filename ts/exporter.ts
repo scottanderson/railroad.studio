@@ -1144,7 +1144,7 @@ function stringToBlob(str: GvasString): BlobPart {
         const words = encodeUtf16(str + '\0');
         return new Blob([
             new Uint32Array([-words.length]),
-            words,
+            words.buffer as ArrayBuffer,
         ]);
     }
 
