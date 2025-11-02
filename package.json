@@ -13,19 +13,19 @@
         "build:prod": "webpack --mode=production"
     },
     "devDependencies": {
-        "@eslint/js": "^9.21.0",
-        "@stylistic/eslint-plugin-ts": "^4.1.0",
-        "@svgdotjs/svg.js": "^3.2.4",
-        "@total-typescript/ts-reset": "^0.6.0",
-        "@typescript-eslint/eslint-plugin": "^8.25.0",
-        "eslint": "^9.21.0",
+        "@eslint/js": "^9.39.0",
+        "@stylistic/eslint-plugin-ts": "^4.4.1",
+        "@svgdotjs/svg.js": "^3.2.5",
+        "@total-typescript/ts-reset": "^0.6.1",
+        "@typescript-eslint/eslint-plugin": "^8.46.2",
+        "eslint": "^9.39.0",
         "eslint-config-google": "^0.14.0",
-        "eslint-webpack-plugin": "^5.0.0",
-        "globals": "^16.0.0",
-        "svg-pan-zoom": "^3.6.1",
-        "ts-loader": "^9.5.1",
-        "typescript": "^5.8.2",
+        "eslint-webpack-plugin": "^5.0.2",
+        "globals": "^16.5.0",
+        "svg-pan-zoom": "^3.6.2",
+        "ts-loader": "^9.5.4",
+        "typescript": "^5.9.3",
         "webpack-cli": "^6.0.1",
-        "webpack-dev-server": "^5.2.0"
+        "webpack-dev-server": "^5.2.2"
     }
 }
