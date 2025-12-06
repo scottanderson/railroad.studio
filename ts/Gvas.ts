@@ -129,7 +129,7 @@ export type FormatArgumentValueMap = {
 };
 
 export type FormatArgumentValue =
-    | ['Int', number]
+    | ['Int', bigint]
     | ['Text', GvasText]
     ;
 
