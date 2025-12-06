@@ -734,9 +734,8 @@ function parseText(buffer: ArrayBuffer, pos = 0): [number, GvasText] {
 function parseFormatArgumentValue(buffer: ArrayBuffer, pos: number): [number, FormatArgumentValue] {
     const type = new Uint8Array(buffer, pos++, 1)[0];
     if (type === 0) {
-        const [value, extra] = new Int32Array(buffer.slice(pos, pos + 8));
+        const [value] = new BigInt64Array(buffer.slice(pos, pos + 8));
         pos += 8;
-        if (extra !== 0) throw new Error('Overflow');
         return [pos, ['Int', value]];
     } else if (type === 4) {
         let text;

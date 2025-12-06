@@ -1238,7 +1238,7 @@ function formatArgumentValueToBlob(value: FormatArgumentValue): BlobPart {
         // Int (0)
         return new Blob([
             new Uint8Array([0]),
-            new Int32Array([value[1], 0]),
+            new BigInt64Array([value[1]])
         ]);
     } else if (value[0] === 'Text') {
         // Text (4)
