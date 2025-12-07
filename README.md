@@ -4,19 +4,28 @@ This repository contains the source code for [railroad.studio](https://railroad.
 
 ## About
 
-Railroad Studio is a static HTML, JavaScript and CSS webpage used to view and modify save files for Railroads Online.
+Railroad Studio is a web app for editing Railroads Online save files.
+Everything runs locally in your browser; your save file is never uploaded to a
+server.
 
 ## Editing save files
 
-Most of the data contained within a .sav file can be modified through the studio
-interface, by clicking the tabs across the top of the page. The industry editor
-can be used to modify industry type, location, orientation, input and output
-quantities. The player editor can be used to change money and xp. The Spline
-Track editor allows editing any of the properties of the newest spline system.
+Railroad Studio never modifies your original save file. Edits happen in memory
+only. When you choose to save your changes, the app generates a new .sav file
+in the browser's downloads folder.
 
-When any property is modified, Railroad Studio will set a flag indicating that
-there are unsaved edits to the save file. This will cause web browsers to notify
-users before navigating away from the page, and make the export button yellow.
+When you make a change, the app marks the save as having unsaved edits, and the
+Export button turns yellow to indicate pending changes. Your browser may also
+warn you before navigating away from the page.
+
+Most of the data in a .sav file can be modified through the studio interface by
+using the tabs at the top of the page.
+
+- The **Industry Editor** allows you to change industry type, location,
+  orientation, inputs, and outputs.
+- The **Player Editor** lets you edit player money and XP.
+- The **Spline Track Editor** provides access to the properties of the
+  spline track system.
 
 ## Editing save files (advanced)
 
