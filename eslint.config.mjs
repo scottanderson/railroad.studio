@@ -1,6 +1,6 @@
 import globals from 'globals';
 import js from '@eslint/js';
-import stylisticTs from '@stylistic/eslint-plugin';
+import stylistic from '@stylistic/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 
@@ -31,16 +31,16 @@ const tsConfig = {
         sourceType: 'script',
     },
     plugins: {
-        '@stylistic/ts': stylisticTs,
+        '@stylistic': stylistic,
         '@typescript-eslint': typescriptEslint,
     },
     rules: {
-        '@stylistic/ts/indent': 'error',
-        '@stylistic/ts/no-multiple-empty-lines': ['error', { max: 1 }],
-        '@stylistic/ts/object-curly-spacing': 'error',
-        '@stylistic/ts/semi': 'error',
-        '@stylistic/ts/space-infix-ops': ['error', { int32Hint: false }],
-        '@stylistic/ts/type-annotation-spacing': [
+        '@stylistic/indent': 'error',
+        '@stylistic/no-multiple-empty-lines': ['error', { max: 1 }],
+        '@stylistic/object-curly-spacing': 'error',
+        '@stylistic/semi': 'error',
+        '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
+        '@stylistic/type-annotation-spacing': [
             'error',
             {
                 after: true,
