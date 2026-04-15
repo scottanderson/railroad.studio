@@ -231,7 +231,6 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'Baldwin 11D1 (Bells Gap RR#1)',
     },
 
-
     'BellsGapTender': { // Pioneer DLC
         coal: true,
         length: 501.4,
@@ -771,7 +770,6 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         tender: true,
     },
 
-
     'FEMV_480': { // Explorer DLC
         coal: true,
         engine: true,
@@ -824,7 +822,6 @@ export const frameDefinitions: Record<FrameType, FrameDefinition> = {
         name: 'FE&MV 4-8-0 Mastodon Tender',
         tender: true,
     },
-
 
     'Ferries242T': {
         coal: true,

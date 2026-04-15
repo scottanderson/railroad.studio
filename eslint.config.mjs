@@ -36,6 +36,7 @@ const tsConfig = {
     },
     rules: {
         '@stylistic/ts/indent': 'error',
+        '@stylistic/ts/no-multiple-empty-lines': ['error', { max: 1 }],
         '@stylistic/ts/object-curly-spacing': 'error',
         '@stylistic/ts/semi': 'error',
         '@stylistic/ts/space-infix-ops': ['error', { int32Hint: false }],
