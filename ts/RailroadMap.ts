@@ -833,7 +833,7 @@ export class RailroadMap {
             }, [[], []]);
         }
 
-        let listeners: { [key: string]: (e: Event) => unknown };
+        let listeners: {[key: string]: (e: Event) => unknown};
         return svgPanZoom(this.svg.node, {
             beforePan: beforePan,
             customEventsHandler: {

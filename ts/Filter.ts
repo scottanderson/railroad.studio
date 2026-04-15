@@ -4,7 +4,7 @@ export function createFilter<C extends string>(
     onFilter: (category: C, value: boolean) => void,
     options?: [string, string][],
     onOption?: (value: string) => void,
-    checked?: { [k: string]: boolean },
+    checked?: {[k: string]: boolean},
     selected?: string,
 ) {
     const form = document.createElement('form');
