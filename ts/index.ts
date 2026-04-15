@@ -138,7 +138,7 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
         }
     };
 
-    const {parseGvas, gvasToRailroad, Studio} = await import('./index-imports');
+    const {parseGvas, gvasToRailroad, Studio} = await import('./index-imports.js');
     return new Promise<void>((resolve, reject) => {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
