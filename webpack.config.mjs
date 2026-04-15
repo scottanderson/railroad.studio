@@ -43,6 +43,9 @@ export default {
         }),
     ],
     resolve: {
+        extensionAlias: {
+            '.js': ['.ts', '.js'],
+        },
         extensions: ['.tsx', '.ts', '.js'],
     },
 };

@@ -71,8 +71,8 @@ export function simplifySplines(railroad: Railroad, limits: MergeLimits): Spline
 function splitSpline(spline: Spline): Spline[] {
     const splines: Spline[] = [];
     const firstVisibleSegment = spline.segmentsVisible.findIndex(Boolean);
-    let vectors: Vector[] = [];
-    let visible: boolean[] = [];
+    let vectors: Vector[];
+    let visible: boolean[];
     if (firstVisibleSegment === -1) {
         throw new Error('No segments are visible');
     } else if (firstVisibleSegment === 0) {
