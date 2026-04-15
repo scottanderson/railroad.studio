@@ -23,9 +23,8 @@
     "useUnknownInCatchVariables": true,
 
     // Modules
-    "baseUrl": ".",
-    "module": "ES2020",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "rootDir": "ts",
 
     // Emit
@@ -35,6 +34,5 @@
 
     // Language and Environment
     "target": "ES2020"
-  },
-  "include": ["./ts"]
+  }
 }

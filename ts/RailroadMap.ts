@@ -1,4 +1,3 @@
-import * as svgPanZoom from 'svg-pan-zoom';
 import {
     BezierCurve,
     cubicBezier,
@@ -45,6 +44,7 @@ import {flattenSpline} from './tool-flatten';
 import {gvasToString} from './Gvas';
 import {handleError} from './index';
 import {rect} from './util-path';
+import svgPanZoom from 'svg-pan-zoom';
 
 enum MapToolMode {
     pan_zoom,
