@@ -175,7 +175,7 @@ function removeOverlappedSegments(splines: Spline[]): Spline[] {
     const result: Spline[] = splines.slice();
     result.forEach((s) => s.segmentsVisible = s.segmentsVisible.slice());
     let numHidden = 0;
-    const typesHidden: { [key: number]: number } = {};
+    const typesHidden: {[key: number]: number} = {};
     for (let ai = 0; ai < result.length - 1; ai++) {
         for (let bi = result.length - 1; bi > ai; bi--) {
             const a = result[ai];

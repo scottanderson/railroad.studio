@@ -36,6 +36,7 @@ const tsConfig = {
     },
     rules: {
         '@stylistic/ts/indent': 'error',
+        '@stylistic/ts/object-curly-spacing': 'error',
         '@stylistic/ts/semi': 'error',
         '@stylistic/ts/space-infix-ops': ['error', { int32Hint: false }],
         '@stylistic/ts/type-annotation-spacing': [
