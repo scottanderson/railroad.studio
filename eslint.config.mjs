@@ -35,6 +35,7 @@ const tsConfig = {
         '@typescript-eslint': typescriptEslint,
     },
     rules: {
+        '@stylistic/brace-style': 'error',
         '@stylistic/indent': 'error',
         '@stylistic/no-multiple-empty-lines': ['error', { max: 1 }],
         '@stylistic/object-curly-spacing': 'error',
