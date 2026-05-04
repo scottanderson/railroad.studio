@@ -475,7 +475,7 @@ export function editIndustryType(
         const name = value;
         options[type] = isIndustryName(name) ? industryNames[name] : name;
     }
-    const save = (value: string) => saveValue(Number(value) as IndustryType);
+    const save = (value: string) => saveValue(Number(value));
     return editDropdown(studio, String(type), options, save);
 }
 
