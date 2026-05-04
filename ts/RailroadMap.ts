@@ -809,7 +809,7 @@ export class RailroadMap {
             const gutterHeight = 100;
             // Computed variables
             const sizes = this.panZoom.getSizes();
-            const viewBox = sizes.viewBox as {x: number, y: number, width: number, height: number};
+            const viewBox = sizes.viewBox;
             const leftLimit = -((viewBox.x + viewBox.width) * sizes.realZoom) + gutterWidth;
             const rightLimit = sizes.width - gutterWidth - (viewBox.x * sizes.realZoom);
             const topLimit = -((viewBox.y + viewBox.height) * sizes.realZoom) + gutterHeight;
