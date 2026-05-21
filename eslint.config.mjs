@@ -36,10 +36,13 @@ const tsConfig = {
     },
     rules: {
         '@stylistic/brace-style': 'error',
+        '@stylistic/comma-dangle': ['error', 'always-multiline'],
         '@stylistic/indent': 'error',
+        '@stylistic/keyword-spacing': 'error',
         '@stylistic/no-multiple-empty-lines': ['error', { max: 1 }],
         '@stylistic/object-curly-spacing': 'error',
         '@stylistic/semi': 'error',
+        '@stylistic/space-in-parens': 'error',
         '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
         '@stylistic/type-annotation-spacing': [
             'error',
@@ -83,9 +86,10 @@ const tsConfig = {
         '@typescript-eslint/prefer-includes': 'error',
         '@typescript-eslint/prefer-literal-enum-member': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
+        'comma-dangle': 'off', // @stylistic/comma-dangle
         'eqeqeq': 'error',
-        'indent': 'off', // @stylistic/ts/indent
-        'keyword-spacing': 'error',
+        'indent': 'off', // @stylistic/indent
+        'keyword-spacing': 'off', // @stylistic/keyword-spacing
         'max-depth': ['error', { max: 5 }],
         'max-len': ['error', { code: 120 }],
         'max-lines': ['error', { max: 2000, skipBlankLines: true, skipComments: true }],
@@ -96,7 +100,7 @@ const tsConfig = {
         'no-unused-vars': 'off', // @typescript-eslint/no-unused-vars
         'sort-imports': 'error',
         'sort-keys': ['error', 'asc', { caseSensitive: false, minKeys: 2, natural: false }],
-        'space-in-parens': 'error',
+        'space-in-parens': 'off', // @stylistic/space-in-parens
         'space-infix-ops': 'off',
     },
 };
