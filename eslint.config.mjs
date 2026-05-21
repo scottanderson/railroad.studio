@@ -85,6 +85,7 @@ const tsConfig = {
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
         'eqeqeq': 'error',
         'indent': 'off', // @stylistic/ts/indent
+        'keyword-spacing': 'error',
         'max-depth': ['error', { max: 5 }],
         'max-len': ['error', { code: 120 }],
         'max-lines': ['error', { max: 2000, skipBlankLines: true, skipComments: true }],
@@ -95,6 +96,7 @@ const tsConfig = {
         'no-unused-vars': 'off', // @typescript-eslint/no-unused-vars
         'sort-imports': 'error',
         'sort-keys': ['error', 'asc', { caseSensitive: false, minKeys: 2, natural: false }],
+        'space-in-parens': 'error',
         'space-infix-ops': 'off',
     },
 };
