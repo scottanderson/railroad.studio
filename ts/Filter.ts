@@ -45,7 +45,7 @@ export function createFilter<C extends string>(
         }
         select.value = options[0][0];
         if (typeof selected !== 'undefined') {
-            if (options.some(([k]) => k === selected) ) {
+            if (options.some(([k]) => k === selected)) {
                 select.value = selected;
             } else {
                 onOption(select.value);
