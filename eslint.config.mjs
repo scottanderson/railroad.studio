@@ -36,10 +36,14 @@ const tsConfig = {
     },
     rules: {
         '@stylistic/brace-style': 'error',
+        '@stylistic/comma-dangle': ['error', 'always-multiline'],
         '@stylistic/indent': 'error',
+        '@stylistic/keyword-spacing': 'error',
         '@stylistic/no-multiple-empty-lines': ['error', { max: 1 }],
+        '@stylistic/no-trailing-spaces': 'error',
         '@stylistic/object-curly-spacing': 'error',
         '@stylistic/semi': 'error',
+        '@stylistic/space-in-parens': 'error',
         '@stylistic/space-infix-ops': ['error', { int32Hint: false }],
         '@stylistic/type-annotation-spacing': [
             'error',
@@ -84,7 +88,6 @@ const tsConfig = {
         '@typescript-eslint/prefer-literal-enum-member': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
         'eqeqeq': 'error',
-        'indent': 'off', // @stylistic/ts/indent
         'max-depth': ['error', { max: 5 }],
         'max-len': ['error', { code: 120 }],
         'max-lines': ['error', { max: 2000, skipBlankLines: true, skipComments: true }],
