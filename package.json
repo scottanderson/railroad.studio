@@ -17,16 +17,16 @@
         "@stylistic/eslint-plugin": "^5.10.0",
         "@svgdotjs/svg.js": "^3.2.5",
         "@total-typescript/ts-reset": "^0.6.1",
-        "@typescript-eslint/eslint-plugin": "^8.59.1",
-        "@typescript-eslint/parser": "^8.59.1",
-        "eslint": "^10.3.0",
+        "@typescript-eslint/eslint-plugin": "^8.60.0",
+        "@typescript-eslint/parser": "^8.60.0",
+        "eslint": "^10.4.0",
         "eslint-config-google": "^0.14.0",
         "eslint-webpack-plugin": "^6.0.0",
         "globals": "^17.6.0",
         "svg-pan-zoom": "^3.6.2",
         "ts-loader": "^9.5.7",
         "typescript": "^6.0.3",
-        "webpack-cli": "^7.0.2",
+        "webpack-cli": "^7.0.3",
         "webpack-dev-server": "^5.2.4"
     }
 }
