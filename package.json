@@ -24,7 +24,7 @@
         "eslint-webpack-plugin": "^6.0.0",
         "globals": "^17.6.0",
         "svg-pan-zoom": "^3.6.2",
-        "ts-loader": "^9.5.7",
+        "ts-loader": "^9.6.0",
         "typescript": "^6.0.3",
         "webpack-cli": "^7.0.3",
         "webpack-dev-server": "^5.2.4"
