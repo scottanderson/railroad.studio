@@ -7,6 +7,13 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'monthly'
+    groups:
+      npm-minor-patch:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
