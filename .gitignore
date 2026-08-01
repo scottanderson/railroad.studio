@@ -2,4 +2,6 @@
 node_modules
 railroad.studio/studio.js
 railroad.studio/studio.js.map
+railroad.studio/ts*.js
+railroad.studio/vendors-*.js
 .vs/
