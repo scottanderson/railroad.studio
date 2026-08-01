@@ -1046,8 +1046,7 @@ export class RailroadMap {
         let capture = false;
         let captureDirection: GizmoDirection = 'none';
         gizmoG
-            .on('pointerdown', (evt) => {
-                const e = evt as PointerEvent;
+            .on('pointerdown', (e) => {
                 if (this.toolMode !== MapToolMode.pan_zoom) return;
                 const direction = gizmoDirection(e);
                 switch (direction) {
@@ -1081,7 +1080,7 @@ export class RailroadMap {
                 this.panZoom
                     .enablePan()
                     .enableDblClickZoom();
-                let {x, y} = this.mouseLocalLocation(e as PointerEvent, gizmoG);
+                let {x, y} = this.mouseLocalLocation(e, gizmoG);
                 // Snap to grid
                 x = Math.round(x / gridSize) * gridSize;
                 y = Math.round(y / gridSize) * gridSize;
@@ -1100,7 +1099,7 @@ export class RailroadMap {
                 if (!capture) return;
                 e.preventDefault();
                 e.stopPropagation();
-                let {x, y} = this.mouseLocalLocation(e as PointerEvent, gizmoG);
+                let {x, y} = this.mouseLocalLocation(e, gizmoG);
                 // Snap to grid
                 x = Math.round(x / gridSize) * gridSize;
                 y = Math.round(y / gridSize) * gridSize;
