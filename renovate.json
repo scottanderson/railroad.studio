@@ -1,6 +1,26 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "timezone": "America/New_York",
+    "schedule": "on the first day of the month",
+    "packageRules": [
+        {
+            "description": "Group npm minor and patch updates",
+            "matchManagers": ["npm"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "npm minor/patch"
+        },
+        {
+            "description": "Keep npm major updates separate",
+            "matchManagers": ["npm"],
+            "matchUpdateTypes": ["major"],
+            "groupName": null
+        },
+        {
+            "description": "Keep CodeQL on the moving v4 tag",
+            "matchManagers": ["github-actions"],
+            "matchPackageNames": ["github/codeql-action"],
+            "followTag": "v4"
+        }
+    ]
 }
