@@ -26,3 +26,10 @@ export function icon(name: string): HTMLElement {
     i.setAttribute('aria-hidden', 'true');
     return i;
 }
+
+export function iconButton(className: string, iconName: string, text: string): HTMLButtonElement {
+    const button = el('button', className);
+    button.type = 'button';
+    button.append(icon(iconName), ' ' + text);
+    return button;
+}
