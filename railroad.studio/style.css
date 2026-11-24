@@ -105,6 +105,24 @@ body {
   z-index: 10;
 }
 
+/* Values in the editor tables that open an edit control when clicked */
+
+.editable-value {
+  display: inline-block;
+  min-width: 2rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px dashed transparent;
+  border-radius: var(--bs-border-radius-sm);
+  cursor: pointer;
+}
+
+.editable-value:hover,
+.editable-value:focus-visible {
+  border-color: var(--bs-border-color);
+  background: var(--bs-secondary-bg);
+  outline: none;
+}
+
 .map-svg {
   position: fixed;
   top: 0;
