@@ -100,9 +100,84 @@ body {
   transition: background-color var(--duration) var(--animation);
 }
 
+/* A low-key button that stays readable in both themes */
+
+.btn-quiet {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-border-color: var(--bs-border-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-secondary-bg);
+  --bs-btn-hover-border-color: var(--bs-secondary-color);
+  --bs-btn-active-color: var(--bs-body-color);
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: var(--bs-secondary-color);
+}
+
 .studio-controls {
   position: absolute;
   z-index: 10;
+}
+
+/* Players */
+
+.players-page {
+  max-width: 1320px;
+}
+
+.player-card {
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.player-card.edited {
+  border-color: var(--bs-warning);
+  box-shadow: 0 0 0 1px var(--bs-warning);
+}
+
+.player-undo {
+  position: absolute;
+  top: 0;
+  right: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+  transform: translateY(-50%);
+}
+
+.player-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--bs-secondary-bg);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.player-who {
+  min-width: 0;
+}
+
+.stat-input {
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-hint {
+  min-height: 1.3em;
+  margin-top: 0.25rem;
+}
+
+.permission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.player-position summary {
+  cursor: pointer;
 }
 
 .map-svg {

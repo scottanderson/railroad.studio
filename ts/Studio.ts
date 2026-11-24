@@ -26,7 +26,6 @@ import {
     editIndustryProducts,
     editIndustryType,
     editNumber,
-    editPermissions,
     editQuaternion,
     editRotator,
     editSlider,
@@ -38,7 +37,6 @@ import {
 import {MapLayers, RailroadMap} from './RailroadMap';
 import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {SplineTrackType} from './SplineTrackType';
@@ -50,6 +48,7 @@ import {clamp} from './math';
 import {createFilter} from './Filter';
 import {createPager} from './Pager';
 import {handleError} from './index';
+import {renderPlayers} from './StudioPlayers';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
 import {toggleDarkMode} from './themes';
@@ -282,12 +281,13 @@ export class Studio {
         btnPlayers.textContent = 'Players';
         btnPlayers.classList.add('btn', 'btn-secondary');
         btnPlayers.addEventListener('click', () => {
-            const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
+            const div = document.createElement('div');
+            div.classList.add('mt-5', 'mb-5');
             studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
+            content.replaceChildren(div);
             this.floatHeader(false);
-            this.players(table);
+            this.setTitle('Players');
+            renderPlayers(this, div);
         });
         // Props
         const btnProps = document.createElement('button');
@@ -1661,68 +1661,6 @@ export class Studio {
             const setIndustryRotation = (rotation: Rotator) => industry.rotation = rotation;
             td.replaceChildren(editRotator(this, industry.rotation, setIndustryRotation));
             tr.appendChild(td);
-        }
-    }
-
-    private players(table: HTMLTableElement): void {
-        this.setTitle('Players');
-        const thead = document.createElement('thead');
-        table.appendChild(thead);
-        let tr = document.createElement('tr');
-        thead.appendChild(tr);
-        const hasRotations = this.railroad.players.some((player) => typeof player.rotation !== 'undefined');
-        const hasPermissions = this.railroad.players.some((player) => typeof player.permissions !== 'undefined');
-        const columnHeaders = ['Steam ID', 'Name', 'Money', 'XP', 'Location'];
-        if (hasRotations) columnHeaders.push('Rotation');
-        if (hasPermissions) columnHeaders.push('Permissions');
-        for (const columnHeader of columnHeaders) {
-            const th = document.createElement('th');
-            th.textContent = columnHeader;
-            tr.appendChild(th);
-        }
-        const tbody = document.createElement('tbody');
-        table.appendChild(tbody);
-        for (const player of this.railroad.players) {
-            tr = document.createElement('tr');
-            tbody.appendChild(tr);
-            // ID
-            let td = document.createElement('td');
-            td.textContent = String(player.id);
-            tr.appendChild(td);
-            // Name
-            td = document.createElement('td');
-            td.textContent = String(player.name);
-            tr.appendChild(td);
-            // Money
-            td = document.createElement('td');
-            td.appendChild(editNumber(this, player.money, {min: '0'}, (money) => player.money = money));
-            tr.appendChild(td);
-            // XP
-            td = document.createElement('td');
-            td.appendChild(editNumber(this, player.xp, {min: '0'}, (xp) => player.xp = xp));
-            tr.appendChild(td);
-            // Location
-            td = document.createElement('td');
-            if (player.location) {
-                const setPlayerLocation = (location: Vector): Vector => player.location = location;
-                td.appendChild(editVector(this, player.location, setPlayerLocation));
-            }
-            tr.appendChild(td);
-            // Rotation
-            if (player.rotation) {
-                td = document.createElement('td');
-                const setPlayerRotation = (r: number) => player.rotation = r;
-                const options: InputTextOptions = {max: '180', min: '-180'};
-                td.replaceChildren(editNumber(this, player.rotation, options, setPlayerRotation));
-                tr.appendChild(td);
-            }
-            // Permissions
-            if (hasPermissions) {
-                td = document.createElement('td');
-                const setPlayerPermissions = (p: Permission | undefined) => player.permissions = p;
-                td.appendChild(editPermissions(this, player.permissions, setPlayerPermissions));
-                tr.appendChild(td);
-            }
         }
     }
 
