@@ -470,7 +470,7 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
     const intro = el('div', 'd-flex align-items-center gap-3 flex-wrap mb-3');
     intro.append(el('div', 'text-body-secondary me-auto',
         `${plural(players.length, 'player')} in this save. Changes apply as you type. ` +
-        'When you are done, use the Download button.'));
+        'When you are done, use Download save in the sidebar.'));
     const summary = el('div', 'hstack gap-2 d-none');
     const summaryText = el('span', 'badge text-bg-warning');
     const btnUndoAll = iconButton('btn btn-sm btn-quiet', 'bi-arrow-counterclockwise', 'Undo all');

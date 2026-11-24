@@ -340,6 +340,64 @@ body {
   opacity: 0.7;
 }
 
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.sidebar-state {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--bs-secondary-color);
+}
+
+.sidebar-state-dot {
+  flex-shrink: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--bs-secondary-color);
+  opacity: 0.5;
+}
+
+.sidebar-state[data-state='unsaved'] {
+  color: var(--bs-body-color);
+}
+
+.sidebar-state[data-state='unsaved'] .sidebar-state-dot {
+  background: var(--bs-warning);
+  opacity: 1;
+}
+
+.sidebar-state[data-state='downloaded'] .sidebar-state-dot {
+  background: var(--bs-success);
+  opacity: 1;
+}
+
+.sidebar-download,
+.sidebar-extras .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.sidebar-extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sidebar-extras .btn {
+  flex: 1 1 0;
+}
+
 /* What to do with a downloaded save */
 
 .studio-notice {

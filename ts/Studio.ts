@@ -52,7 +52,6 @@ import {handleError} from './index';
 import {renderPlayers} from './StudioPlayers';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
-import {toggleDarkMode} from './themes';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
@@ -66,13 +65,13 @@ export class Studio {
     private unsaved = false;
     private mapShowing = true;
     private mapTitle = 'Map';
-    private readonly btnDownload: HTMLButtonElement;
     private readonly filename: string;
     private readonly header: HTMLHeadingElement;
     private readonly map: RailroadMap;
     private readonly originalFilename: string;
     private readonly originalSegmentCount: number;
     readonly railroad: Railroad;
+    private readonly sidebar: Sidebar;
     private readonly vegetationUtil: VegetationUtil;
 
     constructor(
@@ -95,11 +94,9 @@ export class Studio {
         header.classList.add('app-title');
         this.header = header;
         header.textContent = 'Loaded ' + this.filename;
-        const buttons = document.createElement('div');
-        buttons.classList.add('hstack', 'gap-2');
         // Every page puts its controls in the header bar and its body in the content area
         const show = (controls: (Element | undefined)[], body: Element) => {
-            studioControls.replaceChildren(buttons, ...controls.filter(Boolean));
+            studioControls.replaceChildren(...controls.filter(Boolean));
             this.mapShowing = body === mapDiv;
             content.classList.toggle('is-map', this.mapShowing);
             content.replaceChildren(body);
@@ -311,41 +308,6 @@ export class Studio {
             const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
             this.splineTracks(table, first, last);
         };
-        // Export
-        const btnDownload = document.createElement('button');
-        const imgDownload = bootstrapIcon('bi-download', 'Download');
-        this.btnDownload = btnDownload;
-        btnDownload.appendChild(imgDownload);
-        btnDownload.classList.add('btn', 'btn-secondary');
-        btnDownload.addEventListener('click', () => {
-            if (this.modified) {
-                console.log('Exporting', this.railroad);
-            }
-            const gvas = railroadToGvas(this.railroad);
-            console.log('Exported', gvas);
-            const blob = gvasToBlob(gvas);
-            const url = URL.createObjectURL(blob);
-            console.log('Serialized', blob);
-            const filename = this.exportFileName();
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.append(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-            // The download holds every change made so far
-            this.unsaved = false;
-            btnDownload.classList.replace('btn-warning', 'btn-secondary');
-            document.title = this.filename + ' - Railroad Studio';
-            showDownloadNotice(filename, this.originalFilename);
-        });
-        // Toggle dark mode
-        const btnDark = document.createElement('button');
-        btnDark.classList.add('btn', 'btn-secondary');
-        btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
-        btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnDownload, btnDark);
         // Sidebar
         const sections: Partial<Record<SectionKey, SectionHandler>> = {map: {onSelect: showMap}};
         if (hasFrames) {
@@ -364,12 +326,14 @@ export class Studio {
         if (hasSplineTracks) {
             sections.splineTracks = {count: railroad.splineTracks.length, onSelect: resetSplineTrackPage};
         }
+        this.sidebar = sidebar;
         sidebar.setFile(this.originalFilename, 'Save file');
-        sidebar.setSections(sections);
+        sidebar.setSections(sections, () => this.download());
+        sidebar.setSaveState('clean');
         // Studio controls
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls');
-        studioControls.replaceChildren(buttons, mapButtons);
+        studioControls.replaceChildren(mapButtons);
         headerElement.replaceChildren(header, studioControls);
         layers
             .map((l) => l.listener)
@@ -1037,6 +1001,34 @@ export class Studio {
         return grpMinimizeSegments;
     }
 
+    /**
+     * Export the railroad and hand it to the browser as a download.
+     * @return {string} The name of the downloaded file.
+     */
+    download(): string {
+        if (this.modified) {
+            console.log('Exporting', this.railroad);
+        }
+        const gvas = railroadToGvas(this.railroad);
+        console.log('Exported', gvas);
+        const blob = gvasToBlob(gvas);
+        const url = URL.createObjectURL(blob);
+        console.log('Serialized', blob);
+        const filename = this.exportFileName();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.append(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.unsaved = false;
+        document.title = this.filename + ' - Railroad Studio';
+        this.sidebar.setSaveState('downloaded');
+        showDownloadNotice(filename, this.originalFilename);
+        return filename;
+    }
+
     private exportFileName() {
         const appendModified = this.modified && !this.filename.match(/modified/);
         const fileExtension = this.filename.match(/(\.[^.]+)?$/)?.[1];
@@ -1063,8 +1055,8 @@ export class Studio {
         }
         if (!this.unsaved) {
             this.unsaved = true;
-            this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
             document.title = this.filename + '* - Railroad Studio';
+            this.sidebar.setSaveState('unsaved');
         }
         if (affectsSplines) {
             this.logRadiusGrade();

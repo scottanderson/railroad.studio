@@ -19,7 +19,8 @@ Export button turns yellow to indicate pending changes. Until you download those
 changes, your browser may also warn you before navigating away from the page.
 
 Most of the data in a .sav file can be modified through the studio interface by
-using the sidebar on the left of the page.
+using the sidebar on the left of the page. The sidebar also shows whether you
+have changes that have not been downloaded yet, and holds the Download button.
 
 - The **Industry Editor** allows you to change industry type, location,
   orientation, inputs, and outputs.

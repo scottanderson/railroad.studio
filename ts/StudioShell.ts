@@ -1,6 +1,8 @@
 import {el, icon} from './dom';
+import {toggleDarkMode} from './themes';
 
 const SAVE_FOLDER = '%localappdata%\\arr\\saved\\savegames';
+const GITHUB_URL = 'https://github.com/scottanderson/railroad.studio';
 
 export type SectionKey = 'map' | 'frames' | 'bulkFrames' | 'industries' | 'players' | 'props' | 'splineTracks';
 
@@ -28,11 +30,21 @@ export type SectionHandler = {
     onSelect: () => void;
 };
 
+export type SaveState = 'none' | 'clean' | 'unsaved' | 'downloaded';
+
 export type Sidebar = {
     /** Show which file is open, or that none is. */
     setFile: (name: string | undefined, detail: string, busy?: boolean) => void;
+    setSaveState: (state: SaveState) => void;
     /** Enable the sections a save has. The first one becomes the current section. */
-    setSections: (handlers: Partial<Record<SectionKey, SectionHandler>>) => void;
+    setSections: (handlers: Partial<Record<SectionKey, SectionHandler>>, onDownload: () => void) => void;
+};
+
+const saveStateLabels: Record<SaveState, string> = {
+    clean: 'No changes',
+    downloaded: 'Changes downloaded',
+    none: 'No save open',
+    unsaved: 'Unsaved changes',
 };
 
 /**
@@ -136,20 +148,59 @@ export function mountSidebar(): Sidebar {
             }
         }
     };
-    const setSections = (next: Partial<Record<SectionKey, SectionHandler>>) => {
+    // Save state and download
+    const foot = el('div', 'sidebar-foot');
+    const state = el('div', 'sidebar-state small');
+    state.setAttribute('role', 'status');
+    const stateText = el('span', 'sidebar-label');
+    state.append(el('span', 'sidebar-state-dot'), stateText);
+    const download = sidebarButton('btn btn-secondary sidebar-download', 'bi-download', 'Download save');
+    let onDownload: (() => void) | undefined;
+    download.addEventListener('click', () => onDownload?.());
+    const setSaveState = (next: SaveState) => {
+        state.setAttribute('data-state', next);
+        state.title = saveStateLabels[next];
+        stateText.textContent = saveStateLabels[next];
+        download.disabled = next === 'none';
+        download.classList.toggle('btn-warning', next === 'unsaved');
+        download.classList.toggle('btn-secondary', next !== 'unsaved');
+        if (next === 'none') {
+            download.title = 'Open a save first';
+        } else if (next === 'unsaved') {
+            download.title = 'Download the save file with your changes';
+        } else {
+            download.title = 'Download the save file';
+        }
+    };
+    const setSections = (next: Partial<Record<SectionKey, SectionHandler>>, nextOnDownload: () => void) => {
         handlers = next;
+        onDownload = nextOnDownload;
         syncSections(true);
         if (openLabel) openLabel.textContent = 'Open another save';
         open.title = 'Open another save';
         const first = sectionOrder.map((key) => handlers[key] && sectionLinks.get(key)).find(Boolean);
         if (first) select(first);
     };
+    // Everything else
+    const extras = el('div', 'sidebar-extras');
+    const theme = sidebarButton('btn btn-sm btn-quiet', 'bi-moon-stars', 'Theme');
+    theme.title = 'Toggle dark mode';
+    theme.addEventListener('click', toggleDarkMode);
+    const github = el('a', 'btn btn-sm btn-quiet');
+    github.href = GITHUB_URL;
+    github.target = '_blank';
+    github.rel = 'noopener noreferrer';
+    github.title = 'Railroad Studio on GitHub';
+    github.append(icon('bi-github'), el('span', 'sidebar-label', 'GitHub'));
+    extras.append(theme, github);
+    foot.append(state, download, extras);
     // Start out with no save open
     setFile(undefined, 'Open a .sav file to begin');
     syncSections(false);
     select(open);
-    element.replaceChildren(head, file, list);
-    return {setFile, setSections};
+    setSaveState('none');
+    element.replaceChildren(head, file, list, foot);
+    return {setFile, setSaveState, setSections};
 }
 
 /**
@@ -180,7 +231,7 @@ export function showDownloadNotice(downloaded: string, originalFilename: string)
     if (downloaded !== originalFilename) {
         step('To replace your existing save, rename it to ', el('code', '', originalFilename), '.');
     }
-    const copy = el('button', 'btn btn-sm btn-secondary', 'Copy folder path');
+    const copy = el('button', 'btn btn-sm btn-quiet', 'Copy folder path');
     copy.type = 'button';
     copy.addEventListener('click', () => {
         navigator.clipboard.writeText(SAVE_FOLDER)
