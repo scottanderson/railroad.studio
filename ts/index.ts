@@ -34,6 +34,15 @@ window.onload = () => {
     if (fileElem) {
         fileElem.addEventListener('change', handleChange, false);
     }
+    const copySavePath = document.getElementById('copySavePath');
+    const savePath = document.getElementById('savePath');
+    if (copySavePath && savePath) {
+        copySavePath.addEventListener('click', () => {
+            navigator.clipboard.writeText(savePath.textContent ?? '')
+                .then(() => copySavePath.textContent = 'Copied')
+                .catch(console.error);
+        });
+    }
 };
 
 function handleChange(event: Event) {
