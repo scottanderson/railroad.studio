@@ -100,9 +100,59 @@ body {
   transition: background-color var(--duration) var(--animation);
 }
 
+/* A low-key button that stays readable in both themes */
+
+.btn-quiet {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-border-color: var(--bs-border-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-secondary-bg);
+  --bs-btn-hover-border-color: var(--bs-secondary-color);
+  --bs-btn-active-color: var(--bs-body-color);
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: var(--bs-secondary-color);
+}
+
 .studio-controls {
   position: absolute;
   z-index: 10;
+}
+
+/* Players */
+
+.players-page {
+  max-width: 1320px;
+}
+
+.player-avatar {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--bs-secondary-bg);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.player-who {
+  min-width: 0;
+}
+
+.stat-input {
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.permission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+.player-position summary {
+  cursor: pointer;
 }
 
 .map-svg {
