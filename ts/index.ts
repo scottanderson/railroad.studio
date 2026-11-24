@@ -1,3 +1,4 @@
+import {Sidebar, mountSidebar} from './StudioShell';
 import {Railroad} from './Railroad';
 import {activateTheme} from './themes';
 
@@ -8,6 +9,9 @@ declare const SHORT_HASH: string;
 
 // Set up dark mode before doing anything else
 activateTheme();
+
+// The sidebar is part of every screen, including this first one
+const sidebar: Sidebar = mountSidebar();
 
 // Main app entry point
 window.onload = () => {
@@ -33,6 +37,15 @@ window.onload = () => {
     const fileElem = document.getElementById('fileElem');
     if (fileElem) {
         fileElem.addEventListener('change', handleChange, false);
+    }
+    const copySavePath = document.getElementById('copySavePath');
+    const savePath = document.getElementById('savePath');
+    if (copySavePath && savePath) {
+        copySavePath.addEventListener('click', () => {
+            navigator.clipboard.writeText(savePath.textContent ?? '')
+                .then(() => copySavePath.textContent = 'Copied')
+                .catch(console.error);
+        });
     }
 };
 
@@ -126,6 +139,7 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     const content = document.getElementById('content');
     if (!content) throw new Error('Missing content');
     const title = document.createElement('h2');
+    title.classList.add('app-title');
     const titleText = document.createTextNode('Parsing ' + filename);
     title.appendChild(titleText);
     header.replaceChildren(title);
@@ -150,9 +164,10 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
+                    const originalFilename = filename;
                     filename = updateFilename(railroad, filename);
                     // Initialize the Studio UI
-                    window.studio = new Studio(filename, railroad, header, content);
+                    window.studio = new Studio(filename, railroad, header, content, sidebar, originalFilename);
                     document.title = filename + ' - Railroad Studio';
                     resolve();
                 }), 10);
@@ -190,7 +205,9 @@ export function handleError(error: unknown) {
     const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
     const preText = document.createTextNode(stack ?? 'Stack trace not available');
     pre.appendChild(preText);
-    document.getElementById('content')!.replaceChildren(title, pre);
+    const content = document.getElementById('content')!;
+    content.classList.remove('is-map');
+    content.replaceChildren(title, pre);
     document.getElementById('header')!.replaceChildren();
     throw error; // also print the stack trace with TypeScript mapped source links in the console
 }
