@@ -8,6 +8,8 @@ import {toFloatingPointVec} from './util';
 /** Money is stored as a 32-bit float, XP as a signed 32-bit integer. Stay well inside both. */
 const MAX_MONEY = 1_000_000_000;
 const MAX_XP = 2_000_000_000;
+/** Only show the search box when there are enough players to need it. */
+const SEARCH_THRESHOLD = 6;
 
 type StatKey = 'money' | 'xp';
 
@@ -55,6 +57,7 @@ const snapshots = new WeakMap<Player, Snapshot>();
 
 type Card = {
     element: HTMLElement;
+    matches: (query: string) => boolean;
     sync: (force?: boolean) => void;
 };
 
@@ -428,7 +431,12 @@ function playerCard(
         card.classList.toggle('edited', dirty);
         syncs.forEach((s) => s(force));
     };
-    return {element, sync};
+    const haystack = `${name}\n${id}`.toLowerCase();
+    return {
+        element,
+        matches: (query) => haystack.includes(query),
+        sync,
+    };
 }
 
 /**
@@ -458,7 +466,7 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
         permissionCount,
         onChange,
     ));
-    // Intro, and a summary of what has been edited
+    // Intro, a summary of what has been edited, and search
     const intro = el('div', 'd-flex align-items-center gap-3 flex-wrap mb-3');
     intro.append(el('div', 'text-body-secondary me-auto',
         `${plural(players.length, 'player')} in this save. Changes apply as you type. ` +
@@ -480,6 +488,24 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
         summary.classList.toggle('d-none', editedCount === 0);
         summaryText.textContent = `${plural(editedCount, 'player')} edited`;
     };
+    const noMatches = el('div', 'text-body-secondary d-none', 'No players match that search.');
+    if (players.length > SEARCH_THRESHOLD) {
+        const search = el('input', 'form-control player-search');
+        search.type = 'search';
+        search.placeholder = 'Search by name or Steam ID';
+        search.setAttribute('aria-label', search.placeholder);
+        search.addEventListener('input', () => {
+            const query = search.value.trim().toLowerCase();
+            let shown = 0;
+            for (const card of cards) {
+                const match = card.matches(query);
+                card.element.classList.toggle('d-none', !match);
+                if (match) shown++;
+            }
+            noMatches.classList.toggle('d-none', shown > 0);
+        });
+        intro.append(search);
+    }
     page.append(intro);
     // Everyone at once
     if (players.length > 1) {
@@ -491,7 +517,7 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
     // Cards
     const grid = el('div', 'row row-cols-1 row-cols-lg-2 row-cols-xxl-3 g-3');
     grid.append(...cards.map((card) => card.element));
-    page.append(grid);
+    page.append(grid, noMatches);
     cards.forEach((card) => card.sync(true));
     syncSummary();
     container.replaceChildren(page);

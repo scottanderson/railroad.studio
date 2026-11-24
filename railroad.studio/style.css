@@ -159,6 +159,10 @@ body {
   min-width: 0;
 }
 
+.player-search {
+  max-width: 20rem;
+}
+
 .stat-input {
   font-size: 1.15rem;
   font-weight: 600;
