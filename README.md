@@ -23,7 +23,8 @@ using the tabs at the top of the page.
 
 - The **Industry Editor** allows you to change industry type, location,
   orientation, inputs, and outputs.
-- The **Player Editor** lets you edit player money and XP.
+- The **Player Editor** lets you edit player money, XP, permissions and position.
+  Changes apply as you type.
 - The **Spline Track Editor** provides access to the properties of the
   spline track system.
 
