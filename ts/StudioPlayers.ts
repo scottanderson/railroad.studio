@@ -448,6 +448,8 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
         studio.setMapModified();
         cards.forEach((card) => card.sync());
         syncSummary();
+        // A bulk result only describes the latest change
+        page.querySelector('.bulk-result')?.replaceChildren();
     };
     const cards = players.map((player, i) => playerCard(
         player,
@@ -479,6 +481,13 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
         summaryText.textContent = `${plural(editedCount, 'player')} edited`;
     };
     page.append(intro);
+    // Everyone at once
+    if (players.length > 1) {
+        page.append(bulkPanel(players, permissionCount, () => {
+            onChange();
+            cards.forEach((card) => card.sync(true));
+        }));
+    }
     // Cards
     const grid = el('div', 'row row-cols-1 row-cols-lg-2 row-cols-xxl-3 g-3');
     grid.append(...cards.map((card) => card.element));
@@ -486,4 +495,63 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
     cards.forEach((card) => card.sync(true));
     syncSummary();
     container.replaceChildren(page);
+}
+
+function bulkPanel(players: Player[], permissionCount: number, onChange: () => void): HTMLElement {
+    const panel = el('div', 'card bg-body-tertiary mb-4');
+    const body = el('div', 'card-body');
+    panel.append(body);
+    const head = el('div', 'd-flex align-items-baseline gap-2 flex-wrap mb-2');
+    head.append(
+        el('h6', 'mb-0', 'Everyone at once'),
+        el('span', 'small text-body-secondary', `Applies to all ${plural(players.length, 'player')}`),
+    );
+    const row = el('div', 'row g-3 align-items-start');
+    const result = el('div', 'small text-success mt-2 bulk-result');
+    result.setAttribute('role', 'status');
+    body.append(head, row, result);
+    for (const stat of STATS) {
+        const col = el('div', 'col-md');
+        const {error, group, input, read, setError} = amountInput(stat, () => undefined);
+        input.placeholder = stat.integer ? 'e.g. 100k' : 'e.g. 250,000';
+        const noun = stat.integer ? stat.label : stat.label.toLowerCase();
+        const label = el('label', 'form-label small mb-1', `Set everyone's ${noun} to`);
+        label.htmlFor = input.id;
+        const apply = el('button', 'btn btn-outline-primary', 'Apply');
+        apply.type = 'button';
+        const run = () => {
+            if (input.value.trim() === '') return setError('Enter an amount first');
+            const amount = read();
+            if (typeof amount === 'undefined') return;
+            players.forEach((player) => player[stat.key] = amount);
+            input.value = '';
+            onChange();
+            result.textContent = `Set ${noun} to ${formatStat(stat, amount)} for ` +
+                `${plural(players.length, 'player')}.`;
+        };
+        apply.addEventListener('click', run);
+        input.addEventListener('keydown', (event: KeyboardEvent) => {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            run();
+        });
+        group.append(apply);
+        col.append(label, group, error);
+        row.append(col);
+    }
+    if (permissionCount > 0) {
+        const col = el('div', 'col-md-auto');
+        const label = el('div', 'form-label small mb-1', 'Permissions');
+        const allow = iconButton('btn btn-outline-primary', 'bi-unlock', 'Allow everything for everyone');
+        allow.addEventListener('click', () => {
+            // Players without stored permissions are left alone, see renderPlayers
+            const withPermissions = players.filter((p) => p.permissions);
+            withPermissions.forEach((p) => p.permissions = {values: (p.permissions?.values ?? []).map(() => true)});
+            onChange();
+            result.textContent = `Allowed everything for ${plural(withPermissions.length, 'player')}.`;
+        });
+        col.append(label, allow);
+        row.append(col);
+    }
+    return panel;
 }
