@@ -1,0 +1,62 @@
+name: 🚀 Feature request
+description: Suggest an idea or propose a change
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If you plan to implement this yourself, please wait until we agree on the approach here before opening pull
+        requests. Each feature gets its own pull request. See [CONTRIBUTING.md](https://github.com/scottanderson/railroad.studio/blob/mainline/CONTRIBUTING.md).
+
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    attributes:
+      label: What problem does this solve?
+      description: For example, "I'm always frustrated when ..."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposed solution
+      description: What you would like to happen. Screenshots or mockups are welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: Other solutions or features you have considered.
+
+  - type: textarea
+    attributes:
+      label: Save file
+      description: |
+        If the request depends on data in a particular save, add the .sav file to a zip and attach it here.
+
+  - type: dropdown
+    attributes:
+      label: Do you plan to implement this?
+      options:
+        - 'No'
+        - Yes, I'd like to open pull requests
+        - I already have a working branch
+
+  - type: dropdown
+    attributes:
+      label: Was generative AI used to write this issue or the implementation?
+      description: AI use is allowed, see the rules in CONTRIBUTING.md.
+      options:
+        - 'No'
+        - 'Yes'
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: Links, references, or anything else that gives more context.
