@@ -168,6 +168,11 @@ export class RailroadMap {
         this.layers = this.createLayers();
         this.render();
         this.panZoom = this.initPanZoom();
+        // The pan-zoom library caches the map's size, so tell it when that changes.
+        // The size is zero while another page is showing; it is picked up again on return.
+        new ResizeObserver(([entry]) => {
+            if (entry.contentRect.width > 0) this.panZoom.resize();
+        }).observe(this.svg.node);
         if (options.pan && options.zoom) {
             try {
                 this.panZoom.zoom(options.zoom);
