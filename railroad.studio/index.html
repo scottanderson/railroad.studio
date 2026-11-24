@@ -27,17 +27,23 @@
     <nav id="sidebar" class="studio-sidebar"></nav>
     <div class="app-main">
       <header id="header" class="app-header">
-        <h2 class="app-title">Railroad Studio</h2>
+        <h2 class="app-title">Open a save</h2>
       </header>
       <main id="content" class="app-content">
         <div id="drop-area">
           <form class="drop-form">
-            <p>Drag and drop a file here, or browse to select a save file.</p>
-            <input class="form-control" type="file" id="fileElem" accept=".sav" />
-            <div class="form-text">
+            <div class="drop-icon mb-3"><i class="bi bi-folder2-open" aria-hidden="true"></i></div>
+            <h3 class="mb-2">Drop a Railroads Online save here</h3>
+            <p class="text-body-secondary">
+              Or browse for a <code>.sav</code> file. Everything stays on your computer.
+            </p>
+            <input class="form-control form-control-lg" type="file" id="fileElem" accept=".sav" />
+            <div class="form-text mt-3">
               Save files are located in
-              <code id="savePath">%localappdata%\arr\saved\savegames</code>
-              <button type="button" class="btn btn-sm btn-secondary ms-1" id="copySavePath">Copy path</button>
+              <span class="save-path">
+                <code id="savePath">%localappdata%\arr\saved\savegames</code>
+                <button type="button" class="btn btn-sm btn-quiet" id="copySavePath">Copy path</button>
+              </span>
             </div>
             <div class="form-text">Paste that path into the file picker's file name box to jump straight there.</div>
           </form>

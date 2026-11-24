@@ -454,6 +454,39 @@ body.sidebar-collapsed {
   width: min(24rem, calc(100vw - 2rem));
 }
 
+/* Front page */
+
+#drop-area {
+  max-width: 44rem;
+  margin: 8vh auto 0;
+  padding: 2.5rem 2rem;
+  border: 2px dashed var(--bs-border-color);
+  border-radius: 1rem;
+  background: var(--bs-tertiary-bg);
+  text-align: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+#drop-area.highlight {
+  border-color: var(--bs-primary);
+  background: var(--bs-primary-bg-subtle);
+}
+
+#drop-area .drop-icon {
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--bs-secondary-color);
+}
+
+#drop-area .save-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
 /* Values in the editor tables that open an edit control when clicked */
 
 .editable-value {

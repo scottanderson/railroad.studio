@@ -140,10 +140,15 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     if (!content) throw new Error('Missing content');
     const title = document.createElement('h2');
     title.classList.add('app-title');
-    const titleText = document.createTextNode('Parsing ' + filename);
+    const titleText = document.createTextNode('');
     title.appendChild(titleText);
     header.replaceChildren(title);
     content.replaceChildren();
+    const progress = (stage: string) => {
+        titleText.textContent = `${stage} ${filename}`;
+        sidebar.setFile(filename, `${stage}…`, true);
+    };
+    progress('Parsing');
     const rejectOnCatch = (reject: (reason: unknown) => void, func: () => void) => () => {
         try {
             func();
@@ -157,11 +162,11 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
             console.log('Parsed', gvas);
-            titleText.textContent = 'Importing ' + filename;
+            progress('Importing');
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
                 console.log('Imported', railroad);
-                titleText.textContent = 'Initializing ' + filename;
+                progress('Initializing');
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
                     const originalFilename = filename;
@@ -199,15 +204,29 @@ function updateFilename(railroad: Railroad, filename: string) {
  */
 export function handleError(error: unknown) {
     const title = document.createElement('h2');
-    const titleText = document.createTextNode('Failed to load: ' + error);
-    title.appendChild(titleText);
+    title.classList.add('app-title');
+    title.textContent = 'Something went wrong';
+    const message = document.createElement('div');
+    message.classList.add('alert', 'alert-danger');
+    message.setAttribute('role', 'alert');
+    message.textContent = 'Failed to load: ' + error;
     const pre = document.createElement('pre');
     const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
     const preText = document.createTextNode(stack ?? 'Stack trace not available');
     pre.appendChild(preText);
     const content = document.getElementById('content')!;
     content.classList.remove('is-map');
-    content.replaceChildren(title, pre);
-    document.getElementById('header')!.replaceChildren();
+    content.replaceChildren(message, pre);
+    document.getElementById('header')!.replaceChildren(title);
+    if (typeof window.studio === 'undefined') {
+        // Nothing was opened. Once a save is open, its sections lead back out of here.
+        sidebar.setFile(undefined, 'That file could not be opened');
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.classList.add('btn', 'btn-primary', 'mb-3');
+        retry.textContent = 'Choose another file';
+        retry.addEventListener('click', () => window.location.assign(window.location.pathname));
+        message.after(retry);
+    }
     throw error; // also print the stack trace with TypeScript mapped source links in the console
 }
