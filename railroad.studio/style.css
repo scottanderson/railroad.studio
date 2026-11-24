@@ -102,6 +102,7 @@ body {
 }
 
 body {
+  --sidebar-width: 15rem;
   display: flex;
   overflow: hidden;
   transition: background-color var(--duration) var(--animation);
@@ -120,7 +121,21 @@ body {
   --bs-btn-active-border-color: var(--bs-secondary-color);
 }
 
-/* App shell: a header bar over the content */
+/* App shell: the sidebar, and a header bar over the content, are on every screen */
+
+.studio-sidebar {
+  display: flex;
+  flex: 0 0 var(--sidebar-width);
+  flex-direction: column;
+  gap: 0.75rem;
+  width: var(--sidebar-width);
+  height: 100%;
+  padding: 0.75rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-right: 1px solid var(--bs-border-color);
+  background: var(--bs-tertiary-bg);
+}
 
 .app-main {
   display: flex;
@@ -231,6 +246,98 @@ body {
   z-index: 2;
   background: var(--bs-body-bg);
   box-shadow: inset 0 -1px 0 var(--bs-border-color);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-brand {
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sidebar-file {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--bs-body-bg);
+}
+
+.sidebar-file-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.25rem;
+  color: var(--bs-secondary-color);
+  font-size: 1.25rem;
+}
+
+.sidebar-divider {
+  height: 1px;
+  margin: 0.4rem 0.25rem;
+  background: var(--bs-border-color);
+  list-style: none;
+}
+
+.sidebar-nav .nav-link:disabled {
+  opacity: 0.45;
+}
+
+.sidebar-file-text {
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.sidebar-file-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  flex-wrap: nowrap;
+  gap: 0.125rem;
+}
+
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  color: var(--bs-body-color);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sidebar-nav .nav-link.active {
+  color: var(--bs-nav-pills-link-active-color);
+}
+
+.sidebar-nav .nav-link:hover:not(.active) {
+  background: var(--bs-secondary-bg);
+}
+
+.sidebar-nav .nav-link .bi {
+  flex-shrink: 0;
+  width: 1.25rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.sidebar-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
 }
 
 /* What to do with a downloaded save */

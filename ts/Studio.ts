@@ -35,6 +35,7 @@ import {
     editVector,
 } from './StudioEditor';
 import {MapLayers, RailroadMap} from './RailroadMap';
+import {SectionHandler, SectionKey, Sidebar, showDownloadNotice} from './StudioShell';
 import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {gvasToBlob, railroadToGvas} from './exporter';
 import {Quaternion} from './Quaternion';
@@ -49,7 +50,6 @@ import {createFilter} from './Filter';
 import {createPager} from './Pager';
 import {handleError} from './index';
 import {renderPlayers} from './StudioPlayers';
-import {showDownloadNotice} from './StudioShell';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
 import {toggleDarkMode} from './themes';
@@ -80,6 +80,7 @@ export class Studio {
         railroad: Railroad,
         headerElement: HTMLElement,
         content: HTMLElement,
+        sidebar: Sidebar,
         originalFilename = filename,
     ) {
         this.filename = filename;
@@ -105,15 +106,12 @@ export class Studio {
             content.scrollTo(0, 0);
         };
         // Map
-        const btnMap = document.createElement('button');
-        btnMap.textContent = 'Map';
-        btnMap.classList.add('btn', 'btn-secondary');
         const mapDiv = document.createElement('div');
         mapDiv.classList.add('map-container');
-        btnMap.addEventListener('click', () => {
+        const showMap = () => {
             show([mapButtons], mapDiv);
             this.setTitle(this.mapTitle);
-        });
+        };
         content.classList.add('is-map');
         content.replaceChildren(mapDiv);
         const mapInverted = this.isMapInverted();
@@ -176,9 +174,6 @@ export class Studio {
             ].forEach((e) => mapButtons.appendChild(e));
         }
         // Frames
-        const btnFrames = document.createElement('button');
-        btnFrames.textContent = 'Frames';
-        btnFrames.classList.add('btn', 'btn-secondary');
         let framePage = 0;
         const onFramePage = (page: number) => {
             framePage = page;
@@ -264,40 +259,27 @@ export class Studio {
             const last = Math.min(filtered.length, first + pageSize) - 1;
             this.frames(table, first, last, filtered);
         };
-        btnFrames.addEventListener('click', resetFramePage);
         // Bulk Frames
-        const btnBulkFrames = document.createElement('button');
-        btnBulkFrames.textContent = 'Bulk Frames';
-        btnBulkFrames.classList.add('btn', 'btn-secondary');
-        btnBulkFrames.addEventListener('click', () => {
+        const showBulkFrames = () => {
             const div = document.createElement('div');
             show([], div);
             this.bulkFrames(div);
-        });
+        };
         // Industries
-        const btnIndustries = document.createElement('button');
-        btnIndustries.textContent = 'Industries';
-        btnIndustries.classList.add('btn', 'btn-secondary');
-        btnIndustries.addEventListener('click', () => {
+        const showIndustries = () => {
             const table = document.createElement('table');
             table.classList.add('table', 'table-striped');
             show([], table);
             this.industries(table);
-        });
+        };
         // Players
-        const btnPlayers = document.createElement('button');
-        btnPlayers.textContent = 'Players';
-        btnPlayers.classList.add('btn', 'btn-secondary');
-        btnPlayers.addEventListener('click', () => {
+        const showPlayers = () => {
             const div = document.createElement('div');
             show([], div);
             this.setTitle('Players');
             renderPlayers(this, div);
-        });
+        };
         // Props
-        const btnProps = document.createElement('button');
-        btnProps.textContent = 'Props';
-        btnProps.classList.add('btn', 'btn-secondary');
         let propPage = 0;
         const resetPropPage = () => {
             const pageSize = 20;
@@ -313,11 +295,7 @@ export class Studio {
             const last = Math.min(railroad.props.length, first + pageSize) - 1;
             this.props(table, first, last);
         };
-        btnProps.addEventListener('click', resetPropPage);
         // Spline Tracks
-        const btnSplineTracks = document.createElement('button');
-        btnSplineTracks.textContent = 'Spline Tracks';
-        btnSplineTracks.classList.add('btn', 'btn-secondary');
         let splineTrackPage = 0;
         const resetSplineTrackPage = () => {
             const pageSize = 20;
@@ -333,7 +311,6 @@ export class Studio {
             const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
             this.splineTracks(table, first, last);
         };
-        btnSplineTracks.addEventListener('click', resetSplineTrackPage);
         // Export
         const btnDownload = document.createElement('button');
         const imgDownload = bootstrapIcon('bi-download', 'Download');
@@ -368,23 +345,27 @@ export class Studio {
         btnDark.classList.add('btn', 'btn-secondary');
         btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
         btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnMap, btnDownload, btnDark);
+        buttons.replaceChildren(btnDownload, btnDark);
+        // Sidebar
+        const sections: Partial<Record<SectionKey, SectionHandler>> = {map: {onSelect: showMap}};
         if (hasFrames) {
-            buttons.insertBefore(btnFrames, btnDownload);
-            buttons.insertBefore(btnBulkFrames, btnDownload);
+            sections.frames = {count: railroad.frames.length, onSelect: resetFramePage};
+            sections.bulkFrames = {onSelect: showBulkFrames};
         }
         if (hasIndustries) {
-            buttons.insertBefore(btnIndustries, btnDownload);
+            sections.industries = {count: railroad.industries.length, onSelect: showIndustries};
         }
         if (hasPlayers) {
-            buttons.insertBefore(btnPlayers, btnDownload);
+            sections.players = {count: railroad.players.length, onSelect: showPlayers};
         }
         if (hasProps) {
-            buttons.insertBefore(btnProps, btnDownload);
+            sections.props = {count: railroad.props.length, onSelect: resetPropPage};
         }
         if (hasSplineTracks) {
-            buttons.insertBefore(btnSplineTracks, btnDownload);
+            sections.splineTracks = {count: railroad.splineTracks.length, onSelect: resetSplineTrackPage};
         }
+        sidebar.setFile(this.originalFilename, 'Save file');
+        sidebar.setSections(sections);
         // Studio controls
         const studioControls = document.createElement('div');
         studioControls.classList.add('studio-controls');
@@ -1136,7 +1117,8 @@ export class Studio {
     }
 
     setTitle(title: string) {
-        this.header.textContent = title + ' - ' + this.filename;
+        // The sidebar shows which save is open
+        this.header.textContent = title;
     }
 
     /**

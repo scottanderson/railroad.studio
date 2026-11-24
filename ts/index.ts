@@ -1,3 +1,4 @@
+import {Sidebar, mountSidebar} from './StudioShell';
 import {Railroad} from './Railroad';
 import {activateTheme} from './themes';
 
@@ -8,6 +9,9 @@ declare const SHORT_HASH: string;
 
 // Set up dark mode before doing anything else
 activateTheme();
+
+// The sidebar is part of every screen, including this first one
+const sidebar: Sidebar = mountSidebar();
 
 // Main app entry point
 window.onload = () => {
@@ -163,7 +167,7 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                     const originalFilename = filename;
                     filename = updateFilename(railroad, filename);
                     // Initialize the Studio UI
-                    window.studio = new Studio(filename, railroad, header, content, originalFilename);
+                    window.studio = new Studio(filename, railroad, header, content, sidebar, originalFilename);
                     document.title = filename + ' - Railroad Studio';
                     resolve();
                 }), 10);
