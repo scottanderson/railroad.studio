@@ -1,7 +1,8 @@
 import {Permission, permissionLabels} from './Permission';
-import {el, icon} from './dom';
+import {el, icon, iconButton} from './dom';
 import {Player} from './Railroad';
 import {Studio} from './Studio';
+import {Vector} from './Vector';
 import {toFloatingPointVec} from './util';
 
 /** Money is stored as a 32-bit float, XP as a signed 32-bit integer. Stay well inside both. */
@@ -41,6 +42,17 @@ const STATS: Stat[] = [
     },
 ];
 
+type Snapshot = {
+    location: Vector | undefined;
+    money: number;
+    permissions: boolean[] | undefined;
+    rotation: number | undefined;
+    xp: number;
+};
+
+/** The values each player had when the save was loaded, used for undo and for the "Edited" badge. */
+const snapshots = new WeakMap<Player, Snapshot>();
+
 type Card = {
     element: HTMLElement;
     sync: (force?: boolean) => void;
@@ -71,6 +83,52 @@ export function parseAmount(text: string, stat: Stat): number | string {
     if (!Number.isFinite(amount)) return 'Enter a number, like 25000 or 25k';
     if (amount > stat.max) return `The most this can hold is ${formatStat(stat, stat.max)}`;
     return amount;
+}
+
+function takeSnapshot(player: Player): Snapshot {
+    return {
+        location: player.location ? {...player.location} : undefined,
+        money: player.money,
+        permissions: player.permissions ? [...player.permissions.values] : undefined,
+        rotation: player.rotation,
+        xp: player.xp,
+    };
+}
+
+function sameVector(a: Vector | undefined, b: Vector | undefined): boolean {
+    if (!a || !b) return a === b;
+    return a.x === b.x && a.y === b.y && a.z === b.z;
+}
+
+function sameFlags(a: boolean[] | undefined, b: boolean[] | undefined): boolean {
+    if (!a || !b) return a === b;
+    return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+function isEdited(player: Player): boolean {
+    const snap = snapshots.get(player);
+    if (!snap) return false;
+    return player.money !== snap.money ||
+        player.xp !== snap.xp ||
+        player.rotation !== snap.rotation ||
+        !sameVector(player.location, snap.location) ||
+        !sameFlags(player.permissions?.values, snap.permissions);
+}
+
+function restore(player: Player, players: Player[]): void {
+    const snap = snapshots.get(player);
+    if (!snap) return;
+    player.money = snap.money;
+    player.xp = snap.xp;
+    player.rotation = snap.rotation;
+    player.location = snap.location ? {...snap.location} : undefined;
+    if (snap.permissions) {
+        player.permissions = {values: [...snap.permissions]};
+    } else if (!players.slice(players.indexOf(player) + 1).some((p) => p.permissions)) {
+        // Only drop permissions the save did not have while no later player has some,
+        // because the exporter cannot leave them out ahead of a player who has them
+        player.permissions = undefined;
+    }
 }
 
 function permissionLabel(i: number): string {
@@ -138,6 +196,7 @@ function statField(stat: Stat, player: Player, onChange: () => void) {
     const {error, group, input, setError} = amountInput(stat, set);
     const label = el('label', 'form-label fw-semibold mb-1', stat.label);
     label.htmlFor = input.id;
+    const hint = el('div', 'small text-body-secondary player-hint');
     // Quick add buttons
     const steps = el('div', 'btn-group btn-group-sm w-100 mt-2');
     steps.setAttribute('role', 'group');
@@ -172,11 +231,14 @@ function statField(stat: Stat, player: Player, onChange: () => void) {
         }
     });
     const sync = (force = false) => {
+        const original = snapshots.get(player)?.[stat.key];
+        const changed = typeof original !== 'undefined' && original !== player[stat.key];
+        hint.textContent = changed ? `Was ${formatStat(stat, original)}` : '';
         if (!force && document.activeElement === input) return;
         setError();
         input.value = numberFormat.format(player[stat.key]);
     };
-    wrapper.append(label, group, error, steps);
+    wrapper.append(label, group, error, steps, hint);
     return {sync, wrapper};
 }
 
@@ -322,7 +384,16 @@ function playerCard(
         }
         who.append(sub);
     }
+    // Sits on the border of the card, so nothing moves when it appears
+    const undo = iconButton('btn btn-sm btn-warning player-undo d-none', 'bi-arrow-counterclockwise', 'Undo edits');
+    undo.title = `Put ${name} back the way the save had them`;
+    undo.addEventListener('click', () => {
+        restore(player, players);
+        onChange();
+        sync(true);
+    });
     header.append(avatar, who);
+    card.append(undo);
     body.append(header);
     // Money and XP
     const statRow = el('div', 'row g-3');
@@ -351,7 +422,12 @@ function playerCard(
         body.append(details);
         syncs.push(syncPosition);
     }
-    const sync = (force = false) => syncs.forEach((s) => s(force));
+    const sync = (force = false) => {
+        const dirty = isEdited(player);
+        undo.classList.toggle('d-none', !dirty);
+        card.classList.toggle('edited', dirty);
+        syncs.forEach((s) => s(force));
+    };
     return {element, sync};
 }
 
@@ -363,9 +439,16 @@ function playerCard(
  */
 export function renderPlayers(studio: Studio, container: HTMLElement): void {
     const {players, settings} = studio.railroad;
+    for (const player of players) {
+        if (!snapshots.has(player)) snapshots.set(player, takeSnapshot(player));
+    }
     const permissionCount = Math.max(0, ...players.map((p) => p.permissions?.values.length ?? 0));
     const page = el('div', 'players-page');
-    const onChange = () => studio.setMapModified();
+    const onChange = () => {
+        studio.setMapModified();
+        cards.forEach((card) => card.sync());
+        syncSummary();
+    };
     const cards = players.map((player, i) => playerCard(
         player,
         players,
@@ -373,13 +456,34 @@ export function renderPlayers(studio: Studio, container: HTMLElement): void {
         permissionCount,
         onChange,
     ));
-    const intro = el('div', 'text-body-secondary mb-3',
+    // Intro, and a summary of what has been edited
+    const intro = el('div', 'd-flex align-items-center gap-3 flex-wrap mb-3');
+    intro.append(el('div', 'text-body-secondary me-auto',
         `${plural(players.length, 'player')} in this save. Changes apply as you type. ` +
-        'When you are done, use the Download button.');
+        'When you are done, use the Download button.'));
+    const summary = el('div', 'hstack gap-2 d-none');
+    const summaryText = el('span', 'badge text-bg-warning');
+    const btnUndoAll = iconButton('btn btn-sm btn-quiet', 'bi-arrow-counterclockwise', 'Undo all');
+    btnUndoAll.title = 'Put every player back the way the save had them';
+    btnUndoAll.addEventListener('click', () => {
+        // Last player first, so that permissions are dropped from the end of the list
+        [...players].reverse().forEach((player) => restore(player, players));
+        onChange();
+        cards.forEach((card) => card.sync(true));
+    });
+    summary.append(summaryText, btnUndoAll);
+    intro.append(summary);
+    const syncSummary = () => {
+        const editedCount = players.filter(isEdited).length;
+        summary.classList.toggle('d-none', editedCount === 0);
+        summaryText.textContent = `${plural(editedCount, 'player')} edited`;
+    };
+    page.append(intro);
     // Cards
     const grid = el('div', 'row row-cols-1 row-cols-lg-2 row-cols-xxl-3 g-3');
     grid.append(...cards.map((card) => card.element));
-    page.append(intro, grid);
+    page.append(grid);
     cards.forEach((card) => card.sync(true));
+    syncSummary();
     container.replaceChildren(page);
 }
