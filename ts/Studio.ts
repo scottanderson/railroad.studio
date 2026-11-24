@@ -26,7 +26,6 @@ import {
     editIndustryProducts,
     editIndustryType,
     editNumber,
-    editPermissions,
     editQuaternion,
     editRotator,
     editSlider,
@@ -36,9 +35,9 @@ import {
     editVector,
 } from './StudioEditor';
 import {MapLayers, RailroadMap} from './RailroadMap';
+import {SectionHandler, SectionKey, Sidebar, showDownloadNotice} from './StudioShell';
 import {cubicBezierMinRadius, hermiteToBezier} from './util-bezier';
 import {gvasToBlob, railroadToGvas} from './exporter';
-import {Permission} from './Permission';
 import {Quaternion} from './Quaternion';
 import {Rotator} from './Rotator';
 import {SplineTrackType} from './SplineTrackType';
@@ -50,9 +49,9 @@ import {clamp} from './math';
 import {createFilter} from './Filter';
 import {createPager} from './Pager';
 import {handleError} from './index';
+import {renderPlayers} from './StudioPlayers';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
-import {toggleDarkMode} from './themes';
 
 const OLDEST_TESTED_SAVE_GAME_VERSION = 1;
 const NEWEST_TESTED_SAVE_GAME_VERSION = 231117;
@@ -63,16 +62,28 @@ const INVERT_BEFORE_SAVE_GAME_VERSION = 231117;
  */
 export class Studio {
     private modified: boolean;
-    private readonly btnDownload: HTMLButtonElement;
+    private unsaved = false;
+    private mapShowing = true;
+    private mapTitle = 'Map';
     private readonly filename: string;
     private readonly header: HTMLHeadingElement;
     private readonly map: RailroadMap;
+    private readonly originalFilename: string;
     private readonly originalSegmentCount: number;
     readonly railroad: Railroad;
+    private readonly sidebar: Sidebar;
     private readonly vegetationUtil: VegetationUtil;
 
-    constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
+    constructor(
+        filename: string,
+        railroad: Railroad,
+        headerElement: HTMLElement,
+        content: HTMLElement,
+        sidebar: Sidebar,
+        originalFilename = filename,
+    ) {
         this.filename = filename;
+        this.originalFilename = originalFilename;
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
@@ -80,21 +91,25 @@ export class Studio {
         this.logRadiusGrade();
         // Set up the DOM
         const header = document.createElement('h2');
+        header.classList.add('app-title');
         this.header = header;
         header.textContent = 'Loaded ' + this.filename;
-        const buttons = document.createElement('div');
-        buttons.classList.add('hstack', 'gap-2');
+        // Every page puts its controls in the header bar and its body in the content area
+        const show = (controls: (Element | undefined)[], body: Element) => {
+            studioControls.replaceChildren(...controls.filter(Boolean));
+            this.mapShowing = body === mapDiv;
+            content.classList.toggle('is-map', this.mapShowing);
+            content.replaceChildren(body);
+            content.scrollTo(0, 0);
+        };
         // Map
-        const btnMap = document.createElement('button');
-        btnMap.textContent = 'Map';
-        btnMap.classList.add('btn', 'btn-secondary');
         const mapDiv = document.createElement('div');
-        btnMap.addEventListener('click', () => {
-            studioControls.replaceChildren(buttons, mapButtons);
-            content.replaceChildren(mapDiv);
-            this.setTitle('Map');
-            this.floatHeader(true);
-        });
+        mapDiv.classList.add('map-container');
+        const showMap = () => {
+            show([mapButtons], mapDiv);
+            this.setTitle(this.mapTitle);
+        };
+        content.classList.add('is-map');
         content.replaceChildren(mapDiv);
         const mapInverted = this.isMapInverted();
         this.map = new RailroadMap(this, mapDiv, mapInverted);
@@ -156,9 +171,6 @@ export class Studio {
             ].forEach((e) => mapButtons.appendChild(e));
         }
         // Frames
-        const btnFrames = document.createElement('button');
-        btnFrames.textContent = 'Frames';
-        btnFrames.classList.add('btn', 'btn-secondary');
         let framePage = 0;
         const onFramePage = (page: number) => {
             framePage = page;
@@ -231,7 +243,6 @@ export class Studio {
             // Create a dropdown entry for all
             options.unshift(['all', `All (${filteredCategory.length})`]);
             const filterNav = createFilter(categories, labels, onFrameFilter, options, onOption, checked, frameSelect);
-            filterNav.classList.add('mt-5');
             const filtered = (frameSelect && frameSelect !== 'all') ?
                 filteredCategory.filter((f) => f.type === frameSelect || getFrameType(f.type) === frameSelect) :
                 filteredCategory;
@@ -239,60 +250,33 @@ export class Studio {
             framePage = clamp(framePage, 0, numPages - 1);
             const framesNav = createPager(framePage, filtered.length, onFramePage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            const children = [];
-            if (framesNav) {
-                framesNav.classList.add('mt-3');
-                children.push(framesNav);
-            }
-            content.replaceChildren(filterNav, ...children, table);
-            this.floatHeader(false);
+            table.classList.add('table', 'table-striped');
+            show([filterNav, framesNav], table);
             const first = pageSize * framePage;
             const last = Math.min(filtered.length, first + pageSize) - 1;
             this.frames(table, first, last, filtered);
         };
-        btnFrames.addEventListener('click', resetFramePage);
         // Bulk Frames
-        const btnBulkFrames = document.createElement('button');
-        btnBulkFrames.textContent = 'Bulk Frames';
-        btnBulkFrames.classList.add('btn', 'btn-secondary');
-        btnBulkFrames.addEventListener('click', () => {
+        const showBulkFrames = () => {
             const div = document.createElement('div');
-            div.classList.add('mt-5', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            content.replaceChildren(div);
-            this.floatHeader(false);
+            show([], div);
             this.bulkFrames(div);
-        });
+        };
         // Industries
-        const btnIndustries = document.createElement('button');
-        btnIndustries.textContent = 'Industries';
-        btnIndustries.classList.add('btn', 'btn-secondary');
-        btnIndustries.addEventListener('click', () => {
+        const showIndustries = () => {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
-            this.floatHeader(false);
+            table.classList.add('table', 'table-striped');
+            show([], table);
             this.industries(table);
-        });
+        };
         // Players
-        const btnPlayers = document.createElement('button');
-        btnPlayers.textContent = 'Players';
-        btnPlayers.classList.add('btn', 'btn-secondary');
-        btnPlayers.addEventListener('click', () => {
-            const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mt-5', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            content.replaceChildren(table);
-            this.floatHeader(false);
-            this.players(table);
-        });
+        const showPlayers = () => {
+            const div = document.createElement('div');
+            show([], div);
+            this.setTitle('Players');
+            renderPlayers(this, div);
+        };
         // Props
-        const btnProps = document.createElement('button');
-        btnProps.textContent = 'Props';
-        btnProps.classList.add('btn', 'btn-secondary');
         let propPage = 0;
         const resetPropPage = () => {
             const pageSize = 20;
@@ -302,25 +286,13 @@ export class Studio {
             };
             const propNav = createPager(propPage, railroad.props.length, onPage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            if (propNav) {
-                propNav.classList.add('mt-5');
-                content.replaceChildren(propNav, table);
-            } else {
-                table.classList.add('mt-5');
-                content.replaceChildren(table);
-            }
-            this.floatHeader(false);
+            table.classList.add('table', 'table-striped');
+            show([propNav], table);
             const first = pageSize * propPage;
             const last = Math.min(railroad.props.length, first + pageSize) - 1;
             this.props(table, first, last);
         };
-        btnProps.addEventListener('click', resetPropPage);
         // Spline Tracks
-        const btnSplineTracks = document.createElement('button');
-        btnSplineTracks.textContent = 'Spline Tracks';
-        btnSplineTracks.classList.add('btn', 'btn-secondary');
         let splineTrackPage = 0;
         const resetSplineTrackPage = () => {
             const pageSize = 20;
@@ -330,70 +302,38 @@ export class Studio {
             };
             const splineTrackNav = createPager(splineTrackPage, railroad.splineTracks.length, onPage, pageSize);
             const table = document.createElement('table');
-            table.classList.add('table', 'table-striped', 'mb-5');
-            studioControls.replaceChildren(buttons);
-            if (splineTrackNav) {
-                splineTrackNav.classList.add('mt-5');
-                content.replaceChildren(splineTrackNav, table);
-            } else {
-                table.classList.add('mt-5');
-                content.replaceChildren(table);
-            }
-            this.floatHeader(false);
+            table.classList.add('table', 'table-striped');
+            show([splineTrackNav], table);
             const first = pageSize * splineTrackPage;
             const last = Math.min(railroad.splineTracks.length, first + pageSize) - 1;
             this.splineTracks(table, first, last);
         };
-        btnSplineTracks.addEventListener('click', resetSplineTrackPage);
-        // Export
-        const btnDownload = document.createElement('button');
-        const imgDownload = bootstrapIcon('bi-download', 'Download');
-        this.btnDownload = btnDownload;
-        btnDownload.appendChild(imgDownload);
-        btnDownload.classList.add('btn', 'btn-secondary');
-        btnDownload.addEventListener('click', () => {
-            if (this.modified) {
-                console.log('Exporting', this.railroad);
-            }
-            const gvas = railroadToGvas(this.railroad);
-            console.log('Exported', gvas);
-            const blob = gvasToBlob(gvas);
-            const url = URL.createObjectURL(blob);
-            console.log('Serialized', blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = this.exportFileName();
-            document.body.append(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-        });
-        // Toggle dark mode
-        const btnDark = document.createElement('button');
-        btnDark.classList.add('btn', 'btn-secondary');
-        btnDark.appendChild(bootstrapIcon('bi-lightbulb', 'Toggle dark mode'));
-        btnDark.addEventListener('click', toggleDarkMode);
-        buttons.replaceChildren(btnMap, btnDownload, btnDark);
+        // Sidebar
+        const sections: Partial<Record<SectionKey, SectionHandler>> = {map: {onSelect: showMap}};
         if (hasFrames) {
-            buttons.insertBefore(btnFrames, btnDownload);
-            buttons.insertBefore(btnBulkFrames, btnDownload);
+            sections.frames = {count: railroad.frames.length, onSelect: resetFramePage};
+            sections.bulkFrames = {onSelect: showBulkFrames};
         }
         if (hasIndustries) {
-            buttons.insertBefore(btnIndustries, btnDownload);
+            sections.industries = {count: railroad.industries.length, onSelect: showIndustries};
         }
         if (hasPlayers) {
-            buttons.insertBefore(btnPlayers, btnDownload);
+            sections.players = {count: railroad.players.length, onSelect: showPlayers};
         }
         if (hasProps) {
-            buttons.insertBefore(btnProps, btnDownload);
+            sections.props = {count: railroad.props.length, onSelect: resetPropPage};
         }
         if (hasSplineTracks) {
-            buttons.insertBefore(btnSplineTracks, btnDownload);
+            sections.splineTracks = {count: railroad.splineTracks.length, onSelect: resetSplineTrackPage};
         }
+        this.sidebar = sidebar;
+        sidebar.setFile(this.originalFilename, 'Save file');
+        sidebar.setSections(sections, () => this.download());
+        sidebar.setSaveState('clean');
         // Studio controls
         const studioControls = document.createElement('div');
-        studioControls.classList.add('studio-controls', 'vstack', 'gap-2');
-        studioControls.replaceChildren(buttons, mapButtons);
+        studioControls.classList.add('studio-controls');
+        studioControls.replaceChildren(mapButtons);
         headerElement.replaceChildren(header, studioControls);
         layers
             .map((l) => l.listener)
@@ -407,11 +347,10 @@ export class Studio {
         if (showSaveVersionWarning) {
             const warning = `Warning: Save game version ${railroad.saveGame.version} has not been tested.`;
             console.log(warning);
-            const headerWarning = document.createElement('h4');
+            const headerWarning = document.createElement('div');
             headerWarning.textContent = warning;
-            headerWarning.classList.add('text-warning');
-            headerElement.insertBefore(headerWarning, studioControls);
-            // headerElement.replaceChildren(header, headerWarning, studioControls);
+            headerWarning.classList.add('app-header-note', 'text-warning');
+            headerElement.append(headerWarning);
         }
     }
 
@@ -1062,6 +1001,34 @@ export class Studio {
         return grpMinimizeSegments;
     }
 
+    /**
+     * Export the railroad and hand it to the browser as a download.
+     * @return {string} The name of the downloaded file.
+     */
+    download(): string {
+        if (this.modified) {
+            console.log('Exporting', this.railroad);
+        }
+        const gvas = railroadToGvas(this.railroad);
+        console.log('Exported', gvas);
+        const blob = gvasToBlob(gvas);
+        const url = URL.createObjectURL(blob);
+        console.log('Serialized', blob);
+        const filename = this.exportFileName();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.append(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.unsaved = false;
+        document.title = this.filename + ' - Railroad Studio';
+        this.sidebar.setSaveState('downloaded');
+        showDownloadNotice(filename, this.originalFilename);
+        return filename;
+    }
+
     private exportFileName() {
         const appendModified = this.modified && !this.filename.match(/modified/);
         const fileExtension = this.filename.match(/(\.[^.]+)?$/)?.[1];
@@ -1075,28 +1042,21 @@ export class Studio {
         }
     }
 
-    private floatHeader(float: boolean) {
-        const header = document.getElementById('header');
-        if (header) {
-            header.classList[float ? 'add' : 'remove']('fixed-top', 'm-3');
-        }
-        const content = document.getElementById('content');
-        if (content) {
-            if (float) {
-                content.classList.replace('pt-1', 'pt-5');
-            } else {
-                content.classList.replace('pt-5', 'pt-1');
-            }
-        }
-    }
-
     setMapModified(affectsSplines = false) {
         if (!this.modified) {
             this.modified = true;
-            this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
-            document.title = this.filename + '* - Railroad Studio';
-            const onBeforeUnload = (e: BeforeUnloadEvent) => e.returnValue = 'Changes you made may not be saved.';
+            // Only warn about leaving while there are changes that have not been downloaded
+            const onBeforeUnload = (e: BeforeUnloadEvent) => {
+                if (!this.unsaved) return;
+                e.preventDefault();
+                e.returnValue = 'Changes you made may not be saved.';
+            };
             window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
+        }
+        if (!this.unsaved) {
+            this.unsaved = true;
+            document.title = this.filename + '* - Railroad Studio';
+            this.sidebar.setSaveState('unsaved');
         }
         if (affectsSplines) {
             this.logRadiusGrade();
@@ -1149,7 +1109,19 @@ export class Studio {
     }
 
     setTitle(title: string) {
-        this.header.textContent = title + ' - ' + this.filename;
+        // The sidebar shows which save is open
+        this.header.textContent = title;
+    }
+
+    /**
+     * A status message from the map, such as rendering progress or a tool
+     * prompt. The map keeps working while another page is open, so the message
+     * is held back until the map is the current page again.
+     * @param {string} title
+     */
+    setMapTitle(title: string) {
+        this.mapTitle = title;
+        if (this.mapShowing) this.setTitle(title);
     }
 
     private splineTracks(table: HTMLTableElement, first: number, last: number): void {
@@ -1661,68 +1633,6 @@ export class Studio {
             const setIndustryRotation = (rotation: Rotator) => industry.rotation = rotation;
             td.replaceChildren(editRotator(this, industry.rotation, setIndustryRotation));
             tr.appendChild(td);
-        }
-    }
-
-    private players(table: HTMLTableElement): void {
-        this.setTitle('Players');
-        const thead = document.createElement('thead');
-        table.appendChild(thead);
-        let tr = document.createElement('tr');
-        thead.appendChild(tr);
-        const hasRotations = this.railroad.players.some((player) => typeof player.rotation !== 'undefined');
-        const hasPermissions = this.railroad.players.some((player) => typeof player.permissions !== 'undefined');
-        const columnHeaders = ['Steam ID', 'Name', 'Money', 'XP', 'Location'];
-        if (hasRotations) columnHeaders.push('Rotation');
-        if (hasPermissions) columnHeaders.push('Permissions');
-        for (const columnHeader of columnHeaders) {
-            const th = document.createElement('th');
-            th.textContent = columnHeader;
-            tr.appendChild(th);
-        }
-        const tbody = document.createElement('tbody');
-        table.appendChild(tbody);
-        for (const player of this.railroad.players) {
-            tr = document.createElement('tr');
-            tbody.appendChild(tr);
-            // ID
-            let td = document.createElement('td');
-            td.textContent = String(player.id);
-            tr.appendChild(td);
-            // Name
-            td = document.createElement('td');
-            td.textContent = String(player.name);
-            tr.appendChild(td);
-            // Money
-            td = document.createElement('td');
-            td.appendChild(editNumber(this, player.money, {min: '0'}, (money) => player.money = money));
-            tr.appendChild(td);
-            // XP
-            td = document.createElement('td');
-            td.appendChild(editNumber(this, player.xp, {min: '0'}, (xp) => player.xp = xp));
-            tr.appendChild(td);
-            // Location
-            td = document.createElement('td');
-            if (player.location) {
-                const setPlayerLocation = (location: Vector): Vector => player.location = location;
-                td.appendChild(editVector(this, player.location, setPlayerLocation));
-            }
-            tr.appendChild(td);
-            // Rotation
-            if (player.rotation) {
-                td = document.createElement('td');
-                const setPlayerRotation = (r: number) => player.rotation = r;
-                const options: InputTextOptions = {max: '180', min: '-180'};
-                td.replaceChildren(editNumber(this, player.rotation, options, setPlayerRotation));
-                tr.appendChild(td);
-            }
-            // Permissions
-            if (hasPermissions) {
-                td = document.createElement('td');
-                const setPlayerPermissions = (p: Permission | undefined) => player.permissions = p;
-                td.appendChild(editPermissions(this, player.permissions, setPlayerPermissions));
-                tr.appendChild(td);
-            }
         }
     }
 

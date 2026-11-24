@@ -1,3 +1,4 @@
+import {Sidebar, mountSidebar} from './StudioShell';
 import {Railroad} from './Railroad';
 import {activateTheme} from './themes';
 
@@ -8,6 +9,9 @@ declare const SHORT_HASH: string;
 
 // Set up dark mode before doing anything else
 activateTheme();
+
+// The sidebar is part of every screen, including this first one
+const sidebar: Sidebar = mountSidebar();
 
 // Main app entry point
 window.onload = () => {
@@ -33,6 +37,15 @@ window.onload = () => {
     const fileElem = document.getElementById('fileElem');
     if (fileElem) {
         fileElem.addEventListener('change', handleChange, false);
+    }
+    const copySavePath = document.getElementById('copySavePath');
+    const savePath = document.getElementById('savePath');
+    if (copySavePath && savePath) {
+        copySavePath.addEventListener('click', () => {
+            navigator.clipboard.writeText(savePath.textContent ?? '')
+                .then(() => copySavePath.textContent = 'Copied')
+                .catch(console.error);
+        });
     }
 };
 
@@ -126,10 +139,16 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     const content = document.getElementById('content');
     if (!content) throw new Error('Missing content');
     const title = document.createElement('h2');
-    const titleText = document.createTextNode('Parsing ' + filename);
+    title.classList.add('app-title');
+    const titleText = document.createTextNode('');
     title.appendChild(titleText);
     header.replaceChildren(title);
     content.replaceChildren();
+    const progress = (stage: string) => {
+        titleText.textContent = `${stage} ${filename}`;
+        sidebar.setFile(filename, `${stage}…`, true);
+    };
+    progress('Parsing');
     const rejectOnCatch = (reject: (reason: unknown) => void, func: () => void) => () => {
         try {
             func();
@@ -143,16 +162,17 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
         window.setTimeout(rejectOnCatch(reject, () => {
             const gvas = parseGvas(buffer);
             console.log('Parsed', gvas);
-            titleText.textContent = 'Importing ' + filename;
+            progress('Importing');
             window.setTimeout(rejectOnCatch(reject, () => {
                 const railroad = gvasToRailroad(gvas);
                 console.log('Imported', railroad);
-                titleText.textContent = 'Initializing ' + filename;
+                progress('Initializing');
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
+                    const originalFilename = filename;
                     filename = updateFilename(railroad, filename);
                     // Initialize the Studio UI
-                    window.studio = new Studio(filename, railroad, header, content);
+                    window.studio = new Studio(filename, railroad, header, content, sidebar, originalFilename);
                     document.title = filename + ' - Railroad Studio';
                     resolve();
                 }), 10);
@@ -184,13 +204,29 @@ function updateFilename(railroad: Railroad, filename: string) {
  */
 export function handleError(error: unknown) {
     const title = document.createElement('h2');
-    const titleText = document.createTextNode('Failed to load: ' + error);
-    title.appendChild(titleText);
+    title.classList.add('app-title');
+    title.textContent = 'Something went wrong';
+    const message = document.createElement('div');
+    message.classList.add('alert', 'alert-danger');
+    message.setAttribute('role', 'alert');
+    message.textContent = 'Failed to load: ' + error;
     const pre = document.createElement('pre');
     const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
     const preText = document.createTextNode(stack ?? 'Stack trace not available');
     pre.appendChild(preText);
-    document.getElementById('content')!.replaceChildren(title, pre);
-    document.getElementById('header')!.replaceChildren();
+    const content = document.getElementById('content')!;
+    content.classList.remove('is-map');
+    content.replaceChildren(message, pre);
+    document.getElementById('header')!.replaceChildren(title);
+    if (typeof window.studio === 'undefined') {
+        // Nothing was opened. Once a save is open, its sections lead back out of here.
+        sidebar.setFile(undefined, 'That file could not be opened');
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.classList.add('btn', 'btn-primary', 'mb-3');
+        retry.textContent = 'Choose another file';
+        retry.addEventListener('click', () => window.location.assign(window.location.pathname));
+        message.after(retry);
+    }
     throw error; // also print the stack trace with TypeScript mapped source links in the console
 }

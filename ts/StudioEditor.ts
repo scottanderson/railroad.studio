@@ -31,10 +31,23 @@ export function saveContext(
     formatValue: () => string,
 ): [Node, () => void, () => void] {
     const pre = document.createElement('pre');
-    pre.classList.add('m-0');
+    pre.classList.add('m-0', 'editable-value');
     pre.textContent = formatValue();
-    pre.addEventListener('click', () => {
+    pre.title = 'Click to edit';
+    pre.tabIndex = 0;
+    pre.setAttribute('role', 'button');
+    const open = () => {
         pre.parentElement?.replaceChildren(div);
+        // Start in the value itself, rather than in a checkbox that sits in front of it
+        const field = div.querySelector<HTMLElement>('input:not([type=checkbox]), select, textarea') ??
+            div.querySelector<HTMLElement>('input');
+        field?.focus();
+    };
+    pre.addEventListener('click', open);
+    pre.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        open();
     });
     // Save
     const btnSave = document.createElement('button');

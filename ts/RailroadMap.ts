@@ -146,7 +146,7 @@ export class RailroadMap {
 
     constructor(studio: Studio, element: HTMLElement, inverted: boolean) {
         this.setMapModified = (affectsSplines = false) => studio.setMapModified(affectsSplines);
-        this.setTitle = (title) => studio.setTitle(title);
+        this.setTitle = (title) => studio.setMapTitle(title);
         this.railroad = studio.railroad;
         this.inverted = inverted;
         this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
@@ -168,6 +168,11 @@ export class RailroadMap {
         this.layers = this.createLayers();
         this.render();
         this.panZoom = this.initPanZoom();
+        // The pan-zoom library caches the map's size, so tell it when that changes.
+        // The size is zero while another page is showing; it is picked up again on return.
+        new ResizeObserver(([entry]) => {
+            if (entry.contentRect.width > 0) this.panZoom.resize();
+        }).observe(this.svg.node);
         if (options.pan && options.zoom) {
             try {
                 this.panZoom.zoom(options.zoom);
