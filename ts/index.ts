@@ -135,6 +135,7 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
     const content = document.getElementById('content');
     if (!content) throw new Error('Missing content');
     const title = document.createElement('h2');
+    title.classList.add('app-title');
     const titleText = document.createTextNode('Parsing ' + filename);
     title.appendChild(titleText);
     header.replaceChildren(title);
@@ -200,7 +201,9 @@ export function handleError(error: unknown) {
     const stack = error && typeof error === 'object' && 'stack' in error ? String(error.stack) : undefined;
     const preText = document.createTextNode(stack ?? 'Stack trace not available');
     pre.appendChild(preText);
-    document.getElementById('content')!.replaceChildren(title, pre);
+    const content = document.getElementById('content')!;
+    content.classList.remove('is-map');
+    content.replaceChildren(title, pre);
     document.getElementById('header')!.replaceChildren();
     throw error; // also print the stack trace with TypeScript mapped source links in the console
 }

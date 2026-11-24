@@ -146,7 +146,7 @@ export class RailroadMap {
 
     constructor(studio: Studio, element: HTMLElement, inverted: boolean) {
         this.setMapModified = (affectsSplines = false) => studio.setMapModified(affectsSplines);
-        this.setTitle = (title) => studio.setTitle(title);
+        this.setTitle = (title) => studio.setMapTitle(title);
         this.railroad = studio.railroad;
         this.inverted = inverted;
         this.treeUtil = new TreeUtil(studio, async (before, after, changed, dryrun) => {
