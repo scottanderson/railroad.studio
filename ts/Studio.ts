@@ -63,6 +63,7 @@ const INVERT_BEFORE_SAVE_GAME_VERSION = 231117;
  */
 export class Studio {
     private modified: boolean;
+    private unsaved = false;
     private readonly btnDownload: HTMLButtonElement;
     private readonly filename: string;
     private readonly header: HTMLHeadingElement;
@@ -367,6 +368,10 @@ export class Studio {
             a.click();
             window.URL.revokeObjectURL(url);
             a.remove();
+            // The download holds every change made so far
+            this.unsaved = false;
+            btnDownload.classList.replace('btn-warning', 'btn-secondary');
+            document.title = this.filename + ' - Railroad Studio';
         });
         // Toggle dark mode
         const btnDark = document.createElement('button');
@@ -1093,10 +1098,18 @@ export class Studio {
     setMapModified(affectsSplines = false) {
         if (!this.modified) {
             this.modified = true;
+            // Only warn about leaving while there are changes that have not been downloaded
+            const onBeforeUnload = (e: BeforeUnloadEvent) => {
+                if (!this.unsaved) return;
+                e.preventDefault();
+                e.returnValue = 'Changes you made may not be saved.';
+            };
+            window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
+        }
+        if (!this.unsaved) {
+            this.unsaved = true;
             this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
             document.title = this.filename + '* - Railroad Studio';
-            const onBeforeUnload = (e: BeforeUnloadEvent) => e.returnValue = 'Changes you made may not be saved.';
-            window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
         }
         if (affectsSplines) {
             this.logRadiusGrade();
