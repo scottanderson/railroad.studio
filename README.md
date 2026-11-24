@@ -15,8 +15,8 @@ only. When you choose to save your changes, the app generates a new .sav file
 in the browser's downloads folder.
 
 When you make a change, the app marks the save as having unsaved edits, and the
-Export button turns yellow to indicate pending changes. Your browser may also
-warn you before navigating away from the page.
+Export button turns yellow to indicate pending changes. Until you download those
+changes, your browser may also warn you before navigating away from the page.
 
 Most of the data in a .sav file can be modified through the studio interface by
 using the tabs at the top of the page.

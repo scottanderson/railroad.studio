@@ -118,6 +118,16 @@ body {
   z-index: 10;
 }
 
+/* What to do with a downloaded save */
+
+.studio-notice {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1050;
+  width: min(24rem, calc(100vw - 2rem));
+}
+
 /* Values in the editor tables that open an edit control when clicked */
 
 .editable-value {

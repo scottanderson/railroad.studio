@@ -49,6 +49,7 @@ import {createFilter} from './Filter';
 import {createPager} from './Pager';
 import {handleError} from './index';
 import {renderPlayers} from './StudioPlayers';
+import {showDownloadNotice} from './StudioShell';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
 import {toggleDarkMode} from './themes';
@@ -62,16 +63,25 @@ const INVERT_BEFORE_SAVE_GAME_VERSION = 231117;
  */
 export class Studio {
     private modified: boolean;
+    private unsaved = false;
     private readonly btnDownload: HTMLButtonElement;
     private readonly filename: string;
     private readonly header: HTMLHeadingElement;
     private readonly map: RailroadMap;
+    private readonly originalFilename: string;
     private readonly originalSegmentCount: number;
     readonly railroad: Railroad;
     private readonly vegetationUtil: VegetationUtil;
 
-    constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
+    constructor(
+        filename: string,
+        railroad: Railroad,
+        headerElement: HTMLElement,
+        content: HTMLElement,
+        originalFilename = filename,
+    ) {
         this.filename = filename;
+        this.originalFilename = originalFilename;
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
@@ -360,13 +370,19 @@ export class Studio {
             const blob = gvasToBlob(gvas);
             const url = URL.createObjectURL(blob);
             console.log('Serialized', blob);
+            const filename = this.exportFileName();
             const a = document.createElement('a');
             a.href = url;
-            a.download = this.exportFileName();
+            a.download = filename;
             document.body.append(a);
             a.click();
             window.URL.revokeObjectURL(url);
             a.remove();
+            // The download holds every change made so far
+            this.unsaved = false;
+            btnDownload.classList.replace('btn-warning', 'btn-secondary');
+            document.title = this.filename + ' - Railroad Studio';
+            showDownloadNotice(filename, this.originalFilename);
         });
         // Toggle dark mode
         const btnDark = document.createElement('button');
@@ -1093,10 +1109,18 @@ export class Studio {
     setMapModified(affectsSplines = false) {
         if (!this.modified) {
             this.modified = true;
+            // Only warn about leaving while there are changes that have not been downloaded
+            const onBeforeUnload = (e: BeforeUnloadEvent) => {
+                if (!this.unsaved) return;
+                e.preventDefault();
+                e.returnValue = 'Changes you made may not be saved.';
+            };
+            window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
+        }
+        if (!this.unsaved) {
+            this.unsaved = true;
             this.btnDownload.classList.replace('btn-secondary', 'btn-warning');
             document.title = this.filename + '* - Railroad Studio';
-            const onBeforeUnload = (e: BeforeUnloadEvent) => e.returnValue = 'Changes you made may not be saved.';
-            window.addEventListener('beforeunload', onBeforeUnload, {capture: true});
         }
         if (affectsSplines) {
             this.logRadiusGrade();
