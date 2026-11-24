@@ -147,7 +147,8 @@ function statField(stat: Stat, player: Player, onChange: () => void) {
         button.type = 'button';
         button.title = `Add ${formatStat(stat, amount)}`;
         button.addEventListener('click', () => {
-            const sum = Math.min(stat.max, player[stat.key] + amount);
+            // Adds stop at the cap, but never lower a value that was already above it
+            const sum = Math.min(Math.max(stat.max, player[stat.key]), player[stat.key] + amount);
             set(stat.integer ? Math.round(sum) : sum);
             sync(true);
         });
