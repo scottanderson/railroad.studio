@@ -108,6 +108,10 @@ body {
   transition: background-color var(--duration) var(--animation);
 }
 
+body.sidebar-collapsed {
+  --sidebar-width: 3.75rem;
+}
+
 /* A low-key button that stays readable in both themes */
 
 .btn-quiet {
@@ -260,6 +264,17 @@ body {
   white-space: nowrap;
 }
 
+.sidebar-toggle {
+  padding: 0.25rem 0.55rem;
+  border: 0;
+  color: var(--bs-body-color);
+  font-size: 1.1rem;
+}
+
+.sidebar-toggle:hover {
+  background: var(--bs-secondary-bg);
+}
+
 .sidebar-file {
   display: flex;
   align-items: center;
@@ -396,6 +411,37 @@ body {
 
 .sidebar-extras .btn {
   flex: 1 1 0;
+}
+
+/* Collapsed to a rail of icons */
+
+.sidebar-collapsed .sidebar-label {
+  display: none;
+}
+
+.sidebar-collapsed .studio-sidebar {
+  padding: 0.75rem 0.5rem;
+}
+
+.sidebar-collapsed .sidebar-head,
+.sidebar-collapsed .sidebar-file,
+.sidebar-collapsed .sidebar-state,
+.sidebar-collapsed .sidebar-nav .nav-link {
+  justify-content: center;
+}
+
+.sidebar-collapsed .sidebar-file,
+.sidebar-collapsed .sidebar-nav .nav-link {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.sidebar-collapsed .sidebar-extras {
+  flex-direction: column;
+}
+
+.sidebar-collapsed .sidebar-extras .btn {
+  flex: 0 0 auto;
 }
 
 /* What to do with a downloaded save */

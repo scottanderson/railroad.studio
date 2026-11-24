@@ -1,6 +1,8 @@
 import {el, icon} from './dom';
 import {toggleDarkMode} from './themes';
 
+const COLLAPSED_KEY = 'rs.sidebar-collapsed';
+const NARROW_WINDOW = 768;
 const SAVE_FOLDER = '%localappdata%\\arr\\saved\\savegames';
 const GITHUB_URL = 'https://github.com/scottanderson/railroad.studio';
 
@@ -47,8 +49,26 @@ const saveStateLabels: Record<SaveState, string> = {
     unsaved: 'Unsaved changes',
 };
 
+function readCollapsed(): boolean {
+    try {
+        const stored = localStorage.getItem(COLLAPSED_KEY);
+        if (stored !== null) return stored === 'true';
+    } catch (e) {
+        console.log(e);
+    }
+    return window.innerWidth < NARROW_WINDOW;
+}
+
+function writeCollapsed(collapsed: boolean): void {
+    try {
+        localStorage.setItem(COLLAPSED_KEY, String(collapsed));
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 /**
- * A sidebar button: an icon and a text label.
+ * A button whose text disappears when the sidebar is collapsed to icons.
  * @param {string} className
  * @param {string} iconName
  * @param {string} text
@@ -71,9 +91,24 @@ export function mountSidebar(): Sidebar {
     const element = document.getElementById('sidebar') ??
         document.body.insertBefore(el('nav', 'studio-sidebar'), document.body.firstChild);
     element.setAttribute('aria-label', 'Railroad Studio');
-    // Brand
+    document.body.classList.toggle('sidebar-collapsed', readCollapsed());
+    // Brand and collapse toggle
     const head = el('div', 'sidebar-head');
-    head.append(el('span', 'sidebar-brand sidebar-label', 'Railroad Studio'));
+    const toggle = el('button', 'btn btn-sm sidebar-toggle');
+    toggle.type = 'button';
+    toggle.append(icon('bi-layout-sidebar'));
+    const syncToggle = () => {
+        const collapsed = document.body.classList.contains('sidebar-collapsed');
+        toggle.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+        toggle.setAttribute('aria-label', toggle.title);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+    };
+    toggle.addEventListener('click', () => {
+        writeCollapsed(document.body.classList.toggle('sidebar-collapsed'));
+        syncToggle();
+    });
+    syncToggle();
+    head.append(toggle, el('span', 'sidebar-brand sidebar-label', 'Railroad Studio'));
     // Which save is open
     const file = el('div', 'sidebar-file');
     const fileIcon = el('span', 'sidebar-file-icon');
