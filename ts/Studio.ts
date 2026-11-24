@@ -50,6 +50,7 @@ import {clamp} from './math';
 import {createFilter} from './Filter';
 import {createPager} from './Pager';
 import {handleError} from './index';
+import {showDownloadNotice} from './StudioShell';
 import {simplifySplines} from './splines';
 import {textToString} from './util';
 import {toggleDarkMode} from './themes';
@@ -68,12 +69,20 @@ export class Studio {
     private readonly filename: string;
     private readonly header: HTMLHeadingElement;
     private readonly map: RailroadMap;
+    private readonly originalFilename: string;
     private readonly originalSegmentCount: number;
     readonly railroad: Railroad;
     private readonly vegetationUtil: VegetationUtil;
 
-    constructor(filename: string, railroad: Railroad, headerElement: HTMLElement, content: HTMLElement) {
+    constructor(
+        filename: string,
+        railroad: Railroad,
+        headerElement: HTMLElement,
+        content: HTMLElement,
+        originalFilename = filename,
+    ) {
         this.filename = filename;
+        this.originalFilename = originalFilename;
         this.railroad = railroad;
         this.originalSegmentCount = this.railroad.splines.reduce((a, s) => a + s.segmentsVisible.length, 0);
         this.modified = false;
@@ -361,9 +370,10 @@ export class Studio {
             const blob = gvasToBlob(gvas);
             const url = URL.createObjectURL(blob);
             console.log('Serialized', blob);
+            const filename = this.exportFileName();
             const a = document.createElement('a');
             a.href = url;
-            a.download = this.exportFileName();
+            a.download = filename;
             document.body.append(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -372,6 +382,7 @@ export class Studio {
             this.unsaved = false;
             btnDownload.classList.replace('btn-warning', 'btn-secondary');
             document.title = this.filename + ' - Railroad Studio';
+            showDownloadNotice(filename, this.originalFilename);
         });
         // Toggle dark mode
         const btnDark = document.createElement('button');

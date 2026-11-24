@@ -150,9 +150,10 @@ async function handleArrayBuffer(buffer: ArrayBuffer, filename: string) {
                 titleText.textContent = 'Initializing ' + filename;
                 window.setTimeout(rejectOnCatch(reject, () => {
                     // Loaded successfully, prefix filename with player save name
+                    const originalFilename = filename;
                     filename = updateFilename(railroad, filename);
                     // Initialize the Studio UI
-                    window.studio = new Studio(filename, railroad, header, content);
+                    window.studio = new Studio(filename, railroad, header, content, originalFilename);
                     document.title = filename + ' - Railroad Studio';
                     resolve();
                 }), 10);
