@@ -329,6 +329,7 @@ interface Railroad {
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the pull request requirements, including the rules for generative AI.
 
 ## License
 

@@ -1,0 +1,31 @@
+name: Check pull request description
+
+on:
+  pull_request:
+    branches:
+      - mainline
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  description:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reject links to AI sessions
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          patterns=(
+            'claude\.ai/(chat|code|share)/'
+            'chatgpt\.com/(g/[^/]+/)?(c|share)/'
+          )
+          status=0
+          for pattern in "${patterns[@]}"; do
+            if printf '%s' "$BODY" | grep -Eiq "$pattern"; then
+              echo "::error::The pull request description links to an AI session ($pattern). Remove the link; see CONTRIBUTING.md."
+              status=1
+            fi
+          done
+          exit $status

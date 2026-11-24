@@ -1,0 +1,55 @@
+name: 🐛 Bug report
+description: Something in Railroad Studio doesn't work
+labels: ['bug']
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Include any error message shown on the page or in the browser console.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the save
+        2. Go to '...'
+        3. Click on '...'
+        4. See the error
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Save file
+      description: |
+        Add the .sav file to a zip and attach the zip here. If you can't share it, say why, and give the map and save
+        game version.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Browser and operating system
+      placeholder: e.g. Chrome 142 on Windows 11
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: Screenshots, links, or anything else that gives more context.
